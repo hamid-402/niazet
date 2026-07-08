@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
-import { AdminScope, UserRole } from '@prisma/client';
+import { AdminScope, Prisma, UserRole } from '@prisma/client';
 import { SettingsService } from './settings.service';
 import { Roles } from '../common/decorators/roles.decorator';
 import { AdminScopes } from '../common/decorators/admin-scopes.decorator';
@@ -24,7 +24,7 @@ export class SettingsController {
   set(
     @CurrentUser() user: AuthenticatedUser,
     @Body('key') key: string,
-    @Body('value') value: unknown,
+    @Body('value') value: Prisma.InputJsonValue,
   ) {
     return this.settings.set(key, value, user.id);
   }

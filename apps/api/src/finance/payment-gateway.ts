@@ -14,23 +14,35 @@ export interface PaymentGatewayAdapter {
   }): Promise<{ gatewayRef: string; redirectUrl: string }>;
 
   /** verify باید همیشه سمت سرور انجام شود؛ هرگز به مقدار ارسالی کلاینت اعتماد نکنید. */
-  verifyPayment(input: { gatewayRef: string; amount: number }): Promise<{ verified: boolean }>;
+  verifyPayment(input: {
+    gatewayRef: string;
+    amount: number;
+  }): Promise<{ verified: boolean }>;
 }
 
 @Injectable()
 export class MockPaymentGateway implements PaymentGatewayAdapter {
   private readonly logger = new Logger('MockPaymentGateway');
 
-  async createPaymentRequest(input: { amount: number; orderId: string; callbackUrl: string }) {
+  createPaymentRequest(input: {
+    amount: number;
+    orderId: string;
+    callbackUrl: string;
+  }) {
     const gatewayRef = `MOCK-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     this.logger.log(
       `[MOCK GATEWAY] payment request for order ${input.orderId}, amount=${input.amount}`,
     );
-    return { gatewayRef, redirectUrl: `${input.callbackUrl}?gatewayRef=${gatewayRef}&status=success` };
+    return Promise.resolve({
+      gatewayRef,
+      redirectUrl: `${input.callbackUrl}?gatewayRef=${gatewayRef}&status=success`,
+    });
   }
 
-  async verifyPayment(input: { gatewayRef: string; amount: number }) {
-    this.logger.log(`[MOCK GATEWAY] verify ${input.gatewayRef} amount=${input.amount}`);
-    return { verified: true };
+  verifyPayment(input: { gatewayRef: string; amount: number }) {
+    this.logger.log(
+      `[MOCK GATEWAY] verify ${input.gatewayRef} amount=${input.amount}`,
+    );
+    return Promise.resolve({ verified: true });
   }
 }

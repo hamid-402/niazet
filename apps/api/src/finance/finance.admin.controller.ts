@@ -1,5 +1,20 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
-import { AdminScope, EscrowStatus, PaymentStatus, UserRole, WithdrawalStatus } from '@prisma/client';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  AdminScope,
+  EscrowStatus,
+  PaymentStatus,
+  UserRole,
+  WithdrawalStatus,
+} from '@prisma/client';
 import { PaymentsService } from './payments.service';
 import { EscrowService } from './escrow.service';
 import { LedgerService } from './ledger.service';
@@ -10,7 +25,11 @@ import { AdminScopes } from '../common/decorators/admin-scopes.decorator';
 import { AdminScopeGuard } from '../common/guards/admin-scope.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { PaginationDto, buildPagination } from '../common/dto/pagination.dto';
-import { ReleaseEscrowDto, RefundEscrowDto, DecideWithdrawalDto } from './dto/finance.dto';
+import {
+  ReleaseEscrowDto,
+  RefundEscrowDto,
+  DecideWithdrawalDto,
+} from './dto/finance.dto';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
 import { AuditService } from '../audit/audit.service';
@@ -33,24 +52,33 @@ export class FinanceAdminController {
 
   @Get('dashboard')
   async dashboard() {
-    const [pendingRefunds, activeEscrow, pendingWithdrawals, failedPayments, monthRevenue] =
-      await Promise.all([
-        this.prisma.refund.count({ where: { status: 'pending' } }),
-        this.prisma.escrowHold.aggregate({
-          _sum: { amount: true },
-          _count: true,
-          where: { status: { in: [EscrowStatus.held, EscrowStatus.partially_released] } },
-        }),
-        this.prisma.withdrawal.count({ where: { status: WithdrawalStatus.pending } }),
-        this.prisma.payment.count({ where: { status: PaymentStatus.failed } }),
-        this.prisma.payment.aggregate({
-          _sum: { amount: true },
-          where: {
-            status: PaymentStatus.succeeded,
-            createdAt: { gte: new Date(new Date().setDate(1)) },
-          },
-        }),
-      ]);
+    const [
+      pendingRefunds,
+      activeEscrow,
+      pendingWithdrawals,
+      failedPayments,
+      monthRevenue,
+    ] = await Promise.all([
+      this.prisma.refund.count({ where: { status: 'pending' } }),
+      this.prisma.escrowHold.aggregate({
+        _sum: { amount: true },
+        _count: true,
+        where: {
+          status: { in: [EscrowStatus.held, EscrowStatus.partially_released] },
+        },
+      }),
+      this.prisma.withdrawal.count({
+        where: { status: WithdrawalStatus.pending },
+      }),
+      this.prisma.payment.count({ where: { status: PaymentStatus.failed } }),
+      this.prisma.payment.aggregate({
+        _sum: { amount: true },
+        where: {
+          status: PaymentStatus.succeeded,
+          createdAt: { gte: new Date(new Date().setDate(1)) },
+        },
+      }),
+    ]);
 
     return {
       pendingRefunds,
@@ -63,13 +91,19 @@ export class FinanceAdminController {
   }
 
   @Get('payments')
-  paymentsList(@Query() pagination: PaginationDto, @Query('status') status?: PaymentStatus) {
+  paymentsList(
+    @Query() pagination: PaginationDto,
+    @Query('status') status?: PaymentStatus,
+  ) {
     const { skip, take } = buildPagination(pagination);
     return this.payments.listForAdmin({ status, skip, take });
   }
 
   @Get('escrow')
-  escrowList(@Query() pagination: PaginationDto, @Query('status') status?: EscrowStatus) {
+  escrowList(
+    @Query() pagination: PaginationDto,
+    @Query('status') status?: EscrowStatus,
+  ) {
     const { skip, take } = buildPagination(pagination);
     return this.escrow.listForAdmin({ status, skip, take });
   }

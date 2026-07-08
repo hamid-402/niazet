@@ -1,4 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { OrderStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateFeedbackDto } from './dto/feedback.dto';
@@ -14,12 +19,16 @@ export class FeedbackService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(customerId: string, orderId: string, dto: CreateFeedbackDto) {
-    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
     if (!order || order.customerId !== customerId) {
       throw new ForbiddenException('این سفارش متعلق به شما نیست.');
     }
     if (!FEEDBACK_ALLOWED_STATUSES.includes(order.status)) {
-      throw new BadRequestException('بازخورد فقط پس از تحویل سفارش قابل ثبت است.');
+      throw new BadRequestException(
+        'بازخورد فقط پس از تحویل سفارش قابل ثبت است.',
+      );
     }
 
     let targetInternalId: string | undefined;
@@ -72,7 +81,10 @@ export class FeedbackService {
   }
 
   listForOrder(orderId: string) {
-    return this.prisma.feedback.findMany({ where: { orderId }, orderBy: { createdAt: 'desc' } });
+    return this.prisma.feedback.findMany({
+      where: { orderId },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
   listForExecutor(executorProfileId: string) {

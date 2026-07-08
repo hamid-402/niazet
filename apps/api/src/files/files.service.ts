@@ -1,4 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { FileKind } from '@prisma/client';
@@ -62,19 +67,27 @@ export class FilesService {
     });
     if (!order) throw new NotFoundException('سفارش یافت نشد.');
 
-    const uploader = await this.prisma.user.findUnique({ where: { id: params.uploadedByUserId } });
+    const uploader = await this.prisma.user.findUnique({
+      where: { id: params.uploadedByUserId },
+    });
     const isCustomer = order.customerId === params.uploadedByUserId;
     const isAssignedExecutor = order.assignments.some(
-      (a) => a.unassignedAt === null && a.executorProfile.userId === params.uploadedByUserId,
+      (a) =>
+        a.unassignedAt === null &&
+        a.executorProfile.userId === params.uploadedByUserId,
     );
     const isStaff = uploader?.role === 'admin' || uploader?.role === 'support';
 
     if (!isCustomer && !isAssignedExecutor && !isStaff) {
-      throw new ForbiddenException('اجازه آپلود فایل برای این سفارش را ندارید.');
+      throw new ForbiddenException(
+        'اجازه آپلود فایل برای این سفارش را ندارید.',
+      );
     }
 
     const storageKey = randomUUID();
-    const checksum = createHash('sha256').update(params.file.buffer).digest('hex');
+    const checksum = createHash('sha256')
+      .update(params.file.buffer)
+      .digest('hex');
     writeFileSync(join(UPLOAD_ROOT, storageKey), params.file.buffer);
 
     return this.prisma.orderFile.create({
@@ -127,10 +140,15 @@ export class FilesService {
 
   async resolveSignedToken(token: string) {
     try {
-      const payload = await this.jwt.verifyAsync<{ fileId: string; sub: string }>(token, {
+      const payload = await this.jwt.verifyAsync<{
+        fileId: string;
+        sub: string;
+      }>(token, {
         secret: this.config.get('JWT_ACCESS_SECRET'),
       });
-      const file = await this.prisma.orderFile.findUnique({ where: { id: payload.fileId } });
+      const file = await this.prisma.orderFile.findUnique({
+        where: { id: payload.fileId },
+      });
       if (!file) throw new NotFoundException('فایل یافت نشد.');
       return file;
     } catch {
@@ -139,7 +157,9 @@ export class FilesService {
   }
 
   async deleteFile(fileId: string) {
-    const file = await this.prisma.orderFile.findUnique({ where: { id: fileId } });
+    const file = await this.prisma.orderFile.findUnique({
+      where: { id: fileId },
+    });
     if (!file) return;
     const path = join(UPLOAD_ROOT, file.storageKey);
     if (existsSync(path)) unlinkSync(path);

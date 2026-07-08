@@ -1,5 +1,14 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { LedgerAccountType, LedgerReferenceType, Prisma, WalletTxDirection } from '@prisma/client';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  LedgerAccountType,
+  LedgerReferenceType,
+  Prisma,
+  WalletTxDirection,
+} from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 export interface PostEntryInput {
@@ -26,9 +35,13 @@ export class LedgerService {
     userId: string,
     accountType: LedgerAccountType,
   ) {
-    const existing = await tx.ledgerAccount.findUnique({ where: { ownerUserId: userId } });
+    const existing = await tx.ledgerAccount.findUnique({
+      where: { ownerUserId: userId },
+    });
     if (existing) return existing;
-    return tx.ledgerAccount.create({ data: { ownerUserId: userId, accountType } });
+    return tx.ledgerAccount.create({
+      data: { ownerUserId: userId, accountType },
+    });
   }
 
   /** حساب‌های سیستمی (platform_escrow, platform_commission, payment_gateway_clearing) در seed ساخته می‌شوند. */
@@ -37,7 +50,9 @@ export class LedgerService {
       where: { accountType, ownerUserId: null },
     });
     if (!account) {
-      throw new NotFoundException(`حساب سیستمی ${accountType} یافت نشد؛ seed را اجرا کنید.`);
+      throw new NotFoundException(
+        `حساب سیستمی ${accountType} یافت نشد؛ seed را اجرا کنید.`,
+      );
     }
     return account;
   }
@@ -75,8 +90,18 @@ export class LedgerService {
         },
       });
 
-      await this.projectToWallet(client, entry.debitAccountId, entry, WalletTxDirection.debit);
-      await this.projectToWallet(client, entry.creditAccountId, entry, WalletTxDirection.credit);
+      await this.projectToWallet(
+        client,
+        entry.debitAccountId,
+        entry,
+        WalletTxDirection.debit,
+      );
+      await this.projectToWallet(
+        client,
+        entry.creditAccountId,
+        entry,
+        WalletTxDirection.credit,
+      );
 
       return entry;
     };
@@ -90,10 +115,17 @@ export class LedgerService {
   private async projectToWallet(
     client: Prisma.TransactionClient,
     accountId: string,
-    entry: { id: string; amount: number; referenceType: LedgerReferenceType; referenceId: string },
+    entry: {
+      id: string;
+      amount: number;
+      referenceType: LedgerReferenceType;
+      referenceId: string;
+    },
     direction: WalletTxDirection,
   ) {
-    const account = await client.ledgerAccount.findUnique({ where: { id: accountId } });
+    const account = await client.ledgerAccount.findUnique({
+      where: { id: accountId },
+    });
     if (!account?.ownerUserId) {
       return; // حساب سیستمی است، کیف پول کاربری ندارد.
     }
@@ -104,7 +136,8 @@ export class LedgerService {
       update: {},
     });
 
-    const delta = direction === WalletTxDirection.credit ? entry.amount : -entry.amount;
+    const delta =
+      direction === WalletTxDirection.credit ? entry.amount : -entry.amount;
     const updatedWallet = await client.wallet.update({
       where: { id: wallet.id },
       data: { balance: { increment: delta } },
@@ -125,8 +158,11 @@ export class LedgerService {
 
   /** قانون طلایی الحاقیه §۲.۶: SUM(credit) - SUM(debit) باید با wallets.balance برابر باشد. */
   async verifyWalletConsistency(userId: string) {
-    const account = await this.prisma.ledgerAccount.findUnique({ where: { ownerUserId: userId } });
-    if (!account) return { consistent: true, ledgerBalance: 0, walletBalance: 0 };
+    const account = await this.prisma.ledgerAccount.findUnique({
+      where: { ownerUserId: userId },
+    });
+    if (!account)
+      return { consistent: true, ledgerBalance: 0, walletBalance: 0 };
 
     const [creditSum, debitSum, wallet] = await Promise.all([
       this.prisma.ledgerEntry.aggregate({
@@ -140,10 +176,15 @@ export class LedgerService {
       this.prisma.wallet.findUnique({ where: { userId } }),
     ]);
 
-    const ledgerBalance = (creditSum._sum.amount ?? 0) - (debitSum._sum.amount ?? 0);
+    const ledgerBalance =
+      (creditSum._sum.amount ?? 0) - (debitSum._sum.amount ?? 0);
     const walletBalance = wallet?.balance ?? 0;
 
-    return { consistent: ledgerBalance === walletBalance, ledgerBalance, walletBalance };
+    return {
+      consistent: ledgerBalance === walletBalance,
+      ledgerBalance,
+      walletBalance,
+    };
   }
 
   listEntries(params: {
@@ -154,7 +195,9 @@ export class LedgerService {
   }) {
     return this.prisma.ledgerEntry.findMany({
       where: {
-        ...(params.referenceType ? { referenceType: params.referenceType } : {}),
+        ...(params.referenceType
+          ? { referenceType: params.referenceType }
+          : {}),
         ...(params.referenceId ? { referenceId: params.referenceId } : {}),
       },
       include: { debitAccount: true, creditAccount: true },

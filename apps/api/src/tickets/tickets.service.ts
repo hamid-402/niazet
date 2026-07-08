@@ -1,9 +1,21 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { MessageVisibility, TicketStatus } from '@prisma/client';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  MessageVisibility,
+  TicketCategory,
+  TicketPriority,
+  TicketStatus,
+} from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { generateReferenceCode } from '../common/utils/code-generator';
-import { addBusinessHours, slaTargetHoursForPriority } from '../common/utils/business-hours';
+import {
+  addBusinessHours,
+  slaTargetHoursForPriority,
+} from '../common/utils/business-hours';
 import { AddTicketMessageDto, CreateTicketDto } from './dto/ticket.dto';
 
 @Injectable()
@@ -15,14 +27,19 @@ export class TicketsService {
 
   async create(customerId: string, dto: CreateTicketDto) {
     if (dto.orderId) {
-      const order = await this.prisma.order.findUnique({ where: { id: dto.orderId } });
+      const order = await this.prisma.order.findUnique({
+        where: { id: dto.orderId },
+      });
       if (!order || order.customerId !== customerId) {
         throw new ForbiddenException('این سفارش متعلق به شما نیست.');
       }
     }
 
     const priority = dto.priority ?? 'normal';
-    const slaDueAt = addBusinessHours(new Date(), slaTargetHoursForPriority(priority));
+    const slaDueAt = addBusinessHours(
+      new Date(),
+      slaTargetHoursForPriority(priority),
+    );
 
     const ticket = await this.prisma.ticket.create({
       data: {
@@ -61,7 +78,10 @@ export class TicketsService {
     const ticket = await this.prisma.ticket.findUnique({
       where: { id },
       include: {
-        messages: { where: { visibility: MessageVisibility.customer_visible }, orderBy: { createdAt: 'asc' } },
+        messages: {
+          where: { visibility: MessageVisibility.customer_visible },
+          orderBy: { createdAt: 'asc' },
+        },
         order: { select: { code: true, title: true } },
       },
     });
@@ -71,8 +91,14 @@ export class TicketsService {
     return ticket;
   }
 
-  async addCustomerMessage(customerId: string, ticketId: string, dto: AddTicketMessageDto) {
-    const ticket = await this.prisma.ticket.findUnique({ where: { id: ticketId } });
+  async addCustomerMessage(
+    customerId: string,
+    ticketId: string,
+    dto: AddTicketMessageDto,
+  ) {
+    const ticket = await this.prisma.ticket.findUnique({
+      where: { id: ticketId },
+    });
     if (!ticket || ticket.customerId !== customerId) {
       throw new NotFoundException('تیکت یافت نشد.');
     }
@@ -85,8 +111,14 @@ export class TicketsService {
         visibility: MessageVisibility.customer_visible,
       },
     });
-    if (ticket.status === TicketStatus.resolved || ticket.status === TicketStatus.waiting_internal) {
-      await this.prisma.ticket.update({ where: { id: ticketId }, data: { status: TicketStatus.waiting_internal } });
+    if (
+      ticket.status === TicketStatus.resolved ||
+      ticket.status === TicketStatus.waiting_internal
+    ) {
+      await this.prisma.ticket.update({
+        where: { id: ticketId },
+        data: { status: TicketStatus.waiting_internal },
+      });
     }
     return message;
   }
@@ -97,18 +129,23 @@ export class TicketsService {
 
   listQueue(params: {
     status?: TicketStatus;
-    priority?: string;
-    category?: string;
+    priority?: TicketPriority;
+    category?: TicketCategory;
     assignedToUserId?: string;
   }) {
     return this.prisma.ticket.findMany({
       where: {
         ...(params.status ? { status: params.status } : {}),
-        ...(params.priority ? { priority: params.priority as any } : {}),
-        ...(params.category ? { category: params.category as any } : {}),
-        ...(params.assignedToUserId ? { assignedToUserId: params.assignedToUserId } : {}),
+        ...(params.priority ? { priority: params.priority } : {}),
+        ...(params.category ? { category: params.category } : {}),
+        ...(params.assignedToUserId
+          ? { assignedToUserId: params.assignedToUserId }
+          : {}),
       },
-      include: { customer: { select: { fullName: true, phone: true } }, order: { select: { code: true } } },
+      include: {
+        customer: { select: { fullName: true, phone: true } },
+        order: { select: { code: true } },
+      },
       orderBy: [{ priority: 'desc' }, { slaDueAt: 'asc' }],
     });
   }
@@ -135,9 +172,16 @@ export class TicketsService {
     });
   }
 
-  async reply(supportUserId: string, ticketId: string, dto: AddTicketMessageDto) {
+  async reply(
+    supportUserId: string,
+    ticketId: string,
+    dto: AddTicketMessageDto,
+  ) {
     const ticket = await this.ensureExists(ticketId);
-    const visibility = dto.visibility === 'internal_only' ? MessageVisibility.internal_only : MessageVisibility.customer_visible;
+    const visibility =
+      dto.visibility === 'internal_only'
+        ? MessageVisibility.internal_only
+        : MessageVisibility.customer_visible;
 
     const message = await this.prisma.ticketMessage.create({
       data: {
@@ -167,9 +211,16 @@ export class TicketsService {
 
   async escalate(ticketId: string, escalatedByUserId: string, reason: string) {
     await this.ensureExists(ticketId);
-    await this.prisma.ticket.update({ where: { id: ticketId }, data: { status: TicketStatus.escalated } });
-    await this.prisma.ticketSlaEvent.create({ data: { ticketId, eventType: 'escalated' } });
-    return this.prisma.ticketEscalation.create({ data: { ticketId, escalatedByUserId, reason } });
+    await this.prisma.ticket.update({
+      where: { id: ticketId },
+      data: { status: TicketStatus.escalated },
+    });
+    await this.prisma.ticketSlaEvent.create({
+      data: { ticketId, eventType: 'escalated' },
+    });
+    return this.prisma.ticketEscalation.create({
+      data: { ticketId, escalatedByUserId, reason },
+    });
   }
 
   async resolve(ticketId: string) {
@@ -190,8 +241,12 @@ export class TicketsService {
 
   async supportPerformance() {
     const [totalReplied, resolved, slaBreaches] = await Promise.all([
-      this.prisma.ticketMessage.count({ where: { visibility: MessageVisibility.customer_visible } }),
-      this.prisma.ticket.count({ where: { status: { in: [TicketStatus.resolved, TicketStatus.closed] } } }),
+      this.prisma.ticketMessage.count({
+        where: { visibility: MessageVisibility.customer_visible },
+      }),
+      this.prisma.ticket.count({
+        where: { status: { in: [TicketStatus.resolved, TicketStatus.closed] } },
+      }),
       this.prisma.ticketSlaEvent.count({ where: { eventType: 'breach' } }),
     ]);
     return { totalReplied, resolved, slaBreaches };
@@ -208,13 +263,24 @@ export class TicketsService {
     const overdue = await this.prisma.ticket.findMany({
       where: {
         slaDueAt: { lt: new Date() },
-        status: { notIn: [TicketStatus.resolved, TicketStatus.closed, TicketStatus.escalated] },
+        status: {
+          notIn: [
+            TicketStatus.resolved,
+            TicketStatus.closed,
+            TicketStatus.escalated,
+          ],
+        },
       },
     });
 
     for (const ticket of overdue) {
-      await this.prisma.ticketSlaEvent.create({ data: { ticketId: ticket.id, eventType: 'breach' } });
-      await this.prisma.ticket.update({ where: { id: ticket.id }, data: { priority: 'urgent' } });
+      await this.prisma.ticketSlaEvent.create({
+        data: { ticketId: ticket.id, eventType: 'breach' },
+      });
+      await this.prisma.ticket.update({
+        where: { id: ticket.id },
+        data: { priority: 'urgent' },
+      });
     }
 
     return overdue.length;

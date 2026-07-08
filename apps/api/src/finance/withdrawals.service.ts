@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { WithdrawalStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -7,7 +11,11 @@ import { PrismaService } from '../prisma/prisma.service';
 export class WithdrawalsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async request(executorProfileId: string, amount: number, shabaNumber: string) {
+  async request(
+    executorProfileId: string,
+    amount: number,
+    shabaNumber: string,
+  ) {
     const profile = await this.prisma.executorProfile.findUnique({
       where: { id: executorProfileId },
       include: { user: { include: { ledgerAccount: true } } },
@@ -16,26 +24,44 @@ export class WithdrawalsService {
       throw new NotFoundException('پروفایل مجری یافت نشد.');
     }
 
-    const wallet = await this.prisma.wallet.findUnique({ where: { userId: profile.userId } });
+    const wallet = await this.prisma.wallet.findUnique({
+      where: { userId: profile.userId },
+    });
     if (!wallet || wallet.balance < amount) {
       throw new BadRequestException('موجودی کافی برای برداشت وجود ندارد.');
     }
 
     return this.prisma.withdrawal.create({
-      data: { executorProfileId, amount, shabaNumber, status: WithdrawalStatus.pending },
+      data: {
+        executorProfileId,
+        amount,
+        shabaNumber,
+        status: WithdrawalStatus.pending,
+      },
     });
   }
 
   listForAdmin(status?: WithdrawalStatus) {
     return this.prisma.withdrawal.findMany({
       where: status ? { status } : {},
-      include: { executorProfile: { select: { displayAlias: true, publicHandlerCode: true } } },
+      include: {
+        executorProfile: {
+          select: { displayAlias: true, publicHandlerCode: true },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  async decide(id: string, approve: boolean, decidedByUserId: string, note?: string) {
-    const withdrawal = await this.prisma.withdrawal.findUnique({ where: { id } });
+  async decide(
+    id: string,
+    approve: boolean,
+    decidedByUserId: string,
+    note?: string,
+  ) {
+    const withdrawal = await this.prisma.withdrawal.findUnique({
+      where: { id },
+    });
     if (!withdrawal) {
       throw new NotFoundException('درخواست برداشت یافت نشد.');
     }

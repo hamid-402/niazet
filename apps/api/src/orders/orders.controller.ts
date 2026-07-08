@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { UserRole } from '@prisma/client';
 import { OrdersService } from './orders.service';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -22,9 +30,16 @@ export class OrdersController {
   constructor(private readonly orders: OrdersService) {}
 
   @Get()
-  list(@CurrentUser() user: AuthenticatedUser, @Query() query: ListOrdersQueryDto) {
+  list(
+    @CurrentUser() user: AuthenticatedUser,
+    @Query() query: ListOrdersQueryDto,
+  ) {
     const { skip, take } = buildPagination(query);
-    return this.orders.listForCustomer(user.id, { status: query.status, skip, take });
+    return this.orders.listForCustomer(user.id, {
+      status: query.status,
+      skip,
+      take,
+    });
   }
 
   @Post()
@@ -76,17 +91,35 @@ export class OrdersController {
   }
 
   @Post(':id/dispute')
-  dispute(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string, @Body() dto: DisputeOrderDto) {
+  dispute(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: DisputeOrderDto,
+  ) {
     return this.orders.raiseDispute(user.id, user.role, id, dto);
   }
 
   @Post(':id/cancel')
-  cancel(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string, @Body() dto: CancelOrderDto) {
+  cancel(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: CancelOrderDto,
+  ) {
     return this.orders.cancelByCustomer(user.id, id, dto.reason);
   }
 
   @Post(':id/messages')
-  addMessage(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string, @Body() dto: OrderMessageDto) {
-    return this.orders.addMessage(id, user.id, dto.body, 'customer_visible', dto.attachmentFileId);
+  addMessage(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: OrderMessageDto,
+  ) {
+    return this.orders.addMessage(
+      id,
+      user.id,
+      dto.body,
+      'customer_visible',
+      dto.attachmentFileId,
+    );
   }
 }

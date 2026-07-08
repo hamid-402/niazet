@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { AdminScope, ExecutorStatus, UserRole } from '@prisma/client';
 import { ExecutorService } from './executor.service';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -21,7 +30,11 @@ export class StaffAdminController {
   constructor(private readonly executor: ExecutorService) {}
 
   @Get()
-  list(@Query() pagination: PaginationDto, @Query('teamId') teamId?: string, @Query('status') status?: ExecutorStatus) {
+  list(
+    @Query() pagination: PaginationDto,
+    @Query('teamId') teamId?: string,
+    @Query('status') status?: ExecutorStatus,
+  ) {
     const { skip, take } = buildPagination(pagination);
     return this.executor.listStaffForAdmin({ teamId, status, skip, take });
   }

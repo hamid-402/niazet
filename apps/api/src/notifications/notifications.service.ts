@@ -13,7 +13,12 @@ export class NotificationsService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async notifyUser(userId: string, eventType: string, title: string, body: string) {
+  async notifyUser(
+    userId: string,
+    eventType: string,
+    title: string,
+    body: string,
+  ) {
     await this.prisma.outboxEvent.create({
       data: { eventType, payload: { userId, title, body } },
     });

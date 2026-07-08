@@ -27,7 +27,11 @@ export class QcController {
   }
 
   @Post(':id/approve')
-  approve(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string, @Body() dto: SubmitQcReviewDto) {
+  approve(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: SubmitQcReviewDto,
+  ) {
     return this.qc.approve(id, user.id, dto);
   }
 
@@ -41,7 +45,11 @@ export class QcController {
   }
 
   @Post(':id/reject')
-  reject(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string, @Body() dto: SubmitQcReviewDto) {
+  reject(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: SubmitQcReviewDto,
+  ) {
     return this.qc.reject(id, user.id, dto);
   }
 }

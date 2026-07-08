@@ -1,4 +1,11 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -47,7 +54,10 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  logout(@CurrentUser() user: AuthenticatedUser, @Body('refreshToken') refreshToken: string) {
+  logout(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body('refreshToken') refreshToken: string,
+  ) {
     return this.authService.logout(user.id, refreshToken);
   }
 

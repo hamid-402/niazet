@@ -8,7 +8,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.use(helmet());
-  app.enableCors({ origin: process.env.WEB_URL ?? 'http://localhost:3000', credentials: true });
+  app.enableCors({
+    origin: process.env.WEB_URL ?? 'http://localhost:3000',
+    credentials: true,
+  });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -28,7 +31,7 @@ async function bootstrap() {
 
   const port = process.env.APP_PORT ?? 3001;
   await app.listen(port);
-  // eslint-disable-next-line no-console
+
   console.log(`API running on http://localhost:${port} (docs at /docs)`);
 }
-bootstrap();
+void bootstrap();

@@ -1,5 +1,13 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
-import { AdminScope, UserRole } from '@prisma/client';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { AdminScope, MessageVisibility, UserRole } from '@prisma/client';
 import { OrdersService } from './orders.service';
 import { Roles } from '../common/decorators/roles.decorator';
 import { AdminScopes } from '../common/decorators/admin-scopes.decorator';
@@ -55,7 +63,9 @@ export class OrdersAdminController {
     ]);
 
     return {
-      byStatus: Object.fromEntries(byStatus.map((row) => [row.status, row._count])),
+      byStatus: Object.fromEntries(
+        byStatus.map((row) => [row.status, row._count]),
+      ),
       activeExecutionCount: riskySla,
       activeComplaints,
     };
@@ -69,19 +79,31 @@ export class OrdersAdminController {
 
   @Post(':id/triage')
   @AdminScopes(AdminScope.ops_admin)
-  triage(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string, @Body() dto: TriageDecisionDto) {
+  triage(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: TriageDecisionDto,
+  ) {
     return this.orders.triage(user.id, id, dto);
   }
 
   @Post(':id/quote')
   @AdminScopes(AdminScope.ops_admin)
-  quote(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string, @Body() dto: QuoteOrderDto) {
+  quote(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: QuoteOrderDto,
+  ) {
     return this.orders.quote(user.id, id, dto);
   }
 
   @Post(':id/assign')
   @AdminScopes(AdminScope.ops_admin)
-  assign(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string, @Body() dto: AssignOrderDto) {
+  assign(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: AssignOrderDto,
+  ) {
     return this.orders.assign(user.id, id, dto);
   }
 
@@ -97,18 +119,26 @@ export class OrdersAdminController {
 
   @Post(':id/cancel')
   @AdminScopes(AdminScope.ops_admin)
-  cancel(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string, @Body() dto: CancelOrderDto) {
+  cancel(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: CancelOrderDto,
+  ) {
     return this.orders.cancelByAdmin(user.id, id, dto.reason);
   }
 
   @Post(':id/messages')
   @AdminScopes(AdminScope.ops_admin)
-  addMessage(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string, @Body() dto: OrderMessageDto) {
+  addMessage(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: OrderMessageDto,
+  ) {
     return this.orders.addMessage(
       id,
       user.id,
       dto.body,
-      (dto.visibility as any) ?? 'internal_only',
+      dto.visibility ?? MessageVisibility.internal_only,
       dto.attachmentFileId,
     );
   }

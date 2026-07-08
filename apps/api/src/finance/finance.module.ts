@@ -20,6 +20,13 @@ import { FinanceAdminController } from './finance.admin.controller';
     WithdrawalsService,
     MockPaymentGateway,
   ],
-  exports: [LedgerService, WalletService, PaymentsService, EscrowService, InvoicesService, WithdrawalsService],
+  exports: [
+    LedgerService,
+    WalletService,
+    PaymentsService,
+    EscrowService,
+    InvoicesService,
+    WithdrawalsService,
+  ],
 })
 export class FinanceModule {}

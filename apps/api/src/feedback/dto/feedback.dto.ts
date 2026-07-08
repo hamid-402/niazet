@@ -1,7 +1,13 @@
 import { FeedbackTargetType, FeedbackType } from '@prisma/client';
 import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
-const TARGET_TYPES: FeedbackTargetType[] = ['order', 'team', 'executor', 'support', 'qc'];
+const TARGET_TYPES: FeedbackTargetType[] = [
+  'order',
+  'team',
+  'executor',
+  'support',
+  'qc',
+];
 const FEEDBACK_TYPES: FeedbackType[] = ['rating', 'complaint', 'compliment'];
 
 export class CreateFeedbackDto {

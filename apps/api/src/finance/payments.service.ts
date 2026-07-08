@@ -1,5 +1,14 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { EscrowStatus, LedgerAccountType, LedgerReferenceType, PaymentStatus } from '@prisma/client';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  EscrowStatus,
+  LedgerAccountType,
+  LedgerReferenceType,
+  PaymentStatus,
+} from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { LedgerService } from './ledger.service';
@@ -52,13 +61,17 @@ export class PaymentsService {
    * برابر باشد؛ عملیات idempotent است (سند v4 §۱۲.۲/۲۷).
    */
   async verifyAndSettlePayment(paymentId: string) {
-    const payment = await this.prisma.payment.findUnique({ where: { id: paymentId } });
+    const payment = await this.prisma.payment.findUnique({
+      where: { id: paymentId },
+    });
     if (!payment) {
       throw new NotFoundException('پرداخت یافت نشد.');
     }
 
     if (payment.status === PaymentStatus.succeeded) {
-      const escrow = await this.prisma.escrowHold.findUnique({ where: { paymentId } });
+      const escrow = await this.prisma.escrowHold.findUnique({
+        where: { paymentId },
+      });
       return { payment, escrow, alreadyProcessed: true };
     }
 
@@ -74,7 +87,10 @@ export class PaymentsService {
     if (!verification.verified) {
       await this.prisma.payment.update({
         where: { id: paymentId },
-        data: { status: PaymentStatus.failed, failureReason: 'gateway_verification_failed' },
+        data: {
+          status: PaymentStatus.failed,
+          failureReason: 'gateway_verification_failed',
+        },
       });
       throw new BadRequestException('پرداخت تأیید نشد.');
     }
@@ -82,7 +98,9 @@ export class PaymentsService {
     const clearingAccount = await this.ledger.getSystemAccount(
       LedgerAccountType.payment_gateway_clearing,
     );
-    const escrowAccount = await this.ledger.getSystemAccount(LedgerAccountType.platform_escrow);
+    const escrowAccount = await this.ledger.getSystemAccount(
+      LedgerAccountType.platform_escrow,
+    );
 
     const result = await this.prisma.$transaction(async (tx) => {
       const updatedPayment = await tx.payment.update({
@@ -125,13 +143,23 @@ export class PaymentsService {
   }
 
   listForOrder(orderId: string) {
-    return this.prisma.payment.findMany({ where: { orderId }, orderBy: { createdAt: 'desc' } });
+    return this.prisma.payment.findMany({
+      where: { orderId },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
-  listForAdmin(params: { status?: PaymentStatus; skip?: number; take?: number }) {
+  listForAdmin(params: {
+    status?: PaymentStatus;
+    skip?: number;
+    take?: number;
+  }) {
     return this.prisma.payment.findMany({
       where: params.status ? { status: params.status } : {},
-      include: { order: { select: { code: true, title: true } }, customer: { select: { fullName: true, phone: true } } },
+      include: {
+        order: { select: { code: true, title: true } },
+        customer: { select: { fullName: true, phone: true } },
+      },
       orderBy: { createdAt: 'desc' },
       skip: params.skip,
       take: params.take,

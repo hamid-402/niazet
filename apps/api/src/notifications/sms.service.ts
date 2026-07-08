@@ -15,8 +15,9 @@ export interface SmsProvider {
 export class MockSmsProvider implements SmsProvider {
   private readonly logger = new Logger('MockSmsProvider');
 
-  async send(phone: string, message: string): Promise<void> {
+  send(phone: string, message: string): Promise<void> {
     this.logger.log(`[MOCK SMS] to ${phone}: ${message}`);
+    return Promise.resolve();
   }
 }
 

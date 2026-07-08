@@ -35,13 +35,17 @@ export class AuthService {
   // ---------------------------------------------------------------------
 
   async register(dto: RegisterDto) {
-    const existing = await this.prisma.user.findUnique({ where: { phone: dto.phone } });
+    const existing = await this.prisma.user.findUnique({
+      where: { phone: dto.phone },
+    });
 
     if (existing && existing.status !== UserStatus.pending_verification) {
       throw new ConflictException('این شماره موبایل قبلاً ثبت شده است.');
     }
 
-    const passwordHash = dto.password ? await bcrypt.hash(dto.password, 10) : null;
+    const passwordHash = dto.password
+      ? await bcrypt.hash(dto.password, 10)
+      : null;
 
     const user = existing
       ? await this.prisma.user.update({
@@ -58,7 +62,10 @@ export class AuthService {
           },
         });
 
-    const otp = await this.requestOtp({ phone: user.phone, purpose: 'register' });
+    const otp = await this.requestOtp({
+      phone: user.phone,
+      purpose: 'register',
+    });
 
     return {
       ...otp,
@@ -68,11 +75,15 @@ export class AuthService {
   }
 
   async requestOtp(dto: RequestOtpDto) {
-    const code = randomInt(0, 10 ** OTP_LENGTH).toString().padStart(OTP_LENGTH, '0');
+    const code = randomInt(0, 10 ** OTP_LENGTH)
+      .toString()
+      .padStart(OTP_LENGTH, '0');
     const codeHash = await bcrypt.hash(code, 10);
     const ttlSeconds = Number(this.config.get('OTP_TTL_SECONDS') ?? 120);
 
-    const existingUser = await this.prisma.user.findUnique({ where: { phone: dto.phone } });
+    const existingUser = await this.prisma.user.findUnique({
+      where: { phone: dto.phone },
+    });
 
     if (dto.purpose === 'login' && !existingUser) {
       throw new NotFoundException('حسابی با این شماره موبایل یافت نشد.');
@@ -107,7 +118,9 @@ export class AuthService {
     });
 
     if (!otp) {
-      throw new BadRequestException('کد تاییدی برای این شماره یافت نشد. دوباره درخواست دهید.');
+      throw new BadRequestException(
+        'کد تاییدی برای این شماره یافت نشد. دوباره درخواست دهید.',
+      );
     }
 
     if (otp.expiresAt.getTime() < Date.now()) {
@@ -115,7 +128,9 @@ export class AuthService {
     }
 
     if (otp.attempts >= OTP_MAX_ATTEMPTS) {
-      throw new BadRequestException('تعداد تلاش مجاز برای این کد به پایان رسیده است.');
+      throw new BadRequestException(
+        'تعداد تلاش مجاز برای این کد به پایان رسیده است.',
+      );
     }
 
     const isValid = await bcrypt.compare(dto.code, otp.codeHash);
@@ -133,11 +148,15 @@ export class AuthService {
       data: { consumedAt: new Date() },
     });
 
-    let user = await this.prisma.user.findUnique({ where: { phone: dto.phone } });
+    let user = await this.prisma.user.findUnique({
+      where: { phone: dto.phone },
+    });
 
     if (dto.purpose === 'register') {
       if (!user) {
-        throw new BadRequestException('ابتدا باید فرآیند ثبت‌نام را شروع کنید.');
+        throw new BadRequestException(
+          'ابتدا باید فرآیند ثبت‌نام را شروع کنید.',
+        );
       }
       if (user.status === UserStatus.pending_verification) {
         user = await this.prisma.user.update({
@@ -162,13 +181,18 @@ export class AuthService {
   // ---------------------------------------------------------------------
 
   async login(dto: LoginDto) {
-    const user = await this.prisma.user.findUnique({ where: { phone: dto.phone } });
+    const user = await this.prisma.user.findUnique({
+      where: { phone: dto.phone },
+    });
 
     if (!user || !user.passwordHash) {
       throw new UnauthorizedException('شماره موبایل یا رمز عبور نادرست است.');
     }
 
-    const passwordMatches = await bcrypt.compare(dto.password, user.passwordHash);
+    const passwordMatches = await bcrypt.compare(
+      dto.password,
+      user.passwordHash,
+    );
 
     if (!passwordMatches) {
       await this.prisma.loginAttempt.create({
@@ -192,7 +216,10 @@ export class AuthService {
     });
 
     for (const session of sessions) {
-      const matches = await bcrypt.compare(refreshToken, session.refreshTokenHash);
+      const matches = await bcrypt.compare(
+        refreshToken,
+        session.refreshTokenHash,
+      );
       if (matches) {
         await this.prisma.session.update({
           where: { id: session.id },
@@ -216,7 +243,11 @@ export class AuthService {
     }
 
     const sessions = await this.prisma.session.findMany({
-      where: { userId: payload.sub, revokedAt: null, expiresAt: { gt: new Date() } },
+      where: {
+        userId: payload.sub,
+        revokedAt: null,
+        expiresAt: { gt: new Date() },
+      },
     });
 
     let matchedSession: (typeof sessions)[number] | null = null;
@@ -231,7 +262,9 @@ export class AuthService {
       throw new UnauthorizedException('نشست معتبر نیست.');
     }
 
-    const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
+    const user = await this.prisma.user.findUnique({
+      where: { id: payload.sub },
+    });
     if (!user) {
       throw new UnauthorizedException('کاربر یافت نشد.');
     }
@@ -258,13 +291,17 @@ export class AuthService {
       throw new ForbiddenException('حساب شما به‌طور موقت غیرفعال شده است.');
     }
     if (user.status === UserStatus.pending_verification) {
-      throw new ForbiddenException('لطفاً ابتدا شماره موبایل خود را تایید کنید.');
+      throw new ForbiddenException(
+        'لطفاً ابتدا شماره موبایل خود را تایید کنید.',
+      );
     }
   }
 
   async ensureFinancialAccounts(userId: string, role: UserRole) {
     const accountType =
-      role === UserRole.executor ? LedgerAccountType.executor_wallet : LedgerAccountType.customer_wallet;
+      role === UserRole.executor
+        ? LedgerAccountType.executor_wallet
+        : LedgerAccountType.customer_wallet;
 
     if (role !== UserRole.customer && role !== UserRole.executor) {
       return;

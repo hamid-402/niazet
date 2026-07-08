@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   EscrowStatus,
   LedgerAccountType,
@@ -35,7 +39,10 @@ export class EscrowService {
     note: string;
   }) {
     const escrow = await this.prisma.escrowHold.findFirst({
-      where: { orderId: params.orderId, status: { in: [EscrowStatus.held, EscrowStatus.partially_released] } },
+      where: {
+        orderId: params.orderId,
+        status: { in: [EscrowStatus.held, EscrowStatus.partially_released] },
+      },
       orderBy: { heldAt: 'desc' },
     });
     if (!escrow) {
@@ -48,7 +55,9 @@ export class EscrowService {
       orderBy: { assignedAt: 'asc' },
     });
     if (!assignment) {
-      throw new BadRequestException('هیچ مجری‌ای برای این سفارش تخصیص داده نشده است.');
+      throw new BadRequestException(
+        'هیچ مجری‌ای برای این سفارش تخصیص داده نشده است.',
+      );
     }
 
     const amount = params.amount ?? escrow.amount;
@@ -60,7 +69,9 @@ export class EscrowService {
     const commissionAmount = Math.round(amount * commissionRate);
     const executorAmount = amount - commissionAmount;
 
-    const escrowAccount = await this.ledger.getSystemAccount(LedgerAccountType.platform_escrow);
+    const escrowAccount = await this.ledger.getSystemAccount(
+      LedgerAccountType.platform_escrow,
+    );
     const commissionAccount = await this.ledger.getSystemAccount(
       LedgerAccountType.platform_commission,
     );
@@ -100,7 +111,9 @@ export class EscrowService {
       const updatedEscrow = await tx.escrowHold.update({
         where: { id: escrow.id },
         data: {
-          status: isFull ? EscrowStatus.released : EscrowStatus.partially_released,
+          status: isFull
+            ? EscrowStatus.released
+            : EscrowStatus.partially_released,
           releasedAt: new Date(),
         },
       });
@@ -119,13 +132,18 @@ export class EscrowService {
     note: string;
     decidedByUserId: string;
   }) {
-    const order = await this.prisma.order.findUnique({ where: { id: params.orderId } });
+    const order = await this.prisma.order.findUnique({
+      where: { id: params.orderId },
+    });
     if (!order) {
       throw new NotFoundException('سفارش یافت نشد.');
     }
 
     const escrow = await this.prisma.escrowHold.findFirst({
-      where: { orderId: params.orderId, status: { in: [EscrowStatus.held, EscrowStatus.partially_released] } },
+      where: {
+        orderId: params.orderId,
+        status: { in: [EscrowStatus.held, EscrowStatus.partially_released] },
+      },
       orderBy: { heldAt: 'desc' },
     });
     if (!escrow) {
@@ -137,7 +155,9 @@ export class EscrowService {
       throw new BadRequestException('مبلغ رفاند نامعتبر است.');
     }
 
-    const escrowAccount = await this.ledger.getSystemAccount(LedgerAccountType.platform_escrow);
+    const escrowAccount = await this.ledger.getSystemAccount(
+      LedgerAccountType.platform_escrow,
+    );
 
     const result = await this.prisma.$transaction(async (tx) => {
       const customerAccount = await this.ledger.getOrCreateUserAccount(
@@ -163,7 +183,9 @@ export class EscrowService {
       const updatedEscrow = await tx.escrowHold.update({
         where: { id: escrow.id },
         data: {
-          status: isFull ? EscrowStatus.refunded : EscrowStatus.partially_refunded,
+          status: isFull
+            ? EscrowStatus.refunded
+            : EscrowStatus.partially_refunded,
           refundedAt: new Date(),
         },
       });
@@ -186,7 +208,11 @@ export class EscrowService {
     return result;
   }
 
-  listForAdmin(params: { status?: EscrowStatus; skip?: number; take?: number }) {
+  listForAdmin(params: {
+    status?: EscrowStatus;
+    skip?: number;
+    take?: number;
+  }) {
     return this.prisma.escrowHold.findMany({
       where: params.status ? { status: params.status } : {},
       include: { order: { select: { code: true, title: true, status: true } } },

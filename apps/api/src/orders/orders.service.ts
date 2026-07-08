@@ -5,8 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import {
-  AssignmentRole,
   DisputeStatus,
+  FileKind,
   MessageVisibility,
   Order,
   OrderStatus,
@@ -90,7 +90,9 @@ export class OrdersService {
   }
 
   private async loadOwnedOrder(orderId: string, customerId: string) {
-    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
     if (!order) throw new NotFoundException('سفارش یافت نشد.');
     if (order.customerId !== customerId) {
       throw new ForbiddenException('این سفارش متعلق به شما نیست.');
@@ -98,7 +100,10 @@ export class OrdersService {
     return order;
   }
 
-  private async assertExecutorOwnsOrder(orderId: string, executorUserId: string) {
+  private async assertExecutorOwnsOrder(
+    orderId: string,
+    executorUserId: string,
+  ) {
     const assignment = await this.prisma.orderAssignment.findFirst({
       where: {
         orderId,
@@ -117,7 +122,9 @@ export class OrdersService {
   // ---------------------------------------------------------------------
 
   async createDraft(customerId: string, dto: CreateOrderDto) {
-    const service = await this.prisma.serviceLine.findUnique({ where: { id: dto.serviceId } });
+    const service = await this.prisma.serviceLine.findUnique({
+      where: { id: dto.serviceId },
+    });
     if (!service || !service.isActive) {
       throw new NotFoundException('خدمت انتخابی یافت نشد.');
     }
@@ -131,11 +138,15 @@ export class OrdersService {
         title: dto.title,
         urgency: dto.urgency ?? 'normal',
         briefDescription: dto.briefDescription,
-        formResponses: dto.formResponses as any,
+        formResponses: dto.formResponses as Prisma.InputJsonValue | undefined,
         budgetHint: dto.budgetHint,
         status: OrderStatus.draft,
         acceptanceCriteria: dto.acceptanceCriteria
-          ? { create: dto.acceptanceCriteria.map((description) => ({ description })) }
+          ? {
+              create: dto.acceptanceCriteria.map((description) => ({
+                description,
+              })),
+            }
           : undefined,
       },
       include: { acceptanceCriteria: true, serviceLine: true, package: true },
@@ -150,9 +161,16 @@ export class OrdersService {
       throw new BadRequestException('فقط پیش‌نویس قابل ارسال است.');
     }
 
-    await this.transition(orderId, OrderStatus.submitted, OrderStatusSource.customer, customerId, undefined, {
-      submittedAt: new Date(),
-    });
+    await this.transition(
+      orderId,
+      OrderStatus.submitted,
+      OrderStatusSource.customer,
+      customerId,
+      undefined,
+      {
+        submittedAt: new Date(),
+      },
+    );
 
     // گذار خودکار سیستمی مطابق جدول گذار (submitted -> pending_triage)
     const finalOrder = await this.transition(
@@ -204,20 +222,35 @@ export class OrdersService {
   // ---------------------------------------------------------------------
 
   async triage(adminId: string, orderId: string, dto: TriageDecisionDto) {
-    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
     if (!order) throw new NotFoundException('سفارش یافت نشد.');
 
     if (order.status === OrderStatus.pending_triage) {
-      await this.transition(orderId, OrderStatus.triaging, OrderStatusSource.admin, adminId, dto.note);
+      await this.transition(
+        orderId,
+        OrderStatus.triaging,
+        OrderStatusSource.admin,
+        adminId,
+        dto.note,
+      );
     } else if (order.status !== OrderStatus.triaging) {
       throw new BadRequestException('سفارش در وضعیت تریاژ نیست.');
     }
 
     switch (dto.decision) {
       case 'reject':
-        return this.transition(orderId, OrderStatus.cancelled, OrderStatusSource.admin, adminId, dto.note, {
-          cancelledAt: new Date(),
-        });
+        return this.transition(
+          orderId,
+          OrderStatus.cancelled,
+          OrderStatusSource.admin,
+          adminId,
+          dto.note,
+          {
+            cancelledAt: new Date(),
+          },
+        );
       case 'need_more_info':
         await this.prisma.orderMessage.create({
           data: {
@@ -231,12 +264,21 @@ export class OrdersService {
         return this.prisma.order.findUnique({ where: { id: orderId } });
       case 'auto_quote':
         if (dto.finalPrice == null) {
-          throw new BadRequestException('برای قیمت‌گذاری خودکار باید finalPrice ارسال شود.');
+          throw new BadRequestException(
+            'برای قیمت‌گذاری خودکار باید finalPrice ارسال شود.',
+          );
         }
-        return this.transition(orderId, OrderStatus.quoted, OrderStatusSource.admin, adminId, dto.note, {
-          finalPrice: dto.finalPrice,
-          quotedAt: new Date(),
-        });
+        return this.transition(
+          orderId,
+          OrderStatus.quoted,
+          OrderStatusSource.admin,
+          adminId,
+          dto.note,
+          {
+            finalPrice: dto.finalPrice,
+            quotedAt: new Date(),
+          },
+        );
       case 'send_to_quote':
       default:
         return this.transition(
@@ -250,7 +292,9 @@ export class OrdersService {
   }
 
   async quote(adminId: string, orderId: string, dto: QuoteOrderDto) {
-    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
     if (!order) throw new NotFoundException('سفارش یافت نشد.');
     if (order.status !== OrderStatus.pending_quote) {
       throw new BadRequestException('سفارش آماده قیمت‌گذاری نیست.');
@@ -280,11 +324,18 @@ export class OrdersService {
     if (order.status !== OrderStatus.quoted) {
       throw new BadRequestException('سفارش در وضعیت آماده تایید قیمت نیست.');
     }
-    return this.transition(orderId, OrderStatus.pending_payment, OrderStatusSource.customer, customerId);
+    return this.transition(
+      orderId,
+      OrderStatus.pending_payment,
+      OrderStatusSource.customer,
+      customerId,
+    );
   }
 
   async assign(adminId: string, orderId: string, dto: AssignOrderDto) {
-    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
     if (!order) throw new NotFoundException('سفارش یافت نشد.');
     if (order.status !== OrderStatus.paid) {
       throw new BadRequestException('فقط سفارش پرداخت‌شده قابل تخصیص است.');
@@ -295,7 +346,7 @@ export class OrdersService {
     });
     if (!executorProfile) throw new NotFoundException('مجری یافت نشد.');
 
-    const assignmentRole = (dto.assignmentRole ?? 'pursuit_owner') as AssignmentRole;
+    const assignmentRole = dto.assignmentRole ?? 'pursuit_owner';
 
     await this.prisma.orderAssignment.create({
       data: {
@@ -368,10 +419,21 @@ export class OrdersService {
     const result = await this.payments.verifyAndSettlePayment(paymentId);
 
     if (order.status === OrderStatus.pending_payment) {
-      await this.transition(orderId, OrderStatus.paid, OrderStatusSource.system, null, 'پرداخت تایید شد', {
-        paidAt: new Date(),
-      });
-      await this.invoices.issueForOrder(orderId, customerId, order.finalPrice ?? 0);
+      await this.transition(
+        orderId,
+        OrderStatus.paid,
+        OrderStatusSource.system,
+        null,
+        'پرداخت تایید شد',
+        {
+          paidAt: new Date(),
+        },
+      );
+      await this.invoices.issueForOrder(
+        orderId,
+        customerId,
+        order.finalPrice ?? 0,
+      );
       await this.notifications.notifyUser(
         customerId,
         'payment.succeeded',
@@ -389,18 +451,33 @@ export class OrdersService {
 
   async executorStart(executorUserId: string, orderId: string) {
     await this.assertExecutorOwnsOrder(orderId, executorUserId);
-    const order = await this.prisma.order.findUniqueOrThrow({ where: { id: orderId } });
+    const order = await this.prisma.order.findUniqueOrThrow({
+      where: { id: orderId },
+    });
     if (order.status !== OrderStatus.assigned) {
       throw new BadRequestException('سفارش در وضعیت آماده شروع اجرا نیست.');
     }
-    return this.transition(orderId, OrderStatus.in_progress, OrderStatusSource.executor, executorUserId);
+    return this.transition(
+      orderId,
+      OrderStatus.in_progress,
+      OrderStatusSource.executor,
+      executorUserId,
+    );
   }
 
-  async progressReport(executorUserId: string, orderId: string, dto: ProgressReportDto) {
+  async progressReport(
+    executorUserId: string,
+    orderId: string,
+    dto: ProgressReportDto,
+  ) {
     await this.assertExecutorOwnsOrder(orderId, executorUserId);
-    const order = await this.prisma.order.findUniqueOrThrow({ where: { id: orderId } });
+    const order = await this.prisma.order.findUniqueOrThrow({
+      where: { id: orderId },
+    });
     if (order.status !== OrderStatus.in_progress) {
-      throw new BadRequestException('فقط برای سفارش در حال اجرا می‌توان گزارش پیشرفت ثبت کرد.');
+      throw new BadRequestException(
+        'فقط برای سفارش در حال اجرا می‌توان گزارش پیشرفت ثبت کرد.',
+      );
     }
 
     const report = await this.prisma.orderReport.create({
@@ -454,7 +531,12 @@ export class OrdersService {
       });
     }
 
-    await this.transition(orderId, OrderStatus.submitted_for_qc, OrderStatusSource.executor, executorUserId);
+    await this.transition(
+      orderId,
+      OrderStatus.submitted_for_qc,
+      OrderStatusSource.executor,
+      executorUserId,
+    );
     await this.transition(
       orderId,
       OrderStatus.qc_in_review,
@@ -510,7 +592,9 @@ export class OrdersService {
   // ---------------------------------------------------------------------
 
   async applyQcApproval(orderId: string, reviewerUserId: string) {
-    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
     if (!order) throw new NotFoundException('سفارش یافت نشد.');
     if (order.status !== OrderStatus.qc_in_review) {
       throw new BadRequestException('سفارش در وضعیت بررسی QC نیست.');
@@ -544,7 +628,9 @@ export class OrdersService {
   }
 
   async applyQcRejection(orderId: string, reviewerUserId: string) {
-    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
     if (!order) throw new NotFoundException('سفارش یافت نشد.');
     if (order.status !== OrderStatus.qc_in_review) {
       throw new BadRequestException('سفارش در وضعیت بررسی QC نیست.');
@@ -600,9 +686,16 @@ export class OrdersService {
       throw new BadRequestException('سفارش هنوز تحویل داده نشده است.');
     }
 
-    await this.transition(orderId, OrderStatus.confirmed, OrderStatusSource.customer, customerId, undefined, {
-      confirmedAt: new Date(),
-    });
+    await this.transition(
+      orderId,
+      OrderStatus.confirmed,
+      OrderStatusSource.customer,
+      customerId,
+      undefined,
+      {
+        confirmedAt: new Date(),
+      },
+    );
 
     await this.escrow.release({
       orderId,
@@ -622,13 +715,19 @@ export class OrdersService {
     return closed;
   }
 
-  async requestRevision(customerId: string, orderId: string, dto: RevisionRequestDto) {
+  async requestRevision(
+    customerId: string,
+    orderId: string,
+    dto: RevisionRequestDto,
+  ) {
     const order = await this.loadOwnedOrder(orderId, customerId);
     if (order.status !== OrderStatus.delivered) {
       throw new BadRequestException('سفارش هنوز تحویل داده نشده است.');
     }
     if (order.revisionsUsed >= order.revisionsAllowed) {
-      throw new BadRequestException('تعداد اصلاحات مجاز این سفارش به پایان رسیده است.');
+      throw new BadRequestException(
+        'تعداد اصلاحات مجاز این سفارش به پایان رسیده است.',
+      );
     }
 
     if (dto.unmetCriteriaIds?.length) {
@@ -685,27 +784,46 @@ export class OrdersService {
     return inProgress;
   }
 
-  async raiseDispute(actorUserId: string, actorRole: UserRole, orderId: string, dto: DisputeOrderDto) {
-    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+  async raiseDispute(
+    actorUserId: string,
+    actorRole: UserRole,
+    orderId: string,
+    dto: DisputeOrderDto,
+  ) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
     if (!order) throw new NotFoundException('سفارش یافت نشد.');
 
     if (actorRole === UserRole.customer && order.customerId !== actorUserId) {
       throw new ForbiddenException('این سفارش متعلق به شما نیست.');
     }
 
-    const disputableStatuses: OrderStatus[] = [OrderStatus.in_progress, OrderStatus.delivered];
+    const disputableStatuses: OrderStatus[] = [
+      OrderStatus.in_progress,
+      OrderStatus.delivered,
+    ];
     if (!disputableStatuses.includes(order.status)) {
-      throw new BadRequestException('امکان ثبت dispute در این وضعیت سفارش وجود ندارد.');
+      throw new BadRequestException(
+        'امکان ثبت dispute در این وضعیت سفارش وجود ندارد.',
+      );
     }
 
     const dispute = await this.prisma.dispute.create({
-      data: { orderId, raisedByUserId: actorUserId, reason: dto.reason, note: dto.note },
+      data: {
+        orderId,
+        raisedByUserId: actorUserId,
+        reason: dto.reason,
+        note: dto.note,
+      },
     });
 
     await this.transition(
       orderId,
       OrderStatus.disputed,
-      actorRole === UserRole.customer ? OrderStatusSource.customer : OrderStatusSource.admin,
+      actorRole === UserRole.customer
+        ? OrderStatusSource.customer
+        : OrderStatusSource.admin,
       actorUserId,
       dto.note,
     );
@@ -723,8 +841,14 @@ export class OrdersService {
     return dispute;
   }
 
-  async resolveDispute(adminId: string, orderId: string, dto: ResolveDisputeDto) {
-    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+  async resolveDispute(
+    adminId: string,
+    orderId: string,
+    dto: ResolveDisputeDto,
+  ) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
     if (!order) throw new NotFoundException('سفارش یافت نشد.');
     if (order.status !== OrderStatus.disputed) {
       throw new BadRequestException('سفارش در وضعیت اختلاف نیست.');
@@ -749,13 +873,26 @@ export class OrdersService {
         );
         break;
       case 'refund_full':
-        await this.escrow.refund({ orderId, reason: 'dispute_refund_full', note: dto.note, decidedByUserId: adminId });
-        resultOrder = await this.transition(orderId, OrderStatus.cancelled, OrderStatusSource.admin, adminId, dto.note, {
-          cancelledAt: new Date(),
+        await this.escrow.refund({
+          orderId,
+          reason: 'dispute_refund_full',
+          note: dto.note,
+          decidedByUserId: adminId,
         });
+        resultOrder = await this.transition(
+          orderId,
+          OrderStatus.cancelled,
+          OrderStatusSource.admin,
+          adminId,
+          dto.note,
+          {
+            cancelledAt: new Date(),
+          },
+        );
         break;
       case 'refund_partial':
-        if (!dto.amount) throw new BadRequestException('برای رفاند جزئی باید مبلغ مشخص شود.');
+        if (!dto.amount)
+          throw new BadRequestException('برای رفاند جزئی باید مبلغ مشخص شود.');
         await this.escrow.refund({
           orderId,
           amount: dto.amount,
@@ -763,12 +900,23 @@ export class OrdersService {
           note: dto.note,
           decidedByUserId: adminId,
         });
-        resultOrder = await this.transition(orderId, OrderStatus.closed, OrderStatusSource.admin, adminId, dto.note, {
-          closedAt: new Date(),
-        });
+        resultOrder = await this.transition(
+          orderId,
+          OrderStatus.closed,
+          OrderStatusSource.admin,
+          adminId,
+          dto.note,
+          {
+            closedAt: new Date(),
+          },
+        );
         break;
       case 'release_to_executor':
-        await this.escrow.release({ orderId, decidedByUserId: adminId, note: dto.note });
+        await this.escrow.release({
+          orderId,
+          decidedByUserId: adminId,
+          note: dto.note,
+        });
         resultOrder = await this.transition(
           orderId,
           OrderStatus.confirmed,
@@ -777,15 +925,29 @@ export class OrdersService {
           dto.note,
           { confirmedAt: new Date() },
         );
-        resultOrder = await this.transition(orderId, OrderStatus.closed, OrderStatusSource.system, null, undefined, {
-          closedAt: new Date(),
-        });
+        resultOrder = await this.transition(
+          orderId,
+          OrderStatus.closed,
+          OrderStatusSource.system,
+          null,
+          undefined,
+          {
+            closedAt: new Date(),
+          },
+        );
         break;
       case 'close':
       default:
-        resultOrder = await this.transition(orderId, OrderStatus.closed, OrderStatusSource.admin, adminId, dto.note, {
-          closedAt: new Date(),
-        });
+        resultOrder = await this.transition(
+          orderId,
+          OrderStatus.closed,
+          OrderStatusSource.admin,
+          adminId,
+          dto.note,
+          {
+            closedAt: new Date(),
+          },
+        );
         break;
     }
 
@@ -806,7 +968,11 @@ export class OrdersService {
       action: 'order.dispute_resolved',
       entityType: 'order',
       entityId: orderId,
-      after: { resolutionType: dto.resolutionType, amount: dto.amount, note: dto.note },
+      after: {
+        resolutionType: dto.resolutionType,
+        amount: dto.amount,
+        note: dto.note,
+      },
       sensitivity: 'critical',
     });
 
@@ -814,7 +980,9 @@ export class OrdersService {
   }
 
   async cancelByAdmin(adminId: string, orderId: string, reason: string) {
-    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
     if (!order) throw new NotFoundException('سفارش یافت نشد.');
 
     const financialStatuses: OrderStatus[] = [
@@ -829,7 +997,9 @@ export class OrdersService {
       });
       if (escrowHold) {
         const refundRate =
-          order.status === OrderStatus.in_progress ? DEFAULT_IN_PROGRESS_CANCEL_REFUND_RATE : 1;
+          order.status === OrderStatus.in_progress
+            ? DEFAULT_IN_PROGRESS_CANCEL_REFUND_RATE
+            : 1;
         const refundAmount = Math.round(escrowHold.amount * refundRate);
         await this.escrow.refund({
           orderId,
@@ -878,23 +1048,37 @@ export class OrdersService {
     return order;
   }
 
-  listForCustomer(customerId: string, params: { status?: string; skip?: number; take?: number }) {
+  listForCustomer(
+    customerId: string,
+    params: { status?: string; skip?: number; take?: number },
+  ) {
     return this.prisma.order.findMany({
       where: {
         customerId,
         ...(params.status ? { status: params.status as OrderStatus } : {}),
       },
-      include: { serviceLine: { select: { title: true } }, publicHandlers: true },
+      include: {
+        serviceLine: { select: { title: true } },
+        publicHandlers: true,
+      },
       orderBy: { createdAt: 'desc' },
       skip: params.skip,
       take: params.take,
     });
   }
 
-  listForExecutor(executorUserId: string, params: { skip?: number; take?: number }) {
+  listForExecutor(
+    executorUserId: string,
+    params: { skip?: number; take?: number },
+  ) {
     return this.prisma.order.findMany({
       where: {
-        assignments: { some: { unassignedAt: null, executorProfile: { userId: executorUserId } } },
+        assignments: {
+          some: {
+            unassignedAt: null,
+            executorProfile: { userId: executorUserId },
+          },
+        },
       },
       include: { serviceLine: { select: { title: true } } },
       orderBy: { createdAt: 'desc' },
@@ -995,9 +1179,14 @@ export class OrdersService {
       statusHistory: { orderBy: { createdAt: 'asc' as const } },
       publicHandlers: { where: { visibleToCustomer: true } },
       milestones: true,
-      files: { where: { fileKind: { in: ['output', 'revision'] as any } } },
+      files: {
+        where: { fileKind: { in: [FileKind.output, FileKind.revision] } },
+      },
       reports: { where: { visibleToCustomer: true } },
-      messages: { where: { visibility: MessageVisibility.customer_visible }, orderBy: { createdAt: 'asc' as const } },
+      messages: {
+        where: { visibility: MessageVisibility.customer_visible },
+        orderBy: { createdAt: 'asc' as const },
+      },
       payments: true,
       escrowHolds: true,
       tickets: true,

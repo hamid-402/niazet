@@ -1,6 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreatePackageDto, CreateServiceDto, UpdateServiceDto } from './dto/service.dto';
+import {
+  CreatePackageDto,
+  CreateServiceDto,
+  UpdateServiceDto,
+} from './dto/service.dto';
 
 @Injectable()
 export class CatalogService {
@@ -33,7 +37,11 @@ export class CatalogService {
 
   listAllForAdmin() {
     return this.prisma.serviceLine.findMany({
-      include: { packages: true, formFields: true, qcChecklistTemplates: { include: { items: true } } },
+      include: {
+        packages: true,
+        formFields: true,
+        qcChecklistTemplates: { include: { items: true } },
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -65,7 +73,10 @@ export class CatalogService {
 
   async setActive(id: string, isActive: boolean) {
     await this.getForAdmin(id);
-    return this.prisma.serviceLine.update({ where: { id }, data: { isActive } });
+    return this.prisma.serviceLine.update({
+      where: { id },
+      data: { isActive },
+    });
   }
 
   async addPackage(serviceId: string, dto: CreatePackageDto) {

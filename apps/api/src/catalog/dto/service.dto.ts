@@ -1,5 +1,12 @@
 import { PricingModel } from '@prisma/client';
-import { IsBoolean, IsIn, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import {
+  IsBoolean,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 
 const PRICING_MODELS: PricingModel[] = ['fixed', 'formula', 'manual_quote'];
 

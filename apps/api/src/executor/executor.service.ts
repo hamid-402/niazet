@@ -1,5 +1,15 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { ExecutorStatus, ExecutorType, OrderStatus, UserRole, UserStatus } from '@prisma/client';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  ExecutorStatus,
+  ExecutorType,
+  OrderStatus,
+  UserRole,
+  UserStatus,
+} from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthService } from '../auth/auth.service';
 import { generateReferenceCode } from '../common/utils/code-generator';
@@ -21,13 +31,19 @@ export class ExecutorService {
   }
 
   listTeams() {
-    return this.prisma.team.findMany({ include: { _count: { select: { members: true } } } });
+    return this.prisma.team.findMany({
+      include: { _count: { select: { members: true } } },
+    });
   }
 
   async createStaff(dto: CreateStaffDto) {
-    const existing = await this.prisma.user.findUnique({ where: { phone: dto.phone } });
+    const existing = await this.prisma.user.findUnique({
+      where: { phone: dto.phone },
+    });
     if (existing) {
-      throw new BadRequestException('کاربری با این شماره موبایل قبلاً ثبت شده است.');
+      throw new BadRequestException(
+        'کاربری با این شماره موبایل قبلاً ثبت شده است.',
+      );
     }
 
     const user = await this.prisma.user.create({
@@ -54,7 +70,12 @@ export class ExecutorService {
     return { user, profile };
   }
 
-  listStaffForAdmin(params: { teamId?: string; status?: ExecutorStatus; skip?: number; take?: number }) {
+  listStaffForAdmin(params: {
+    teamId?: string;
+    status?: ExecutorStatus;
+    skip?: number;
+    take?: number;
+  }) {
     return this.prisma.executorProfile.findMany({
       where: {
         ...(params.teamId ? { teamId: params.teamId } : {}),
@@ -79,7 +100,11 @@ export class ExecutorService {
         user: { select: { fullName: true, phone: true, status: true } },
         team: true,
         skills: { include: { skill: true } },
-        assignments: { include: { order: { select: { code: true, title: true, status: true } } } },
+        assignments: {
+          include: {
+            order: { select: { code: true, title: true, status: true } },
+          },
+        },
         performanceSnapshots: { orderBy: { periodEnd: 'desc' }, take: 12 },
       },
     });
@@ -89,12 +114,16 @@ export class ExecutorService {
 
   async setStatus(id: string, status: ExecutorStatus) {
     await this.getProfileForAdmin(id);
-    return this.prisma.executorProfile.update({ where: { id }, data: { status } });
+    return this.prisma.executorProfile.update({
+      where: { id },
+      data: { status },
+    });
   }
 
   async setCapacity(id: string, capacityPercent: number) {
     await this.getProfileForAdmin(id);
-    const status: ExecutorStatus | undefined = capacityPercent >= 100 ? 'over_capacity' : undefined;
+    const status: ExecutorStatus | undefined =
+      capacityPercent >= 100 ? 'over_capacity' : undefined;
     return this.prisma.executorProfile.update({
       where: { id },
       data: { capacityPercent, ...(status ? { status } : {}) },
@@ -107,7 +136,9 @@ export class ExecutorService {
    * `recalculate_staff_performance` این کار را دوره‌ای انجام دهد.
    */
   async recalculatePerformance(executorProfileId: string) {
-    const profile = await this.prisma.executorProfile.findUnique({ where: { id: executorProfileId } });
+    const profile = await this.prisma.executorProfile.findUnique({
+      where: { id: executorProfileId },
+    });
     if (!profile) throw new NotFoundException('پروفایل مجری یافت نشد.');
 
     const assignments = await this.prisma.orderAssignment.findMany({
@@ -115,29 +146,54 @@ export class ExecutorService {
       include: { order: true },
     });
 
-    const completed = assignments.filter((a) => a.order.status === OrderStatus.closed);
-    const active = assignments.filter((a) => a.unassignedAt === null && a.order.status !== OrderStatus.closed);
+    const completed = assignments.filter(
+      (a) => a.order.status === OrderStatus.closed,
+    );
+    const active = assignments.filter(
+      (a) => a.unassignedAt === null && a.order.status !== OrderStatus.closed,
+    );
 
     const onTimeCount = completed.filter(
-      (a) => a.order.deliveredAt && a.order.confirmedAt && a.order.deliveredAt <= a.order.confirmedAt,
+      (a) =>
+        a.order.deliveredAt &&
+        a.order.confirmedAt &&
+        a.order.deliveredAt <= a.order.confirmedAt,
     ).length;
 
     const qcReviews = await this.prisma.qcReview.findMany({
-      where: { order: { assignments: { some: { executorProfileId } } }, result: { not: null } },
+      where: {
+        order: { assignments: { some: { executorProfileId } } },
+        result: { not: null },
+      },
     });
     const qcPassed = qcReviews.filter((r) => r.result === 'passed').length;
 
     const feedback = await this.prisma.feedback.findMany({
       where: { targetType: 'executor', targetInternalId: executorProfileId },
     });
-    const ratings = feedback.filter((f) => f.rating != null).map((f) => f.rating as number);
-    const avgRating = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
-    const complaints = feedback.filter((f) => f.feedbackType === 'complaint').length;
-    const compliments = feedback.filter((f) => f.feedbackType === 'compliment').length;
+    const ratings = feedback
+      .filter((f) => f.rating != null)
+      .map((f) => f.rating as number);
+    const avgRating = ratings.length
+      ? ratings.reduce((a, b) => a + b, 0) / ratings.length
+      : 0;
+    const complaints = feedback.filter(
+      (f) => f.feedbackType === 'complaint',
+    ).length;
+    const compliments = feedback.filter(
+      (f) => f.feedbackType === 'compliment',
+    ).length;
 
-    const onTimeRate = completed.length ? (onTimeCount / completed.length) * 100 : 0;
-    const qcPassRate = qcReviews.length ? (qcPassed / qcReviews.length) * 100 : 0;
-    const riskScore = Math.max(0, complaints * 10 - compliments * 2 - onTimeRate * 0.1);
+    const onTimeRate = completed.length
+      ? (onTimeCount / completed.length) * 100
+      : 0;
+    const qcPassRate = qcReviews.length
+      ? (qcPassed / qcReviews.length) * 100
+      : 0;
+    const riskScore = Math.max(
+      0,
+      complaints * 10 - compliments * 2 - onTimeRate * 0.1,
+    );
 
     await this.prisma.executorProfile.update({
       where: { id: executorProfileId },
@@ -200,34 +256,47 @@ export class ExecutorService {
 
   async getDashboard(userId: string) {
     const profile = await this.getOwnProfile(userId);
-    const [activeOrders, dueSoon, needsRework, recentReports] = await Promise.all([
-      this.prisma.order.count({
-        where: {
-          assignments: { some: { executorProfileId: profile.id, unassignedAt: null } },
-          status: { in: [OrderStatus.assigned, OrderStatus.in_progress] },
-        },
-      }),
-      this.prisma.order.findMany({
-        where: {
-          assignments: { some: { executorProfileId: profile.id, unassignedAt: null } },
-          status: { in: [OrderStatus.assigned, OrderStatus.in_progress] },
-        },
-        orderBy: { createdAt: 'asc' },
-        take: 5,
-        select: { id: true, code: true, title: true, status: true, urgency: true },
-      }),
-      this.prisma.order.count({
-        where: {
-          assignments: { some: { executorProfileId: profile.id, unassignedAt: null } },
-          status: OrderStatus.qc_rejected,
-        },
-      }),
-      this.prisma.orderReport.findMany({
-        where: { authorUserId: userId },
-        orderBy: { createdAt: 'desc' },
-        take: 5,
-      }),
-    ]);
+    const [activeOrders, dueSoon, needsRework, recentReports] =
+      await Promise.all([
+        this.prisma.order.count({
+          where: {
+            assignments: {
+              some: { executorProfileId: profile.id, unassignedAt: null },
+            },
+            status: { in: [OrderStatus.assigned, OrderStatus.in_progress] },
+          },
+        }),
+        this.prisma.order.findMany({
+          where: {
+            assignments: {
+              some: { executorProfileId: profile.id, unassignedAt: null },
+            },
+            status: { in: [OrderStatus.assigned, OrderStatus.in_progress] },
+          },
+          orderBy: { createdAt: 'asc' },
+          take: 5,
+          select: {
+            id: true,
+            code: true,
+            title: true,
+            status: true,
+            urgency: true,
+          },
+        }),
+        this.prisma.order.count({
+          where: {
+            assignments: {
+              some: { executorProfileId: profile.id, unassignedAt: null },
+            },
+            status: OrderStatus.qc_rejected,
+          },
+        }),
+        this.prisma.orderReport.findMany({
+          where: { authorUserId: userId },
+          orderBy: { createdAt: 'desc' },
+          take: 5,
+        }),
+      ]);
 
     return { profile, activeOrders, dueSoon, needsRework, recentReports };
   }

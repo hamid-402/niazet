@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { TicketStatus, UserRole } from '@prisma/client';
 import { TicketsService } from './tickets.service';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -14,7 +22,10 @@ export class TicketsController {
   constructor(private readonly tickets: TicketsService) {}
 
   @Get()
-  list(@CurrentUser() user: AuthenticatedUser, @Query('status') status?: TicketStatus) {
+  list(
+    @CurrentUser() user: AuthenticatedUser,
+    @Query('status') status?: TicketStatus,
+  ) {
     return this.tickets.listForCustomer(user.id, status);
   }
 

@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { AdminScope, UserRole, UserStatus } from '@prisma/client';
 import { UsersService } from './users.service';
 import { AuditService } from '../audit/audit.service';
@@ -9,7 +18,11 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
 import { buildPagination, PaginationDto } from '../common/dto/pagination.dto';
-import { CreateAdminDto, UpdateAdminScopeDto, UpdateUserStatusDto } from './dto/user.dto';
+import {
+  CreateAdminDto,
+  UpdateAdminScopeDto,
+  UpdateUserStatusDto,
+} from './dto/user.dto';
 
 @Controller('v1/admin/users')
 @UseGuards(RolesGuard, AdminScopeGuard)
@@ -22,7 +35,11 @@ export class UsersAdminController {
 
   @Get()
   @AdminScopes(AdminScope.super_admin, AdminScope.ops_admin)
-  list(@Query() pagination: PaginationDto, @Query('role') role?: UserRole, @Query('status') status?: UserStatus) {
+  list(
+    @Query() pagination: PaginationDto,
+    @Query('role') role?: UserRole,
+    @Query('status') status?: UserStatus,
+  ) {
     const { skip, take } = buildPagination(pagination);
     return this.users.listUsers({ role, status, skip, take });
   }
@@ -70,7 +87,10 @@ export class AdminsAdminController {
   }
 
   @Post()
-  async create(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateAdminDto) {
+  async create(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: CreateAdminDto,
+  ) {
     const result = await this.users.createAdmin(dto);
     await this.audit.record({
       actorUserId: user.id,
@@ -111,7 +131,11 @@ export class AuditLogAdminController {
   constructor(private readonly audit: AuditService) {}
 
   @Get()
-  @AdminScopes(AdminScope.super_admin, AdminScope.ops_admin, AdminScope.finance_admin)
+  @AdminScopes(
+    AdminScope.super_admin,
+    AdminScope.ops_admin,
+    AdminScope.finance_admin,
+  )
   list(
     @Query() pagination: PaginationDto,
     @Query('entityType') entityType?: string,

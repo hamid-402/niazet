@@ -26,7 +26,10 @@ export class InvoicesService {
 
   listForAdmin(params: { skip?: number; take?: number }) {
     return this.prisma.invoice.findMany({
-      include: { order: { select: { code: true } }, customer: { select: { fullName: true } } },
+      include: {
+        order: { select: { code: true } },
+        customer: { select: { fullName: true } },
+      },
       orderBy: { issuedAt: 'desc' },
       skip: params.skip,
       take: params.take,

@@ -19,7 +19,8 @@ export function addBusinessHours(start: Date, hoursToAdd: number): Date {
   }
 
   while (remaining > 0) {
-    const hoursLeftToday = WORK_END_HOUR - cursor.getHours() - cursor.getMinutes() / 60;
+    const hoursLeftToday =
+      WORK_END_HOUR - cursor.getHours() - cursor.getMinutes() / 60;
 
     if (remaining <= hoursLeftToday) {
       cursor.setTime(cursor.getTime() + remaining * 60 * 60 * 1000);
@@ -44,7 +45,9 @@ function moveToNextWorkdayStart(date: Date): void {
   date.setHours(WORK_START_HOUR, 0, 0, 0);
 }
 
-export function slaTargetHoursForPriority(priority: 'low' | 'normal' | 'high' | 'urgent'): number {
+export function slaTargetHoursForPriority(
+  priority: 'low' | 'normal' | 'high' | 'urgent',
+): number {
   switch (priority) {
     case 'urgent':
       return 4;

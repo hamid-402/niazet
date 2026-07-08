@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { UserRole } from '@prisma/client';
 import { ExecutorService } from './executor.service';
 import { OrdersService } from '../orders/orders.service';
@@ -34,7 +42,10 @@ export class ExecutorController {
   }
 
   @Get('orders')
-  listOrders(@CurrentUser() user: AuthenticatedUser, @Query() pagination: PaginationDto) {
+  listOrders(
+    @CurrentUser() user: AuthenticatedUser,
+    @Query() pagination: PaginationDto,
+  ) {
     const { skip, take } = buildPagination(pagination);
     return this.orders.listForExecutor(user.id, { skip, take });
   }
@@ -59,7 +70,11 @@ export class ExecutorController {
   }
 
   @Post('orders/:id/deliver')
-  deliver(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string, @Body() dto: DeliverOrderDto) {
+  deliver(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: DeliverOrderDto,
+  ) {
     return this.orders.deliver(user.id, id, dto);
   }
 }

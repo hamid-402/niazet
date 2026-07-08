@@ -1,11 +1,29 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
-import { TicketStatus, UserRole } from '@prisma/client';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  TicketCategory,
+  TicketPriority,
+  TicketStatus,
+  UserRole,
+} from '@prisma/client';
 import { TicketsService } from './tickets.service';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
-import { AddTicketMessageDto, AssignTicketDto, EscalateTicketDto } from './dto/ticket.dto';
+import {
+  AddTicketMessageDto,
+  AssignTicketDto,
+  EscalateTicketDto,
+} from './dto/ticket.dto';
 
 @Controller('v1/support/tickets')
 @UseGuards(RolesGuard)
@@ -16,11 +34,16 @@ export class TicketsSupportController {
   @Get()
   list(
     @Query('status') status?: TicketStatus,
-    @Query('priority') priority?: string,
-    @Query('category') category?: string,
+    @Query('priority') priority?: TicketPriority,
+    @Query('category') category?: TicketCategory,
     @Query('assignedToUserId') assignedToUserId?: string,
   ) {
-    return this.tickets.listQueue({ status, priority, category, assignedToUserId });
+    return this.tickets.listQueue({
+      status,
+      priority,
+      category,
+      assignedToUserId,
+    });
   }
 
   @Get('performance')
@@ -39,12 +62,20 @@ export class TicketsSupportController {
   }
 
   @Post(':id/reply')
-  reply(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string, @Body() dto: AddTicketMessageDto) {
+  reply(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: AddTicketMessageDto,
+  ) {
     return this.tickets.reply(user.id, id, dto);
   }
 
   @Post(':id/escalate')
-  escalate(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string, @Body() dto: EscalateTicketDto) {
+  escalate(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: EscalateTicketDto,
+  ) {
     return this.tickets.escalate(id, user.id, dto.reason);
   }
 

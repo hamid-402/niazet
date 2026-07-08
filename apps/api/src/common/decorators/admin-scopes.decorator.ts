@@ -9,4 +9,5 @@ export const ADMIN_SCOPES_KEY = 'adminScopes';
  * (see AdminScopeGuard), matching the "قواعد غیرقابل مذاکره" rule
  * that super_admin has access to everything.
  */
-export const AdminScopes = (...scopes: AdminScope[]) => SetMetadata(ADMIN_SCOPES_KEY, scopes);
+export const AdminScopes = (...scopes: AdminScope[]) =>
+  SetMetadata(ADMIN_SCOPES_KEY, scopes);

@@ -1,8 +1,17 @@
 import { AdminScope, UserStatus } from '@prisma/client';
 import { IsIn, IsOptional, IsString } from 'class-validator';
 
-const ADMIN_SCOPES: AdminScope[] = ['super_admin', 'ops_admin', 'finance_admin'];
-const USER_STATUSES: UserStatus[] = ['pending_verification', 'active', 'suspended', 'blocked'];
+const ADMIN_SCOPES: AdminScope[] = [
+  'super_admin',
+  'ops_admin',
+  'finance_admin',
+];
+const USER_STATUSES: UserStatus[] = [
+  'pending_verification',
+  'active',
+  'suspended',
+  'blocked',
+];
 
 export class CreateAdminDto {
   @IsString()

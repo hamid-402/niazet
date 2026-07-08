@@ -1,4 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { QcResult } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { OrdersService } from '../orders/orders.service';
@@ -21,7 +26,12 @@ export class QcService {
             code: true,
             title: true,
             status: true,
-            serviceLine: { select: { title: true, qcChecklistTemplates: { include: { items: true } } } },
+            serviceLine: {
+              select: {
+                title: true,
+                qcChecklistTemplates: { include: { items: true } },
+              },
+            },
           },
         },
       },
@@ -36,7 +46,9 @@ export class QcService {
         order: {
           include: {
             files: { where: { fileKind: 'output' } },
-            serviceLine: { include: { qcChecklistTemplates: { include: { items: true } } } },
+            serviceLine: {
+              include: { qcChecklistTemplates: { include: { items: true } } },
+            },
           },
         },
         items: true,
@@ -46,7 +58,10 @@ export class QcService {
     return review;
   }
 
-  private async assertReviewerNotExecutor(orderId: string, reviewerUserId: string) {
+  private async assertReviewerNotExecutor(
+    orderId: string,
+    reviewerUserId: string,
+  ) {
     const executorUserId = await this.orders.getExecutorUserIdForOrder(orderId);
     if (executorUserId === reviewerUserId) {
       throw new ForbiddenException('reviewer نمی‌تواند همان مجری سفارش باشد.');
@@ -55,7 +70,9 @@ export class QcService {
 
   private async saveItems(reviewId: string, dto: SubmitQcReviewDto) {
     if (!dto.items?.length) return;
-    await this.prisma.qcReviewItem.deleteMany({ where: { qcReviewId: reviewId } });
+    await this.prisma.qcReviewItem.deleteMany({
+      where: { qcReviewId: reviewId },
+    });
     await this.prisma.qcReviewItem.createMany({
       data: dto.items.map((item) => ({
         qcReviewId: reviewId,
@@ -66,10 +83,17 @@ export class QcService {
     });
   }
 
-  async approve(reviewId: string, reviewerUserId: string, dto: SubmitQcReviewDto) {
-    const review = await this.prisma.qcReview.findUnique({ where: { id: reviewId } });
+  async approve(
+    reviewId: string,
+    reviewerUserId: string,
+    dto: SubmitQcReviewDto,
+  ) {
+    const review = await this.prisma.qcReview.findUnique({
+      where: { id: reviewId },
+    });
     if (!review) throw new NotFoundException('پرونده QC یافت نشد.');
-    if (review.result) throw new BadRequestException('این پرونده قبلاً بررسی شده است.');
+    if (review.result)
+      throw new BadRequestException('این پرونده قبلاً بررسی شده است.');
 
     await this.assertReviewerNotExecutor(review.orderId, reviewerUserId);
     await this.saveItems(reviewId, dto);
@@ -87,12 +111,30 @@ export class QcService {
     return this.orders.applyQcApproval(review.orderId, reviewerUserId);
   }
 
-  async requestRework(reviewId: string, reviewerUserId: string, dto: SubmitQcReviewDto) {
-    return this.rejectInternal(reviewId, reviewerUserId, dto, QcResult.needs_rework);
+  async requestRework(
+    reviewId: string,
+    reviewerUserId: string,
+    dto: SubmitQcReviewDto,
+  ) {
+    return this.rejectInternal(
+      reviewId,
+      reviewerUserId,
+      dto,
+      QcResult.needs_rework,
+    );
   }
 
-  async reject(reviewId: string, reviewerUserId: string, dto: SubmitQcReviewDto) {
-    return this.rejectInternal(reviewId, reviewerUserId, dto, QcResult.rejected);
+  async reject(
+    reviewId: string,
+    reviewerUserId: string,
+    dto: SubmitQcReviewDto,
+  ) {
+    return this.rejectInternal(
+      reviewId,
+      reviewerUserId,
+      dto,
+      QcResult.rejected,
+    );
   }
 
   private async rejectInternal(
@@ -101,9 +143,12 @@ export class QcService {
     dto: SubmitQcReviewDto,
     result: QcResult,
   ) {
-    const review = await this.prisma.qcReview.findUnique({ where: { id: reviewId } });
+    const review = await this.prisma.qcReview.findUnique({
+      where: { id: reviewId },
+    });
     if (!review) throw new NotFoundException('پرونده QC یافت نشد.');
-    if (review.result) throw new BadRequestException('این پرونده قبلاً بررسی شده است.');
+    if (review.result)
+      throw new BadRequestException('این پرونده قبلاً بررسی شده است.');
 
     await this.assertReviewerNotExecutor(review.orderId, reviewerUserId);
     await this.saveItems(reviewId, dto);

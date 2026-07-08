@@ -7,7 +7,6 @@ import {
   IsOptional,
   IsString,
   Min,
-  ValidateNested,
 } from 'class-validator';
 
 export class CreateOrderDto {
@@ -51,8 +50,19 @@ export class SubmitOrderDto {
 }
 
 export class TriageDecisionDto {
-  @IsIn(['send_to_quote', 'auto_quote', 'need_more_info', 'assign_direct', 'reject'])
-  decision!: 'send_to_quote' | 'auto_quote' | 'need_more_info' | 'assign_direct' | 'reject';
+  @IsIn([
+    'send_to_quote',
+    'auto_quote',
+    'need_more_info',
+    'assign_direct',
+    'reject',
+  ])
+  decision!:
+    | 'send_to_quote'
+    | 'auto_quote'
+    | 'need_more_info'
+    | 'assign_direct'
+    | 'reject';
 
   @IsOptional()
   @IsString()
@@ -84,7 +94,8 @@ export class AssignOrderDto {
 
   @IsOptional()
   @IsIn(['pursuit_owner', 'team_lead', 'contributor', 'qc_reviewer'])
-  assignmentRole?: 'pursuit_owner' | 'team_lead' | 'contributor' | 'qc_reviewer';
+  assignmentRole?:
+    'pursuit_owner' | 'team_lead' | 'contributor' | 'qc_reviewer';
 
   @IsOptional()
   @IsString()
@@ -128,8 +139,19 @@ export class DisputeOrderDto {
 }
 
 export class ResolveDisputeDto {
-  @IsIn(['rework', 'refund_full', 'refund_partial', 'release_to_executor', 'close'])
-  resolutionType!: 'rework' | 'refund_full' | 'refund_partial' | 'release_to_executor' | 'close';
+  @IsIn([
+    'rework',
+    'refund_full',
+    'refund_partial',
+    'release_to_executor',
+    'close',
+  ])
+  resolutionType!:
+    | 'rework'
+    | 'refund_full'
+    | 'refund_partial'
+    | 'release_to_executor'
+    | 'close';
 
   @IsOptional()
   @IsInt()

@@ -26,11 +26,15 @@ export class HttpExceptionFilter implements ExceptionFilter {
       : { message: 'خطای غیرمنتظره سرور رخ داد.' };
 
     if (!isHttpException) {
-      this.logger.error(exception instanceof Error ? exception.stack : exception);
+      this.logger.error(
+        exception instanceof Error ? exception.stack : exception,
+      );
     }
 
     const normalized =
-      typeof body === 'string' ? { message: body } : (body as Record<string, unknown>);
+      typeof body === 'string'
+        ? { message: body }
+        : (body as Record<string, unknown>);
 
     response.status(status).json({
       statusCode: status,

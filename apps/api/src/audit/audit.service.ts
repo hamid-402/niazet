@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AuditSensitivity, UserRole } from '@prisma/client';
+import { AuditSensitivity, Prisma, UserRole } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 export interface AuditLogInput {
@@ -8,8 +8,8 @@ export interface AuditLogInput {
   action: string;
   entityType: string;
   entityId: string;
-  before?: unknown;
-  after?: unknown;
+  before?: Prisma.InputJsonValue;
+  after?: Prisma.InputJsonValue;
   sensitivity?: AuditSensitivity;
   ipAddress?: string | null;
 }
@@ -30,8 +30,8 @@ export class AuditService {
         action: input.action,
         entityType: input.entityType,
         entityId: input.entityId,
-        before: input.before as any,
-        after: input.after as any,
+        before: input.before,
+        after: input.after,
         sensitivity: input.sensitivity ?? AuditSensitivity.normal,
         ipAddress: input.ipAddress ?? null,
       },

@@ -8,7 +8,12 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
-  imports: [ConfigModule, PassportModule, JwtModule.register({}), NotificationsModule],
+  imports: [
+    ConfigModule,
+    PassportModule,
+    JwtModule.register({}),
+    NotificationsModule,
+  ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
   exports: [AuthService],

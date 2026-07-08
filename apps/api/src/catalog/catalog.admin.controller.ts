@@ -1,10 +1,22 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AdminScope, UserRole } from '@prisma/client';
 import { CatalogService } from './catalog.service';
 import { Roles } from '../common/decorators/roles.decorator';
 import { AdminScopes } from '../common/decorators/admin-scopes.decorator';
 import { AdminScopeGuard } from '../common/guards/admin-scope.guard';
-import { CreatePackageDto, CreateServiceDto, UpdateServiceDto } from './dto/service.dto';
+import {
+  CreatePackageDto,
+  CreateServiceDto,
+  UpdateServiceDto,
+} from './dto/service.dto';
 
 @Controller('v1/admin/services')
 @Roles(UserRole.admin)
