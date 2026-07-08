@@ -861,14 +861,14 @@ model OrderAssignment {
 model QcReview {
   id             String    @id @default(uuid())
   orderId        String    @map("order_id")
-  reviewerUserId String    @map("reviewer_user_id")
+  reviewerUserId String?   @map("reviewer_user_id")
   result         QcResult?
   comment        String?
   reviewedAt     DateTime? @map("reviewed_at")
   createdAt      DateTime  @default(now()) @map("created_at")
 
   order    Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  reviewer User           @relation("QcReviewer", fields: [reviewerUserId], references: [id])
+  reviewer User?          @relation("QcReviewer", fields: [reviewerUserId], references: [id])
   items    QcReviewItem[]
 
   @@index([orderId])
