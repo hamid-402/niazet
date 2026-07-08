@@ -56,7 +56,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   logout(
     @CurrentUser() user: AuthenticatedUser,
-    @Body('refreshToken') refreshToken: string,
+    @Body('refreshToken') refreshToken?: string,
   ) {
     return this.authService.logout(user.id, refreshToken);
   }

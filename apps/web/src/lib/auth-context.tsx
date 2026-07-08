@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { apiFetch, clearTokens, setTokens } from './api';
+import { apiFetch, clearTokens, getRefreshToken, setTokens } from './api';
 import type { AuthUser } from './types';
 
 interface AuthContextValue {
@@ -84,7 +84,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     try {
-      await apiFetch('/auth/logout', { method: 'POST', body: {} });
+      const refreshToken = getRefreshToken();
+      await apiFetch('/auth/logout', { method: 'POST', body: { refreshToken } });
     } catch {
       // ignore
     }

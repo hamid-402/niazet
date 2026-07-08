@@ -210,7 +210,11 @@ export class AuthService {
     return this.issueSessionTokens(user);
   }
 
-  async logout(userId: string, refreshToken: string) {
+  async logout(userId: string, refreshToken?: string) {
+    if (!refreshToken) {
+      return { message: 'خروج با موفقیت انجام شد.' };
+    }
+
     const sessions = await this.prisma.session.findMany({
       where: { userId, revokedAt: null },
     });
