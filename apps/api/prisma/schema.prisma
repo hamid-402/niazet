@@ -1,0 +1,1261 @@
+// نیازت با ما — Prisma schema
+// منبع: docs/specs/architecture-v4.md, docs/specs/addendum-state-machine-ledger.md
+// این schema همه جدول‌های سند اصلی (بخش ۲۱) و الحاقیه را پوشش می‌دهد، حتی جدول‌های
+// فاز بعد (withdrawal، مجری بیرونی، AI ...) تا نیاز به migration اساسی بعدی نباشد.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum UserRole {
+  customer
+  executor
+  support
+  admin
+}
+
+enum AdminScope {
+  super_admin
+  ops_admin
+  finance_admin
+}
+
+enum CapabilityType {
+  customer
+  executor
+}
+
+enum UserStatus {
+  pending_verification
+  active
+  suspended
+  blocked
+}
+
+enum ExecutorType {
+  internal_staff
+  vetted_external
+}
+
+enum VerificationStatus {
+  pending
+  in_review
+  approved
+  rejected
+}
+
+enum ExecutorStatus {
+  active
+  over_capacity
+  on_leave
+  under_review
+  blocked
+}
+
+enum PricingModel {
+  fixed
+  formula
+  manual_quote
+}
+
+enum OrderStatus {
+  draft
+  submitted
+  pending_triage
+  triaging
+  pending_quote
+  quoted
+  pending_payment
+  paid
+  assigned
+  in_progress
+  submitted_for_qc
+  qc_in_review
+  qc_rejected
+  ready_for_customer_review
+  delivered
+  revision_requested
+  confirmed
+  disputed
+  cancelled
+  closed
+}
+
+enum OrderStatusSource {
+  customer
+  admin
+  executor
+  system
+  support
+}
+
+enum ConfidentialityLevel {
+  normal
+  sensitive
+  highly_sensitive
+}
+
+enum FileKind {
+  input
+  output
+  revision
+  message_attachment
+  ticket_attachment
+  report
+  invoice
+}
+
+enum FileScanStatus {
+  pending
+  clean
+  infected
+  skipped
+}
+
+enum ReportType {
+  progress
+  qc
+  delivery
+  management
+  support
+  staff_performance
+}
+
+enum ReportStatus {
+  draft
+  published
+}
+
+enum MessageVisibility {
+  customer_visible
+  internal_only
+}
+
+enum AssignmentRole {
+  pursuit_owner
+  team_lead
+  contributor
+  qc_reviewer
+}
+
+enum QcResult {
+  passed
+  needs_rework
+  rejected
+}
+
+enum TicketCategory {
+  payment
+  quality
+  delay
+  file
+  report
+  support
+  complaint
+  compliment
+  other
+}
+
+enum TicketPriority {
+  low
+  normal
+  high
+  urgent
+}
+
+enum TicketStatus {
+  open
+  assigned
+  in_progress
+  waiting_customer
+  waiting_internal
+  resolved
+  closed
+  escalated
+}
+
+enum LedgerAccountType {
+  customer_wallet
+  executor_wallet
+  platform_commission
+  platform_escrow
+  payment_gateway_clearing
+}
+
+enum LedgerReferenceType {
+  payment
+  escrow_release
+  escrow_refund
+  withdrawal
+  commission
+  refund
+}
+
+enum WalletTxDirection {
+  debit
+  credit
+}
+
+enum PaymentStatus {
+  pending
+  verifying
+  succeeded
+  failed
+  refunded
+}
+
+enum EscrowStatus {
+  held
+  partially_released
+  released
+  partially_refunded
+  refunded
+  disputed
+}
+
+enum RefundStatus {
+  pending
+  approved
+  rejected
+  processed
+}
+
+enum WithdrawalStatus {
+  pending
+  approved
+  rejected
+  paid
+}
+
+enum DisputeStatus {
+  open
+  resolved
+}
+
+enum DisputeResolutionType {
+  rework
+  refund_full
+  refund_partial
+  release_to_executor
+  close
+}
+
+enum FeedbackType {
+  rating
+  complaint
+  compliment
+}
+
+enum FeedbackTargetType {
+  order
+  team
+  executor
+  support
+  qc
+}
+
+enum FeedbackVisibility {
+  internal_only
+  admin_and_target
+}
+
+enum AuditSensitivity {
+  normal
+  sensitive
+  critical
+}
+
+enum NotificationChannel {
+  in_app
+  email
+  sms
+}
+
+enum OutboxStatus {
+  pending
+  sent
+  failed
+}
+
+enum OnboardingStage {
+  registered
+  identity_verification
+  skills_exam
+  interview
+  reference_check
+  contract
+  nda
+  trial_period
+  limited_access
+  initial_evaluation
+  approved
+  rejected
+}
+
+// ---------------------------------------------------------------------------
+// Users, auth, capabilities
+// ---------------------------------------------------------------------------
+
+model User {
+  id         String      @id @default(uuid())
+  role       UserRole
+  adminScope AdminScope? @map("admin_scope")
+  status     UserStatus  @default(pending_verification)
+
+  fullName     String  @map("full_name")
+  displayAlias String? @map("display_alias")
+  email        String? @unique
+  phone        String  @unique
+  passwordHash String? @map("password_hash")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  capabilities  UserCapability[]
+  sessions      Session[]
+  loginAttempts LoginAttempt[]
+  otpCodes      OtpCode[]
+
+  executorProfile ExecutorProfile?
+
+  ordersAsCustomer Order[] @relation("OrderCustomer")
+
+  sentMessages    OrderMessage[] @relation("MessageSender")
+  uploadedFiles   OrderFile[]    @relation("FileUploader")
+  authoredReports OrderReport[]  @relation("ReportAuthor")
+
+  assignedOrdersBy   OrderAssignment[]    @relation("AssignedBy")
+  publicHandlerLinks OrderPublicHandler[] @relation("PublicHandlerUser")
+
+  qcReviews QcReview[] @relation("QcReviewer")
+
+  ticketsAsCustomer Ticket[]           @relation("TicketCustomer")
+  ticketsAssigned   Ticket[]           @relation("TicketAssignee")
+  ticketMessages    TicketMessage[]    @relation("TicketMessageSender")
+  ticketEscalations TicketEscalation[] @relation("TicketEscalatedBy")
+
+  wallet               Wallet?
+  ledgerAccount        LedgerAccount?
+  ledgerEntriesCreated LedgerEntry[]  @relation("LedgerCreatedBy")
+
+  paymentsAsCustomer Payment[]    @relation("PaymentCustomer")
+  refundsDecided     Refund[]     @relation("RefundDecidedBy")
+  withdrawalsDecided Withdrawal[] @relation("WithdrawalDecidedBy")
+  invoices           Invoice[]    @relation("InvoiceCustomer")
+
+  disputesRaised   Dispute[] @relation("DisputeRaisedBy")
+  disputesResolved Dispute[] @relation("DisputeResolvedBy")
+
+  feedbackGiven Feedback[] @relation("FeedbackCustomer")
+
+  statusChanges OrderStatusHistory[] @relation("StatusActor")
+
+  auditLogs     AuditLog[]        @relation("AuditActor")
+  notifications NotificationLog[]
+
+  systemSettingsUpdated SystemSetting[] @relation("SettingUpdatedBy")
+
+  @@map("users")
+}
+
+model UserCapability {
+  id         String         @id @default(uuid())
+  userId     String         @map("user_id")
+  capability CapabilityType
+  grantedAt  DateTime       @default(now()) @map("granted_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, capability])
+  @@map("user_capabilities")
+}
+
+model Session {
+  id               String    @id @default(uuid())
+  userId           String    @map("user_id")
+  refreshTokenHash String    @map("refresh_token_hash")
+  userAgent        String?   @map("user_agent")
+  ipAddress        String?   @map("ip_address")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  expiresAt        DateTime  @map("expires_at")
+  revokedAt        DateTime? @map("revoked_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model LoginAttempt {
+  id         String   @id @default(uuid())
+  userId     String?  @map("user_id")
+  identifier String
+  success    Boolean
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("login_attempts")
+}
+
+model OtpCode {
+  id         String    @id @default(uuid())
+  userId     String?   @map("user_id")
+  identifier String
+  purpose    String
+  codeHash   String    @map("code_hash")
+  expiresAt  DateTime  @map("expires_at")
+  consumedAt DateTime? @map("consumed_at")
+  attempts   Int       @default(0)
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("otp_codes")
+}
+
+// ---------------------------------------------------------------------------
+// Executor / team / skills / performance
+// ---------------------------------------------------------------------------
+
+model Team {
+  id          String   @id @default(uuid())
+  name        String
+  code        String   @unique
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  members            ExecutorProfile[]
+  orderAssignments   OrderAssignment[]
+  publicHandlerLinks OrderPublicHandler[]
+
+  @@map("teams")
+}
+
+model Skill {
+  id       String  @id @default(uuid())
+  name     String  @unique
+  category String?
+
+  executorSkills ExecutorSkill[]
+
+  @@map("skills")
+}
+
+model ExecutorProfile {
+  id                 String             @id @default(uuid())
+  userId             String             @unique @map("user_id")
+  executorType       ExecutorType       @default(internal_staff) @map("executor_type")
+  verificationStatus VerificationStatus @default(approved) @map("verification_status")
+  publicHandlerCode  String             @unique @map("public_handler_code")
+  displayAlias       String             @map("display_alias")
+  teamId             String?            @map("team_id")
+  status             ExecutorStatus     @default(active)
+
+  capacityPercent    Int     @default(0) @map("capacity_percent")
+  qcPassRate         Decimal @default(0) @map("qc_pass_rate") @db.Decimal(5, 2)
+  onTimeDeliveryRate Decimal @default(0) @map("on_time_delivery_rate") @db.Decimal(5, 2)
+  customerRatingAvg  Decimal @default(0) @map("customer_rating_avg") @db.Decimal(3, 2)
+  complaintCount     Int     @default(0) @map("complaint_count")
+  complimentCount    Int     @default(0) @map("compliment_count")
+  riskScore          Decimal @default(0) @map("risk_score") @db.Decimal(5, 2)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team Team? @relation(fields: [teamId], references: [id])
+
+  skills               ExecutorSkill[]
+  capacitySnapshots    StaffCapacitySnapshot[]
+  performanceSnapshots StaffPerformanceSnapshot[]
+  assignments          OrderAssignment[]
+  onboarding           ExecutorOnboarding?
+  withdrawals          Withdrawal[]
+
+  @@map("executor_profiles")
+}
+
+model ExecutorSkill {
+  id                String @id @default(uuid())
+  executorProfileId String @map("executor_profile_id")
+  skillId           String @map("skill_id")
+  level             Int    @default(1)
+
+  executorProfile ExecutorProfile @relation(fields: [executorProfileId], references: [id], onDelete: Cascade)
+  skill           Skill           @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([executorProfileId, skillId])
+  @@map("executor_skills")
+}
+
+model StaffCapacitySnapshot {
+  id                String   @id @default(uuid())
+  executorProfileId String   @map("executor_profile_id")
+  snapshotDate      DateTime @map("snapshot_date")
+  capacityPercent   Int      @map("capacity_percent")
+  activeOrders      Int      @map("active_orders")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  executorProfile ExecutorProfile @relation(fields: [executorProfileId], references: [id], onDelete: Cascade)
+
+  @@map("staff_capacity_snapshots")
+}
+
+model StaffPerformanceSnapshot {
+  id                String   @id @default(uuid())
+  executorProfileId String   @map("executor_profile_id")
+  periodStart       DateTime @map("period_start")
+  periodEnd         DateTime @map("period_end")
+  completedOrders   Int      @default(0) @map("completed_orders")
+  activeOrders      Int      @default(0) @map("active_orders")
+  onTimeRate        Decimal  @default(0) @map("on_time_rate") @db.Decimal(5, 2)
+  qcPassRate        Decimal  @default(0) @map("qc_pass_rate") @db.Decimal(5, 2)
+  avgCustomerRating Decimal  @default(0) @map("avg_customer_rating") @db.Decimal(3, 2)
+  complaintCount    Int      @default(0) @map("complaint_count")
+  complimentCount   Int      @default(0) @map("compliment_count")
+  riskScore         Decimal  @default(0) @map("risk_score") @db.Decimal(5, 2)
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  executorProfile ExecutorProfile @relation(fields: [executorProfileId], references: [id], onDelete: Cascade)
+
+  @@map("staff_performance_snapshots")
+}
+
+// فاز بعد: جذب مجری بیرونی
+model ExecutorOnboarding {
+  id                String          @id @default(uuid())
+  executorProfileId String          @unique @map("executor_profile_id")
+  stage             OnboardingStage @default(registered)
+  notes             String?
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+
+  executorProfile ExecutorProfile @relation(fields: [executorProfileId], references: [id], onDelete: Cascade)
+
+  @@map("executor_onboardings")
+}
+
+// ---------------------------------------------------------------------------
+// Services, packages, forms, QC checklist templates
+// ---------------------------------------------------------------------------
+
+model ServiceLine {
+  id             String       @id @default(uuid())
+  slug           String       @unique
+  title          String
+  category       String
+  description    String
+  deliverables   String?
+  pricingModel   PricingModel @default(manual_quote) @map("pricing_model")
+  basePrice      Int?         @map("base_price")
+  slaHours       Int?         @map("sla_hours")
+  revisionPolicy String?      @map("revision_policy")
+  isActive       Boolean      @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  packages             ServicePackage[]
+  formFields           ServiceFormField[]
+  acceptanceCriteria   ServiceAcceptanceCriteria[]
+  qcChecklistTemplates QcChecklistTemplate[]
+  orders               Order[]
+
+  @@map("service_lines")
+}
+
+model ServicePackage {
+  id           String  @id @default(uuid())
+  serviceId    String  @map("service_id")
+  name         String
+  description  String?
+  price        Int?
+  slaHours     Int?    @map("sla_hours")
+  deliverables String?
+  isActive     Boolean @default(true) @map("is_active")
+
+  service     Order[]     @relation("OrderPackage")
+  serviceLine ServiceLine @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@map("service_packages")
+}
+
+model ServiceFormField {
+  id        String  @id @default(uuid())
+  serviceId String  @map("service_id")
+  label     String
+  fieldKey  String  @map("field_key")
+  fieldType String  @map("field_type")
+  required  Boolean @default(false)
+  options   Json?
+  sortOrder Int     @default(0) @map("sort_order")
+
+  serviceLine ServiceLine @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@unique([serviceId, fieldKey])
+  @@map("service_form_fields")
+}
+
+model ServiceAcceptanceCriteria {
+  id          String @id @default(uuid())
+  serviceId   String @map("service_id")
+  description String
+
+  serviceLine ServiceLine @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@map("service_acceptance_criteria")
+}
+
+model QcChecklistTemplate {
+  id        String @id @default(uuid())
+  serviceId String @map("service_id")
+  name      String
+
+  serviceLine ServiceLine       @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  items       QcChecklistItem[]
+
+  @@map("qc_checklist_templates")
+}
+
+model QcChecklistItem {
+  id         String @id @default(uuid())
+  templateId String @map("template_id")
+  label      String
+  sortOrder  Int    @default(0) @map("sort_order")
+
+  template      QcChecklistTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  qcReviewItems QcReviewItem[]
+
+  @@map("qc_checklist_items")
+}
+
+// ---------------------------------------------------------------------------
+// Orders and lifecycle
+// ---------------------------------------------------------------------------
+
+model Order {
+  id   String @id @default(uuid())
+  code String @unique
+
+  customerId String  @map("customer_id")
+  serviceId  String  @map("service_id")
+  packageId  String? @map("package_id")
+
+  title                String
+  status               OrderStatus          @default(draft)
+  urgency              String               @default("normal")
+  briefDescription     String               @map("brief_description")
+  formResponses        Json?                @map("form_responses")
+  confidentialityLevel ConfidentialityLevel @default(normal) @map("confidentiality_level")
+
+  budgetHint Int?   @map("budget_hint")
+  finalPrice Int?   @map("final_price")
+  currency   String @default("IRT")
+
+  revisionsAllowed Int @default(2) @map("revisions_allowed")
+  revisionsUsed    Int @default(0) @map("revisions_used")
+
+  riskFlags Json? @map("risk_flags")
+
+  submittedAt DateTime? @map("submitted_at")
+  quotedAt    DateTime? @map("quoted_at")
+  paidAt      DateTime? @map("paid_at")
+  assignedAt  DateTime? @map("assigned_at")
+  deliveredAt DateTime? @map("delivered_at")
+  confirmedAt DateTime? @map("confirmed_at")
+  cancelledAt DateTime? @map("cancelled_at")
+  closedAt    DateTime? @map("closed_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  customer    User            @relation("OrderCustomer", fields: [customerId], references: [id])
+  serviceLine ServiceLine     @relation(fields: [serviceId], references: [id])
+  package     ServicePackage? @relation("OrderPackage", fields: [packageId], references: [id])
+
+  statusHistory      OrderStatusHistory[]
+  milestones         OrderMilestone[]
+  acceptanceCriteria OrderAcceptanceCriteria[]
+  files              OrderFile[]
+  reports            OrderReport[]
+  messages           OrderMessage[]
+  publicHandlers     OrderPublicHandler[]
+  assignments        OrderAssignment[]
+  qcReviews          QcReview[]
+  tickets            Ticket[]
+  payments           Payment[]
+  escrowHolds        EscrowHold[]
+  refunds            Refund[]
+  invoices           Invoice[]
+  disputes           Dispute[]
+  feedback           Feedback[]
+
+  @@index([customerId])
+  @@index([status])
+  @@map("orders")
+}
+
+model OrderStatusHistory {
+  id          String            @id @default(uuid())
+  orderId     String            @map("order_id")
+  fromStatus  OrderStatus?      @map("from_status")
+  toStatus    OrderStatus       @map("to_status")
+  actorUserId String?           @map("actor_user_id")
+  source      OrderStatusSource
+  note        String?
+  createdAt   DateTime          @default(now()) @map("created_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  actor User? @relation("StatusActor", fields: [actorUserId], references: [id])
+
+  @@index([orderId])
+  @@map("order_status_history")
+}
+
+model OrderMilestone {
+  id                 String        @id @default(uuid())
+  orderId            String        @map("order_id")
+  sequence           Int
+  title              String
+  amount             Int
+  dueAt              DateTime?     @map("due_at")
+  acceptanceCriteria String?       @map("acceptance_criteria")
+  paymentStatus      PaymentStatus @default(pending) @map("payment_status")
+  deliveryStatus     String        @default("pending") @map("delivery_status")
+  qcStatus           String        @default("not_required") @map("qc_status")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  order    Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  payments Payment[]
+
+  @@unique([orderId, sequence])
+  @@map("order_milestones")
+}
+
+model OrderAcceptanceCriteria {
+  id          String  @id @default(uuid())
+  orderId     String  @map("order_id")
+  description String
+  isMet       Boolean @default(false) @map("is_met")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("order_acceptance_criteria")
+}
+
+model OrderFile {
+  id               String         @id @default(uuid())
+  orderId          String         @map("order_id")
+  uploadedByUserId String         @map("uploaded_by_user_id")
+  fileKind         FileKind       @map("file_kind")
+  storageKey       String         @unique @map("storage_key")
+  originalName     String         @map("original_name")
+  mimeType         String         @map("mime_type")
+  sizeBytes        Int            @map("size_bytes")
+  checksum         String?
+  scanStatus       FileScanStatus @default(pending) @map("scan_status")
+  createdAt        DateTime       @default(now()) @map("created_at")
+
+  order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  uploader User  @relation("FileUploader", fields: [uploadedByUserId], references: [id])
+
+  reports  OrderReport[]
+  messages OrderMessage[]
+
+  @@map("order_files")
+}
+
+model OrderReport {
+  id                String       @id @default(uuid())
+  orderId           String       @map("order_id")
+  authorUserId      String       @map("author_user_id")
+  reportType        ReportType   @map("report_type")
+  version           Int          @default(1)
+  summary           String
+  fileId            String?      @map("file_id")
+  visibleToCustomer Boolean      @default(false) @map("visible_to_customer")
+  status            ReportStatus @default(draft)
+  createdAt         DateTime     @default(now()) @map("created_at")
+
+  order  Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  author User       @relation("ReportAuthor", fields: [authorUserId], references: [id])
+  file   OrderFile? @relation(fields: [fileId], references: [id])
+
+  @@map("order_reports")
+}
+
+model OrderMessage {
+  id               String            @id @default(uuid())
+  orderId          String            @map("order_id")
+  senderUserId     String            @map("sender_user_id")
+  messageType      String            @default("general") @map("message_type")
+  body             String
+  attachmentFileId String?           @map("attachment_file_id")
+  visibility       MessageVisibility @default(customer_visible)
+  createdAt        DateTime          @default(now()) @map("created_at")
+
+  order      Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  sender     User       @relation("MessageSender", fields: [senderUserId], references: [id])
+  attachment OrderFile? @relation(fields: [attachmentFileId], references: [id])
+
+  @@index([orderId])
+  @@map("order_messages")
+}
+
+model OrderPublicHandler {
+  id                String         @id @default(uuid())
+  orderId           String         @map("order_id")
+  internalUserId    String         @map("internal_user_id")
+  teamId            String?        @map("team_id")
+  publicHandlerCode String         @map("public_handler_code")
+  displayAlias      String         @map("display_alias")
+  assignmentRole    AssignmentRole @map("assignment_role")
+  visibleToCustomer Boolean        @default(true) @map("visible_to_customer")
+  activeFrom        DateTime       @default(now()) @map("active_from")
+  activeTo          DateTime?      @map("active_to")
+
+  order        Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  internalUser User  @relation("PublicHandlerUser", fields: [internalUserId], references: [id])
+  team         Team? @relation(fields: [teamId], references: [id])
+
+  @@index([orderId])
+  @@map("order_public_handlers")
+}
+
+model OrderAssignment {
+  id                String         @id @default(uuid())
+  orderId           String         @map("order_id")
+  executorProfileId String         @map("executor_profile_id")
+  teamId            String?        @map("team_id")
+  assignedByUserId  String         @map("assigned_by_user_id")
+  assignmentRole    AssignmentRole @default(contributor) @map("assignment_role")
+  assignedAt        DateTime       @default(now()) @map("assigned_at")
+  unassignedAt      DateTime?      @map("unassigned_at")
+
+  order           Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  executorProfile ExecutorProfile @relation(fields: [executorProfileId], references: [id])
+  team            Team?           @relation(fields: [teamId], references: [id])
+  assignedBy      User            @relation("AssignedBy", fields: [assignedByUserId], references: [id])
+
+  @@index([orderId])
+  @@index([executorProfileId])
+  @@map("order_assignments")
+}
+
+// ---------------------------------------------------------------------------
+// QC
+// ---------------------------------------------------------------------------
+
+model QcReview {
+  id             String    @id @default(uuid())
+  orderId        String    @map("order_id")
+  reviewerUserId String    @map("reviewer_user_id")
+  result         QcResult?
+  comment        String?
+  reviewedAt     DateTime? @map("reviewed_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  order    Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  reviewer User           @relation("QcReviewer", fields: [reviewerUserId], references: [id])
+  items    QcReviewItem[]
+
+  @@index([orderId])
+  @@map("qc_reviews")
+}
+
+model QcReviewItem {
+  id              String  @id @default(uuid())
+  qcReviewId      String  @map("qc_review_id")
+  checklistItemId String  @map("checklist_item_id")
+  passed          Boolean @default(false)
+  note            String?
+
+  qcReview      QcReview        @relation(fields: [qcReviewId], references: [id], onDelete: Cascade)
+  checklistItem QcChecklistItem @relation(fields: [checklistItemId], references: [id])
+
+  @@map("qc_review_items")
+}
+
+// ---------------------------------------------------------------------------
+// Tickets / SLA
+// ---------------------------------------------------------------------------
+
+model Ticket {
+  id                       String         @id @default(uuid())
+  code                     String         @unique
+  customerId               String         @map("customer_id")
+  orderId                  String?        @map("order_id")
+  category                 TicketCategory
+  priority                 TicketPriority @default(normal)
+  status                   TicketStatus   @default(open)
+  assignedToUserId         String?        @map("assigned_to_user_id")
+  subject                  String
+  relatedPublicHandlerCode String?        @map("related_public_handler_code")
+
+  slaDueAt   DateTime? @map("sla_due_at")
+  resolvedAt DateTime? @map("resolved_at")
+  closedAt   DateTime? @map("closed_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  customer   User   @relation("TicketCustomer", fields: [customerId], references: [id])
+  order      Order? @relation(fields: [orderId], references: [id])
+  assignedTo User?  @relation("TicketAssignee", fields: [assignedToUserId], references: [id])
+
+  messages    TicketMessage[]
+  escalations TicketEscalation[]
+  slaEvents   TicketSlaEvent[]
+
+  @@index([customerId])
+  @@index([status])
+  @@map("tickets")
+}
+
+model TicketMessage {
+  id               String            @id @default(uuid())
+  ticketId         String            @map("ticket_id")
+  senderUserId     String            @map("sender_user_id")
+  body             String
+  attachmentFileId String?           @map("attachment_file_id")
+  visibility       MessageVisibility @default(customer_visible)
+  createdAt        DateTime          @default(now()) @map("created_at")
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  sender User   @relation("TicketMessageSender", fields: [senderUserId], references: [id])
+
+  @@map("ticket_messages")
+}
+
+model TicketEscalation {
+  id                String    @id @default(uuid())
+  ticketId          String    @map("ticket_id")
+  escalatedByUserId String    @map("escalated_by_user_id")
+  reason            String
+  escalatedAt       DateTime  @default(now()) @map("escalated_at")
+  resolvedAt        DateTime? @map("resolved_at")
+
+  ticket      Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  escalatedBy User   @relation("TicketEscalatedBy", fields: [escalatedByUserId], references: [id])
+
+  @@map("ticket_escalations")
+}
+
+model TicketSlaEvent {
+  id         String   @id @default(uuid())
+  ticketId   String   @map("ticket_id")
+  eventType  String   @map("event_type")
+  occurredAt DateTime @default(now()) @map("occurred_at")
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@map("ticket_sla_events")
+}
+
+// ---------------------------------------------------------------------------
+// Financial: ledger (source of truth), wallet (cache projection), payments,
+// escrow, refunds, withdrawals, invoices
+// ---------------------------------------------------------------------------
+
+model LedgerAccount {
+  id          String            @id @default(uuid())
+  accountType LedgerAccountType @map("account_type")
+  ownerUserId String?           @unique @map("owner_user_id")
+  currency    String            @default("IRT")
+  createdAt   DateTime          @default(now()) @map("created_at")
+
+  owner User? @relation(fields: [ownerUserId], references: [id])
+
+  debitEntries  LedgerEntry[] @relation("DebitAccount")
+  creditEntries LedgerEntry[] @relation("CreditAccount")
+
+  @@map("ledger_accounts")
+}
+
+model LedgerEntry {
+  id              String              @id @default(uuid())
+  debitAccountId  String              @map("debit_account_id")
+  creditAccountId String              @map("credit_account_id")
+  amount          Int
+  currency        String              @default("IRT")
+  referenceType   LedgerReferenceType @map("reference_type")
+  referenceId     String              @map("reference_id")
+  idempotencyKey  String?             @unique @map("idempotency_key")
+  createdByUserId String?             @map("created_by_user_id")
+  createdAt       DateTime            @default(now()) @map("created_at")
+
+  debitAccount  LedgerAccount @relation("DebitAccount", fields: [debitAccountId], references: [id])
+  creditAccount LedgerAccount @relation("CreditAccount", fields: [creditAccountId], references: [id])
+  createdBy     User?         @relation("LedgerCreatedBy", fields: [createdByUserId], references: [id])
+
+  walletTransactions WalletTransaction[]
+
+  @@index([referenceType, referenceId])
+  @@map("ledger_entries")
+}
+
+model Wallet {
+  id        String   @id @default(uuid())
+  userId    String   @unique @map("user_id")
+  balance   Int      @default(0)
+  currency  String   @default("IRT")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  transactions WalletTransaction[]
+
+  @@map("wallets")
+}
+
+model WalletTransaction {
+  id            String              @id @default(uuid())
+  walletId      String              @map("wallet_id")
+  ledgerEntryId String              @map("ledger_entry_id")
+  direction     WalletTxDirection
+  amount        Int
+  balanceAfter  Int                 @map("balance_after")
+  referenceType LedgerReferenceType @map("reference_type")
+  referenceId   String              @map("reference_id")
+  createdAt     DateTime            @default(now()) @map("created_at")
+
+  wallet      Wallet      @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  ledgerEntry LedgerEntry @relation(fields: [ledgerEntryId], references: [id])
+
+  @@index([walletId])
+  @@map("wallet_transactions")
+}
+
+model Payment {
+  id             String        @id @default(uuid())
+  orderId        String        @map("order_id")
+  milestoneId    String?       @map("milestone_id")
+  customerId     String        @map("customer_id")
+  amount         Int
+  currency       String        @default("IRT")
+  gateway        String
+  gatewayRef     String?       @map("gateway_ref")
+  status         PaymentStatus @default(pending)
+  idempotencyKey String        @unique @map("idempotency_key")
+  verifiedAt     DateTime?     @map("verified_at")
+  failureReason  String?       @map("failure_reason")
+  createdAt      DateTime      @default(now()) @map("created_at")
+
+  order     Order           @relation(fields: [orderId], references: [id])
+  milestone OrderMilestone? @relation(fields: [milestoneId], references: [id])
+  customer  User            @relation("PaymentCustomer", fields: [customerId], references: [id])
+
+  escrowHold EscrowHold?
+
+  @@index([orderId])
+  @@map("payments")
+}
+
+model EscrowHold {
+  id         String       @id @default(uuid())
+  orderId    String       @map("order_id")
+  paymentId  String       @unique @map("payment_id")
+  amount     Int
+  currency   String       @default("IRT")
+  status     EscrowStatus @default(held)
+  heldAt     DateTime     @default(now()) @map("held_at")
+  releasedAt DateTime?    @map("released_at")
+  refundedAt DateTime?    @map("refunded_at")
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  payment Payment @relation(fields: [paymentId], references: [id])
+
+  refunds Refund[]
+
+  @@index([orderId])
+  @@map("escrow_holds")
+}
+
+model Refund {
+  id                     String       @id @default(uuid())
+  orderId                String       @map("order_id")
+  escrowHoldId           String?      @map("escrow_hold_id")
+  amount                 Int
+  reason                 String
+  note                   String
+  decidedByUserId        String       @map("decided_by_user_id")
+  status                 RefundStatus @default(pending)
+  ledgerEntryReferenceId String?      @map("ledger_entry_reference_id")
+  createdAt              DateTime     @default(now()) @map("created_at")
+
+  order      Order       @relation(fields: [orderId], references: [id])
+  escrowHold EscrowHold? @relation(fields: [escrowHoldId], references: [id])
+  decidedBy  User        @relation("RefundDecidedBy", fields: [decidedByUserId], references: [id])
+
+  @@map("refunds")
+}
+
+model Withdrawal {
+  id                String           @id @default(uuid())
+  executorProfileId String           @map("executor_profile_id")
+  amount            Int
+  shabaNumber       String           @map("shaba_number")
+  status            WithdrawalStatus @default(pending)
+  decidedByUserId   String?          @map("decided_by_user_id")
+  decidedAt         DateTime?        @map("decided_at")
+  note              String?
+  createdAt         DateTime         @default(now()) @map("created_at")
+
+  executorProfile ExecutorProfile @relation(fields: [executorProfileId], references: [id])
+  decidedBy       User?           @relation("WithdrawalDecidedBy", fields: [decidedByUserId], references: [id])
+
+  @@map("withdrawals")
+}
+
+model Invoice {
+  id            String    @id @default(uuid())
+  orderId       String    @map("order_id")
+  customerId    String    @map("customer_id")
+  invoiceNumber String    @unique @map("invoice_number")
+  amount        Int
+  issuedAt      DateTime  @default(now()) @map("issued_at")
+  pdfFileKey    String?   @map("pdf_file_key")
+  emailSentAt   DateTime? @map("email_sent_at")
+
+  order    Order @relation(fields: [orderId], references: [id])
+  customer User  @relation("InvoiceCustomer", fields: [customerId], references: [id])
+
+  @@map("invoices")
+}
+
+// ---------------------------------------------------------------------------
+// Dispute
+// ---------------------------------------------------------------------------
+
+model Dispute {
+  id                    String                 @id @default(uuid())
+  orderId               String                 @map("order_id")
+  raisedByUserId        String                 @map("raised_by_user_id")
+  reason                String
+  note                  String
+  status                DisputeStatus          @default(open)
+  resolutionType        DisputeResolutionType? @map("resolution_type")
+  resolvedByUserId      String?                @map("resolved_by_user_id")
+  resolvedAt            DateTime?              @map("resolved_at")
+  financialEffectAmount Int?                   @map("financial_effect_amount")
+  createdAt             DateTime               @default(now()) @map("created_at")
+
+  order      Order @relation(fields: [orderId], references: [id])
+  raisedBy   User  @relation("DisputeRaisedBy", fields: [raisedByUserId], references: [id])
+  resolvedBy User? @relation("DisputeResolvedBy", fields: [resolvedByUserId], references: [id])
+
+  @@map("disputes")
+}
+
+// ---------------------------------------------------------------------------
+// Feedback / rating (order_ratings + staff_feedback + customer_feedback یکپارچه)
+// ---------------------------------------------------------------------------
+
+model Feedback {
+  id                  String             @id @default(uuid())
+  orderId             String             @map("order_id")
+  customerId          String             @map("customer_id")
+  targetType          FeedbackTargetType @map("target_type")
+  targetInternalId    String?            @map("target_internal_id")
+  publicHandlerCode   String?            @map("public_handler_code")
+  rating              Int?
+  satisfactionPercent Int?               @map("satisfaction_percent")
+  feedbackType        FeedbackType       @map("feedback_type")
+  comment             String?
+  visibility          FeedbackVisibility @default(admin_and_target)
+  createdAt           DateTime           @default(now()) @map("created_at")
+
+  order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  customer User  @relation("FeedbackCustomer", fields: [customerId], references: [id])
+
+  @@index([orderId])
+  @@index([targetType, targetInternalId])
+  @@map("feedback")
+}
+
+// ---------------------------------------------------------------------------
+// Audit / outbox / notifications / idempotency / settings
+// ---------------------------------------------------------------------------
+
+model AuditLog {
+  id          String           @id @default(uuid())
+  actorUserId String?          @map("actor_user_id")
+  actorRole   UserRole?        @map("actor_role")
+  action      String
+  entityType  String           @map("entity_type")
+  entityId    String           @map("entity_id")
+  before      Json?
+  after       Json?
+  sensitivity AuditSensitivity @default(normal)
+  ipAddress   String?          @map("ip_address")
+  createdAt   DateTime         @default(now()) @map("created_at")
+
+  actor User? @relation("AuditActor", fields: [actorUserId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([actorUserId])
+  @@map("audit_logs")
+}
+
+model OutboxEvent {
+  id        String       @id @default(uuid())
+  eventType String       @map("event_type")
+  payload   Json
+  status    OutboxStatus @default(pending)
+  attempts  Int          @default(0)
+  createdAt DateTime     @default(now()) @map("created_at")
+  sentAt    DateTime?    @map("sent_at")
+
+  @@map("outbox_events")
+}
+
+model NotificationLog {
+  id        String              @id @default(uuid())
+  userId    String              @map("user_id")
+  channel   NotificationChannel
+  eventType String              @map("event_type")
+  title     String
+  body      String
+  readAt    DateTime?           @map("read_at")
+  sentAt    DateTime?           @map("sent_at")
+  createdAt DateTime            @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("notification_logs")
+}
+
+model IdempotencyKey {
+  id               String   @id @default(uuid())
+  key              String   @unique
+  scope            String
+  responseSnapshot Json?    @map("response_snapshot")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@map("idempotency_keys")
+}
+
+model SystemSetting {
+  id              String   @id @default(uuid())
+  key             String   @unique
+  value           Json
+  updatedByUserId String?  @map("updated_by_user_id")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  updatedBy User? @relation("SettingUpdatedBy", fields: [updatedByUserId], references: [id])
+
+  @@map("system_settings")
+}
