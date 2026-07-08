@@ -84,21 +84,33 @@ production-ready» تحویل نمی‌دهم، بلکه یک **اسکلت کا�
 
 ## ۴. وضعیت پیاده‌سازی (به‌روزرسانی می‌شود)
 
-جدول زیر با پیشرفت کار در همین PR/شاخه به‌روزرسانی می‌شود.
-
 | بخش | وضعیت |
 |---|---|
-| Monorepo scaffold | در حال انجام |
-| Prisma schema کامل | در حال انجام |
-| Auth + Guard ها | در صف |
-| Services/Packages | در صف |
-| Orders + state machine | در صف |
-| Finance (ledger/wallet/escrow/payment) | در صف |
-| Tickets/SLA | در صف |
-| Feedback/rating | در صف |
-| Audit/Outbox | در صف |
-| Seed داده نمونه | در صف |
-| تست‌های backend | در صف |
-| Frontend عمومی + مشتری | در صف |
-| Frontend کارمند/پشتیبان | در صف |
-| Frontend ادمین عملیاتی/مالی | در صف |
+| Monorepo scaffold | ✅ تکمیل |
+| Prisma schema کامل (همه جدول‌های سند اصلی + الحاقیه) | ✅ تکمیل |
+| Auth + Guard ها (role/admin_scope/capability) | ✅ تکمیل |
+| Services/Packages (عمومی + ادمین) | ✅ تکمیل |
+| Orders + state machine کامل (۲۰ وضعیت طبق جدول گذار) | ✅ تکمیل + تست واحد |
+| Finance (ledger دوطرفه/wallet cache/escrow/payment/refund/invoice/withdrawal) | ✅ تکمیل + تست e2e |
+| QC (صف، چک‌لیست، تایید/رد/rework، enforce نبودن reviewer=executor) | ✅ تکمیل |
+| Tickets/SLA (بر اساس ساعت کاری، escalation) | ✅ تکمیل |
+| Feedback/rating (کد قابل ارجاع) | ✅ تکمیل |
+| Files (whitelist، signed URL، کنترل مالکیت) | ✅ تکمیل (آنتی‌ویروس واقعی فاز بعد) |
+| Audit/Outbox/Notifications | ✅ تکمیل (سطح پایه) |
+| Users/Admin (super_admin: کاربران، ادمین‌ها، audit log، settings) | ✅ تکمیل |
+| Seed داده نمونه (هر نقش + خدمات نمونه) | ✅ تکمیل |
+| تست‌های backend (state machine + business-hours) | ✅ تکمیل |
+| اسکریپت e2e دستی (کل چرخه سفارش، تایید شده) | ✅ تکمیل |
+| Frontend: عمومی (خانه/خدمات/ورود/ثبت‌نام) | ✅ تکمیل |
+| Frontend: مشتری (میز کار/ثبت درخواست/سفارش‌ها/کیف پول/تیکت) | ✅ تکمیل |
+| Frontend: کارمند/مجری (داشبورد/سفارش‌ها/اجرا/عملکرد) | ✅ تکمیل |
+| Frontend: پشتیبان (صف تیکت/پاسخ/escalation) | ✅ تکمیل |
+| Frontend: ادمین عملیاتی (داشبورد/سفارش‌ها/تریاژ/تخصیص/QC/کارمندان) | ✅ تکمیل |
+| Frontend: ادمین مالی (داشبورد/پرداخت/escrow/ledger) | ✅ تکمیل |
+| Frontend: ادمین کل (کاربران/ادمین‌ها) | ✅ تکمیل (سطح پایه) |
+| تست UI با مرورگر واقعی (ورود همه نقش‌ها + جریان کامل ثبت سفارش/تریاژ/قیمت‌گذاری) | ✅ تایید شده |
+| مدیریت کامل کارمندان (تب‌های کامل پروفایل)، گزارش‌های مدیریتی پیشرفته | ⏳ فاز بعد |
+| تنظیمات سیستم/AI UI، withdrawal UI کامل | ⏳ فاز بعد |
+| جذب مجری بیرونی، AI پیشنهادی، BI پیشرفته | ⏳ فاز بعد (خارج از MVP طبق سند) |
+| اتصال درگاه پرداخت/SMS واقعی، آنتی‌ویروس واقعی | ⏳ نیازمند تصمیم/اعتبار سرویس واقعی (بخش ۲ همین سند) |
+| Docker/CI برای استقرار production | ⏳ فاز بعد |

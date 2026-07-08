@@ -9,3 +9,6 @@ build/
 coverage/
 .turbo/
 apps/api/generated/
+apps/api/storage/
+playwright-report/
+test-results/
