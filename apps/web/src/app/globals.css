@@ -1,18 +1,72 @@
 @import 'tailwindcss';
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #faf9f6;
+  --foreground: #131c2e;
+  --card: #ffffff;
+  --card-foreground: #131c2e;
+  --border: #e6e2d8;
+  --muted: #6b7280;
+  --muted-soft: #f1efe8;
+  --brand: #0f1f3d;
+  --brand-foreground: #ffffff;
+  --brand-soft: #eef1f6;
+  --accent: #ab8226;
+  --accent-foreground: #17223a;
+  --accent-soft: #f7eed9;
+}
+
+.dark {
+  --background: #080d18;
+  --foreground: #eae7dd;
+  --card: #101a2d;
+  --card-foreground: #eae7dd;
+  --border: #223047;
+  --muted: #9aa3b7;
+  --muted-soft: #131f34;
+  --brand: #2f4d80;
+  --brand-foreground: #ffffff;
+  --brand-soft: #16233b;
+  --accent: #d8b04a;
+  --accent-foreground: #0c0f1a;
+  --accent-soft: #1c2338;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-muted-soft: var(--muted-soft);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-soft: var(--brand-soft);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-soft: var(--accent-soft);
   --font-sans: var(--font-vazirmatn);
+}
+
+* {
+  border-color: var(--border);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-vazirmatn), Tahoma, sans-serif;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent-foreground);
+}
+
+.bg-geo-pattern {
+  background-image: radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0);
+  background-size: 22px 22px;
 }
