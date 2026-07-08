@@ -107,6 +107,16 @@ export class OrdersAdminController {
     return this.orders.assign(user.id, id, dto);
   }
 
+  @Post(':id/reassign')
+  @AdminScopes(AdminScope.ops_admin)
+  reassign(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: AssignOrderDto,
+  ) {
+    return this.orders.reassign(user.id, id, dto);
+  }
+
   @Post(':id/resolve-dispute')
   @AdminScopes(AdminScope.ops_admin, AdminScope.finance_admin)
   resolveDispute(

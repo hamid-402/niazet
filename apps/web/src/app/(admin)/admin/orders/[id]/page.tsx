@@ -17,6 +17,8 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
   const [triageNote, setTriageNote] = useState('');
   const [staff, setStaff] = useState<ExecutorProfile[]>([]);
   const [selectedExecutor, setSelectedExecutor] = useState('');
+  const [reassignExecutor, setReassignExecutor] = useState('');
+  const [reassignNote, setReassignNote] = useState('');
   const [cancelReason, setCancelReason] = useState('');
   const [disputeNote, setDisputeNote] = useState('');
   const [disputeAmount, setDisputeAmount] = useState('');
@@ -185,6 +187,62 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
             >
               تخصیص
             </Button>
+          </div>
+        )}
+
+        {['assigned', 'in_progress', 'qc_rejected'].includes(order.status) && (
+          <div className="mb-4 flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <p className="text-sm font-medium text-slate-700">
+              مسئول فعلی:{' '}
+              {(() => {
+                const active = order.assignments?.find((a) => !a.unassignedAt);
+                return active
+                  ? `${active.executorProfile.displayAlias} (${active.executorProfile.publicHandlerCode})`
+                  : 'نامشخص';
+              })()}
+            </p>
+            <p className="text-xs text-slate-500">
+              اگر لازم است کار از این مجری گرفته شود و به مجری دیگری برای ادامه یا شروع مجدد سپرده شود، از این بخش استفاده کنید. گزارش‌ها و پیام‌های قبلی برای مجری جدید قابل مشاهده می‌ماند.
+            </p>
+            <div className="flex flex-wrap items-end gap-2">
+              <Field label="تغییر مسئول اجرا به">
+                <select
+                  className={inputClass}
+                  value={reassignExecutor}
+                  onChange={(e) => setReassignExecutor(e.target.value)}
+                >
+                  <option value="">انتخاب مجری جدید</option>
+                  {staff
+                    .filter(
+                      (s) => s.id !== order.assignments?.find((a) => !a.unassignedAt)?.executorProfile.id,
+                    )
+                    .map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.displayAlias} ({s.publicHandlerCode}) — ظرفیت: {s.capacityPercent}٪
+                      </option>
+                    ))}
+                </select>
+              </Field>
+              <Field label="یادداشت (اختیاری)">
+                <input className={inputClass} value={reassignNote} onChange={(e) => setReassignNote(e.target.value)} />
+              </Field>
+              <Button
+                variant="secondary"
+                disabled={busy || !reassignExecutor}
+                onClick={() =>
+                  runAction(async () => {
+                    await apiFetch(`/admin/orders/${id}/reassign`, {
+                      method: 'POST',
+                      body: { executorProfileId: reassignExecutor, note: reassignNote || undefined },
+                    });
+                    setReassignExecutor('');
+                    setReassignNote('');
+                  })
+                }
+              >
+                سلب کار و ارجاع به مجری جدید
+              </Button>
+            </div>
           </div>
         )}
 

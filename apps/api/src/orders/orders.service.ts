@@ -395,6 +395,136 @@ export class OrdersService {
     return updated;
   }
 
+  /**
+   * سلب کار از مجری فعلی و ارجاع به مجری دیگر، بدون تغییر وضعیت سفارش
+   * (سفارش همچنان `assigned` یا `in_progress` می‌ماند؛ فقط مسئول اجرا عوض
+   * می‌شود). گزارش‌ها، پیام‌ها و فایل‌های قبلی برای مجری جدید قابل مشاهده
+   * باقی می‌مانند تا کار از همان‌جا ادامه پیدا کند.
+   */
+  async reassign(adminId: string, orderId: string, dto: AssignOrderDto) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
+    if (!order) throw new NotFoundException('سفارش یافت نشد.');
+
+    const reassignableStatuses: OrderStatus[] = [
+      OrderStatus.assigned,
+      OrderStatus.in_progress,
+      OrderStatus.qc_rejected,
+    ];
+    if (!reassignableStatuses.includes(order.status)) {
+      throw new BadRequestException(
+        'فقط سفارش‌های ارجاع‌شده یا در حال اجرا قابل تغییر مسئول هستند.',
+      );
+    }
+
+    const currentAssignment = await this.prisma.orderAssignment.findFirst({
+      where: { orderId, unassignedAt: null },
+      include: { executorProfile: true },
+    });
+
+    if (currentAssignment?.executorProfileId === dto.executorProfileId) {
+      throw new BadRequestException(
+        'این سفارش از قبل به همین مجری تخصیص دارد.',
+      );
+    }
+
+    const newExecutorProfile = await this.prisma.executorProfile.findUnique({
+      where: { id: dto.executorProfileId },
+    });
+    if (!newExecutorProfile) throw new NotFoundException('مجری یافت نشد.');
+
+    const assignmentRole =
+      dto.assignmentRole ??
+      currentAssignment?.assignmentRole ??
+      'pursuit_owner';
+    const now = new Date();
+
+    await this.prisma.$transaction([
+      ...(currentAssignment
+        ? [
+            this.prisma.orderAssignment.update({
+              where: { id: currentAssignment.id },
+              data: { unassignedAt: now },
+            }),
+          ]
+        : []),
+      this.prisma.orderAssignment.create({
+        data: {
+          orderId,
+          executorProfileId: dto.executorProfileId,
+          teamId: dto.teamId ?? newExecutorProfile.teamId,
+          assignedByUserId: adminId,
+          assignmentRole,
+        },
+      }),
+      this.prisma.orderPublicHandler.updateMany({
+        where: { orderId, activeTo: null },
+        data: { activeTo: now },
+      }),
+      this.prisma.orderPublicHandler.create({
+        data: {
+          orderId,
+          internalUserId: newExecutorProfile.userId,
+          teamId: dto.teamId ?? newExecutorProfile.teamId,
+          publicHandlerCode: newExecutorProfile.publicHandlerCode,
+          displayAlias: newExecutorProfile.displayAlias,
+          assignmentRole,
+          visibleToCustomer: true,
+          activeFrom: now,
+        },
+      }),
+    ]);
+
+    await this.prisma.orderMessage.create({
+      data: {
+        orderId,
+        senderUserId: adminId,
+        messageType: 'reassignment',
+        body:
+          dto.note ??
+          `مسئول اجرای سفارش از ${currentAssignment?.executorProfile.displayAlias ?? 'نامشخص'} به ${newExecutorProfile.displayAlias} تغییر کرد.`,
+        visibility: MessageVisibility.internal_only,
+      },
+    });
+
+    await this.audit.record({
+      actorUserId: adminId,
+      actorRole: UserRole.admin,
+      action: 'order.reassigned',
+      entityType: 'order',
+      entityId: orderId,
+      before: {
+        executorProfileId: currentAssignment?.executorProfileId ?? null,
+      },
+      after: { executorProfileId: dto.executorProfileId },
+      sensitivity: 'sensitive',
+    });
+
+    if (currentAssignment) {
+      await this.notifications.notifyUser(
+        currentAssignment.executorProfile.userId,
+        'order.unassigned',
+        'یک سفارش از شما گرفته شد',
+        `سفارش ${order.code} به مجری دیگری واگذار شد.`,
+      );
+    }
+    await this.notifications.notifyUser(
+      newExecutorProfile.userId,
+      'order.assigned',
+      'کار جدید به شما ارجاع شد',
+      `سفارش ${order.code} به شما ارجاع شد (ادامه یک کار قبلی).`,
+    );
+    await this.notifications.notifyUser(
+      order.customerId,
+      'order.reassigned',
+      'مسئول پیگیری سفارش شما تغییر کرد',
+      `مسئول پیگیری جدید: ${newExecutorProfile.displayAlias} (${newExecutorProfile.publicHandlerCode})`,
+    );
+
+    return this.prisma.order.findUnique({ where: { id: orderId } });
+  }
+
   // ---------------------------------------------------------------------
   // Payment
   // ---------------------------------------------------------------------
@@ -1177,7 +1307,7 @@ export class OrdersService {
       package: true,
       acceptanceCriteria: true,
       statusHistory: { orderBy: { createdAt: 'asc' as const } },
-      publicHandlers: { where: { visibleToCustomer: true } },
+      publicHandlers: { where: { visibleToCustomer: true, activeTo: null } },
       milestones: true,
       files: {
         where: { fileKind: { in: [FileKind.output, FileKind.revision] } },

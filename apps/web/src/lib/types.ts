@@ -116,6 +116,11 @@ export interface OrderDetail extends OrderSummary {
   tickets?: { id: string; code: string; subject: string; status: string }[];
   feedback?: { id: string; feedbackType: string; rating: number | null; comment: string | null }[];
   acceptanceCriteria?: { id: string; description: string; isMet: boolean }[];
+  assignments?: {
+    id: string;
+    unassignedAt: string | null;
+    executorProfile: { id: string; displayAlias: string; publicHandlerCode: string };
+  }[];
 }
 
 export type TicketStatus =
