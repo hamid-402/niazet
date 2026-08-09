@@ -3,7 +3,16 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { apiFetch, ApiError } from '@/lib/api';
-import { Badge, Button, Card, ErrorBanner, Field, inputClass, PageLoading, SectionTitle } from '@/components/ui';
+import {
+  Badge,
+  Button,
+  Card,
+  ErrorBanner,
+  Field,
+  inputClass,
+  PageLoading,
+  SectionTitle,
+} from '@/components/ui';
 import type { ExecutorProfile } from '@/lib/types';
 
 export default function AdminStaffPage() {
@@ -16,7 +25,9 @@ export default function AdminStaffPage() {
   const [busy, setBusy] = useState(false);
 
   function load() {
-    apiFetch<ExecutorProfile[]>('/admin/staff').then(setStaff).catch((e) => setError(e.message));
+    apiFetch<ExecutorProfile[]>('/admin/staff')
+      .then(setStaff)
+      .catch((e) => setError(e.message));
   }
 
   useEffect(load, []);
@@ -26,7 +37,10 @@ export default function AdminStaffPage() {
     setBusy(true);
     setError('');
     try {
-      await apiFetch('/admin/staff', { method: 'POST', body: { phone, fullName, displayAlias } });
+      await apiFetch('/admin/staff', {
+        method: 'POST',
+        body: { phone, fullName, displayAlias },
+      });
       setPhone('');
       setFullName('');
       setDisplayAlias('');
@@ -43,17 +57,33 @@ export default function AdminStaffPage() {
     <div>
       <div className="mb-4 flex items-center justify-between">
         <SectionTitle>کارمندان و مجریان</SectionTitle>
-        <Button onClick={() => setShowForm((v) => !v)}>{showForm ? 'بستن' : 'افزودن کارمند'}</Button>
+        <Button onClick={() => setShowForm((v) => !v)}>
+          {showForm ? 'بستن' : 'افزودن کارمند'}
+        </Button>
       </div>
 
       {showForm && (
         <Card className="mb-4">
-          <form onSubmit={createStaff} className="grid grid-cols-1 gap-3 md:grid-cols-4 md:items-end">
+          <form
+            onSubmit={createStaff}
+            className="grid grid-cols-1 gap-3 md:grid-cols-4 md:items-end"
+          >
             <Field label="شماره موبایل">
-              <input className={inputClass} value={phone} onChange={(e) => setPhone(e.target.value)} dir="ltr" required />
+              <input
+                className={inputClass}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                dir="ltr"
+                required
+              />
             </Field>
             <Field label="نام کامل (داخلی)">
-              <input className={inputClass} value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+              <input
+                className={inputClass}
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+              />
             </Field>
             <Field label="نام نمایشی به مشتری">
               <input
@@ -89,19 +119,35 @@ export default function AdminStaffPage() {
             </thead>
             <tbody>
               {staff.map((s) => (
-                <tr key={s.id} className="border-b border-slate-50 last:border-0 hover:bg-slate-50">
+                <tr
+                  key={s.id}
+                  className="border-b border-slate-50 last:border-0 hover:bg-slate-50"
+                >
                   <td className="px-4 py-3">
-                    <Link href={`/admin/staff/${s.id}`} className="font-medium text-slate-800 hover:underline">
+                    <Link
+                      href={`/admin/staff/${s.id}`}
+                      className="font-medium text-slate-800 hover:underline"
+                    >
                       {s.displayAlias}
                     </Link>
-                    <p className="text-xs text-slate-400">{s.publicHandlerCode}</p>
+                    <p className="text-xs text-slate-400">
+                      {s.publicHandlerCode}
+                    </p>
                   </td>
                   <td className="px-4 py-3">
-                    <Badge color={s.status === 'active' ? 'green' : 'yellow'}>{s.status}</Badge>
+                    <Badge color={s.status === 'active' ? 'green' : 'yellow'}>
+                      {s.status}
+                    </Badge>
                   </td>
-                  <td className="px-4 py-3 text-slate-500">{s.capacityPercent}٪</td>
-                  <td className="px-4 py-3 text-slate-500">{Number(s.qcPassRate).toFixed(0)}٪</td>
-                  <td className="px-4 py-3 text-slate-500">{Number(s.customerRatingAvg).toFixed(1)}</td>
+                  <td className="px-4 py-3 text-slate-500">
+                    {s.capacityPercent}٪
+                  </td>
+                  <td className="px-4 py-3 text-slate-500">
+                    {Number(s.qcPassRate).toFixed(0)}٪
+                  </td>
+                  <td className="px-4 py-3 text-slate-500">
+                    {Number(s.customerRatingAvg).toFixed(1)}
+                  </td>
                   <td className="px-4 py-3 text-slate-500">
                     {s.complimentCount} / {s.complaintCount}
                   </td>

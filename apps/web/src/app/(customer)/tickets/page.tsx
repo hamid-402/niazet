@@ -3,7 +3,14 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
-import { Card, EmptyState, ErrorBanner, LinkButton, PageLoading, SectionTitle } from '@/components/ui';
+import {
+  Card,
+  EmptyState,
+  ErrorBanner,
+  LinkButton,
+  PageLoading,
+  SectionTitle,
+} from '@/components/ui';
 import { TicketStatusBadge } from '@/components/status-badge';
 import type { Ticket } from '@/lib/types';
 import { formatDate } from '@/lib/format';
@@ -13,7 +20,9 @@ export default function CustomerTicketsPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    apiFetch<Ticket[]>('/customer/tickets').then(setTickets).catch((e) => setError(e.message));
+    apiFetch<Ticket[]>('/customer/tickets')
+      .then(setTickets)
+      .catch((e) => setError(e.message));
   }, []);
 
   return (
@@ -25,7 +34,9 @@ export default function CustomerTicketsPage() {
 
       {error && <ErrorBanner message={error} />}
       {!tickets && !error && <PageLoading />}
-      {tickets && tickets.length === 0 && <EmptyState title="تیکتی ثبت نکرده‌اید." />}
+      {tickets && tickets.length === 0 && (
+        <EmptyState title="تیکتی ثبت نکرده‌اید." />
+      )}
 
       {tickets && tickets.length > 0 && (
         <Card className="overflow-x-auto p-0">
@@ -40,9 +51,15 @@ export default function CustomerTicketsPage() {
             </thead>
             <tbody>
               {tickets.map((t) => (
-                <tr key={t.id} className="border-b border-slate-50 last:border-0 hover:bg-slate-50">
+                <tr
+                  key={t.id}
+                  className="border-b border-slate-50 last:border-0 hover:bg-slate-50"
+                >
                   <td className="px-4 py-3">
-                    <Link href={`/tickets/${t.id}`} className="font-medium text-slate-800 hover:underline">
+                    <Link
+                      href={`/tickets/${t.id}`}
+                      className="font-medium text-slate-800 hover:underline"
+                    >
                       {t.subject}
                     </Link>
                     <p className="text-xs text-slate-400">{t.code}</p>
@@ -51,7 +68,9 @@ export default function CustomerTicketsPage() {
                   <td className="px-4 py-3">
                     <TicketStatusBadge status={t.status} />
                   </td>
-                  <td className="px-4 py-3 text-slate-400">{formatDate(t.createdAt)}</td>
+                  <td className="px-4 py-3 text-slate-400">
+                    {formatDate(t.createdAt)}
+                  </td>
                 </tr>
               ))}
             </tbody>

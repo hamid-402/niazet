@@ -2,7 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { apiFetch, ApiError } from '@/lib/api';
-import { Badge, Button, Card, EmptyState, ErrorBanner, Field, inputClass, PageLoading, SectionTitle } from '@/components/ui';
+import {
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  ErrorBanner,
+  Field,
+  inputClass,
+  PageLoading,
+  SectionTitle,
+} from '@/components/ui';
 import { formatToman } from '@/lib/format';
 
 interface Escrow {
@@ -20,7 +30,9 @@ export default function AdminEscrowPage() {
   const [note, setNote] = useState<Record<string, string>>({});
 
   function load() {
-    apiFetch<Escrow[]>('/admin/finance/escrow').then(setItems).catch((e) => setError(e.message));
+    apiFetch<Escrow[]>('/admin/finance/escrow')
+      .then(setItems)
+      .catch((e) => setError(e.message));
   }
 
   useEffect(load, []);
@@ -32,8 +44,14 @@ export default function AdminEscrowPage() {
       const body =
         action === 'release'
           ? { note: note[orderId] || 'آزادسازی توسط ادمین مالی' }
-          : { note: note[orderId] || 'رفاند توسط ادمین مالی', reason: 'admin_decision' };
-      await apiFetch(`/admin/finance/escrow/${orderId}/${action}`, { method: 'POST', body });
+          : {
+              note: note[orderId] || 'رفاند توسط ادمین مالی',
+              reason: 'admin_decision',
+            };
+      await apiFetch(`/admin/finance/escrow/${orderId}/${action}`, {
+        method: 'POST',
+        body,
+      });
       load();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'خطا در انجام عملیات');
@@ -47,7 +65,9 @@ export default function AdminEscrowPage() {
       <SectionTitle>Escrow</SectionTitle>
       {error && <ErrorBanner message={error} />}
       {!items && !error && <PageLoading />}
-      {items && items.length === 0 && <EmptyState title="مبلغ در امانتی وجود ندارد." />}
+      {items && items.length === 0 && (
+        <EmptyState title="مبلغ در امانتی وجود ندارد." />
+      )}
 
       <div className="space-y-3">
         {items?.map((e) => (
@@ -57,22 +77,38 @@ export default function AdminEscrowPage() {
                 <p className="font-medium text-slate-800">{e.order.title}</p>
                 <p className="text-xs text-slate-400">{e.order.code}</p>
               </div>
-              <Badge color={e.status === 'held' ? 'yellow' : 'green'}>{e.status}</Badge>
+              <Badge color={e.status === 'held' ? 'yellow' : 'green'}>
+                {e.status}
+              </Badge>
             </div>
-            <p className="mb-3 text-sm text-slate-600">مبلغ: {formatToman(e.amount)}</p>
+            <p className="mb-3 text-sm text-slate-600">
+              مبلغ: {formatToman(e.amount)}
+            </p>
             {(e.status === 'held' || e.status === 'partially_released') && (
               <div className="flex flex-wrap items-end gap-2">
                 <Field label="یادداشت (اجباری)">
                   <input
                     className={inputClass}
                     value={note[e.orderId] ?? ''}
-                    onChange={(ev) => setNote((prev) => ({ ...prev, [e.orderId]: ev.target.value }))}
+                    onChange={(ev) =>
+                      setNote((prev) => ({
+                        ...prev,
+                        [e.orderId]: ev.target.value,
+                      }))
+                    }
                   />
                 </Field>
-                <Button disabled={busy} onClick={() => act(e.orderId, 'release')}>
+                <Button
+                  disabled={busy}
+                  onClick={() => act(e.orderId, 'release')}
+                >
                   آزادسازی
                 </Button>
-                <Button variant="danger" disabled={busy} onClick={() => act(e.orderId, 'refund')}>
+                <Button
+                  variant="danger"
+                  disabled={busy}
+                  onClick={() => act(e.orderId, 'refund')}
+                >
                   رفاند
                 </Button>
               </div>

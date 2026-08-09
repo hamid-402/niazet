@@ -11,7 +11,13 @@ interface DashboardData {
   profile: ExecutorProfile;
   activeOrders: number;
   needsRework: number;
-  dueSoon: { id: string; code: string; title: string; status: OrderStatus; urgency: string }[];
+  dueSoon: {
+    id: string;
+    code: string;
+    title: string;
+    status: OrderStatus;
+    urgency: string;
+  }[];
   recentReports: { id: string; summary: string }[];
 }
 
@@ -20,7 +26,9 @@ export default function ExecutorDashboardPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    apiFetch<DashboardData>('/executor/dashboard').then(setData).catch((e) => setError(e.message));
+    apiFetch<DashboardData>('/executor/dashboard')
+      .then(setData)
+      .catch((e) => setError(e.message));
   }, []);
 
   if (error) return <ErrorBanner message={error} />;
@@ -28,26 +36,36 @@ export default function ExecutorDashboardPage() {
 
   return (
     <div>
-      <SectionTitle subtitle={`مسئول پیگیری: ${data.profile.displayAlias} (${data.profile.publicHandlerCode})`}>
+      <SectionTitle
+        subtitle={`مسئول پیگیری: ${data.profile.displayAlias} (${data.profile.publicHandlerCode})`}
+      >
         کارهای من
       </SectionTitle>
 
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Card>
           <p className="text-xs text-slate-400">کارهای فعال</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{data.activeOrders}</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">
+            {data.activeOrders}
+          </p>
         </Card>
         <Card>
           <p className="text-xs text-slate-400">نیازمند اصلاح (QC)</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{data.needsRework}</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">
+            {data.needsRework}
+          </p>
         </Card>
         <Card>
           <p className="text-xs text-slate-400">نرخ قبولی QC</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{Number(data.profile.qcPassRate).toFixed(0)}٪</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">
+            {Number(data.profile.qcPassRate).toFixed(0)}٪
+          </p>
         </Card>
         <Card>
           <p className="text-xs text-slate-400">تحویل به‌موقع</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{Number(data.profile.onTimeDeliveryRate).toFixed(0)}٪</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">
+            {Number(data.profile.onTimeDeliveryRate).toFixed(0)}٪
+          </p>
         </Card>
       </div>
 

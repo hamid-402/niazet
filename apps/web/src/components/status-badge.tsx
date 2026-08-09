@@ -1,7 +1,15 @@
 import { Badge } from './ui';
-import { ORDER_STATUS_LABELS_FA, TICKET_STATUS_LABELS_FA, type OrderStatus, type TicketStatus } from '@/lib/types';
+import {
+  ORDER_STATUS_LABELS_FA,
+  TICKET_STATUS_LABELS_FA,
+  type OrderStatus,
+  type TicketStatus,
+} from '@/lib/types';
 
-const ORDER_STATUS_COLOR: Record<OrderStatus, 'gray' | 'blue' | 'yellow' | 'green' | 'red' | 'purple'> = {
+const ORDER_STATUS_COLOR: Record<
+  OrderStatus,
+  'gray' | 'blue' | 'yellow' | 'green' | 'red' | 'purple'
+> = {
   draft: 'gray',
   submitted: 'blue',
   pending_triage: 'blue',
@@ -25,10 +33,17 @@ const ORDER_STATUS_COLOR: Record<OrderStatus, 'gray' | 'blue' | 'yellow' | 'gree
 };
 
 export function OrderStatusBadge({ status }: { status: OrderStatus }) {
-  return <Badge color={ORDER_STATUS_COLOR[status]}>{ORDER_STATUS_LABELS_FA[status]}</Badge>;
+  return (
+    <Badge color={ORDER_STATUS_COLOR[status]}>
+      {ORDER_STATUS_LABELS_FA[status]}
+    </Badge>
+  );
 }
 
-const TICKET_STATUS_COLOR: Record<TicketStatus, 'gray' | 'blue' | 'yellow' | 'green' | 'red' | 'purple'> = {
+const TICKET_STATUS_COLOR: Record<
+  TicketStatus,
+  'gray' | 'blue' | 'yellow' | 'green' | 'red' | 'purple'
+> = {
   open: 'blue',
   assigned: 'blue',
   in_progress: 'yellow',
@@ -40,5 +55,9 @@ const TICKET_STATUS_COLOR: Record<TicketStatus, 'gray' | 'blue' | 'yellow' | 'gr
 };
 
 export function TicketStatusBadge({ status }: { status: TicketStatus }) {
-  return <Badge color={TICKET_STATUS_COLOR[status]}>{TICKET_STATUS_LABELS_FA[status]}</Badge>;
+  return (
+    <Badge color={TICKET_STATUS_COLOR[status]}>
+      {TICKET_STATUS_LABELS_FA[status]}
+    </Badge>
+  );
 }

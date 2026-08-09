@@ -16,9 +16,21 @@ import { OrderStatusBadge } from '@/components/status-badge';
 import type { OrderDetail } from '@/lib/types';
 import { formatDate, formatToman } from '@/lib/format';
 
-const TABS = ['خلاصه', 'مراحل', 'گزارش‌ها', 'فایل‌ها', 'پیام‌ها', 'پرداخت‌ها', 'تیکت‌ها'] as const;
+const TABS = [
+  'خلاصه',
+  'مراحل',
+  'گزارش‌ها',
+  'فایل‌ها',
+  'پیام‌ها',
+  'پرداخت‌ها',
+  'تیکت‌ها',
+] as const;
 
-export default function CustomerOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function CustomerOrderDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [error, setError] = useState('');
@@ -45,7 +57,9 @@ export default function CustomerOrderDetailPage({ params }: { params: Promise<{ 
       await fn();
       load();
     } catch (err) {
-      setActionError(err instanceof ApiError ? err.message : 'خطا در انجام عملیات');
+      setActionError(
+        err instanceof ApiError ? err.message : 'خطا در انجام عملیات',
+      );
     } finally {
       setBusy(false);
     }
@@ -61,29 +75,45 @@ export default function CustomerOrderDetailPage({ params }: { params: Promise<{ 
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-xs text-slate-400">{order.code}</p>
-          <h1 className="text-xl font-extrabold text-slate-900">{order.title}</h1>
+          <h1 className="text-xl font-extrabold text-slate-900">
+            {order.title}
+          </h1>
         </div>
         <OrderStatusBadge status={order.status} />
       </div>
 
-      {actionError && <div className="mb-4"><ErrorBanner message={actionError} /></div>}
+      {actionError && (
+        <div className="mb-4">
+          <ErrorBanner message={actionError} />
+        </div>
+      )}
 
       <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Card>
           <p className="text-xs text-slate-400">مبلغ سفارش</p>
-          <p className="mt-1 font-bold text-slate-800">{formatToman(order.finalPrice)}</p>
+          <p className="mt-1 font-bold text-slate-800">
+            {formatToman(order.finalPrice)}
+          </p>
         </Card>
         <Card>
           <p className="text-xs text-slate-400">مسئول پیگیری</p>
-          <p className="mt-1 font-bold text-slate-800">{handler ? `${handler.displayAlias} (${handler.publicHandlerCode})` : '—'}</p>
+          <p className="mt-1 font-bold text-slate-800">
+            {handler
+              ? `${handler.displayAlias} (${handler.publicHandlerCode})`
+              : '—'}
+          </p>
         </Card>
         <Card>
           <p className="text-xs text-slate-400">اصلاحات</p>
-          <p className="mt-1 font-bold text-slate-800">{order.revisionsUsed} از {order.revisionsAllowed}</p>
+          <p className="mt-1 font-bold text-slate-800">
+            {order.revisionsUsed} از {order.revisionsAllowed}
+          </p>
         </Card>
         <Card>
           <p className="text-xs text-slate-400">تاریخ ثبت</p>
-          <p className="mt-1 font-bold text-slate-800">{formatDate(order.createdAt)}</p>
+          <p className="mt-1 font-bold text-slate-800">
+            {formatDate(order.createdAt)}
+          </p>
         </Card>
       </div>
 
@@ -92,7 +122,16 @@ export default function CustomerOrderDetailPage({ params }: { params: Promise<{ 
         <h3 className="mb-3 font-bold text-slate-800">اقدام بعدی</h3>
         <div className="flex flex-wrap gap-2">
           {order.status === 'quoted' && (
-            <Button disabled={busy} onClick={() => runAction(() => apiFetch(`/customer/orders/${id}/accept-quote`, { method: 'POST' }))}>
+            <Button
+              disabled={busy}
+              onClick={() =>
+                runAction(() =>
+                  apiFetch(`/customer/orders/${id}/accept-quote`, {
+                    method: 'POST',
+                  }),
+                )
+              }
+            >
               تایید قیمت و ادامه به پرداخت
             </Button>
           )}
@@ -101,12 +140,18 @@ export default function CustomerOrderDetailPage({ params }: { params: Promise<{ 
               disabled={busy}
               onClick={() =>
                 runAction(async () => {
-                  const pay = await apiFetch<{ payment: { id: string } }>(`/customer/orders/${id}/pay`, {
-                    method: 'POST',
-                  });
-                  await apiFetch(`/customer/orders/${id}/payments/${pay.payment.id}/verify`, {
-                    method: 'POST',
-                  });
+                  const pay = await apiFetch<{ payment: { id: string } }>(
+                    `/customer/orders/${id}/pay`,
+                    {
+                      method: 'POST',
+                    },
+                  );
+                  await apiFetch(
+                    `/customer/orders/${id}/payments/${pay.payment.id}/verify`,
+                    {
+                      method: 'POST',
+                    },
+                  );
                 })
               }
             >
@@ -115,11 +160,22 @@ export default function CustomerOrderDetailPage({ params }: { params: Promise<{ 
           )}
           {order.status === 'delivered' && (
             <>
-              <Button disabled={busy} onClick={() => runAction(() => apiFetch(`/customer/orders/${id}/confirm`, { method: 'POST' }))}>
+              <Button
+                disabled={busy}
+                onClick={() =>
+                  runAction(() =>
+                    apiFetch(`/customer/orders/${id}/confirm`, {
+                      method: 'POST',
+                    }),
+                  )
+                }
+              >
                 تایید تحویل
               </Button>
               <details className="w-full">
-                <summary className="cursor-pointer text-sm text-slate-600">درخواست اصلاح</summary>
+                <summary className="cursor-pointer text-sm text-slate-600">
+                  درخواست اصلاح
+                </summary>
                 <div className="mt-2 flex gap-2">
                   <input
                     className={inputClass}
@@ -145,7 +201,15 @@ export default function CustomerOrderDetailPage({ params }: { params: Promise<{ 
               </details>
             </>
           )}
-          {['draft', 'submitted', 'pending_triage', 'triaging', 'pending_quote', 'quoted', 'pending_payment'].includes(order.status) && (
+          {[
+            'draft',
+            'submitted',
+            'pending_triage',
+            'triaging',
+            'pending_quote',
+            'quoted',
+            'pending_payment',
+          ].includes(order.status) && (
             <Button
               variant="danger"
               disabled={busy}
@@ -161,8 +225,21 @@ export default function CustomerOrderDetailPage({ params }: { params: Promise<{ 
               لغو سفارش
             </Button>
           )}
-          {!['draft', 'submitted', 'pending_triage', 'triaging', 'pending_quote', 'quoted', 'pending_payment', 'quoted', 'closed', 'cancelled'].includes(order.status) && (
-            <span className="text-sm text-slate-400">برای این وضعیت اقدامی نیاز نیست یا از طریق تیکت پیگیری کنید.</span>
+          {![
+            'draft',
+            'submitted',
+            'pending_triage',
+            'triaging',
+            'pending_quote',
+            'quoted',
+            'pending_payment',
+            'quoted',
+            'closed',
+            'cancelled',
+          ].includes(order.status) && (
+            <span className="text-sm text-slate-400">
+              برای این وضعیت اقدامی نیاز نیست یا از طریق تیکت پیگیری کنید.
+            </span>
           )}
         </div>
       </Card>
@@ -173,7 +250,9 @@ export default function CustomerOrderDetailPage({ params }: { params: Promise<{ 
             key={t}
             onClick={() => setTab(t)}
             className={`whitespace-nowrap px-3 py-2 text-sm font-medium ${
-              tab === t ? 'border-b-2 border-slate-900 text-slate-900' : 'text-slate-400 hover:text-slate-600'
+              tab === t
+                ? 'border-b-2 border-slate-900 text-slate-900'
+                : 'text-slate-400 hover:text-slate-600'
             }`}
           >
             {t}
@@ -183,10 +262,14 @@ export default function CustomerOrderDetailPage({ params }: { params: Promise<{ 
 
       {tab === 'خلاصه' && (
         <Card>
-          <p className="text-sm leading-7 text-slate-600">{order.briefDescription}</p>
+          <p className="text-sm leading-7 text-slate-600">
+            {order.briefDescription}
+          </p>
           {order.acceptanceCriteria && order.acceptanceCriteria.length > 0 && (
             <div className="mt-4">
-              <h4 className="mb-2 text-sm font-bold text-slate-700">معیار پذیرش</h4>
+              <h4 className="mb-2 text-sm font-bold text-slate-700">
+                معیار پذیرش
+              </h4>
               <ul className="list-inside list-disc space-y-1 text-sm text-slate-600">
                 {order.acceptanceCriteria.map((c) => (
                   <li key={c.id}>{c.description}</li>
@@ -206,8 +289,12 @@ export default function CustomerOrderDetailPage({ params }: { params: Promise<{ 
                 <p className="text-sm font-medium text-slate-800">
                   <OrderStatusBadge status={h.toStatus} />
                 </p>
-                {h.note && <p className="mt-1 text-xs text-slate-500">{h.note}</p>}
-                <p className="text-xs text-slate-400">{formatDate(h.createdAt)}</p>
+                {h.note && (
+                  <p className="mt-1 text-xs text-slate-500">{h.note}</p>
+                )}
+                <p className="text-xs text-slate-400">
+                  {formatDate(h.createdAt)}
+                </p>
               </li>
             ))}
           </ol>
@@ -219,10 +306,15 @@ export default function CustomerOrderDetailPage({ params }: { params: Promise<{ 
           {order.reports && order.reports.length > 0 ? (
             <div className="space-y-3">
               {order.reports.map((r) => (
-                <div key={r.id} className="rounded-xl border border-slate-100 p-3">
+                <div
+                  key={r.id}
+                  className="rounded-xl border border-slate-100 p-3"
+                >
                   <div className="flex items-center justify-between">
                     <Badge color="blue">{r.reportType}</Badge>
-                    <span className="text-xs text-slate-400">{formatDate(r.createdAt)}</span>
+                    <span className="text-xs text-slate-400">
+                      {formatDate(r.createdAt)}
+                    </span>
                   </div>
                   <p className="mt-2 text-sm text-slate-600">{r.summary}</p>
                 </div>
@@ -239,7 +331,10 @@ export default function CustomerOrderDetailPage({ params }: { params: Promise<{ 
           {order.files && order.files.length > 0 ? (
             <ul className="divide-y divide-slate-100 text-sm">
               {order.files.map((f) => (
-                <li key={f.id} className="flex items-center justify-between py-2">
+                <li
+                  key={f.id}
+                  className="flex items-center justify-between py-2"
+                >
                   <span>{f.originalName}</span>
                   <span className="text-xs text-slate-400">{f.fileKind}</span>
                 </li>
@@ -258,7 +353,9 @@ export default function CustomerOrderDetailPage({ params }: { params: Promise<{ 
               order.messages.map((m) => (
                 <div key={m.id} className="rounded-xl bg-slate-50 p-3 text-sm">
                   <p className="text-slate-700">{m.body}</p>
-                  <p className="mt-1 text-xs text-slate-400">{formatDate(m.createdAt)}</p>
+                  <p className="mt-1 text-xs text-slate-400">
+                    {formatDate(m.createdAt)}
+                  </p>
                 </div>
               ))
             ) : (
@@ -295,9 +392,14 @@ export default function CustomerOrderDetailPage({ params }: { params: Promise<{ 
           {order.payments && order.payments.length > 0 ? (
             <ul className="divide-y divide-slate-100 text-sm">
               {order.payments.map((p) => (
-                <li key={p.id} className="flex items-center justify-between py-2">
+                <li
+                  key={p.id}
+                  className="flex items-center justify-between py-2"
+                >
                   <span>{formatToman(p.amount)}</span>
-                  <Badge color={p.status === 'succeeded' ? 'green' : 'yellow'}>{p.status}</Badge>
+                  <Badge color={p.status === 'succeeded' ? 'green' : 'yellow'}>
+                    {p.status}
+                  </Badge>
                 </li>
               ))}
             </ul>
@@ -306,7 +408,9 @@ export default function CustomerOrderDetailPage({ params }: { params: Promise<{ 
           )}
           {order.escrowHolds && order.escrowHolds.length > 0 && (
             <div className="mt-4 border-t border-slate-100 pt-3">
-              <h4 className="mb-2 text-sm font-bold text-slate-700">وضعیت امانت (escrow)</h4>
+              <h4 className="mb-2 text-sm font-bold text-slate-700">
+                وضعیت امانت (escrow)
+              </h4>
               {order.escrowHolds.map((e) => (
                 <div key={e.id} className="flex justify-between text-sm">
                   <span>{formatToman(e.amount)}</span>
@@ -323,7 +427,10 @@ export default function CustomerOrderDetailPage({ params }: { params: Promise<{ 
           {order.tickets && order.tickets.length > 0 ? (
             <ul className="divide-y divide-slate-100 text-sm">
               {order.tickets.map((t) => (
-                <li key={t.id} className="flex items-center justify-between py-2">
+                <li
+                  key={t.id}
+                  className="flex items-center justify-between py-2"
+                >
                   <span>{t.subject}</span>
                   <Badge>{t.status}</Badge>
                 </li>
@@ -342,8 +449,16 @@ export default function CustomerOrderDetailPage({ params }: { params: Promise<{ 
   );
 }
 
-function FeedbackForm({ orderId, handlerCode }: { orderId: string; handlerCode?: string }) {
-  const [feedbackType, setFeedbackType] = useState<'rating' | 'complaint' | 'compliment'>('rating');
+function FeedbackForm({
+  orderId,
+  handlerCode,
+}: {
+  orderId: string;
+  handlerCode?: string;
+}) {
+  const [feedbackType, setFeedbackType] = useState<
+    'rating' | 'complaint' | 'compliment'
+  >('rating');
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [sent, setSent] = useState(false);
@@ -353,7 +468,9 @@ function FeedbackForm({ orderId, handlerCode }: { orderId: string; handlerCode?:
   if (sent) {
     return (
       <Card className="mt-4">
-        <p className="text-sm text-emerald-700">بازخورد شما ثبت شد. سپاس از وقتی که گذاشتید.</p>
+        <p className="text-sm text-emerald-700">
+          بازخورد شما ثبت شد. سپاس از وقتی که گذاشتید.
+        </p>
       </Card>
     );
   }
@@ -363,7 +480,13 @@ function FeedbackForm({ orderId, handlerCode }: { orderId: string; handlerCode?:
       <SectionTitle>ثبت بازخورد، تشکر یا شکایت</SectionTitle>
       <div className="flex flex-wrap items-end gap-3">
         <Field label="نوع بازخورد">
-          <select className={inputClass} value={feedbackType} onChange={(e) => setFeedbackType(e.target.value as typeof feedbackType)}>
+          <select
+            className={inputClass}
+            value={feedbackType}
+            onChange={(e) =>
+              setFeedbackType(e.target.value as typeof feedbackType)
+            }
+          >
             <option value="rating">امتیاز</option>
             <option value="compliment">تشکر</option>
             <option value="complaint">شکایت</option>
@@ -380,7 +503,11 @@ function FeedbackForm({ orderId, handlerCode }: { orderId: string; handlerCode?:
           />
         </Field>
         <Field label="توضیح">
-          <input className={inputClass} value={comment} onChange={(e) => setComment(e.target.value)} />
+          <input
+            className={inputClass}
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+          />
         </Field>
         <Button
           disabled={busy}
@@ -400,7 +527,9 @@ function FeedbackForm({ orderId, handlerCode }: { orderId: string; handlerCode?:
               });
               setSent(true);
             } catch (err) {
-              setError(err instanceof ApiError ? err.message : 'خطا در ثبت بازخورد');
+              setError(
+                err instanceof ApiError ? err.message : 'خطا در ثبت بازخورد',
+              );
             } finally {
               setBusy(false);
             }
@@ -409,7 +538,11 @@ function FeedbackForm({ orderId, handlerCode }: { orderId: string; handlerCode?:
           ثبت
         </Button>
       </div>
-      {error && <div className="mt-3"><ErrorBanner message={error} /></div>}
+      {error && (
+        <div className="mt-3">
+          <ErrorBanner message={error} />
+        </div>
+      )}
     </Card>
   );
 }

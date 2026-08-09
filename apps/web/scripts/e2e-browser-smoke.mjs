@@ -2,6 +2,17 @@
 import { chromium } from 'playwright';
 
 const BASE = 'http://localhost:3000';
+const PASSWORD = 'Passw0rd!123';
+
+async function loginAs(page, { phone, waitUrlPattern, logLabel, clearStorage = true }) {
+  if (clearStorage) await page.evaluate(() => localStorage.clear());
+  await page.goto(`${BASE}/login`, { waitUntil: 'networkidle' });
+  await page.fill('input[dir="ltr"]', phone);
+  await page.fill('input[type="password"]', PASSWORD);
+  await page.click('button[type="submit"]');
+  await page.waitForURL(waitUrlPattern, { timeout: 10000 });
+  console.log(logLabel, page.url());
+}
 
 async function main() {
   const browser = await chromium.launch({ executablePath: '/usr/local/bin/google-chrome', headless: true });
@@ -21,12 +32,7 @@ async function main() {
   await page.waitForSelector('text=خدمات');
 
   console.log('== login as customer ==');
-  await page.goto(`${BASE}/login`, { waitUntil: 'networkidle' });
-  await page.fill('input[dir="ltr"]', '09120000009');
-  await page.fill('input[type="password"]', 'Passw0rd!123');
-  await page.click('button[type="submit"]');
-  await page.waitForURL('**/dashboard', { timeout: 10000 });
-  console.log('logged in, url:', page.url());
+  await loginAs(page, { phone: '09120000009', waitUrlPattern: '**/dashboard', logLabel: 'logged in, url:', clearStorage: false });
 
   console.log('== open orders/new ==');
   await page.goto(`${BASE}/orders/new`, { waitUntil: 'networkidle' });
@@ -41,13 +47,7 @@ async function main() {
   await page.waitForSelector('text=تیکت‌های من');
 
   console.log('== login as ops admin ==');
-  await page.evaluate(() => localStorage.clear());
-  await page.goto(`${BASE}/login`, { waitUntil: 'networkidle' });
-  await page.fill('input[dir="ltr"]', '09120000002');
-  await page.fill('input[type="password"]', 'Passw0rd!123');
-  await page.click('button[type="submit"]');
-  await page.waitForURL('**/admin', { timeout: 10000 });
-  console.log('admin logged in, url:', page.url());
+  await loginAs(page, { phone: '09120000002', waitUrlPattern: '**/admin', logLabel: 'admin logged in, url:' });
 
   await page.goto(`${BASE}/admin/orders`, { waitUntil: 'networkidle' });
   await page.waitForSelector('text=مدیریت سفارش‌ها');
@@ -59,37 +59,19 @@ async function main() {
   await page.waitForSelector('text=کنترل کیفیت');
 
   console.log('== login as finance admin ==');
-  await page.evaluate(() => localStorage.clear());
-  await page.goto(`${BASE}/login`, { waitUntil: 'networkidle' });
-  await page.fill('input[dir="ltr"]', '09120000003');
-  await page.fill('input[type="password"]', 'Passw0rd!123');
-  await page.click('button[type="submit"]');
-  await page.waitForURL('**/admin/finance', { timeout: 10000 });
-  console.log('finance admin logged in, url:', page.url());
+  await loginAs(page, { phone: '09120000003', waitUrlPattern: '**/admin/finance', logLabel: 'finance admin logged in, url:' });
 
   await page.goto(`${BASE}/admin/finance/ledger`, { waitUntil: 'networkidle' });
   await page.waitForSelector('text=Ledger');
 
   console.log('== login as executor ==');
-  await page.evaluate(() => localStorage.clear());
-  await page.goto(`${BASE}/login`, { waitUntil: 'networkidle' });
-  await page.fill('input[dir="ltr"]', '09120000005');
-  await page.fill('input[type="password"]', 'Passw0rd!123');
-  await page.click('button[type="submit"]');
-  await page.waitForURL('**/executor', { timeout: 10000 });
-  console.log('executor logged in, url:', page.url());
+  await loginAs(page, { phone: '09120000005', waitUrlPattern: '**/executor', logLabel: 'executor logged in, url:' });
 
   await page.goto(`${BASE}/executor/orders`, { waitUntil: 'networkidle' });
   await page.waitForSelector('text=سفارش‌های ارجاع‌شده');
 
   console.log('== login as support ==');
-  await page.evaluate(() => localStorage.clear());
-  await page.goto(`${BASE}/login`, { waitUntil: 'networkidle' });
-  await page.fill('input[dir="ltr"]', '09120000004');
-  await page.fill('input[type="password"]', 'Passw0rd!123');
-  await page.click('button[type="submit"]');
-  await page.waitForURL('**/support/tickets', { timeout: 10000 });
-  console.log('support logged in, url:', page.url());
+  await loginAs(page, { phone: '09120000004', waitUrlPattern: '**/support/tickets', logLabel: 'support logged in, url:' });
 
   await browser.close();
 

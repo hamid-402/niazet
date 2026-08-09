@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
-import { Card, EmptyState, ErrorBanner, PageLoading, SectionTitle } from '@/components/ui';
+import {
+  Card,
+  EmptyState,
+  ErrorBanner,
+  PageLoading,
+  SectionTitle,
+} from '@/components/ui';
 import { formatDate, formatToman } from '@/lib/format';
 
 interface LedgerEntry {
@@ -27,15 +33,21 @@ export default function AdminLedgerPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    apiFetch<LedgerEntry[]>('/admin/finance/ledger').then(setEntries).catch((e) => setError(e.message));
+    apiFetch<LedgerEntry[]>('/admin/finance/ledger')
+      .then(setEntries)
+      .catch((e) => setError(e.message));
   }, []);
 
   return (
     <div>
-      <SectionTitle subtitle="فقط نمایش؛ بدون امکان ویرایش مستقیم">Ledger</SectionTitle>
+      <SectionTitle subtitle="فقط نمایش؛ بدون امکان ویرایش مستقیم">
+        Ledger
+      </SectionTitle>
       {error && <ErrorBanner message={error} />}
       {!entries && !error && <PageLoading />}
-      {entries && entries.length === 0 && <EmptyState title="تراکنشی ثبت نشده است." />}
+      {entries && entries.length === 0 && (
+        <EmptyState title="تراکنشی ثبت نشده است." />
+      )}
 
       {entries && entries.length > 0 && (
         <Card className="overflow-x-auto p-0">
@@ -51,12 +63,25 @@ export default function AdminLedgerPage() {
             </thead>
             <tbody>
               {entries.map((e) => (
-                <tr key={e.id} className="border-b border-slate-50 last:border-0">
-                  <td className="px-4 py-3 text-slate-500">{ACCOUNT_LABELS[e.debitAccount.accountType]}</td>
-                  <td className="px-4 py-3 text-slate-500">{ACCOUNT_LABELS[e.creditAccount.accountType]}</td>
-                  <td className="px-4 py-3 text-slate-700">{formatToman(e.amount)}</td>
-                  <td className="px-4 py-3 text-slate-500">{e.referenceType}</td>
-                  <td className="px-4 py-3 text-slate-400">{formatDate(e.createdAt)}</td>
+                <tr
+                  key={e.id}
+                  className="border-b border-slate-50 last:border-0"
+                >
+                  <td className="px-4 py-3 text-slate-500">
+                    {ACCOUNT_LABELS[e.debitAccount.accountType]}
+                  </td>
+                  <td className="px-4 py-3 text-slate-500">
+                    {ACCOUNT_LABELS[e.creditAccount.accountType]}
+                  </td>
+                  <td className="px-4 py-3 text-slate-700">
+                    {formatToman(e.amount)}
+                  </td>
+                  <td className="px-4 py-3 text-slate-500">
+                    {e.referenceType}
+                  </td>
+                  <td className="px-4 py-3 text-slate-400">
+                    {formatDate(e.createdAt)}
+                  </td>
                 </tr>
               ))}
             </tbody>

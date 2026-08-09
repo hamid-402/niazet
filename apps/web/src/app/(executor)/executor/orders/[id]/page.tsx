@@ -2,11 +2,21 @@
 
 import { use, useCallback, useEffect, useState } from 'react';
 import { apiFetch, ApiError } from '@/lib/api';
-import { Button, Card, ErrorBanner, inputClass, PageLoading } from '@/components/ui';
+import {
+  Button,
+  Card,
+  ErrorBanner,
+  inputClass,
+  PageLoading,
+} from '@/components/ui';
 import { OrderStatusBadge } from '@/components/status-badge';
 import type { OrderDetail } from '@/lib/types';
 
-export default function ExecutorOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function ExecutorOrderDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [error, setError] = useState('');
@@ -15,7 +25,9 @@ export default function ExecutorOrderDetailPage({ params }: { params: Promise<{ 
   const [deliverSummary, setDeliverSummary] = useState('');
 
   const load = useCallback(() => {
-    apiFetch<OrderDetail>(`/executor/orders/${id}`).then(setOrder).catch((e) => setError(e.message));
+    apiFetch<OrderDetail>(`/executor/orders/${id}`)
+      .then(setOrder)
+      .catch((e) => setError(e.message));
   }, [id]);
 
   useEffect(() => {
@@ -42,19 +54,29 @@ export default function ExecutorOrderDetailPage({ params }: { params: Promise<{ 
       <div className="mb-4 flex items-center justify-between">
         <div>
           <p className="text-xs text-slate-400">{order.code}</p>
-          <h1 className="text-xl font-extrabold text-slate-900">{order.title}</h1>
+          <h1 className="text-xl font-extrabold text-slate-900">
+            {order.title}
+          </h1>
         </div>
         <OrderStatusBadge status={order.status} />
       </div>
 
-      {error && <div className="mb-4"><ErrorBanner message={error} /></div>}
+      {error && (
+        <div className="mb-4">
+          <ErrorBanner message={error} />
+        </div>
+      )}
 
       <Card className="mb-4">
         <h3 className="mb-2 font-bold text-slate-800">شرح کار</h3>
-        <p className="text-sm leading-7 text-slate-600">{order.briefDescription}</p>
+        <p className="text-sm leading-7 text-slate-600">
+          {order.briefDescription}
+        </p>
         {order.acceptanceCriteria && order.acceptanceCriteria.length > 0 && (
           <div className="mt-4">
-            <h4 className="mb-2 text-sm font-bold text-slate-700">معیار پذیرش</h4>
+            <h4 className="mb-2 text-sm font-bold text-slate-700">
+              معیار پذیرش
+            </h4>
             <ul className="list-inside list-disc space-y-1 text-sm text-slate-600">
               {order.acceptanceCriteria.map((c) => (
                 <li key={c.id}>{c.description}</li>
@@ -67,7 +89,14 @@ export default function ExecutorOrderDetailPage({ params }: { params: Promise<{ 
       <Card className="mb-4">
         <h3 className="mb-3 font-bold text-slate-800">اقدام</h3>
         {order.status === 'assigned' && (
-          <Button disabled={busy} onClick={() => runAction(() => apiFetch(`/executor/orders/${id}/start`, { method: 'POST' }))}>
+          <Button
+            disabled={busy}
+            onClick={() =>
+              runAction(() =>
+                apiFetch(`/executor/orders/${id}/start`, { method: 'POST' }),
+              )
+            }
+          >
             شروع اجرا
           </Button>
         )}
@@ -99,7 +128,9 @@ export default function ExecutorOrderDetailPage({ params }: { params: Promise<{ 
             </div>
 
             <div className="border-t border-slate-100 pt-4">
-              <p className="mb-2 text-sm font-medium text-slate-700">ارسال خروجی برای QC / تحویل</p>
+              <p className="mb-2 text-sm font-medium text-slate-700">
+                ارسال خروجی برای QC / تحویل
+              </p>
               <div className="flex gap-2">
                 <input
                   className={inputClass}
@@ -126,11 +157,16 @@ export default function ExecutorOrderDetailPage({ params }: { params: Promise<{ 
         )}
 
         {order.status === 'qc_rejected' && (
-          <p className="text-sm text-amber-700">خروجی نیاز به اصلاح دارد؛ پس از اصلاح دوباره از حالت «در حال اجرا» ارسال کنید.</p>
+          <p className="text-sm text-amber-700">
+            خروجی نیاز به اصلاح دارد؛ پس از اصلاح دوباره از حالت «در حال اجرا»
+            ارسال کنید.
+          </p>
         )}
 
         {!['assigned', 'in_progress', 'qc_rejected'].includes(order.status) && (
-          <p className="text-sm text-slate-400">در این وضعیت اقدامی برای شما نیاز نیست.</p>
+          <p className="text-sm text-slate-400">
+            در این وضعیت اقدامی برای شما نیاز نیست.
+          </p>
         )}
       </Card>
 

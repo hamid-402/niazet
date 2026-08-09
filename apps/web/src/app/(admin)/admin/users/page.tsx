@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { apiFetch, ApiError } from '@/lib/api';
-import { Badge, Button, Card, ErrorBanner, PageLoading, SectionTitle } from '@/components/ui';
+import {
+  Badge,
+  Button,
+  Card,
+  ErrorBanner,
+  PageLoading,
+  SectionTitle,
+} from '@/components/ui';
 import { formatDate } from '@/lib/format';
 
 interface UserRow {
@@ -20,7 +27,9 @@ export default function AdminUsersPage() {
   const [busy, setBusy] = useState(false);
 
   function load() {
-    apiFetch<UserRow[]>('/admin/users').then(setUsers).catch((e) => setError(e.message));
+    apiFetch<UserRow[]>('/admin/users')
+      .then(setUsers)
+      .catch((e) => setError(e.message));
   }
 
   useEffect(load, []);
@@ -29,7 +38,10 @@ export default function AdminUsersPage() {
     const next = user.status === 'blocked' ? 'active' : 'blocked';
     setBusy(true);
     try {
-      await apiFetch(`/admin/users/${user.id}/status`, { method: 'PATCH', body: { status: next } });
+      await apiFetch(`/admin/users/${user.id}/status`, {
+        method: 'PATCH',
+        body: { status: next },
+      });
       load();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'خطا در تغییر وضعیت');
@@ -59,16 +71,29 @@ export default function AdminUsersPage() {
             </thead>
             <tbody>
               {users.map((u) => (
-                <tr key={u.id} className="border-b border-slate-50 last:border-0">
+                <tr
+                  key={u.id}
+                  className="border-b border-slate-50 last:border-0"
+                >
                   <td className="px-4 py-3 text-slate-700">{u.fullName}</td>
-                  <td className="px-4 py-3 text-slate-500" dir="ltr">{u.phone}</td>
+                  <td className="px-4 py-3 text-slate-500" dir="ltr">
+                    {u.phone}
+                  </td>
                   <td className="px-4 py-3 text-slate-500">{u.role}</td>
                   <td className="px-4 py-3">
-                    <Badge color={u.status === 'active' ? 'green' : 'red'}>{u.status}</Badge>
+                    <Badge color={u.status === 'active' ? 'green' : 'red'}>
+                      {u.status}
+                    </Badge>
                   </td>
-                  <td className="px-4 py-3 text-slate-400">{formatDate(u.createdAt)}</td>
+                  <td className="px-4 py-3 text-slate-400">
+                    {formatDate(u.createdAt)}
+                  </td>
                   <td className="px-4 py-3">
-                    <Button variant="secondary" disabled={busy} onClick={() => toggleStatus(u)}>
+                    <Button
+                      variant="secondary"
+                      disabled={busy}
+                      onClick={() => toggleStatus(u)}
+                    >
                       {u.status === 'blocked' ? 'فعال‌سازی' : 'مسدودسازی'}
                     </Button>
                   </td>

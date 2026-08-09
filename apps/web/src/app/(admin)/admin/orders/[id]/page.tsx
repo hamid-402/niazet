@@ -2,12 +2,25 @@
 
 import { use, useCallback, useEffect, useState } from 'react';
 import { apiFetch, ApiError } from '@/lib/api';
-import { Badge, Button, Card, ErrorBanner, Field, inputClass, PageLoading, SectionTitle } from '@/components/ui';
+import {
+  Badge,
+  Button,
+  Card,
+  ErrorBanner,
+  Field,
+  inputClass,
+  PageLoading,
+  SectionTitle,
+} from '@/components/ui';
 import { OrderStatusBadge } from '@/components/status-badge';
 import type { ExecutorProfile, OrderDetail } from '@/lib/types';
 import { formatDate, formatToman } from '@/lib/format';
 
-export default function AdminOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function AdminOrderDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [error, setError] = useState('');
@@ -22,12 +35,16 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
   const [disputeAmount, setDisputeAmount] = useState('');
 
   const load = useCallback(() => {
-    apiFetch<OrderDetail>(`/admin/orders/${id}`).then(setOrder).catch((e) => setError(e.message));
+    apiFetch<OrderDetail>(`/admin/orders/${id}`)
+      .then(setOrder)
+      .catch((e) => setError(e.message));
   }, [id]);
 
   useEffect(() => {
     load();
-    apiFetch<ExecutorProfile[]>('/admin/staff').then(setStaff).catch(() => undefined);
+    apiFetch<ExecutorProfile[]>('/admin/staff')
+      .then(setStaff)
+      .catch(() => undefined);
   }, [load]);
 
   async function runAction(fn: () => Promise<unknown>) {
@@ -50,21 +67,32 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
       <div className="mb-4 flex items-center justify-between">
         <div>
           <p className="text-xs text-slate-400">{order.code}</p>
-          <h1 className="text-xl font-extrabold text-slate-900">{order.title}</h1>
+          <h1 className="text-xl font-extrabold text-slate-900">
+            {order.title}
+          </h1>
         </div>
         <OrderStatusBadge status={order.status} />
       </div>
 
-      {error && <div className="mb-4"><ErrorBanner message={error} /></div>}
+      {error && (
+        <div className="mb-4">
+          <ErrorBanner message={error} />
+        </div>
+      )}
 
       <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Card>
           <p className="text-xs text-slate-400">مشتری</p>
-          <p className="mt-1 font-bold text-slate-800">{(order as unknown as { customer?: { fullName: string } }).customer?.fullName ?? '—'}</p>
+          <p className="mt-1 font-bold text-slate-800">
+            {(order as unknown as { customer?: { fullName: string } }).customer
+              ?.fullName ?? '—'}
+          </p>
         </Card>
         <Card>
           <p className="text-xs text-slate-400">مبلغ نهایی</p>
-          <p className="mt-1 font-bold text-slate-800">{formatToman(order.finalPrice)}</p>
+          <p className="mt-1 font-bold text-slate-800">
+            {formatToman(order.finalPrice)}
+          </p>
         </Card>
         <Card>
           <p className="text-xs text-slate-400">فوریت</p>
@@ -72,13 +100,17 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
         </Card>
         <Card>
           <p className="text-xs text-slate-400">تاریخ ثبت</p>
-          <p className="mt-1 font-bold text-slate-800">{formatDate(order.createdAt)}</p>
+          <p className="mt-1 font-bold text-slate-800">
+            {formatDate(order.createdAt)}
+          </p>
         </Card>
       </div>
 
       <Card className="mb-4">
         <h3 className="mb-2 font-bold text-slate-800">شرح نیاز مشتری</h3>
-        <p className="text-sm leading-7 text-slate-600">{order.briefDescription}</p>
+        <p className="text-sm leading-7 text-slate-600">
+          {order.briefDescription}
+        </p>
       </Card>
 
       <Card className="mb-4">
@@ -87,7 +119,11 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
         {order.status === 'pending_triage' || order.status === 'triaging' ? (
           <div className="mb-4 flex flex-wrap items-end gap-2">
             <Field label="یادداشت تریاژ (اختیاری)">
-              <input className={inputClass} value={triageNote} onChange={(e) => setTriageNote(e.target.value)} />
+              <input
+                className={inputClass}
+                value={triageNote}
+                onChange={(e) => setTriageNote(e.target.value)}
+              />
             </Field>
             <Button
               disabled={busy}
@@ -109,7 +145,10 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
                 runAction(() =>
                   apiFetch(`/admin/orders/${id}/triage`, {
                     method: 'POST',
-                    body: { decision: 'need_more_info', note: triageNote || 'لطفاً اطلاعات بیشتری ارسال کنید.' },
+                    body: {
+                      decision: 'need_more_info',
+                      note: triageNote || 'لطفاً اطلاعات بیشتری ارسال کنید.',
+                    },
                   }),
                 )
               }
@@ -123,7 +162,10 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
                 runAction(() =>
                   apiFetch(`/admin/orders/${id}/triage`, {
                     method: 'POST',
-                    body: { decision: 'reject', note: triageNote || 'رد شده در تریاژ' },
+                    body: {
+                      decision: 'reject',
+                      note: triageNote || 'رد شده در تریاژ',
+                    },
                   }),
                 )
               }
@@ -163,11 +205,16 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
         {order.status === 'paid' && (
           <div className="mb-4 flex flex-wrap items-end gap-2">
             <Field label="تخصیص به کارمند/مجری">
-              <select className={inputClass} value={selectedExecutor} onChange={(e) => setSelectedExecutor(e.target.value)}>
+              <select
+                className={inputClass}
+                value={selectedExecutor}
+                onChange={(e) => setSelectedExecutor(e.target.value)}
+              >
                 <option value="">انتخاب کنید</option>
                 {staff.map((s) => (
                   <option key={s.id} value={s.id}>
-                    {s.displayAlias} ({s.publicHandlerCode}) — QC: {Number(s.qcPassRate).toFixed(0)}٪
+                    {s.displayAlias} ({s.publicHandlerCode}) — QC:{' '}
+                    {Number(s.qcPassRate).toFixed(0)}٪
                   </option>
                 ))}
               </select>
@@ -190,9 +237,15 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
 
         {order.status === 'disputed' && (
           <div className="mb-4 flex flex-col gap-3 rounded-xl border border-red-100 bg-red-50 p-4">
-            <p className="text-sm font-medium text-red-700">این سفارش در وضعیت اختلاف (dispute) است.</p>
+            <p className="text-sm font-medium text-red-700">
+              این سفارش در وضعیت اختلاف (dispute) است.
+            </p>
             <Field label="یادداشت تصمیم (اجباری)">
-              <input className={inputClass} value={disputeNote} onChange={(e) => setDisputeNote(e.target.value)} />
+              <input
+                className={inputClass}
+                value={disputeNote}
+                onChange={(e) => setDisputeNote(e.target.value)}
+              />
             </Field>
             <Field label="مبلغ برای رفاند جزئی (فقط برای گزینه مربوطه)">
               <input
@@ -225,7 +278,10 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
                   runAction(() =>
                     apiFetch(`/admin/orders/${id}/resolve-dispute`, {
                       method: 'POST',
-                      body: { resolutionType: 'refund_full', note: disputeNote },
+                      body: {
+                        resolutionType: 'refund_full',
+                        note: disputeNote,
+                      },
                     }),
                   )
                 }
@@ -239,7 +295,11 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
                   runAction(() =>
                     apiFetch(`/admin/orders/${id}/resolve-dispute`, {
                       method: 'POST',
-                      body: { resolutionType: 'refund_partial', note: disputeNote, amount: Number(disputeAmount) },
+                      body: {
+                        resolutionType: 'refund_partial',
+                        note: disputeNote,
+                        amount: Number(disputeAmount),
+                      },
                     }),
                   )
                 }
@@ -252,7 +312,10 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
                   runAction(() =>
                     apiFetch(`/admin/orders/${id}/resolve-dispute`, {
                       method: 'POST',
-                      body: { resolutionType: 'release_to_executor', note: disputeNote },
+                      body: {
+                        resolutionType: 'release_to_executor',
+                        note: disputeNote,
+                      },
                     }),
                   )
                 }
@@ -266,7 +329,11 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
         {!['cancelled', 'closed'].includes(order.status) && (
           <div className="flex flex-wrap items-end gap-2 border-t border-slate-100 pt-4">
             <Field label="دلیل لغو">
-              <input className={inputClass} value={cancelReason} onChange={(e) => setCancelReason(e.target.value)} />
+              <input
+                className={inputClass}
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+              />
             </Field>
             <Button
               variant="danger"
@@ -290,13 +357,20 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
         <h3 className="mb-3 font-bold text-slate-800">تاریخچه وضعیت</h3>
         <ul className="space-y-2 text-sm">
           {order.statusHistory?.map((h) => (
-            <li key={h.id} className="flex items-center justify-between border-b border-slate-50 pb-2 last:border-0">
+            <li
+              key={h.id}
+              className="flex items-center justify-between border-b border-slate-50 pb-2 last:border-0"
+            >
               <div className="flex items-center gap-2">
                 <Badge>{h.source}</Badge>
                 <OrderStatusBadge status={h.toStatus} />
-                {h.note && <span className="text-xs text-slate-400">{h.note}</span>}
+                {h.note && (
+                  <span className="text-xs text-slate-400">{h.note}</span>
+                )}
               </div>
-              <span className="text-xs text-slate-400">{formatDate(h.createdAt)}</span>
+              <span className="text-xs text-slate-400">
+                {formatDate(h.createdAt)}
+              </span>
             </li>
           ))}
         </ul>

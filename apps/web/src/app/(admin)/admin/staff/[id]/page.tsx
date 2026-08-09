@@ -9,13 +9,19 @@ interface StaffDetail extends ExecutorProfile {
   assignments: { order: { code: string; title: string; status: string } }[];
 }
 
-export default function AdminStaffDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function AdminStaffDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const [profile, setProfile] = useState<StaffDetail | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    apiFetch<StaffDetail>(`/admin/staff/${id}`).then(setProfile).catch((e) => setError(e.message));
+    apiFetch<StaffDetail>(`/admin/staff/${id}`)
+      .then(setProfile)
+      .catch((e) => setError(e.message));
   }, [id]);
 
   if (error) return <ErrorBanner message={error} />;
@@ -23,24 +29,34 @@ export default function AdminStaffDetailPage({ params }: { params: Promise<{ id:
 
   return (
     <div>
-      <SectionTitle subtitle={profile.publicHandlerCode}>{profile.displayAlias}</SectionTitle>
+      <SectionTitle subtitle={profile.publicHandlerCode}>
+        {profile.displayAlias}
+      </SectionTitle>
 
       <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Card>
           <p className="text-xs text-slate-400">ظرفیت</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{profile.capacityPercent}٪</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">
+            {profile.capacityPercent}٪
+          </p>
         </Card>
         <Card>
           <p className="text-xs text-slate-400">QC pass</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{Number(profile.qcPassRate).toFixed(0)}٪</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">
+            {Number(profile.qcPassRate).toFixed(0)}٪
+          </p>
         </Card>
         <Card>
           <p className="text-xs text-slate-400">تحویل به‌موقع</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{Number(profile.onTimeDeliveryRate).toFixed(0)}٪</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">
+            {Number(profile.onTimeDeliveryRate).toFixed(0)}٪
+          </p>
         </Card>
         <Card>
           <p className="text-xs text-slate-400">ریسک عملکرد</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{Number(profile.riskScore).toFixed(0)}</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">
+            {Number(profile.riskScore).toFixed(0)}
+          </p>
         </Card>
       </div>
 

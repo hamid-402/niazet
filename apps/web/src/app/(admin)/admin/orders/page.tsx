@@ -3,7 +3,14 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
-import { Card, EmptyState, ErrorBanner, inputClass, PageLoading, SectionTitle } from '@/components/ui';
+import {
+  Card,
+  EmptyState,
+  ErrorBanner,
+  inputClass,
+  PageLoading,
+  SectionTitle,
+} from '@/components/ui';
 import { OrderStatusBadge } from '@/components/status-badge';
 import type { OrderSummary } from '@/lib/types';
 import { formatDate, formatToman } from '@/lib/format';
@@ -15,7 +22,9 @@ export default function AdminOrdersPage() {
 
   useEffect(() => {
     const query = search ? `?search=${encodeURIComponent(search)}` : '';
-    apiFetch<OrderSummary[]>(`/admin/orders${query}`).then(setOrders).catch((e) => setError(e.message));
+    apiFetch<OrderSummary[]>(`/admin/orders${query}`)
+      .then(setOrders)
+      .catch((e) => setError(e.message));
   }, [search]);
 
   return (
@@ -48,21 +57,32 @@ export default function AdminOrdersPage() {
             </thead>
             <tbody>
               {orders.map((order) => (
-                <tr key={order.id} className="border-b border-slate-50 last:border-0 hover:bg-slate-50">
+                <tr
+                  key={order.id}
+                  className="border-b border-slate-50 last:border-0 hover:bg-slate-50"
+                >
                   <td className="px-4 py-3">
-                    <Link href={`/admin/orders/${order.id}`} className="font-medium text-slate-800 hover:underline">
+                    <Link
+                      href={`/admin/orders/${order.id}`}
+                      className="font-medium text-slate-800 hover:underline"
+                    >
                       {order.title}
                     </Link>
                     <p className="text-xs text-slate-400">{order.code}</p>
                   </td>
                   <td className="px-4 py-3 text-slate-500">
-                    {(order as unknown as { customer?: { fullName: string } }).customer?.fullName ?? '—'}
+                    {(order as unknown as { customer?: { fullName: string } })
+                      .customer?.fullName ?? '—'}
                   </td>
                   <td className="px-4 py-3">
                     <OrderStatusBadge status={order.status} />
                   </td>
-                  <td className="px-4 py-3 text-slate-500">{formatToman(order.finalPrice)}</td>
-                  <td className="px-4 py-3 text-slate-400">{formatDate(order.createdAt)}</td>
+                  <td className="px-4 py-3 text-slate-500">
+                    {formatToman(order.finalPrice)}
+                  </td>
+                  <td className="px-4 py-3 text-slate-400">
+                    {formatDate(order.createdAt)}
+                  </td>
                 </tr>
               ))}
             </tbody>

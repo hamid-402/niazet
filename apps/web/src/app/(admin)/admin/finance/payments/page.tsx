@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
-import { Badge, Card, EmptyState, ErrorBanner, PageLoading, SectionTitle } from '@/components/ui';
+import {
+  Badge,
+  Card,
+  EmptyState,
+  ErrorBanner,
+  PageLoading,
+  SectionTitle,
+} from '@/components/ui';
 import { formatDate, formatToman } from '@/lib/format';
 
 interface Payment {
@@ -28,7 +35,9 @@ export default function AdminPaymentsPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    apiFetch<Payment[]>('/admin/finance/payments').then(setPayments).catch((e) => setError(e.message));
+    apiFetch<Payment[]>('/admin/finance/payments')
+      .then(setPayments)
+      .catch((e) => setError(e.message));
   }, []);
 
   return (
@@ -36,7 +45,9 @@ export default function AdminPaymentsPage() {
       <SectionTitle>پرداخت‌ها</SectionTitle>
       {error && <ErrorBanner message={error} />}
       {!payments && !error && <PageLoading />}
-      {payments && payments.length === 0 && <EmptyState title="پرداختی ثبت نشده است." />}
+      {payments && payments.length === 0 && (
+        <EmptyState title="پرداختی ثبت نشده است." />
+      )}
 
       {payments && payments.length > 0 && (
         <Card className="overflow-x-auto p-0">
@@ -52,14 +63,25 @@ export default function AdminPaymentsPage() {
             </thead>
             <tbody>
               {payments.map((p) => (
-                <tr key={p.id} className="border-b border-slate-50 last:border-0">
+                <tr
+                  key={p.id}
+                  className="border-b border-slate-50 last:border-0"
+                >
                   <td className="px-4 py-3 text-slate-700">{p.order.code}</td>
-                  <td className="px-4 py-3 text-slate-500">{p.customer.fullName}</td>
-                  <td className="px-4 py-3 text-slate-700">{formatToman(p.amount)}</td>
-                  <td className="px-4 py-3">
-                    <Badge color={STATUS_COLOR[p.status] ?? 'gray'}>{p.status}</Badge>
+                  <td className="px-4 py-3 text-slate-500">
+                    {p.customer.fullName}
                   </td>
-                  <td className="px-4 py-3 text-slate-400">{formatDate(p.createdAt)}</td>
+                  <td className="px-4 py-3 text-slate-700">
+                    {formatToman(p.amount)}
+                  </td>
+                  <td className="px-4 py-3">
+                    <Badge color={STATUS_COLOR[p.status] ?? 'gray'}>
+                      {p.status}
+                    </Badge>
+                  </td>
+                  <td className="px-4 py-3 text-slate-400">
+                    {formatDate(p.createdAt)}
+                  </td>
                 </tr>
               ))}
             </tbody>

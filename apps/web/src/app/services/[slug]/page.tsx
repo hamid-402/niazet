@@ -8,7 +8,11 @@ import { formatToman } from '@/lib/format';
 import type { ServiceLine } from '@/lib/types';
 import { useAuth } from '@/lib/auth-context';
 
-export default function ServiceDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+export default function ServiceDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = use(params);
   const { user } = useAuth();
   const [service, setService] = useState<ServiceLine | null>(null);
@@ -29,8 +33,12 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
 
         {service && (
           <>
-            <p className="mb-1 text-xs font-medium text-slate-400">{service.category}</p>
-            <h1 className="mb-3 text-2xl font-extrabold text-slate-900">{service.title}</h1>
+            <p className="mb-1 text-xs font-medium text-slate-400">
+              {service.category}
+            </p>
+            <h1 className="mb-3 text-2xl font-extrabold text-slate-900">
+              {service.title}
+            </h1>
             <p className="mb-6 text-slate-600">{service.description}</p>
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -40,33 +48,51 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
                     <h3 className="mb-3 font-bold text-slate-900">پکیج‌ها</h3>
                     <div className="space-y-3">
                       {service.packages.map((pkg) => (
-                        <div key={pkg.id} className="rounded-xl border border-slate-100 p-3">
+                        <div
+                          key={pkg.id}
+                          className="rounded-xl border border-slate-100 p-3"
+                        >
                           <div className="flex items-center justify-between">
-                            <span className="font-medium text-slate-800">{pkg.name}</span>
-                            <span className="text-sm text-slate-500">{formatToman(pkg.price)}</span>
+                            <span className="font-medium text-slate-800">
+                              {pkg.name}
+                            </span>
+                            <span className="text-sm text-slate-500">
+                              {formatToman(pkg.price)}
+                            </span>
                           </div>
-                          {pkg.description && <p className="mt-1 text-sm text-slate-500">{pkg.description}</p>}
+                          {pkg.description && (
+                            <p className="mt-1 text-sm text-slate-500">
+                              {pkg.description}
+                            </p>
+                          )}
                         </div>
                       ))}
                     </div>
                   </Card>
                 )}
 
-                {service.acceptanceCriteria && service.acceptanceCriteria.length > 0 && (
-                  <Card>
-                    <h3 className="mb-3 font-bold text-slate-900">معیار پذیرش</h3>
-                    <ul className="list-inside list-disc space-y-1 text-sm text-slate-600">
-                      {service.acceptanceCriteria.map((c) => (
-                        <li key={c.id}>{c.description}</li>
-                      ))}
-                    </ul>
-                  </Card>
-                )}
+                {service.acceptanceCriteria &&
+                  service.acceptanceCriteria.length > 0 && (
+                    <Card>
+                      <h3 className="mb-3 font-bold text-slate-900">
+                        معیار پذیرش
+                      </h3>
+                      <ul className="list-inside list-disc space-y-1 text-sm text-slate-600">
+                        {service.acceptanceCriteria.map((c) => (
+                          <li key={c.id}>{c.description}</li>
+                        ))}
+                      </ul>
+                    </Card>
+                  )}
 
                 {service.deliverables && (
                   <Card>
-                    <h3 className="mb-2 font-bold text-slate-900">خروجی قابل تحویل</h3>
-                    <p className="text-sm text-slate-600">{service.deliverables}</p>
+                    <h3 className="mb-2 font-bold text-slate-900">
+                      خروجی قابل تحویل
+                    </h3>
+                    <p className="text-sm text-slate-600">
+                      {service.deliverables}
+                    </p>
                   </Card>
                 )}
               </div>
@@ -77,18 +103,24 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
                     {service.slaHours && (
                       <div className="flex justify-between">
                         <dt className="text-slate-500">زمان تقریبی</dt>
-                        <dd className="font-medium text-slate-800">{service.slaHours} ساعت</dd>
+                        <dd className="font-medium text-slate-800">
+                          {service.slaHours} ساعت
+                        </dd>
                       </div>
                     )}
                     {service.revisionPolicy && (
                       <div className="flex justify-between">
                         <dt className="text-slate-500">سیاست اصلاح</dt>
-                        <dd className="font-medium text-slate-800">{service.revisionPolicy}</dd>
+                        <dd className="font-medium text-slate-800">
+                          {service.revisionPolicy}
+                        </dd>
                       </div>
                     )}
                   </dl>
                   <LinkButton
-                    href={user ? `/orders/new?serviceId=${service.id}` : '/login'}
+                    href={
+                      user ? `/orders/new?serviceId=${service.id}` : '/login'
+                    }
                     className="mt-4 w-full"
                   >
                     شروع ثبت درخواست

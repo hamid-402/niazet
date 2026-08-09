@@ -19,7 +19,9 @@ export default function AdminFinanceDashboardPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    apiFetch<FinanceDashboard>('/admin/finance/dashboard').then(setData).catch((e) => setError(e.message));
+    apiFetch<FinanceDashboard>('/admin/finance/dashboard')
+      .then(setData)
+      .catch((e) => setError(e.message));
   }, []);
 
   if (error) return <ErrorBanner message={error} />;
@@ -31,24 +33,36 @@ export default function AdminFinanceDashboardPage() {
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
         <Card>
           <p className="text-xs text-slate-400">گردش این ماه</p>
-          <p className="mt-1 text-xl font-bold text-slate-900">{formatToman(data.monthRevenue)}</p>
+          <p className="mt-1 text-xl font-bold text-slate-900">
+            {formatToman(data.monthRevenue)}
+          </p>
         </Card>
         <Card>
           <p className="text-xs text-slate-400">escrow فعال</p>
-          <p className="mt-1 text-xl font-bold text-slate-900">{formatToman(data.activeEscrowAmount)}</p>
-          <p className="text-xs text-slate-400">{data.activeEscrowCount} مورد</p>
+          <p className="mt-1 text-xl font-bold text-slate-900">
+            {formatToman(data.activeEscrowAmount)}
+          </p>
+          <p className="text-xs text-slate-400">
+            {data.activeEscrowCount} مورد
+          </p>
         </Card>
         <Card>
           <p className="text-xs text-slate-400">refund در انتظار</p>
-          <p className="mt-1 text-xl font-bold text-slate-900">{data.pendingRefunds}</p>
+          <p className="mt-1 text-xl font-bold text-slate-900">
+            {data.pendingRefunds}
+          </p>
         </Card>
         <Card>
           <p className="text-xs text-slate-400">withdrawal در انتظار</p>
-          <p className="mt-1 text-xl font-bold text-slate-900">{data.pendingWithdrawals}</p>
+          <p className="mt-1 text-xl font-bold text-slate-900">
+            {data.pendingWithdrawals}
+          </p>
         </Card>
         <Card>
           <p className="text-xs text-slate-400">پرداخت ناموفق</p>
-          <p className="mt-1 text-xl font-bold text-slate-900">{data.failedPayments}</p>
+          <p className="mt-1 text-xl font-bold text-slate-900">
+            {data.failedPayments}
+          </p>
         </Card>
       </div>
     </div>

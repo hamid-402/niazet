@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
-import { Card, EmptyState, ErrorBanner, PageLoading, SectionTitle } from '@/components/ui';
+import {
+  Card,
+  EmptyState,
+  ErrorBanner,
+  PageLoading,
+  SectionTitle,
+} from '@/components/ui';
 import type { WalletSummary } from '@/lib/types';
 import { formatDate, formatToman } from '@/lib/format';
 
@@ -19,8 +25,12 @@ export default function WalletPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    apiFetch<WalletSummary>('/customer/wallet').then(setWallet).catch((e) => setError(e.message));
-    apiFetch<Invoice[]>('/customer/invoices').then(setInvoices).catch(() => undefined);
+    apiFetch<WalletSummary>('/customer/wallet')
+      .then(setWallet)
+      .catch((e) => setError(e.message));
+    apiFetch<Invoice[]>('/customer/invoices')
+      .then(setInvoices)
+      .catch(() => undefined);
   }, []);
 
   return (
@@ -33,7 +43,9 @@ export default function WalletPage() {
         <>
           <Card className="mb-4">
             <p className="text-xs text-slate-400">موجودی کیف پول</p>
-            <p className="mt-1 text-2xl font-bold text-slate-900">{formatToman(wallet.balance)}</p>
+            <p className="mt-1 text-2xl font-bold text-slate-900">
+              {formatToman(wallet.balance)}
+            </p>
           </Card>
 
           <Card className="mb-4">
@@ -43,12 +55,23 @@ export default function WalletPage() {
             ) : (
               <ul className="divide-y divide-slate-100 text-sm">
                 {wallet.transactions.map((t) => (
-                  <li key={t.id} className="flex items-center justify-between py-2">
-                    <span className={t.direction === 'credit' ? 'text-emerald-700' : 'text-red-700'}>
+                  <li
+                    key={t.id}
+                    className="flex items-center justify-between py-2"
+                  >
+                    <span
+                      className={
+                        t.direction === 'credit'
+                          ? 'text-emerald-700'
+                          : 'text-red-700'
+                      }
+                    >
                       {t.direction === 'credit' ? '+' : '-'}
                       {formatToman(t.amount)}
                     </span>
-                    <span className="text-xs text-slate-400">{formatDate(t.createdAt)}</span>
+                    <span className="text-xs text-slate-400">
+                      {formatDate(t.createdAt)}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -62,10 +85,15 @@ export default function WalletPage() {
             ) : (
               <ul className="divide-y divide-slate-100 text-sm">
                 {invoices.map((inv) => (
-                  <li key={inv.id} className="flex items-center justify-between py-2">
+                  <li
+                    key={inv.id}
+                    className="flex items-center justify-between py-2"
+                  >
                     <span>{inv.invoiceNumber}</span>
                     <span>{formatToman(inv.amount)}</span>
-                    <span className="text-xs text-slate-400">{formatDate(inv.issuedAt)}</span>
+                    <span className="text-xs text-slate-400">
+                      {formatDate(inv.issuedAt)}
+                    </span>
                   </li>
                 ))}
               </ul>

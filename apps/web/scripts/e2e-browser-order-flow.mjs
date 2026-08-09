@@ -2,6 +2,16 @@
 import { chromium } from 'playwright';
 
 const BASE = 'http://localhost:3000';
+const PASSWORD = 'Passw0rd!123';
+
+async function loginAs(page, { phone, waitUrlPattern, clearStorage = false }) {
+  if (clearStorage) await page.evaluate(() => localStorage.clear());
+  await page.goto(`${BASE}/login`, { waitUntil: 'networkidle' });
+  await page.fill('input[dir="ltr"]', phone);
+  await page.fill('input[type="password"]', PASSWORD);
+  await page.click('button[type="submit"]');
+  await page.waitForURL(waitUrlPattern);
+}
 
 async function main() {
   const browser = await chromium.launch({ executablePath: '/usr/local/bin/google-chrome', headless: true });
@@ -10,11 +20,7 @@ async function main() {
   page.on('pageerror', (err) => errors.push(String(err)));
 
   console.log('== customer login ==');
-  await page.goto(`${BASE}/login`, { waitUntil: 'networkidle' });
-  await page.fill('input[dir="ltr"]', '09120000009');
-  await page.fill('input[type="password"]', 'Passw0rd!123');
-  await page.click('button[type="submit"]');
-  await page.waitForURL('**/dashboard');
+  await loginAs(page, { phone: '09120000009', waitUrlPattern: '**/dashboard' });
 
   console.log('== create new order via UI ==');
   await page.goto(`${BASE}/orders/new`, { waitUntil: 'networkidle' });
@@ -28,12 +34,7 @@ async function main() {
   await page.waitForSelector('text=در صف بررسی');
 
   console.log('== admin login and triage ==');
-  await page.evaluate(() => localStorage.clear());
-  await page.goto(`${BASE}/login`, { waitUntil: 'networkidle' });
-  await page.fill('input[dir="ltr"]', '09120000002');
-  await page.fill('input[type="password"]', 'Passw0rd!123');
-  await page.click('button[type="submit"]');
-  await page.waitForURL('**/admin');
+  await loginAs(page, { phone: '09120000002', waitUrlPattern: '**/admin', clearStorage: true });
 
   const orderId = orderUrl.split('/').pop();
   await page.goto(`${BASE}/admin/orders/${orderId}`, { waitUntil: 'networkidle' });
