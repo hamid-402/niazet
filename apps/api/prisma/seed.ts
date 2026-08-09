@@ -62,7 +62,11 @@ async function ensureUserWithWallet(params: {
       create: { ownerUserId: user.id, accountType },
       update: {},
     });
-    await prisma.wallet.upsert({ where: { userId: user.id }, create: { userId: user.id }, update: {} });
+    await prisma.wallet.upsert({
+      where: { userId: user.id },
+      create: { userId: user.id },
+      update: {},
+    });
   }
 
   return user;
@@ -109,12 +113,20 @@ async function main() {
   // -----------------------------------------------------------------
   const webTeam = await prisma.team.upsert({
     where: { code: 'WEB-02' },
-    create: { code: 'WEB-02', name: 'تیم وب ۲', description: 'طراحی و توسعه سایت' },
+    create: {
+      code: 'WEB-02',
+      name: 'تیم وب ۲',
+      description: 'طراحی و توسعه سایت',
+    },
     update: {},
   });
   const contentTeam = await prisma.team.upsert({
     where: { code: 'CNT-01' },
-    create: { code: 'CNT-01', name: 'تیم محتوا و سئو', description: 'محتوا، سئو و پژوهش' },
+    create: {
+      code: 'CNT-01',
+      name: 'تیم محتوا و سئو',
+      description: 'محتوا، سئو و پژوهش',
+    },
     update: {},
   });
 
@@ -170,15 +182,28 @@ async function main() {
       slug: 'website-design-development',
       title: 'طراحی و توسعه سایت',
       category: 'طراحی و توسعه',
-      description: 'طراحی و پیاده‌سازی وب‌سایت اختصاصی با تیم اجرای مدیریت‌شده.',
+      description:
+        'طراحی و پیاده‌سازی وب‌سایت اختصاصی با تیم اجرای مدیریت‌شده.',
       deliverables: 'وب‌سایت آماده انتشار + مستندات تحویل',
       pricingModel: 'manual_quote',
       slaHours: 120,
       revisionPolicy: 'حداکثر ۲ اصلاح رایگان',
       formFields: {
         create: [
-          { label: 'هدف سایت', fieldKey: 'goal', fieldType: 'text', required: true, sortOrder: 1 },
-          { label: 'تعداد صفحات تقریبی', fieldKey: 'pages_count', fieldType: 'number', required: false, sortOrder: 2 },
+          {
+            label: 'هدف سایت',
+            fieldKey: 'goal',
+            fieldType: 'text',
+            required: true,
+            sortOrder: 1,
+          },
+          {
+            label: 'تعداد صفحات تقریبی',
+            fieldKey: 'pages_count',
+            fieldType: 'number',
+            required: false,
+            sortOrder: 2,
+          },
         ],
       },
       acceptanceCriteria: {
@@ -207,8 +232,18 @@ async function main() {
   if (websiteService.packages.length === 0) {
     await prisma.servicePackage.createMany({
       data: [
-        { serviceId: websiteService.id, name: 'پایه', description: 'وب‌سایت تک‌صفحه‌ای', slaHours: 72 },
-        { serviceId: websiteService.id, name: 'حرفه‌ای', description: 'وب‌سایت چندصفحه‌ای با پنل مدیریت', slaHours: 120 },
+        {
+          serviceId: websiteService.id,
+          name: 'پایه',
+          description: 'وب‌سایت تک‌صفحه‌ای',
+          slaHours: 72,
+        },
+        {
+          serviceId: websiteService.id,
+          name: 'حرفه‌ای',
+          description: 'وب‌سایت چندصفحه‌ای با پنل مدیریت',
+          slaHours: 120,
+        },
       ],
     });
   }
@@ -257,7 +292,9 @@ async function main() {
   console.log('executor (محتوا): 09120000006 (کد CNT-21)');
   console.log('customer      : 09120000009');
   console.log('---------------------------------------------');
-  console.log(`customerId=${customer.id} executorProfile1Id=${executorProfile1.id}`);
+  console.log(
+    `customerId=${customer.id} executorProfile1Id=${executorProfile1.id}`,
+  );
 }
 
 main()

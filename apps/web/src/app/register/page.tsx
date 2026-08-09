@@ -50,11 +50,15 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-bg px-4">
       <Card className="w-full max-w-sm">
-        <h1 className="mb-1 text-xl font-extrabold text-slate-900">ثبت‌نام در نیازت با ما</h1>
-        <p className="mb-6 text-sm text-slate-500">
-          {step === 'form' ? 'اطلاعات خود را وارد کنید.' : 'کد تایید ارسال‌شده به موبایل را وارد کنید.'}
+        <h1 className="mb-1 text-xl font-extrabold text-fg">
+          ثبت‌نام در نیازت با ما
+        </h1>
+        <p className="mb-6 text-sm text-fg-muted">
+          {step === 'form'
+            ? 'اطلاعات خود را وارد کنید.'
+            : 'کد تایید ارسال‌شده به موبایل را وارد کنید.'}
         </p>
 
         {step === 'form' ? (
@@ -77,7 +81,10 @@ export default function RegisterPage() {
                 required
               />
             </Field>
-            <Field label="رمز عبور (اختیاری)" hint="می‌توانید بعداً هم با OTP وارد شوید.">
+            <Field
+              label="رمز عبور (اختیاری)"
+              hint="می‌توانید بعداً هم با OTP وارد شوید."
+            >
               <input
                 type="password"
                 className={inputClass}
@@ -95,7 +102,7 @@ export default function RegisterPage() {
         ) : (
           <form onSubmit={onSubmitOtp} className="flex flex-col gap-4">
             {devOtp && (
-              <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">
+              <p className="rounded-control bg-warning-subtle px-3 py-2 text-xs text-warning">
                 (محیط توسعه) کد تایید: <b dir="ltr">{devOtp}</b>
               </p>
             )}
@@ -117,9 +124,9 @@ export default function RegisterPage() {
           </form>
         )}
 
-        <p className="mt-4 text-center text-sm text-slate-500">
+        <p className="mt-4 text-center text-sm text-fg-muted">
           حساب دارید؟{' '}
-          <Link href="/login" className="font-medium text-slate-900 hover:underline">
+          <Link href="/login" className="font-medium text-fg hover:underline">
             ورود
           </Link>
         </p>

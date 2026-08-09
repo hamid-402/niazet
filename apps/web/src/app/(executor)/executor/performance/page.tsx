@@ -17,7 +17,9 @@ export default function ExecutorPerformancePage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    apiFetch<Performance>('/executor/performance').then(setPerf).catch((e) => setError(e.message));
+    apiFetch<Performance>('/executor/performance')
+      .then(setPerf)
+      .catch((e) => setError(e.message));
   }, []);
 
   if (error) return <ErrorBanner message={error} />;
@@ -25,19 +27,27 @@ export default function ExecutorPerformancePage() {
 
   return (
     <div>
-      <SectionTitle subtitle="خلاصه محدود و غیرحساس عملکرد شما">عملکرد من</SectionTitle>
+      <SectionTitle subtitle="خلاصه محدود و غیرحساس عملکرد شما">
+        عملکرد من
+      </SectionTitle>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Card>
           <p className="text-xs text-slate-400">نرخ قبولی QC</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{Number(perf.qcPassRate).toFixed(0)}٪</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">
+            {Number(perf.qcPassRate).toFixed(0)}٪
+          </p>
         </Card>
         <Card>
           <p className="text-xs text-slate-400">تحویل به‌موقع</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{Number(perf.onTimeDeliveryRate).toFixed(0)}٪</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">
+            {Number(perf.onTimeDeliveryRate).toFixed(0)}٪
+          </p>
         </Card>
         <Card>
           <p className="text-xs text-slate-400">میانگین امتیاز مشتری</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{Number(perf.customerRatingAvg).toFixed(1)}</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">
+            {Number(perf.customerRatingAvg).toFixed(1)}
+          </p>
         </Card>
         <Card>
           <p className="text-xs text-slate-400">تشکر / شکایت</p>

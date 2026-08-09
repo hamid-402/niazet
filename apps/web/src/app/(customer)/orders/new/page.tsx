@@ -3,7 +3,14 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiFetch, ApiError } from '@/lib/api';
-import { Button, Card, ErrorBanner, Field, inputClass, SectionTitle } from '@/components/ui';
+import {
+  Button,
+  Card,
+  ErrorBanner,
+  Field,
+  inputClass,
+  SectionTitle,
+} from '@/components/ui';
 import type { ServiceLine } from '@/lib/types';
 
 function NewOrderForm() {
@@ -25,7 +32,9 @@ function NewOrderForm() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    apiFetch<ServiceLine[]>('/services', { auth: false }).then(setServices).catch(() => undefined);
+    apiFetch<ServiceLine[]>('/services', { auth: false })
+      .then(setServices)
+      .catch(() => undefined);
   }, []);
 
   const selectedService = services.find((s) => s.id === serviceId);
@@ -66,7 +75,9 @@ function NewOrderForm() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <SectionTitle subtitle="فرم کوتاه؛ جزئیات بیشتر اختیاری است">ثبت درخواست جدید</SectionTitle>
+      <SectionTitle subtitle="فرم کوتاه؛ جزئیات بیشتر اختیاری است">
+        ثبت درخواست جدید
+      </SectionTitle>
 
       <form onSubmit={onSubmit} className="flex flex-col gap-5">
         <Card>
@@ -117,7 +128,11 @@ function NewOrderForm() {
             </Field>
 
             <Field label="فوریت">
-              <select className={inputClass} value={urgency} onChange={(e) => setUrgency(e.target.value)}>
+              <select
+                className={inputClass}
+                value={urgency}
+                onChange={(e) => setUrgency(e.target.value)}
+              >
                 <option value="low">کم</option>
                 <option value="normal">عادی</option>
                 <option value="high">زیاد</option>
@@ -127,7 +142,10 @@ function NewOrderForm() {
           </div>
 
           <div className="mt-4">
-            <Field label="شرح نیاز" hint="هرچه دقیق‌تر بنویسید، بررسی سریع‌تر انجام می‌شود.">
+            <Field
+              label="شرح نیاز"
+              hint="هرچه دقیق‌تر بنویسید، بررسی سریع‌تر انجام می‌شود."
+            >
               <textarea
                 className={`${inputClass} min-h-28`}
                 value={briefDescription}
@@ -138,7 +156,10 @@ function NewOrderForm() {
           </div>
 
           <div className="mt-4">
-            <Field label="بودجه تقریبی (اختیاری)" hint="در صورت نبودن قیمت ثابت، پس از بررسی قیمت‌گذاری می‌شود.">
+            <Field
+              label="بودجه تقریبی (اختیاری)"
+              hint="در صورت نبودن قیمت ثابت، پس از بررسی قیمت‌گذاری می‌شود."
+            >
               <input
                 className={inputClass}
                 type="number"
@@ -153,14 +174,19 @@ function NewOrderForm() {
         <Card>
           <button
             type="button"
-            className="text-sm font-medium text-slate-600 hover:text-slate-900"
+            className="text-sm font-medium text-fg-muted hover:text-fg"
             onClick={() => setShowOptional((v) => !v)}
           >
-            {showOptional ? 'بستن جزئیات اختیاری' : 'افزودن جزئیات اختیاری (معیار پذیرش و ...)'}
+            {showOptional
+              ? 'بستن جزئیات اختیاری'
+              : 'افزودن جزئیات اختیاری (معیار پذیرش و ...)'}
           </button>
           {showOptional && (
             <div className="mt-4">
-              <Field label="معیارهای پذیرش" hint="هر معیار را در یک خط بنویسید.">
+              <Field
+                label="معیارهای پذیرش"
+                hint="هر معیار را در یک خط بنویسید."
+              >
                 <textarea
                   className={`${inputClass} min-h-24`}
                   value={acceptanceCriteria}

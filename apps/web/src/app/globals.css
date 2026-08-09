@@ -1,72 +1,402 @@
 @import 'tailwindcss';
-@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================================
+   NIAZAT DESIGN SYSTEM — Design Tokens
+   Semantic tokens are exposed as CSS variables on :root and are
+   re-mapped per theme via [data-theme="..."] selectors below.
+   Component styles should always reference the semantic tokens
+   (--color-surface, --color-fg-muted, etc.), never raw palette
+   values, so themes can be swapped with zero component changes.
+   ============================================================ */
 
 :root {
-  --background: #faf9f6;
-  --foreground: #131c2e;
-  --card: #ffffff;
-  --card-foreground: #131c2e;
-  --border: #e6e2d8;
-  --muted: #6b7280;
-  --muted-soft: #f1efe8;
-  --brand: #0f1f3d;
-  --brand-foreground: #ffffff;
-  --brand-soft: #eef1f6;
-  --accent: #ab8226;
-  --accent-foreground: #17223a;
-  --accent-soft: #f7eed9;
+  /* ---- Radius scale ---- */
+  --radius-control: 0.625rem; /* inputs, buttons, chips */
+  --radius-card: 1rem; /* cards, panels */
+  --radius-modal: 1.25rem; /* dialogs, sheets */
+  --radius-pill: 999px; /* badges, pills */
+
+  /* ---- Elevation / shadow scale (light-mode defaults, overridden per theme) ---- */
+  --shadow-elevation-1: 0 1px 2px 0 rgb(15 23 42 / 0.04);
+  --shadow-elevation-2:
+    0 2px 8px -2px rgb(15 23 42 / 0.08), 0 1px 2px 0 rgb(15 23 42 / 0.04);
+  --shadow-elevation-3:
+    0 12px 24px -8px rgb(15 23 42 / 0.14), 0 4px 8px -4px rgb(15 23 42 / 0.06);
+  --shadow-elevation-4:
+    0 24px 48px -12px rgb(15 23 42 / 0.22), 0 8px 16px -8px rgb(15 23 42 / 0.08);
+
+  /* ---- Motion ---- */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --duration-slow: 280ms;
+
+  /* ---- Z-index layers ---- */
+  --z-dropdown: 30;
+  --z-sticky: 40;
+  --z-overlay: 50;
+  --z-modal: 60;
+  --z-toast: 70;
+  --z-popover: 80;
+
+  /* ---- Focus ring ---- */
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
 }
 
-.dark {
-  --background: #080d18;
-  --foreground: #eae7dd;
-  --card: #101a2d;
-  --card-foreground: #eae7dd;
-  --border: #223047;
-  --muted: #9aa3b7;
-  --muted-soft: #131f34;
-  --brand: #2f4d80;
-  --brand-foreground: #ffffff;
-  --brand-soft: #16233b;
-  --accent: #d8b04a;
-  --accent-foreground: #0c0f1a;
-  --accent-soft: #1c2338;
+/* ============================================================
+   Theme: Simple Light (default)
+   Calm, professional, high-legibility neutral light theme.
+   ============================================================ */
+[data-theme='simple-light'],
+:root {
+  --color-bg: #f7f8fa;
+  --color-bg-subtle: #eef0f3;
+  --color-surface: #ffffff;
+  --color-surface-raised: #ffffff;
+  --color-surface-sunken: #f2f3f5;
+  --color-border: #e2e5ea;
+  --color-border-strong: #cbd1db;
+
+  --color-fg: #12151a;
+  --color-fg-muted: #565d6b;
+  --color-fg-subtle: #8a8f99;
+  --color-fg-on-accent: #ffffff;
+
+  --color-accent: #2f5fed;
+  --color-accent-hover: #2750d1;
+  --color-accent-active: #1f42ae;
+  --color-accent-subtle: #eaf0ff;
+  --color-accent-border: #c4d3fb;
+
+  --color-success: #157a5e;
+  --color-success-subtle: #e5f6ef;
+  --color-success-border: #b6e4d1;
+
+  --color-warning: #92620a;
+  --color-warning-subtle: #fdf3df;
+  --color-warning-border: #f2dba3;
+
+  --color-danger: #c22b3c;
+  --color-danger-subtle: #fdeaec;
+  --color-danger-border: #f5c3cb;
+
+  --color-info: #245ec9;
+  --color-info-subtle: #eaf1ff;
+  --color-info-border: #c1d7fb;
+
+  --color-purple: #6a3fc4;
+  --color-purple-subtle: #f1ecfb;
+  --color-purple-border: #d7c6f2;
+
+  --shadow-elevation-1: 0 1px 2px 0 rgb(15 23 42 / 0.04);
+  --shadow-elevation-2:
+    0 2px 8px -2px rgb(15 23 42 / 0.08), 0 1px 2px 0 rgb(15 23 42 / 0.04);
+  --shadow-elevation-3:
+    0 12px 24px -8px rgb(15 23 42 / 0.14), 0 4px 8px -4px rgb(15 23 42 / 0.06);
+  --shadow-elevation-4:
+    0 24px 48px -12px rgb(15 23 42 / 0.22), 0 8px 16px -8px rgb(15 23 42 / 0.08);
+
+  --color-scrollbar: #cbd1db;
+  color-scheme: light;
 }
 
+/* ============================================================
+   Theme: Simple Dark
+   Low-glare neutral dark theme with the same semantic mapping.
+   ============================================================ */
+[data-theme='simple-dark'] {
+  --color-bg: #0e1116;
+  --color-bg-subtle: #131720;
+  --color-surface: #171b23;
+  --color-surface-raised: #1c212b;
+  --color-surface-sunken: #10141b;
+  --color-border: #262c38;
+  --color-border-strong: #343c4a;
+
+  --color-fg: #edf0f5;
+  --color-fg-muted: #9aa3b2;
+  --color-fg-subtle: #6b7280;
+  --color-fg-on-accent: #ffffff;
+
+  --color-accent: #6690ff;
+  --color-accent-hover: #7fa1ff;
+  --color-accent-active: #4f7bf0;
+  --color-accent-subtle: #1c2740;
+  --color-accent-border: #33447a;
+
+  --color-success: #3fcf9c;
+  --color-success-subtle: #113328;
+  --color-success-border: #1f5b45;
+
+  --color-warning: #f0b647;
+  --color-warning-subtle: #3a2c0f;
+  --color-warning-border: #5c4519;
+
+  --color-danger: #f3697d;
+  --color-danger-subtle: #3a1620;
+  --color-danger-border: #5c2434;
+
+  --color-info: #6fa8ff;
+  --color-info-subtle: #142238;
+  --color-info-border: #274373;
+
+  --color-purple: #b498ef;
+  --color-purple-subtle: #241b3a;
+  --color-purple-border: #3d2d5c;
+
+  --shadow-elevation-1: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow-elevation-2:
+    0 2px 8px -2px rgb(0 0 0 / 0.5), 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-elevation-3:
+    0 12px 24px -8px rgb(0 0 0 / 0.6), 0 4px 8px -4px rgb(0 0 0 / 0.4);
+  --shadow-elevation-4:
+    0 24px 48px -12px rgb(0 0 0 / 0.7), 0 8px 16px -8px rgb(0 0 0 / 0.5);
+
+  --color-scrollbar: #343c4a;
+  color-scheme: dark;
+}
+
+/* ============================================================
+   Theme: Fluent-inspired
+   Blue-grey corporate tones, soft acrylic-like layering.
+   ============================================================ */
+[data-theme='fluent'] {
+  --color-bg: #f3f6fb;
+  --color-bg-subtle: #e9eef6;
+  --color-surface: #ffffffcc;
+  --color-surface-raised: #ffffff;
+  --color-surface-sunken: #e6ebf3;
+  --color-border: #d7e0ec;
+  --color-border-strong: #b9c6dc;
+
+  --color-fg: #17233b;
+  --color-fg-muted: #4c5b76;
+  --color-fg-subtle: #7c8aa3;
+  --color-fg-on-accent: #ffffff;
+
+  --color-accent: #0f6cbd;
+  --color-accent-hover: #0d5da3;
+  --color-accent-active: #0a4c87;
+  --color-accent-subtle: #e2f0fb;
+  --color-accent-border: #b7d9f3;
+
+  --color-success: #0e7a44;
+  --color-success-subtle: #e3f5ea;
+  --color-success-border: #b6e3c7;
+
+  --color-warning: #935c0b;
+  --color-warning-subtle: #fbf0dc;
+  --color-warning-border: #efd6a0;
+
+  --color-danger: #c4314b;
+  --color-danger-subtle: #fbe7ec;
+  --color-danger-border: #f2bfcb;
+
+  --color-info: #0f6cbd;
+  --color-info-subtle: #e2f0fb;
+  --color-info-border: #b7d9f3;
+
+  --color-purple: #744da9;
+  --color-purple-subtle: #efe8f8;
+  --color-purple-border: #d6c3ec;
+
+  --shadow-elevation-1: 0 1px 2px 0 rgb(23 35 59 / 0.05);
+  --shadow-elevation-2:
+    0 3px 10px -2px rgb(23 35 59 / 0.1), 0 1px 3px 0 rgb(23 35 59 / 0.06);
+  --shadow-elevation-3:
+    0 14px 28px -10px rgb(23 35 59 / 0.16), 0 4px 10px -4px rgb(23 35 59 / 0.08);
+  --shadow-elevation-4:
+    0 26px 52px -14px rgb(23 35 59 / 0.24), 0 10px 18px -8px rgb(23 35 59 / 0.1);
+
+  --color-scrollbar: #b9c6dc;
+  color-scheme: light;
+}
+
+/* ============================================================
+   Theme: Linear / Vercel-inspired
+   Sharp, high-contrast dark surfaces, minimal chrome.
+   ============================================================ */
+[data-theme='linear'] {
+  --color-bg: #08090b;
+  --color-bg-subtle: #0d0e11;
+  --color-surface: #111214;
+  --color-surface-raised: #17181b;
+  --color-surface-sunken: #0a0b0d;
+  --color-border: #232427;
+  --color-border-strong: #33353a;
+
+  --color-fg: #f4f5f6;
+  --color-fg-muted: #97999d;
+  --color-fg-subtle: #6b6d72;
+  --color-fg-on-accent: #0a0a0b;
+
+  --color-accent: #ececee;
+  --color-accent-hover: #ffffff;
+  --color-accent-active: #d6d7da;
+  --color-accent-subtle: #1d1e21;
+  --color-accent-border: #34363a;
+
+  --color-success: #4fd097;
+  --color-success-subtle: #10231b;
+  --color-success-border: #1f4535;
+
+  --color-warning: #f2b750;
+  --color-warning-subtle: #2b2110;
+  --color-warning-border: #4a3a1a;
+
+  --color-danger: #f0637a;
+  --color-danger-subtle: #2b1418;
+  --color-danger-border: #4a232b;
+
+  --color-info: #6fa8ff;
+  --color-info-subtle: #14202e;
+  --color-info-border: #24374d;
+
+  --color-purple: #b298f0;
+  --color-purple-subtle: #1e1a2b;
+  --color-purple-border: #362b4a;
+
+  --shadow-elevation-1: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+  --shadow-elevation-2:
+    0 2px 10px -2px rgb(0 0 0 / 0.6), 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow-elevation-3:
+    0 14px 28px -10px rgb(0 0 0 / 0.7), 0 4px 10px -4px rgb(0 0 0 / 0.5);
+  --shadow-elevation-4:
+    0 26px 52px -14px rgb(0 0 0 / 0.8), 0 10px 18px -8px rgb(0 0 0 / 0.6);
+
+  --color-scrollbar: #33353a;
+  color-scheme: dark;
+}
+
+/* ============================================================
+   Tailwind v4 @theme mapping — exposes semantic tokens as
+   utility classes (bg-surface, text-fg-muted, border-border, ...)
+   ============================================================ */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-border: var(--border);
-  --color-muted: var(--muted);
-  --color-muted-soft: var(--muted-soft);
-  --color-brand: var(--brand);
-  --color-brand-foreground: var(--brand-foreground);
-  --color-brand-soft: var(--brand-soft);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent-soft: var(--accent-soft);
   --font-sans: var(--font-vazirmatn);
+
+  --color-bg: var(--color-bg);
+  --color-bg-subtle: var(--color-bg-subtle);
+  --color-surface: var(--color-surface);
+  --color-surface-raised: var(--color-surface-raised);
+  --color-surface-sunken: var(--color-surface-sunken);
+  --color-border: var(--color-border);
+  --color-border-strong: var(--color-border-strong);
+
+  --color-fg: var(--color-fg);
+  --color-fg-muted: var(--color-fg-muted);
+  --color-fg-subtle: var(--color-fg-subtle);
+  --color-fg-on-accent: var(--color-fg-on-accent);
+
+  --color-accent: var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-accent-active: var(--color-accent-active);
+  --color-accent-subtle: var(--color-accent-subtle);
+  --color-accent-border: var(--color-accent-border);
+
+  --color-success: var(--color-success);
+  --color-success-subtle: var(--color-success-subtle);
+  --color-success-border: var(--color-success-border);
+
+  --color-warning: var(--color-warning);
+  --color-warning-subtle: var(--color-warning-subtle);
+  --color-warning-border: var(--color-warning-border);
+
+  --color-danger: var(--color-danger);
+  --color-danger-subtle: var(--color-danger-subtle);
+  --color-danger-border: var(--color-danger-border);
+
+  --color-info: var(--color-info);
+  --color-info-subtle: var(--color-info-subtle);
+  --color-info-border: var(--color-info-border);
+
+  --color-purple: var(--color-purple);
+  --color-purple-subtle: var(--color-purple-subtle);
+  --color-purple-border: var(--color-purple-border);
+
+  --radius-control: var(--radius-control);
+  --radius-card: var(--radius-card);
+  --radius-modal: var(--radius-modal);
+  --radius-pill: var(--radius-pill);
+
+  --shadow-elevation-1: var(--shadow-elevation-1);
+  --shadow-elevation-2: var(--shadow-elevation-2);
+  --shadow-elevation-3: var(--shadow-elevation-3);
+  --shadow-elevation-4: var(--shadow-elevation-4);
+
+  --z-index-dropdown: var(--z-dropdown);
+  --z-index-sticky: var(--z-sticky);
+  --z-index-overlay: var(--z-overlay);
+  --z-index-modal: var(--z-modal);
+  --z-index-toast: var(--z-toast);
+  --z-index-popover: var(--z-popover);
 }
 
-* {
-  border-color: var(--border);
+/* ============================================================
+   Base layer
+   ============================================================ */
+html {
+  color-scheme: light dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-bg);
+  color: var(--color-fg);
   font-family: var(--font-vazirmatn), Tahoma, sans-serif;
-  transition: background-color 0.25s ease, color 0.25s ease;
+  transition:
+    background-color var(--duration-base) var(--ease-standard),
+    color var(--duration-base) var(--ease-standard);
+}
+
+* {
+  border-color: var(--color-border);
 }
 
 ::selection {
-  background: var(--accent-soft);
-  color: var(--accent-foreground);
+  background: var(--color-accent-subtle);
+  color: var(--color-fg);
 }
 
-.bg-geo-pattern {
-  background-image: radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0);
-  background-size: 22px 22px;
+/* Consistent, visible focus ring across every theme + component,
+   satisfying WCAG 2.4.7 (focus visible) without relying on color alone. */
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-accent);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-control);
+}
+
+/* Custom scrollbar, theme-aware */
+* {
+  scrollbar-color: var(--color-scrollbar) transparent;
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-scrollbar);
+  border-radius: var(--radius-pill);
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Respect reduced-motion preference across the whole app */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* RTL-aware numeral tabular alignment for tables/money values */
+.tabular-fa {
+  font-variant-numeric: tabular-nums;
 }

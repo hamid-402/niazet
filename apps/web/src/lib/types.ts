@@ -78,7 +78,13 @@ export interface ServiceLine {
   revisionPolicy: string | null;
   isActive: boolean;
   packages: ServicePackage[];
-  formFields?: { id: string; label: string; fieldKey: string; fieldType: string; required: boolean }[];
+  formFields?: {
+    id: string;
+    label: string;
+    fieldKey: string;
+    fieldType: string;
+    required: boolean;
+  }[];
   acceptanceCriteria?: { id: string; description: string }[];
 }
 
@@ -107,14 +113,48 @@ export interface OrderDetail extends OrderSummary {
   customerId: string;
   revisionsAllowed: number;
   revisionsUsed: number;
-  statusHistory?: { id: string; fromStatus: OrderStatus | null; toStatus: OrderStatus; note: string | null; createdAt: string; source: string }[];
-  files?: { id: string; originalName: string; fileKind: string; createdAt: string }[];
-  reports?: { id: string; reportType: string; summary: string; createdAt: string; visibleToCustomer: boolean }[];
-  messages?: { id: string; body: string; senderUserId: string; createdAt: string; visibility: string }[];
-  payments?: { id: string; amount: number; status: string; createdAt: string }[];
+  statusHistory?: {
+    id: string;
+    fromStatus: OrderStatus | null;
+    toStatus: OrderStatus;
+    note: string | null;
+    createdAt: string;
+    source: string;
+  }[];
+  files?: {
+    id: string;
+    originalName: string;
+    fileKind: string;
+    createdAt: string;
+  }[];
+  reports?: {
+    id: string;
+    reportType: string;
+    summary: string;
+    createdAt: string;
+    visibleToCustomer: boolean;
+  }[];
+  messages?: {
+    id: string;
+    body: string;
+    senderUserId: string;
+    createdAt: string;
+    visibility: string;
+  }[];
+  payments?: {
+    id: string;
+    amount: number;
+    status: string;
+    createdAt: string;
+  }[];
   escrowHolds?: { id: string; amount: number; status: string }[];
   tickets?: { id: string; code: string; subject: string; status: string }[];
-  feedback?: { id: string; feedbackType: string; rating: number | null; comment: string | null }[];
+  feedback?: {
+    id: string;
+    feedbackType: string;
+    rating: number | null;
+    comment: string | null;
+  }[];
   acceptanceCriteria?: { id: string; description: string; isMet: boolean }[];
   assignments?: {
     id: string;

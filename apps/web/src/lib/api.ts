@@ -69,7 +69,10 @@ async function tryRefreshToken(): Promise<string | null> {
   return refreshPromise;
 }
 
-export async function apiFetch<T = unknown>(path: string, options: RequestOptions = {}): Promise<T> {
+export async function apiFetch<T = unknown>(
+  path: string,
+  options: RequestOptions = {},
+): Promise<T> {
   const { method = 'GET', body, auth = true, isFormData = false } = options;
 
   const headers: Record<string, string> = {};
@@ -84,7 +87,11 @@ export async function apiFetch<T = unknown>(path: string, options: RequestOption
     fetch(`${API_URL}${path}`, {
       method,
       headers,
-      body: body ? (isFormData ? (body as FormData) : JSON.stringify(body)) : undefined,
+      body: body
+        ? isFormData
+          ? (body as FormData)
+          : JSON.stringify(body)
+        : undefined,
     });
 
   let response = await doFetch();
@@ -97,12 +104,18 @@ export async function apiFetch<T = unknown>(path: string, options: RequestOption
     }
   }
 
-  const isJson = response.headers.get('content-type')?.includes('application/json');
+  const isJson = response.headers
+    .get('content-type')
+    ?.includes('application/json');
   const data = isJson ? await response.json().catch(() => null) : null;
 
   if (!response.ok) {
     const message = (data && (data.message as string)) || 'خطایی رخ داد.';
-    throw new ApiError(response.status, Array.isArray(message) ? message.join('، ') : message, data);
+    throw new ApiError(
+      response.status,
+      Array.isArray(message) ? message.join('، ') : message,
+      data,
+    );
   }
 
   return data as T;

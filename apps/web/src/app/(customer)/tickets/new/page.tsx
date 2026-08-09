@@ -3,7 +3,14 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiFetch, ApiError } from '@/lib/api';
-import { Button, Card, ErrorBanner, Field, inputClass, SectionTitle } from '@/components/ui';
+import {
+  Button,
+  Card,
+  ErrorBanner,
+  Field,
+  inputClass,
+  SectionTitle,
+} from '@/components/ui';
 import type { OrderSummary } from '@/lib/types';
 
 const CATEGORIES: { value: string; label: string }[] = [
@@ -31,7 +38,9 @@ function NewTicketForm() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    apiFetch<OrderSummary[]>('/customer/orders').then(setOrders).catch(() => undefined);
+    apiFetch<OrderSummary[]>('/customer/orders')
+      .then(setOrders)
+      .catch(() => undefined);
   }, []);
 
   async function onSubmit(e: React.FormEvent) {
@@ -41,7 +50,13 @@ function NewTicketForm() {
     try {
       const ticket = await apiFetch<{ id: string }>('/customer/tickets', {
         method: 'POST',
-        body: { orderId: orderId || undefined, category, subject, message, priority },
+        body: {
+          orderId: orderId || undefined,
+          category,
+          subject,
+          message,
+          priority,
+        },
       });
       router.push(`/tickets/${ticket.id}`);
     } catch (err) {
@@ -58,7 +73,11 @@ function NewTicketForm() {
         <Card>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <Field label="موضوع">
-              <select className={inputClass} value={category} onChange={(e) => setCategory(e.target.value)}>
+              <select
+                className={inputClass}
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
                 {CATEGORIES.map((c) => (
                   <option key={c.value} value={c.value}>
                     {c.label}
@@ -67,7 +86,11 @@ function NewTicketForm() {
               </select>
             </Field>
             <Field label="سفارش مرتبط (اختیاری)">
-              <select className={inputClass} value={orderId} onChange={(e) => setOrderId(e.target.value)}>
+              <select
+                className={inputClass}
+                value={orderId}
+                onChange={(e) => setOrderId(e.target.value)}
+              >
                 <option value="">بدون سفارش مرتبط</option>
                 {orders.map((o) => (
                   <option key={o.id} value={o.id}>
@@ -77,7 +100,11 @@ function NewTicketForm() {
               </select>
             </Field>
             <Field label="اولویت">
-              <select className={inputClass} value={priority} onChange={(e) => setPriority(e.target.value)}>
+              <select
+                className={inputClass}
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+              >
                 <option value="low">کم</option>
                 <option value="normal">عادی</option>
                 <option value="high">زیاد</option>
@@ -85,7 +112,12 @@ function NewTicketForm() {
               </select>
             </Field>
             <Field label="عنوان کوتاه">
-              <input className={inputClass} value={subject} onChange={(e) => setSubject(e.target.value)} required />
+              <input
+                className={inputClass}
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                required
+              />
             </Field>
           </div>
           <div className="mt-4">

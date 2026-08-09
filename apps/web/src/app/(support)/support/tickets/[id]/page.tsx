@@ -2,14 +2,26 @@
 
 import { use, useCallback, useEffect, useState } from 'react';
 import { apiFetch, ApiError } from '@/lib/api';
-import { Button, Card, ErrorBanner, inputClass, PageLoading } from '@/components/ui';
+import {
+  Button,
+  Card,
+  ErrorBanner,
+  inputClass,
+  PageLoading,
+} from '@/components/ui';
 import { TicketStatusBadge } from '@/components/status-badge';
 import type { Ticket, TicketMessage } from '@/lib/types';
 import { formatDate } from '@/lib/format';
 
-export default function SupportTicketDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function SupportTicketDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
-  const [ticket, setTicket] = useState<(Ticket & { messages: TicketMessage[] }) | null>(null);
+  const [ticket, setTicket] = useState<
+    (Ticket & { messages: TicketMessage[] }) | null
+  >(null);
   const [error, setError] = useState('');
   const [body, setBody] = useState('');
   const [internal, setInternal] = useState(false);
@@ -46,12 +58,18 @@ export default function SupportTicketDetailPage({ params }: { params: Promise<{ 
       <div className="mb-4 flex items-center justify-between">
         <div>
           <p className="text-xs text-slate-400">{ticket.code}</p>
-          <h1 className="text-xl font-extrabold text-slate-900">{ticket.subject}</h1>
+          <h1 className="text-xl font-extrabold text-slate-900">
+            {ticket.subject}
+          </h1>
         </div>
         <TicketStatusBadge status={ticket.status} />
       </div>
 
-      {error && <div className="mb-4"><ErrorBanner message={error} /></div>}
+      {error && (
+        <div className="mb-4">
+          <ErrorBanner message={error} />
+        </div>
+      )}
 
       <Card className="mb-4">
         <div className="mb-4 space-y-3">
@@ -61,10 +79,14 @@ export default function SupportTicketDetailPage({ params }: { params: Promise<{ 
               className={`rounded-xl p-3 text-sm ${m.visibility === 'internal_only' ? 'bg-amber-50' : 'bg-slate-50'}`}
             >
               {m.visibility === 'internal_only' && (
-                <p className="mb-1 text-xs font-bold text-amber-700">یادداشت داخلی</p>
+                <p className="mb-1 text-xs font-bold text-amber-700">
+                  یادداشت داخلی
+                </p>
               )}
               <p className="text-slate-700">{m.body}</p>
-              <p className="mt-1 text-xs text-slate-400">{formatDate(m.createdAt)}</p>
+              <p className="mt-1 text-xs text-slate-400">
+                {formatDate(m.createdAt)}
+              </p>
             </div>
           ))}
         </div>
@@ -77,7 +99,11 @@ export default function SupportTicketDetailPage({ params }: { params: Promise<{ 
           />
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 text-sm text-slate-600">
-              <input type="checkbox" checked={internal} onChange={(e) => setInternal(e.target.checked)} />
+              <input
+                type="checkbox"
+                checked={internal}
+                onChange={(e) => setInternal(e.target.checked)}
+              />
               یادداشت داخلی (فقط برای تیم)
             </label>
             <Button
@@ -86,7 +112,12 @@ export default function SupportTicketDetailPage({ params }: { params: Promise<{ 
                 runAction(async () => {
                   await apiFetch(`/support/tickets/${id}/reply`, {
                     method: 'POST',
-                    body: { body, visibility: internal ? 'internal_only' : 'customer_visible' },
+                    body: {
+                      body,
+                      visibility: internal
+                        ? 'internal_only'
+                        : 'customer_visible',
+                    },
                   });
                   setBody('');
                 })
@@ -121,10 +152,26 @@ export default function SupportTicketDetailPage({ params }: { params: Promise<{ 
           >
             ارجاع (Escalate)
           </Button>
-          <Button variant="secondary" disabled={busy} onClick={() => runAction(() => apiFetch(`/support/tickets/${id}/resolve`, { method: 'POST' }))}>
+          <Button
+            variant="secondary"
+            disabled={busy}
+            onClick={() =>
+              runAction(() =>
+                apiFetch(`/support/tickets/${id}/resolve`, { method: 'POST' }),
+              )
+            }
+          >
             علامت‌گذاری به‌عنوان حل‌شده
           </Button>
-          <Button variant="danger" disabled={busy} onClick={() => runAction(() => apiFetch(`/support/tickets/${id}/close`, { method: 'POST' }))}>
+          <Button
+            variant="danger"
+            disabled={busy}
+            onClick={() =>
+              runAction(() =>
+                apiFetch(`/support/tickets/${id}/close`, { method: 'POST' }),
+              )
+            }
+          >
             بستن تیکت
           </Button>
         </div>

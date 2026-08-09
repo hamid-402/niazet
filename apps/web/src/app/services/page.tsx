@@ -40,12 +40,20 @@ export default function ServicesPage() {
           {services?.map((service) => (
             <Link key={service.id} href={`/services/${service.slug}`}>
               <Card className="h-full transition hover:border-slate-400">
-                <p className="mb-1 text-xs font-medium text-slate-400">{service.category}</p>
-                <h3 className="mb-2 text-base font-bold text-slate-900">{service.title}</h3>
-                <p className="mb-4 line-clamp-2 text-sm text-slate-500">{service.description}</p>
+                <p className="mb-1 text-xs font-medium text-slate-400">
+                  {service.category}
+                </p>
+                <h3 className="mb-2 text-base font-bold text-slate-900">
+                  {service.title}
+                </h3>
+                <p className="mb-4 line-clamp-2 text-sm text-slate-500">
+                  {service.description}
+                </p>
                 <div className="flex items-center justify-between text-xs text-slate-400">
                   <span>{PRICING_LABEL[service.pricingModel]}</span>
-                  <span>{service.basePrice ? formatToman(service.basePrice) : ''}</span>
+                  <span>
+                    {service.basePrice ? formatToman(service.basePrice) : ''}
+                  </span>
                 </div>
               </Card>
             </Link>

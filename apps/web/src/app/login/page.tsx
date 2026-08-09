@@ -30,10 +30,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-bg px-4">
       <Card className="w-full max-w-sm">
-        <h1 className="mb-1 text-xl font-extrabold text-slate-900">ورود به نیازت با ما</h1>
-        <p className="mb-6 text-sm text-slate-500">با شماره موبایل و رمز عبور وارد شوید.</p>
+        <h1 className="mb-1 text-xl font-extrabold text-fg">
+          ورود به نیازت با ما
+        </h1>
+        <p className="mb-6 text-sm text-fg-muted">
+          با شماره موبایل و رمز عبور وارد شوید.
+        </p>
 
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
           <Field label="شماره موبایل">
@@ -63,9 +67,12 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-slate-500">
+        <p className="mt-4 text-center text-sm text-fg-muted">
           حساب ندارید؟{' '}
-          <Link href="/register" className="font-medium text-slate-900 hover:underline">
+          <Link
+            href="/register"
+            className="font-medium text-fg hover:underline"
+          >
             ثبت‌نام
           </Link>
         </p>

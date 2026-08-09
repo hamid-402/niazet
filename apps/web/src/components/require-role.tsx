@@ -24,8 +24,15 @@ export function RequireRole({
       router.replace('/login');
       return;
     }
-    const roleOk = roles.includes(user.role) || roles.some((r) => user.capabilities.includes(r as 'customer' | 'executor'));
-    const scopeOk = !adminScopes || (user.adminScope && adminScopes.includes(user.adminScope)) || user.adminScope === 'super_admin';
+    const roleOk =
+      roles.includes(user.role) ||
+      roles.some((r) =>
+        user.capabilities.includes(r as 'customer' | 'executor'),
+      );
+    const scopeOk =
+      !adminScopes ||
+      (user.adminScope && adminScopes.includes(user.adminScope)) ||
+      user.adminScope === 'super_admin';
     if (!roleOk || !scopeOk) {
       router.replace('/');
     }

@@ -3,7 +3,14 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
-import { Card, EmptyState, ErrorBanner, LinkButton, PageLoading, SectionTitle } from '@/components/ui';
+import {
+  Card,
+  EmptyState,
+  ErrorBanner,
+  LinkButton,
+  PageLoading,
+  SectionTitle,
+} from '@/components/ui';
 import { OrderStatusBadge } from '@/components/status-badge';
 import type { OrderSummary } from '@/lib/types';
 import { formatDate, formatToman } from '@/lib/format';
@@ -35,7 +42,7 @@ export default function CustomerOrdersPage() {
         <Card className="overflow-x-auto p-0">
           <table className="w-full min-w-[640px] text-sm">
             <thead>
-              <tr className="border-b border-slate-100 text-right text-xs text-slate-400">
+              <tr className="border-b border-border text-right text-xs text-fg-subtle">
                 <th className="px-4 py-3 font-medium">کد و عنوان</th>
                 <th className="px-4 py-3 font-medium">خدمت</th>
                 <th className="px-4 py-3 font-medium">وضعیت</th>
@@ -45,19 +52,31 @@ export default function CustomerOrdersPage() {
             </thead>
             <tbody>
               {orders.map((order) => (
-                <tr key={order.id} className="border-b border-slate-50 last:border-0 hover:bg-slate-50">
+                <tr
+                  key={order.id}
+                  className="border-b border-border last:border-0 transition-colors hover:bg-bg-subtle"
+                >
                   <td className="px-4 py-3">
-                    <Link href={`/orders/${order.id}`} className="font-medium text-slate-800 hover:underline">
+                    <Link
+                      href={`/orders/${order.id}`}
+                      className="font-medium text-fg hover:underline"
+                    >
                       {order.title}
                     </Link>
-                    <p className="text-xs text-slate-400">{order.code}</p>
+                    <p className="text-xs text-fg-subtle">{order.code}</p>
                   </td>
-                  <td className="px-4 py-3 text-slate-500">{order.serviceLine?.title ?? '—'}</td>
+                  <td className="px-4 py-3 text-fg-muted">
+                    {order.serviceLine?.title ?? '—'}
+                  </td>
                   <td className="px-4 py-3">
                     <OrderStatusBadge status={order.status} />
                   </td>
-                  <td className="px-4 py-3 text-slate-500">{formatToman(order.finalPrice)}</td>
-                  <td className="px-4 py-3 text-slate-400">{formatDate(order.createdAt)}</td>
+                  <td className="px-4 py-3 text-fg-muted">
+                    {formatToman(order.finalPrice)}
+                  </td>
+                  <td className="px-4 py-3 text-fg-subtle">
+                    {formatDate(order.createdAt)}
+                  </td>
                 </tr>
               ))}
             </tbody>
