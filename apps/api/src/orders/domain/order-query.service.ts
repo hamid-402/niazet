@@ -72,6 +72,8 @@ export class OrderQueryService {
         files: true,
         messages: { orderBy: { createdAt: 'asc' } },
         acceptanceCriteria: true,
+        statusHistory: { orderBy: { createdAt: 'asc' } },
+        milestones: { orderBy: { sequence: 'asc' } },
         reports: { include: { file: true } },
       },
     });

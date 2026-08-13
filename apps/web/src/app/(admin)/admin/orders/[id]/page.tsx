@@ -1,9 +1,8 @@
-'use client';
+"use client";
 
-import { use, useCallback, useEffect, useState } from 'react';
-import { apiFetch, ApiError } from '@/lib/api';
+import { use, useCallback, useEffect, useState } from "react";
+import { apiFetch, ApiError } from "@/lib/api";
 import {
-  Badge,
   Button,
   Card,
   ErrorBanner,
@@ -11,10 +10,13 @@ import {
   inputClass,
   PageLoading,
   SectionTitle,
-} from '@/components/ui';
-import { OrderStatusBadge } from '@/components/status-badge';
-import type { ExecutorProfile, OrderDetail } from '@/lib/types';
-import { formatDate, formatToman } from '@/lib/format';
+} from "@/components/ui";
+import { OrderStatusBadge } from "@/components/status-badge";
+import type { ExecutorProfile, OrderDetail } from "@/lib/types";
+import type { OrderFile } from "@/lib/types";
+import { formatDate, formatToman } from "@/lib/format";
+import { OrderTimeline } from "@/components/order-timeline";
+import { SecureFileUpload } from "@/components/secure-file";
 
 export default function AdminOrderDetailPage({
   params,
@@ -23,18 +25,21 @@ export default function AdminOrderDetailPage({
 }) {
   const { id } = use(params);
   const [order, setOrder] = useState<OrderDetail | null>(null);
-  const [error, setError] = useState('');
+  const [managementSummary, setManagementSummary] = useState("");
+  const [managementVisible, setManagementVisible] = useState(false);
+  const [managementFile, setManagementFile] = useState<OrderFile | null>(null);
+  const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const [quotePrice, setQuotePrice] = useState('');
-  const [triageNote, setTriageNote] = useState('');
+  const [quotePrice, setQuotePrice] = useState("");
+  const [triageNote, setTriageNote] = useState("");
   const [staff, setStaff] = useState<ExecutorProfile[]>([]);
-  const [selectedExecutor, setSelectedExecutor] = useState('');
-  const [reassignExecutor, setReassignExecutor] = useState('');
-  const [reassignNote, setReassignNote] = useState('');
-  const [cancelReason, setCancelReason] = useState('');
-  const [disputeNote, setDisputeNote] = useState('');
-  const [disputeAmount, setDisputeAmount] = useState('');
+  const [selectedExecutor, setSelectedExecutor] = useState("");
+  const [reassignExecutor, setReassignExecutor] = useState("");
+  const [reassignNote, setReassignNote] = useState("");
+  const [cancelReason, setCancelReason] = useState("");
+  const [disputeNote, setDisputeNote] = useState("");
+  const [disputeAmount, setDisputeAmount] = useState("");
 
   const load = useCallback(() => {
     apiFetch<OrderDetail>(`/admin/orders/${id}`)
@@ -44,19 +49,19 @@ export default function AdminOrderDetailPage({
 
   useEffect(() => {
     load();
-    apiFetch<ExecutorProfile[]>('/admin/staff')
+    apiFetch<ExecutorProfile[]>("/admin/staff")
       .then(setStaff)
       .catch(() => undefined);
   }, [load]);
 
   async function runAction(fn: () => Promise<unknown>) {
-    setError('');
+    setError("");
     setBusy(true);
     try {
       await fn();
       load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'خطا در انجام عملیات');
+      setError(err instanceof ApiError ? err.message : "خطا در انجام عملیات");
     } finally {
       setBusy(false);
     }
@@ -87,7 +92,7 @@ export default function AdminOrderDetailPage({
           <p className="text-xs text-slate-400">مشتری</p>
           <p className="mt-1 font-bold text-slate-800">
             {(order as unknown as { customer?: { fullName: string } }).customer
-              ?.fullName ?? '—'}
+              ?.fullName ?? "—"}
           </p>
         </Card>
         <Card>
@@ -118,7 +123,7 @@ export default function AdminOrderDetailPage({
       <Card className="mb-4">
         <SectionTitle>اقدامات عملیاتی</SectionTitle>
 
-        {order.status === 'pending_triage' || order.status === 'triaging' ? (
+        {order.status === "pending_triage" || order.status === "triaging" ? (
           <div className="mb-4 flex flex-wrap items-end gap-2">
             <Field label="یادداشت تریاژ (اختیاری)">
               <input
@@ -132,8 +137,8 @@ export default function AdminOrderDetailPage({
               onClick={() =>
                 runAction(() =>
                   apiFetch(`/admin/orders/${id}/triage`, {
-                    method: 'POST',
-                    body: { decision: 'send_to_quote', note: triageNote },
+                    method: "POST",
+                    body: { decision: "send_to_quote", note: triageNote },
                   }),
                 )
               }
@@ -146,10 +151,10 @@ export default function AdminOrderDetailPage({
               onClick={() =>
                 runAction(() =>
                   apiFetch(`/admin/orders/${id}/triage`, {
-                    method: 'POST',
+                    method: "POST",
                     body: {
-                      decision: 'need_more_info',
-                      note: triageNote || 'لطفاً اطلاعات بیشتری ارسال کنید.',
+                      decision: "need_more_info",
+                      note: triageNote || "لطفاً اطلاعات بیشتری ارسال کنید.",
                     },
                   }),
                 )
@@ -163,10 +168,10 @@ export default function AdminOrderDetailPage({
               onClick={() =>
                 runAction(() =>
                   apiFetch(`/admin/orders/${id}/triage`, {
-                    method: 'POST',
+                    method: "POST",
                     body: {
-                      decision: 'reject',
-                      note: triageNote || 'رد شده در تریاژ',
+                      decision: "reject",
+                      note: triageNote || "رد شده در تریاژ",
                     },
                   }),
                 )
@@ -177,7 +182,7 @@ export default function AdminOrderDetailPage({
           </div>
         ) : null}
 
-        {order.status === 'pending_quote' && (
+        {order.status === "pending_quote" && (
           <div className="mb-4 flex flex-wrap items-end gap-2">
             <Field label="مبلغ نهایی (تومان)">
               <input
@@ -193,7 +198,7 @@ export default function AdminOrderDetailPage({
               onClick={() =>
                 runAction(() =>
                   apiFetch(`/admin/orders/${id}/quote`, {
-                    method: 'POST',
+                    method: "POST",
                     body: { finalPrice: Number(quotePrice) },
                   }),
                 )
@@ -204,7 +209,7 @@ export default function AdminOrderDetailPage({
           </div>
         )}
 
-        {order.status === 'paid' && (
+        {order.status === "paid" && (
           <div className="mb-4 flex flex-wrap items-end gap-2">
             <Field label="تخصیص به کارمند/مجری">
               <select
@@ -215,7 +220,7 @@ export default function AdminOrderDetailPage({
                 <option value="">انتخاب کنید</option>
                 {staff.map((s) => (
                   <option key={s.id} value={s.id}>
-                    {s.displayAlias} ({s.publicHandlerCode}) — QC:{' '}
+                    {s.displayAlias} ({s.publicHandlerCode}) — QC:{" "}
                     {Number(s.qcPassRate).toFixed(0)}٪
                   </option>
                 ))}
@@ -226,7 +231,7 @@ export default function AdminOrderDetailPage({
               onClick={() =>
                 runAction(() =>
                   apiFetch(`/admin/orders/${id}/assign`, {
-                    method: 'POST',
+                    method: "POST",
                     body: { executorProfileId: selectedExecutor },
                   }),
                 )
@@ -237,19 +242,21 @@ export default function AdminOrderDetailPage({
           </div>
         )}
 
-        {['assigned', 'in_progress', 'qc_rejected'].includes(order.status) && (
+        {["assigned", "in_progress", "qc_rejected"].includes(order.status) && (
           <div className="mb-4 flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
             <p className="text-sm font-medium text-slate-700">
-              مسئول فعلی:{' '}
+              مسئول فعلی:{" "}
               {(() => {
                 const active = order.assignments?.find((a) => !a.unassignedAt);
                 return active
                   ? `${active.executorProfile.displayAlias} (${active.executorProfile.publicHandlerCode})`
-                  : 'نامشخص';
+                  : "نامشخص";
               })()}
             </p>
             <p className="text-xs text-slate-500">
-              اگر لازم است کار از این مجری گرفته شود و به مجری دیگری برای ادامه یا شروع مجدد سپرده شود، از این بخش استفاده کنید. گزارش‌ها و پیام‌های قبلی برای مجری جدید قابل مشاهده می‌ماند.
+              اگر لازم است کار از این مجری گرفته شود و به مجری دیگری برای ادامه
+              یا شروع مجدد سپرده شود، از این بخش استفاده کنید. گزارش‌ها و
+              پیام‌های قبلی برای مجری جدید قابل مشاهده می‌ماند.
             </p>
             <div className="flex flex-wrap items-end gap-2">
               <Field label="تغییر مسئول اجرا به">
@@ -261,17 +268,25 @@ export default function AdminOrderDetailPage({
                   <option value="">انتخاب مجری جدید</option>
                   {staff
                     .filter(
-                      (s) => s.id !== order.assignments?.find((a) => !a.unassignedAt)?.executorProfile.id,
+                      (s) =>
+                        s.id !==
+                        order.assignments?.find((a) => !a.unassignedAt)
+                          ?.executorProfile.id,
                     )
                     .map((s) => (
                       <option key={s.id} value={s.id}>
-                        {s.displayAlias} ({s.publicHandlerCode}) — ظرفیت: {s.capacityPercent}٪
+                        {s.displayAlias} ({s.publicHandlerCode}) — ظرفیت:{" "}
+                        {s.capacityPercent}٪
                       </option>
                     ))}
                 </select>
               </Field>
               <Field label="یادداشت (اختیاری)">
-                <input className={inputClass} value={reassignNote} onChange={(e) => setReassignNote(e.target.value)} />
+                <input
+                  className={inputClass}
+                  value={reassignNote}
+                  onChange={(e) => setReassignNote(e.target.value)}
+                />
               </Field>
               <Button
                 variant="secondary"
@@ -279,11 +294,14 @@ export default function AdminOrderDetailPage({
                 onClick={() =>
                   runAction(async () => {
                     await apiFetch(`/admin/orders/${id}/reassign`, {
-                      method: 'POST',
-                      body: { executorProfileId: reassignExecutor, note: reassignNote || undefined },
+                      method: "POST",
+                      body: {
+                        executorProfileId: reassignExecutor,
+                        note: reassignNote || undefined,
+                      },
                     });
-                    setReassignExecutor('');
-                    setReassignNote('');
+                    setReassignExecutor("");
+                    setReassignNote("");
                   })
                 }
               >
@@ -293,7 +311,7 @@ export default function AdminOrderDetailPage({
           </div>
         )}
 
-        {order.status === 'disputed' && (
+        {order.status === "disputed" && (
           <div className="mb-4 flex flex-col gap-3 rounded-xl border border-red-100 bg-red-50 p-4">
             <p className="text-sm font-medium text-red-700">
               این سفارش در وضعیت اختلاف (dispute) است.
@@ -321,8 +339,8 @@ export default function AdminOrderDetailPage({
                 onClick={() =>
                   runAction(() =>
                     apiFetch(`/admin/orders/${id}/resolve-dispute`, {
-                      method: 'POST',
-                      body: { resolutionType: 'rework', note: disputeNote },
+                      method: "POST",
+                      body: { resolutionType: "rework", note: disputeNote },
                     }),
                   )
                 }
@@ -335,9 +353,9 @@ export default function AdminOrderDetailPage({
                 onClick={() =>
                   runAction(() =>
                     apiFetch(`/admin/orders/${id}/resolve-dispute`, {
-                      method: 'POST',
+                      method: "POST",
                       body: {
-                        resolutionType: 'refund_full',
+                        resolutionType: "refund_full",
                         note: disputeNote,
                       },
                     }),
@@ -352,9 +370,9 @@ export default function AdminOrderDetailPage({
                 onClick={() =>
                   runAction(() =>
                     apiFetch(`/admin/orders/${id}/resolve-dispute`, {
-                      method: 'POST',
+                      method: "POST",
                       body: {
-                        resolutionType: 'refund_partial',
+                        resolutionType: "refund_partial",
                         note: disputeNote,
                         amount: Number(disputeAmount),
                       },
@@ -369,9 +387,9 @@ export default function AdminOrderDetailPage({
                 onClick={() =>
                   runAction(() =>
                     apiFetch(`/admin/orders/${id}/resolve-dispute`, {
-                      method: 'POST',
+                      method: "POST",
                       body: {
-                        resolutionType: 'release_to_executor',
+                        resolutionType: "release_to_executor",
                         note: disputeNote,
                       },
                     }),
@@ -384,7 +402,7 @@ export default function AdminOrderDetailPage({
           </div>
         )}
 
-        {!['cancelled', 'closed'].includes(order.status) && (
+        {!["cancelled", "closed"].includes(order.status) && (
           <div className="flex flex-wrap items-end gap-2 border-t border-slate-100 pt-4">
             <Field label="دلیل لغو">
               <input
@@ -399,7 +417,7 @@ export default function AdminOrderDetailPage({
               onClick={() =>
                 runAction(() =>
                   apiFetch(`/admin/orders/${id}/cancel`, {
-                    method: 'POST',
+                    method: "POST",
                     body: { reason: cancelReason },
                   }),
                 )
@@ -411,27 +429,65 @@ export default function AdminOrderDetailPage({
         )}
       </Card>
 
+      <Card className="mb-4">
+        <h3 className="mb-3 font-bold text-slate-800">
+          گزارش مدیریتی نسخه‌دار
+        </h3>
+        <textarea
+          className={`${inputClass} min-h-24`}
+          value={managementSummary}
+          onChange={(event) => setManagementSummary(event.target.value)}
+          placeholder="خلاصه مدیریتی سفارش"
+        />
+        <label className="my-3 flex items-center gap-2 text-sm text-fg-muted">
+          <input
+            type="checkbox"
+            checked={managementVisible}
+            onChange={(event) => setManagementVisible(event.target.checked)}
+          />
+          نمایش این گزارش به مشتری
+        </label>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <SecureFileUpload
+            orderId={id}
+            fileKind="report"
+            label={managementFile ? "تغییر فایل گزارش" : "پیوست فایل گزارش"}
+            disabled={busy}
+            onUploaded={setManagementFile}
+          />
+          <Button
+            disabled={busy || managementSummary.trim().length < 3}
+            onClick={() =>
+              runAction(async () => {
+                await apiFetch(`/admin/orders/${id}/reports`, {
+                  method: "POST",
+                  body: {
+                    summary: managementSummary,
+                    visibleToCustomer: managementVisible,
+                    fileId: managementFile?.id,
+                  },
+                });
+                setManagementSummary("");
+                setManagementVisible(false);
+                setManagementFile(null);
+              })
+            }
+          >
+            ثبت گزارش
+          </Button>
+        </div>
+        {managementFile && (
+          <p className="mt-2 text-xs text-emerald-700">
+            فایل آماده: {managementFile.originalName}
+          </p>
+        )}
+      </Card>
+
       <Card>
-        <h3 className="mb-3 font-bold text-slate-800">تاریخچه وضعیت</h3>
-        <ul className="space-y-2 text-sm">
-          {order.statusHistory?.map((h) => (
-            <li
-              key={h.id}
-              className="flex items-center justify-between border-b border-slate-50 pb-2 last:border-0"
-            >
-              <div className="flex items-center gap-2">
-                <Badge>{h.source}</Badge>
-                <OrderStatusBadge status={h.toStatus} />
-                {h.note && (
-                  <span className="text-xs text-slate-400">{h.note}</span>
-                )}
-              </div>
-              <span className="text-xs text-slate-400">
-                {formatDate(h.createdAt)}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <h3 className="mb-3 font-bold text-slate-800">
+          Timeline سفارش، مراحل و گزارش‌ها
+        </h3>
+        <OrderTimeline order={order} />
       </Card>
     </div>
   );

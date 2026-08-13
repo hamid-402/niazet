@@ -17,6 +17,7 @@ import {
   slaTargetHoursForPriority,
 } from '../common/utils/business-hours';
 import { AddTicketMessageDto, CreateTicketDto } from './dto/ticket.dto';
+import { createVersionedOrderReport } from '../orders/domain/order-reports';
 
 @Injectable()
 export class TicketsService {
@@ -267,11 +268,24 @@ export class TicketsService {
     });
   }
 
-  async resolve(ticketId: string) {
-    await this.ensureExists(ticketId);
-    return this.prisma.ticket.update({
-      where: { id: ticketId },
-      data: { status: TicketStatus.resolved, resolvedAt: new Date() },
+  async resolve(ticketId: string, supportUserId: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const ticket = await tx.ticket.findUnique({ where: { id: ticketId } });
+      if (!ticket) throw new NotFoundException('تیکت یافت نشد.');
+      const resolved = await tx.ticket.update({
+        where: { id: ticketId },
+        data: { status: TicketStatus.resolved, resolvedAt: new Date() },
+      });
+      if (ticket.orderId) {
+        await createVersionedOrderReport(tx, {
+          orderId: ticket.orderId,
+          authorUserId: supportUserId,
+          reportType: 'support',
+          summary: `تیکت ${ticket.code} با موضوع «${ticket.subject}» حل شد.`,
+          visibleToCustomer: true,
+        });
+      }
+      return resolved;
     });
   }
 

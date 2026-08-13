@@ -80,8 +80,8 @@ export class TicketsSupportController {
   }
 
   @Post(':id/resolve')
-  resolve(@Param('id') id: string) {
-    return this.tickets.resolve(id);
+  resolve(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
+    return this.tickets.resolve(id, user.id);
   }
 
   @Post(':id/close')

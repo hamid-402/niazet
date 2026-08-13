@@ -12,6 +12,7 @@ import {
 import { OrderStatusBadge } from "@/components/status-badge";
 import { SecureFileLink, SecureFileUpload } from "@/components/secure-file";
 import type { OrderDetail, OrderFile } from "@/lib/types";
+import { OrderTimeline } from "@/components/order-timeline";
 
 export default function ExecutorOrderDetailPage({
   params,
@@ -220,7 +221,9 @@ export default function ExecutorOrderDetailPage({
           <ul className="divide-y divide-slate-100 text-sm">
             {order.reports.map((r) => (
               <li key={r.id} className="py-2">
-                <p className="font-medium text-slate-700">{r.reportType}</p>
+                <p className="font-medium text-slate-700">
+                  {r.reportType} · نسخه {r.version}
+                </p>
                 <p className="text-slate-500">{r.summary}</p>
                 {r.file && (
                   <div className="mt-1">
@@ -233,6 +236,12 @@ export default function ExecutorOrderDetailPage({
         ) : (
           <p className="text-sm text-slate-400">گزارشی ثبت نشده است.</p>
         )}
+      </Card>
+      <Card className="mt-4">
+        <h3 className="mb-3 font-bold text-slate-800">
+          Timeline سفارش و مراحل
+        </h3>
+        <OrderTimeline order={order} />
       </Card>
     </div>
   );

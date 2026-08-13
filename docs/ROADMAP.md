@@ -121,8 +121,8 @@
 - [x] فرم‌های پویای Service شامل تمام Field typeها، Optionها، Validation و پاسخ‌های Snapshotشده
 - [x] Autosave پیش‌نویس، Resume، Summary پیش از ارسال و Submit اتمیک/Idempotent
 - [x] Upload/Download واقعی و امن در سفارش، پیام، تیکت، گزارش، QC و Invoice
-- [ ] Timeline مشترک سفارش، Milestone، History و نمایش واضح «اقدام بعدی»
-- [ ] گزارش پیشرفت، QC، تحویل، مدیریتی و پشتیبانی با Version و Visibility
+- [x] Timeline مشترک سفارش، Milestone، History و نمایش واضح «اقدام بعدی»
+- [x] گزارش پیشرفت، QC، تحویل، مدیریتی و پشتیبانی با Version و Visibility
 - [ ] Notification Center با unread، preference و کانال‌های in-app/email/SMS
 - [ ] ورود OTP کامل، بازیابی رمز، نمایش رمز، Autocomplete و مدیریت Sessionهای فعال
 - [ ] پروفایل مشتری، اطلاعات شرکتی، آدرس فاکتور، اعلان‌ها، امنیت و حریم داده

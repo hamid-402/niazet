@@ -29,6 +29,7 @@ import { OrderQueryService } from './domain/order-query.service';
 import {
   AssignOrderDto,
   ConfigureMilestonesDto,
+  CreateManagementReportDto,
   CreateOrderDto,
   DeliverOrderDto,
   DeliverMilestoneDto,
@@ -41,6 +42,7 @@ import {
   UpdateOrderDraftDto,
 } from './dto/order.dto';
 import { answersFromSnapshot, snapshotServiceForm } from './service-form';
+import { createVersionedOrderReport } from './domain/order-reports';
 
 const DEFAULT_IN_PROGRESS_CANCEL_REFUND_RATE = 0.5;
 
@@ -1018,26 +1020,57 @@ export class OrdersService {
       await this.assertExecutorFileIds(orderId, executorUserId, [dto.fileId]);
     }
 
-    const report = await this.prisma.orderReport.create({
-      data: {
-        orderId,
-        authorUserId: executorUserId,
-        reportType: 'progress',
-        summary: dto.summary,
-        fileId: dto.fileId,
-        visibleToCustomer: true,
-        status: 'published',
+    return this.prisma.$transaction(
+      async (tx) => {
+        const report = await createVersionedOrderReport(tx, {
+          orderId,
+          authorUserId: executorUserId,
+          reportType: 'progress',
+          summary: dto.summary,
+          fileId: dto.fileId,
+          visibleToCustomer: true,
+        });
+        await this.notifications.notifyUser(
+          order.customerId,
+          'order.progress',
+          'گزارش پیشرفت جدید',
+          `گزارش جدیدی برای سفارش ${order.code} ثبت شد.`,
+          tx,
+        );
+        return report;
       },
-    });
-
-    await this.notifications.notifyUser(
-      order.customerId,
-      'order.progress',
-      'گزارش پیشرفت جدید',
-      `گزارش جدیدی برای سفارش ${order.code} ثبت شد.`,
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
+  }
 
-    return report;
+  async addManagementReport(
+    authorUserId: string,
+    orderId: string,
+    dto: CreateManagementReportDto,
+  ) {
+    return this.prisma.$transaction(
+      async (tx) => {
+        const order = await tx.order.findUnique({ where: { id: orderId } });
+        if (!order) throw new NotFoundException('سفارش یافت نشد.');
+        if (dto.fileId) {
+          const file = await tx.orderFile.findFirst({
+            where: { id: dto.fileId, orderId, scanStatus: 'clean' },
+            select: { id: true },
+          });
+          if (!file)
+            throw new BadRequestException('فایل گزارش معتبر و امن نیست.');
+        }
+        return createVersionedOrderReport(tx, {
+          orderId,
+          authorUserId,
+          reportType: 'management',
+          summary: dto.summary,
+          fileId: dto.fileId,
+          visibleToCustomer: dto.visibleToCustomer,
+        });
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    );
   }
 
   async deliver(executorUserId: string, orderId: string, dto: DeliverOrderDto) {
@@ -1075,15 +1108,12 @@ export class OrdersService {
           );
         }
 
-        await tx.orderReport.create({
-          data: {
-            orderId,
-            authorUserId: executorUserId,
-            reportType: 'delivery',
-            summary: dto.summary,
-            visibleToCustomer: true,
-            status: 'published',
-          },
+        await createVersionedOrderReport(tx, {
+          orderId,
+          authorUserId: executorUserId,
+          reportType: 'delivery',
+          summary: dto.summary,
+          visibleToCustomer: true,
         });
         await tx.orderFile.updateMany({
           where: { id: { in: uniqueFileIds }, orderId },

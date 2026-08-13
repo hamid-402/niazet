@@ -151,10 +151,26 @@ export interface OrderDetail extends OrderSummary {
     createdAt: string;
     source: string;
   }[];
+  milestones?: {
+    id: string;
+    sequence: number;
+    title: string;
+    amount: number;
+    dueAt: string | null;
+    acceptanceCriteria: string | null;
+    paymentStatus: string;
+    deliveryStatus: string;
+    qcStatus: string;
+    deliveredAt: string | null;
+    approvedAt: string | null;
+    createdAt: string;
+  }[];
   files?: OrderFile[];
   reports?: {
     id: string;
     reportType: string;
+    version: number;
+    status: string;
     summary: string;
     createdAt: string;
     visibleToCustomer: boolean;

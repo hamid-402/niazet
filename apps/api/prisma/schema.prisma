@@ -822,6 +822,7 @@ model OrderReport {
   author User       @relation("ReportAuthor", fields: [authorUserId], references: [id])
   file   OrderFile? @relation(fields: [fileId], references: [id])
 
+  @@unique([orderId, reportType, version])
   @@map("order_reports")
 }
 

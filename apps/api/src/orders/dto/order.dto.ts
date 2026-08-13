@@ -3,6 +3,7 @@ import {
   IsArray,
   ArrayMinSize,
   ArrayUnique,
+  IsBoolean,
   IsIn,
   IsInt,
   IsObject,
@@ -188,6 +189,19 @@ export class ProgressReportDto {
   @IsOptional()
   @IsString()
   fileId?: string;
+}
+
+export class CreateManagementReportDto {
+  @IsString()
+  @MinLength(3)
+  summary!: string;
+
+  @IsOptional()
+  @IsString()
+  fileId?: string;
+
+  @IsBoolean()
+  visibleToCustomer!: boolean;
 }
 
 export class DeliverOrderDto {

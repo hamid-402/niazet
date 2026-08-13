@@ -8,6 +8,7 @@ import { Prisma, QcResult } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { OrdersService } from '../orders/orders.service';
 import { SubmitQcReviewDto } from './dto/qc.dto';
+import { createVersionedOrderReport } from '../orders/domain/order-reports';
 
 @Injectable()
 export class QcService {
@@ -177,6 +178,13 @@ export class QcService {
             data: { isMet: true },
           });
         }
+        await createVersionedOrderReport(tx, {
+          orderId: review.orderId,
+          authorUserId: reviewerUserId,
+          reportType: 'qc',
+          summary: dto.comment?.trim() || `نتیجه کنترل کیفیت: ${result}`,
+          visibleToCustomer: true,
+        });
         await tx.auditLog.create({
           data: {
             actorUserId: reviewerUserId,

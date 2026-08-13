@@ -21,6 +21,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import {
   AssignOrderDto,
   ConfigureMilestonesDto,
+  CreateManagementReportDto,
   CancelOrderDto,
   ListOrdersQueryDto,
   OrderMessageDto,
@@ -61,6 +62,16 @@ export class OrdersAdminController {
     @Body() dto: ConfigureMilestonesDto,
   ) {
     return this.orders.configureMilestones(user.id, id, dto);
+  }
+
+  @Post(':id/reports')
+  @AdminScopes(AdminScope.ops_admin)
+  addManagementReport(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: CreateManagementReportDto,
+  ) {
+    return this.orders.addManagementReport(user.id, id, dto);
   }
 
   @Get('dashboard')

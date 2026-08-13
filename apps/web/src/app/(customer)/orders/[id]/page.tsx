@@ -16,6 +16,7 @@ import { OrderStatusBadge } from "@/components/status-badge";
 import { SecureFileLink, SecureFileUpload } from "@/components/secure-file";
 import type { OrderDetail, OrderFile } from "@/lib/types";
 import { formatDate, formatToman } from "@/lib/format";
+import { customerNextAction, OrderTimeline } from "@/components/order-timeline";
 
 const TABS = [
   "خلاصه",
@@ -124,6 +125,9 @@ export default function CustomerOrderDetailPage({
       {/* اقدام‌های وابسته به وضعیت */}
       <Card className="mb-4">
         <h3 className="mb-3 font-bold text-slate-800">اقدام بعدی</h3>
+        <p className="mb-3 text-sm leading-7 text-fg-muted">
+          {customerNextAction(order.status)}
+        </p>
         <div className="flex flex-wrap gap-2">
           {order.status === "quoted" && (
             <Button
@@ -286,22 +290,7 @@ export default function CustomerOrderDetailPage({
 
       {tab === "مراحل" && (
         <Card>
-          <ol className="relative border-r border-slate-200 pr-4">
-            {order.statusHistory?.map((h) => (
-              <li key={h.id} className="mb-4 last:mb-0">
-                <span className="absolute -mr-[21px] mt-1 h-2.5 w-2.5 rounded-full bg-slate-900" />
-                <p className="text-sm font-medium text-slate-800">
-                  <OrderStatusBadge status={h.toStatus} />
-                </p>
-                {h.note && (
-                  <p className="mt-1 text-xs text-slate-500">{h.note}</p>
-                )}
-                <p className="text-xs text-slate-400">
-                  {formatDate(h.createdAt)}
-                </p>
-              </li>
-            ))}
-          </ol>
+          <OrderTimeline order={order} />
         </Card>
       )}
 
@@ -315,7 +304,9 @@ export default function CustomerOrderDetailPage({
                   className="rounded-xl border border-slate-100 p-3"
                 >
                   <div className="flex items-center justify-between">
-                    <Badge color="blue">{r.reportType}</Badge>
+                    <Badge color="blue">
+                      {r.reportType} · نسخه {r.version}
+                    </Badge>
                     <span className="text-xs text-slate-400">
                       {formatDate(r.createdAt)}
                     </span>
