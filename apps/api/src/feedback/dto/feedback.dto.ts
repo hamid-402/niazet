@@ -1,5 +1,18 @@
-import { FeedbackTargetType, FeedbackType } from '@prisma/client';
-import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  FeedbackStatus,
+  FeedbackTargetType,
+  FeedbackType,
+} from '@prisma/client';
+import {
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  Matches,
+  Max,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 const TARGET_TYPES: FeedbackTargetType[] = [
   'order',
@@ -16,6 +29,7 @@ export class CreateFeedbackDto {
 
   @IsOptional()
   @IsString()
+  @Matches(/^[A-Z]{2,5}-[A-Z0-9]+$/)
   publicHandlerCode?: string;
 
   @IsIn(FEEDBACK_TYPES)
@@ -35,5 +49,31 @@ export class CreateFeedbackDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(2000)
   comment?: string;
+}
+
+export class ListFeedbackQueryDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(30)
+  code?: string;
+
+  @IsOptional()
+  @IsIn(FEEDBACK_TYPES)
+  feedbackType?: FeedbackType;
+
+  @IsOptional()
+  @IsIn(['submitted', 'in_review', 'resolved', 'closed'])
+  status?: FeedbackStatus;
+}
+
+export class UpdateFeedbackStatusDto {
+  @IsIn(['in_review', 'resolved', 'closed'])
+  status!: FeedbackStatus;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000)
+  resolutionNote?: string;
 }

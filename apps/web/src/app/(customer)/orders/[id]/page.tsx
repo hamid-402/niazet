@@ -486,7 +486,10 @@ export default function CustomerOrderDetailPage({
       )}
 
       {["delivered", "confirmed", "closed"].includes(order.status) && (
-        <FeedbackForm orderId={id} handlerCode={handler?.publicHandlerCode} />
+        <FeedbackForm
+          orderId={id}
+          handlers={order.publicHandlers ?? []}
+        />
       )}
     </div>
   );
@@ -494,98 +497,180 @@ export default function CustomerOrderDetailPage({
 
 function FeedbackForm({
   orderId,
-  handlerCode,
+  handlers,
 }: {
   orderId: string;
-  handlerCode?: string;
+  handlers: Array<{
+    publicHandlerCode: string;
+    displayAlias: string;
+  }>;
 }) {
+  type FeedbackTarget = "order" | "team" | "executor" | "support" | "qc";
+  interface FeedbackRecord {
+    id: string;
+    code: string;
+    targetType: FeedbackTarget;
+    publicHandlerCode: string | null;
+    rating: number | null;
+    satisfactionPercent: number | null;
+    feedbackType: "rating" | "complaint" | "compliment";
+    comment: string | null;
+    status: "submitted" | "in_review" | "resolved" | "closed";
+    resolutionNote: string | null;
+    resolvedAt: string | null;
+    createdAt: string;
+  }
+
+  const [targetType, setTargetType] = useState<FeedbackTarget>("order");
+  const [handlerCode, setHandlerCode] = useState(
+    handlers[0]?.publicHandlerCode ?? "",
+  );
   const [feedbackType, setFeedbackType] = useState<
     "rating" | "complaint" | "compliment"
   >("rating");
   const [rating, setRating] = useState(5);
+  const [satisfactionPercent, setSatisfactionPercent] = useState(100);
   const [comment, setComment] = useState("");
-  const [sent, setSent] = useState(false);
+  const [items, setItems] = useState<FeedbackRecord[]>([]);
+  const [lastCode, setLastCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  if (sent) {
-    return (
-      <Card className="mt-4">
-        <p className="text-sm text-emerald-700">
-          بازخورد شما ثبت شد. سپاس از وقتی که گذاشتید.
-        </p>
-      </Card>
-    );
-  }
+  const loadFeedback = useCallback(() => {
+    apiFetch<FeedbackRecord[]>(`/customer/orders/${orderId}/feedback`, {
+      dedupe: false,
+    })
+      .then(setItems)
+      .catch(() => undefined);
+  }, [orderId]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(loadFeedback, 0);
+    return () => window.clearTimeout(timer);
+  }, [loadFeedback]);
+
+  const needsHandler = targetType === "executor" || targetType === "team";
+  const commentRequired = feedbackType !== "rating";
+  const targetLabels: Record<FeedbackTarget, string> = {
+    order: "کل سفارش و تجربه دریافت خدمت",
+    team: "تیم اجرا",
+    executor: "مسئول یا مجری",
+    support: "پشتیبانی مرتبط با سفارش",
+    qc: "کنترل کیفیت (QC)",
+  };
+  const feedbackLabels = {
+    rating: "امتیاز",
+    compliment: "تشکر",
+    complaint: "شکایت",
+  } as const;
+  const statusLabels = {
+    submitted: "ثبت‌شده",
+    in_review: "در حال بررسی",
+    resolved: "رسیدگی‌شده",
+    closed: "بسته‌شده",
+  } as const;
 
   return (
-    <Card className="mt-4">
-      <SectionTitle>ثبت بازخورد، تشکر یا شکایت</SectionTitle>
-      <div className="flex flex-wrap items-end gap-3">
-        <Field label="نوع بازخورد">
-          <select
-            className={inputClass}
-            value={feedbackType}
-            onChange={(e) =>
-              setFeedbackType(e.target.value as typeof feedbackType)
-            }
-          >
-            <option value="rating">امتیاز</option>
-            <option value="compliment">تشکر</option>
-            <option value="complaint">شکایت</option>
-          </select>
-        </Field>
-        <Field label="امتیاز (۱ تا ۵)">
-          <input
-            type="number"
-            min={1}
-            max={5}
-            className={inputClass}
-            value={rating}
-            onChange={(e) => setRating(Number(e.target.value))}
-          />
-        </Field>
-        <Field label="توضیح">
-          <input
-            className={inputClass}
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-          />
-        </Field>
-        <Button
-          disabled={busy}
-          onClick={async () => {
-            setBusy(true);
-            setError("");
-            try {
-              await apiFetch(`/customer/orders/${orderId}/feedback`, {
-                method: "POST",
-                body: {
-                  targetType: handlerCode ? "executor" : "order",
-                  publicHandlerCode: handlerCode,
-                  feedbackType,
-                  rating,
-                  comment,
-                },
-              });
-              setSent(true);
-            } catch (err) {
-              setError(
-                err instanceof ApiError ? err.message : "خطا در ثبت بازخورد",
-              );
-            } finally {
-              setBusy(false);
-            }
-          }}
-        >
-          ثبت
-        </Button>
-      </div>
-      {error && (
-        <div className="mt-3">
-          <ErrorBanner message={error} />
+    <div className="mt-5 space-y-4">
+      <Card>
+        <SectionTitle subtitle="برای هر بازخورد یک کد پیگیری مستقل دریافت می‌کنید.">
+          ثبت امتیاز، تشکر یا شکایت
+        </SectionTitle>
+        {lastCode && (
+          <p role="status" className="mb-4 rounded-control border border-success-border bg-success-subtle px-4 py-3 text-sm text-success">
+            بازخورد ثبت شد. کد پیگیری: <b dir="ltr">{lastCode}</b>
+          </p>
+        )}
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="نوع بازخورد">
+            <select className={inputClass} value={feedbackType} onChange={(event) => setFeedbackType(event.target.value as typeof feedbackType)}>
+              <option value="rating">امتیاز</option>
+              <option value="compliment">تشکر</option>
+              <option value="complaint">شکایت</option>
+            </select>
+          </Field>
+          <Field label="بازخورد درباره">
+            <select className={inputClass} value={targetType} onChange={(event) => setTargetType(event.target.value as FeedbackTarget)}>
+              {Object.entries(targetLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            </select>
+          </Field>
+          {needsHandler && (
+            <Field label="مسئول مرتبط" hint={handlers.length ? "فقط مسئولان قابل نمایش همین سفارش" : "مسئولی برای انتخاب ثبت نشده است."}>
+              <select className={inputClass} value={handlerCode} onChange={(event) => setHandlerCode(event.target.value)} required>
+                <option value="">انتخاب مسئول</option>
+                {handlers.map((item) => <option key={item.publicHandlerCode} value={item.publicHandlerCode}>{item.displayAlias} ({item.publicHandlerCode})</option>)}
+              </select>
+            </Field>
+          )}
+          <Field label={`امتیاز: ${rating.toLocaleString("fa-IR")} از ۵`}>
+            <div className="flex gap-1" role="radiogroup" aria-label="امتیاز ستاره‌ای">
+              {[1, 2, 3, 4, 5].map((value) => (
+                <button key={value} type="button" role="radio" aria-checked={rating === value} aria-label={`${value} ستاره`} onClick={() => setRating(value)} className={`rounded-control px-3 py-2 text-xl ${value <= rating ? "bg-warning-subtle text-warning" : "bg-bg-subtle text-fg-subtle"}`}>★</button>
+              ))}
+            </div>
+          </Field>
+          <Field label={`رضایت کلی: ${satisfactionPercent.toLocaleString("fa-IR")}٪`}>
+            <input type="range" min={0} max={100} step={5} value={satisfactionPercent} onChange={(event) => setSatisfactionPercent(Number(event.target.value))} className="w-full accent-accent" />
+          </Field>
+          <div className="md:col-span-2">
+            <Field label={commentRequired ? "توضیح (الزامی)" : "توضیح تکمیلی (اختیاری)"} hint={feedbackType === "complaint" ? "شرح دقیق‌تر، رسیدگی را سریع‌تر می‌کند." : undefined}>
+              <textarea className={`${inputClass} min-h-28`} value={comment} onChange={(event) => setComment(event.target.value)} maxLength={2000} required={commentRequired} />
+            </Field>
+          </div>
         </div>
+        {error && <div className="mt-4"><ErrorBanner message={error} /></div>}
+        <div className="mt-4 flex justify-end">
+          <Button
+            disabled={busy || (needsHandler && !handlerCode) || (commentRequired && comment.trim().length < 5)}
+            onClick={async () => {
+              setBusy(true);
+              setError("");
+              setLastCode("");
+              try {
+                const result = await apiFetch<{ code: string }>(`/customer/orders/${orderId}/feedback`, {
+                  method: "POST",
+                  body: {
+                    targetType,
+                    publicHandlerCode: needsHandler ? handlerCode : undefined,
+                    feedbackType,
+                    rating,
+                    satisfactionPercent,
+                    comment: comment.trim() || undefined,
+                  },
+                });
+                setLastCode(result.code);
+                setComment("");
+                loadFeedback();
+              } catch (err) {
+                setError(err instanceof ApiError ? err.message : "خطا در ثبت بازخورد");
+              } finally {
+                setBusy(false);
+              }
+            }}
+          >
+            {busy ? "در حال ثبت..." : "ثبت و دریافت کد پیگیری"}
+          </Button>
+        </div>
+      </Card>
+
+      {items.length > 0 && (
+        <Card>
+          <h3 className="mb-3 font-extrabold text-fg">سوابق بازخورد این سفارش</h3>
+          <div className="space-y-3">
+            {items.map((item) => (
+              <div key={item.id} className="rounded-control border border-border p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div><p className="font-bold text-fg">{feedbackLabels[item.feedbackType]} درباره {targetLabels[item.targetType]}</p><p className="mt-1 text-xs text-fg-subtle">{formatDate(item.createdAt)} · کد <b dir="ltr">{item.code}</b></p></div>
+                  <Badge color={item.status === "resolved" || item.status === "closed" ? "green" : item.status === "in_review" ? "yellow" : "blue"}>{statusLabels[item.status]}</Badge>
+                </div>
+                {item.rating && <p className="mt-2 text-sm text-warning">{"★".repeat(item.rating)}<span className="text-fg-subtle">{"★".repeat(5 - item.rating)}</span></p>}
+                {item.comment && <p className="mt-2 text-sm leading-7 text-fg-muted">{item.comment}</p>}
+                {item.resolutionNote && <p className="mt-3 rounded-control bg-success-subtle px-3 py-2 text-sm text-success">نتیجه رسیدگی: {item.resolutionNote}</p>}
+              </div>
+            ))}
+          </div>
+        </Card>
       )}
-    </Card>
+    </div>
   );
 }

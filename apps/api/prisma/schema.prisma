@@ -269,6 +269,13 @@ enum FeedbackVisibility {
   admin_and_target
 }
 
+enum FeedbackStatus {
+  submitted
+  in_review
+  resolved
+  closed
+}
+
 enum AuditSensitivity {
   normal
   sensitive
@@ -1275,6 +1282,7 @@ model Dispute {
 
 model Feedback {
   id                  String             @id @default(uuid())
+  code                String             @unique
   orderId             String             @map("order_id")
   customerId          String             @map("customer_id")
   targetType          FeedbackTargetType @map("target_type")
@@ -1285,6 +1293,10 @@ model Feedback {
   feedbackType        FeedbackType       @map("feedback_type")
   comment             String?
   visibility          FeedbackVisibility @default(admin_and_target)
+  status              FeedbackStatus     @default(submitted)
+  resolutionNote      String?            @map("resolution_note")
+  resolvedAt          DateTime?          @map("resolved_at")
+  idempotencyKey      String?            @unique @map("idempotency_key")
   createdAt           DateTime           @default(now()) @map("created_at")
 
   order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
@@ -1292,6 +1304,8 @@ model Feedback {
 
   @@index([orderId])
   @@index([targetType, targetInternalId])
+  @@index([customerId, createdAt])
+  @@index([status, createdAt])
   @@map("feedback")
 }
 

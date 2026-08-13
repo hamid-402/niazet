@@ -10,6 +10,7 @@ const OPS_NAV = [
   { href: '/admin/orders', label: 'مدیریت سفارش‌ها' },
   { href: '/admin/qc', label: 'کنترل کیفیت QC' },
   { href: '/admin/staff', label: 'کارمندان و مجریان' },
+  { href: '/admin/feedback', label: 'بازخورد و شکایت‌ها' },
   { href: '/account/security', label: 'حساب و امنیت' },
 ];
 
