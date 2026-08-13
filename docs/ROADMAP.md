@@ -75,7 +75,7 @@
 - [x] سیاست Password، Lockout/Backoff، ثبت Login Attempt و بازیابی رمز امن با ابطال Sessionها
 - [x] Security headerها، CSP، CORS allowlist و محدودیت Swagger در محیط Production
 - [x] Audit اجباری و اتمیک عملیات role/scope، block، download حساس، مالی و dispute
-- [ ] تست منفی ماتریس Role/Scope/Capability/Ownership برای تمام endpointهای حساس
+- [x] تست منفی ماتریس Role/Scope/Capability و مسیرهای حساس؛ Ownership با Policyهای سفارش، تیکت و فایل
 
 ## فاز ۲ — صحت مالی و دامنه سفارش P0/P1
 
