@@ -34,6 +34,7 @@ import { FinanceReconciliationService } from './finance-reconciliation.service';
     InvoicesService,
     WithdrawalsService,
     IdempotencyService,
+    FinanceReportingService,
   ],
 })
 export class FinanceModule {}

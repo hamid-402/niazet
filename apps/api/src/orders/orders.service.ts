@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import {
   DisputeStatus,
-  FileKind,
   MessageVisibility,
   Order,
   OrderStatus,
@@ -22,7 +21,11 @@ import { IdempotencyService } from '../finance/idempotency.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { AuditService } from '../audit/audit.service';
 import { generateReferenceCode } from '../common/utils/code-generator';
-import { isTransitionAllowedForSource } from './order-state-machine';
+import { OrderAssignmentService } from './domain/order-assignment.service';
+import { OrderDisputeService } from './domain/order-dispute.service';
+import { OrderMessagingService } from './domain/order-messaging.service';
+import { OrderWorkflowService } from './domain/order-workflow.service';
+import { OrderQueryService } from './domain/order-query.service';
 import {
   AssignOrderDto,
   ConfigureMilestonesDto,
@@ -48,6 +51,11 @@ export class OrdersService {
     private readonly notifications: NotificationsService,
     private readonly audit: AuditService,
     private readonly idempotency: IdempotencyService,
+    private readonly workflow: OrderWorkflowService,
+    private readonly assignment: OrderAssignmentService,
+    private readonly messaging: OrderMessagingService,
+    private readonly disputes: OrderDisputeService,
+    private readonly queries: OrderQueryService,
   ) {}
 
   // ---------------------------------------------------------------------
@@ -69,51 +77,17 @@ export class OrdersService {
     },
     allowDisputeResolution = false,
   ): Promise<Order> {
-    const perform = async (client: Prisma.TransactionClient) => {
-      const order = await client.order.findUnique({ where: { id: orderId } });
-      if (!order) throw new NotFoundException('سفارش یافت نشد.');
-      if (order.status === OrderStatus.disputed && !allowDisputeResolution) {
-        throw new BadRequestException(
-          'خروج از وضعیت اختلاف فقط از مسیر resolve-dispute مجاز است.',
-        );
-      }
-      if (!isTransitionAllowedForSource(order.status, toStatus, source)) {
-        throw new BadRequestException(
-          `تغییر وضعیت سفارش از ${order.status} به ${toStatus} مجاز نیست.`,
-        );
-      }
-
-      const claimed = await client.order.updateMany({
-        where: { id: orderId, status: order.status, version: order.version },
-        data: { status: toStatus, version: { increment: 1 }, ...extraData },
-      });
-      if (claimed.count !== 1) {
-        throw new ConflictException(
-          'سفارش هم‌زمان تغییر کرده است؛ اطلاعات را تازه کنید.',
-        );
-      }
-      await client.orderStatusHistory.create({
-        data: {
-          orderId,
-          fromStatus: order.status,
-          toStatus,
-          actorUserId,
-          source,
-          note:
-            note?.trim() ||
-            `گذار ${order.status} به ${toStatus} توسط ${source}`,
-          financialEffectType: financialEffect?.type ?? 'none',
-          financialEffectAmount: financialEffect?.amount,
-          context: financialEffect?.context,
-        },
-      });
-      return client.order.findUniqueOrThrow({ where: { id: orderId } });
-    };
-
-    if (tx) return perform(tx);
-    return this.prisma.$transaction((trx) => perform(trx), {
-      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
-    });
+    return this.workflow.transition(
+      orderId,
+      toStatus,
+      source,
+      actorUserId,
+      note,
+      extraData,
+      tx,
+      financialEffect,
+      allowDisputeResolution,
+    );
   }
 
   private async loadOwnedOrder(orderId: string, customerId: string) {
@@ -151,58 +125,13 @@ export class OrdersService {
     requestedTeamId?: string,
     assignmentRole?: string,
   ) {
-    const profile = await client.executorProfile.findUnique({
-      where: { id: executorProfileId },
-      include: { user: true, skills: { include: { skill: true } } },
-    });
-    if (!profile) throw new NotFoundException('مجری یافت نشد.');
-    if (
-      profile.status !== 'active' ||
-      profile.verificationStatus !== 'approved' ||
-      profile.user.status !== 'active' ||
-      profile.capacityPercent >= 100
-    ) {
-      throw new BadRequestException(
-        'مجری باید فعال، تأییدشده و دارای ظرفیت آزاد باشد.',
-      );
-    }
-    if (requestedTeamId && profile.teamId !== requestedTeamId) {
-      throw new BadRequestException('مجری عضو تیم انتخاب‌شده نیست.');
-    }
-
-    const service = await client.serviceLine.findUnique({
-      where: { id: order.serviceId },
-      select: { category: true },
-    });
-    const categorizedSkills = service
-      ? await client.skill.count({ where: { category: service.category } })
-      : 0;
-    if (
-      service &&
-      categorizedSkills > 0 &&
-      !profile.skills.some((item) => item.skill.category === service.category)
-    ) {
-      throw new BadRequestException(
-        'مهارت مجری با دسته خدمت سفارش سازگار نیست.',
-      );
-    }
-
-    if (assignmentRole === 'qc_reviewer') {
-      const activeExecutor = await client.orderAssignment.findFirst({
-        where: {
-          orderId: order.id,
-          unassignedAt: null,
-          assignmentRole: { not: 'qc_reviewer' },
-        },
-        include: { executorProfile: true },
-      });
-      if (activeExecutor?.executorProfile.userId === profile.userId) {
-        throw new BadRequestException(
-          'بازبین QC نمی‌تواند همان مجری سفارش باشد.',
-        );
-      }
-    }
-    return profile;
+    return this.assignment.loadEligibleExecutor(
+      client,
+      order,
+      executorProfileId,
+      requestedTeamId,
+      assignmentRole,
+    );
   }
 
   // ---------------------------------------------------------------------
@@ -1361,21 +1290,7 @@ export class OrdersService {
       async (tx) => {
         const order = await tx.order.findUnique({ where: { id: orderId } });
         if (!order) throw new NotFoundException('سفارش یافت نشد.');
-        if (
-          actorRole === UserRole.customer &&
-          order.customerId !== actorUserId
-        ) {
-          throw new ForbiddenException('این سفارش متعلق به شما نیست.');
-        }
-        const disputableStatuses: OrderStatus[] = [
-          OrderStatus.in_progress,
-          OrderStatus.delivered,
-        ];
-        if (!disputableStatuses.includes(order.status)) {
-          throw new BadRequestException(
-            'امکان ثبت اختلاف در این وضعیت سفارش وجود ندارد.',
-          );
-        }
+        this.disputes.assertCanRaise(order, actorUserId, actorRole);
         const existing = await tx.dispute.findFirst({
           where: { orderId, status: DisputeStatus.open },
         });
@@ -1714,125 +1629,41 @@ export class OrdersService {
   // ---------------------------------------------------------------------
 
   async findOneForCustomer(customerId: string, orderId: string) {
-    const order = await this.prisma.order.findUnique({
-      where: { id: orderId },
-      include: this.customerOrderInclude(),
-    });
-    if (!order || order.customerId !== customerId) {
-      throw new NotFoundException('سفارش یافت نشد.');
-    }
-    return order;
+    return this.queries.findOneForCustomer(customerId, orderId);
   }
 
   listForCustomer(
     customerId: string,
     params: { status?: string; skip?: number; take?: number },
   ) {
-    return this.prisma.order.findMany({
-      where: {
-        customerId,
-        ...(params.status ? { status: params.status as OrderStatus } : {}),
-      },
-      include: {
-        serviceLine: { select: { title: true } },
-        publicHandlers: true,
-      },
-      orderBy: { createdAt: 'desc' },
-      skip: params.skip,
-      take: params.take,
-    });
+    return this.queries.listForCustomer(customerId, params);
   }
 
   listForExecutor(
     executorUserId: string,
     params: { skip?: number; take?: number },
   ) {
-    return this.prisma.order.findMany({
-      where: {
-        assignments: {
-          some: {
-            unassignedAt: null,
-            executorProfile: { userId: executorUserId },
-          },
-        },
-      },
-      include: { serviceLine: { select: { title: true } } },
-      orderBy: { createdAt: 'desc' },
-      skip: params.skip,
-      take: params.take,
-    });
+    return this.queries.listForExecutor(executorUserId, params);
   }
 
   async findOneForExecutor(executorUserId: string, orderId: string) {
-    await this.assertExecutorOwnsOrder(orderId, executorUserId);
-    return this.prisma.order.findUnique({
-      where: { id: orderId },
-      include: {
-        serviceLine: true,
-        files: true,
-        messages: { orderBy: { createdAt: 'asc' } },
-        acceptanceCriteria: true,
-        reports: true,
-      },
-    });
+    return this.queries.findOneForExecutor(executorUserId, orderId);
   }
 
   listForAdmin(params: {
     status?: string;
     serviceId?: string;
     search?: string;
+    sortBy?: 'createdAt' | 'updatedAt' | 'code' | 'quotedPrice';
+    sortDirection?: 'asc' | 'desc';
     skip?: number;
     take?: number;
   }) {
-    return this.prisma.order.findMany({
-      where: {
-        ...(params.status ? { status: params.status as OrderStatus } : {}),
-        ...(params.serviceId ? { serviceId: params.serviceId } : {}),
-        ...(params.search
-          ? {
-              OR: [
-                { code: { contains: params.search, mode: 'insensitive' } },
-                { title: { contains: params.search, mode: 'insensitive' } },
-              ],
-            }
-          : {}),
-      },
-      include: {
-        customer: { select: { fullName: true, phone: true } },
-        serviceLine: { select: { title: true } },
-        publicHandlers: true,
-      },
-      orderBy: { createdAt: 'desc' },
-      skip: params.skip,
-      take: params.take,
-    });
+    return this.queries.listForAdmin(params);
   }
 
   async findOneForAdmin(orderId: string) {
-    const order = await this.prisma.order.findUnique({
-      where: { id: orderId },
-      include: {
-        customer: { select: { fullName: true, phone: true, email: true } },
-        serviceLine: true,
-        package: true,
-        acceptanceCriteria: true,
-        statusHistory: { orderBy: { createdAt: 'asc' } },
-        assignments: { include: { executorProfile: true, team: true } },
-        publicHandlers: true,
-        milestones: true,
-        files: true,
-        reports: true,
-        messages: { orderBy: { createdAt: 'asc' } },
-        payments: true,
-        escrowHolds: true,
-        disputes: true,
-        tickets: true,
-        feedback: true,
-        qcReviews: { include: { items: true } },
-      },
-    });
-    if (!order) throw new NotFoundException('سفارش یافت نشد.');
-    return order;
+    return this.queries.findOneForAdmin(orderId);
   }
 
   async addCustomerMessage(
@@ -1842,20 +1673,13 @@ export class OrdersService {
     attachmentFileId?: string,
   ) {
     await this.loadOwnedOrder(orderId, customerId);
-    await this.assertMessageAttachment(
+    return this.messaging.create({
       orderId,
-      customerId,
+      senderUserId: customerId,
+      body,
+      visibility: MessageVisibility.customer_visible,
       attachmentFileId,
-      true,
-    );
-    return this.prisma.orderMessage.create({
-      data: {
-        orderId,
-        senderUserId: customerId,
-        body,
-        visibility: MessageVisibility.customer_visible,
-        attachmentFileId,
-      },
+      requireUploaderOwnership: true,
     });
   }
 
@@ -1871,66 +1695,13 @@ export class OrdersService {
       select: { id: true },
     });
     if (!order) throw new NotFoundException('سفارش یافت نشد.');
-    await this.assertMessageAttachment(
+    return this.messaging.create({
       orderId,
-      adminId,
+      senderUserId: adminId,
+      body,
+      visibility,
       attachmentFileId,
-      false,
-    );
-    return this.prisma.orderMessage.create({
-      data: {
-        orderId,
-        senderUserId: adminId,
-        body,
-        visibility,
-        attachmentFileId,
-      },
+      requireUploaderOwnership: false,
     });
-  }
-
-  private async assertMessageAttachment(
-    orderId: string,
-    senderUserId: string,
-    attachmentFileId: string | undefined,
-    requireUploaderOwnership: boolean,
-  ) {
-    if (!attachmentFileId) return;
-    const attachment = await this.prisma.orderFile.findFirst({
-      where: {
-        id: attachmentFileId,
-        orderId,
-        ...(requireUploaderOwnership ? { uploadedByUserId: senderUserId } : {}),
-        scanStatus: 'clean',
-      },
-      select: { id: true },
-    });
-    if (!attachment) {
-      throw new BadRequestException(
-        'پیوست باید فایل امن همان سفارش و متعلق به فرستنده باشد.',
-      );
-    }
-  }
-
-  private customerOrderInclude() {
-    return {
-      serviceLine: true,
-      package: true,
-      acceptanceCriteria: true,
-      statusHistory: { orderBy: { createdAt: 'asc' as const } },
-      publicHandlers: { where: { visibleToCustomer: true, activeTo: null } },
-      milestones: true,
-      files: {
-        where: { fileKind: { in: [FileKind.output, FileKind.revision] } },
-      },
-      reports: { where: { visibleToCustomer: true } },
-      messages: {
-        where: { visibility: MessageVisibility.customer_visible },
-        orderBy: { createdAt: 'asc' as const },
-      },
-      payments: true,
-      escrowHolds: true,
-      tickets: true,
-      feedback: true,
-    };
   }
 }

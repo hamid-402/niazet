@@ -46,6 +46,8 @@ export class OrdersAdminController {
       status: query.status,
       serviceId: query.serviceId,
       search: query.search,
+      sortBy: query.sortBy,
+      sortDirection: query.sortDirection,
       skip,
       take,
     });

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
@@ -19,6 +19,8 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { RateLimitGuard } from './common/guards/rate-limit.guard';
 import { validateEnvironment } from './config/validate-env';
+import { JobsModule } from './jobs/jobs.module';
+import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
 
 @Module({
   imports: [
@@ -40,6 +42,7 @@ import { validateEnvironment } from './config/validate-env';
     FinanceModule,
     FeedbackModule,
     FilesModule,
+    JobsModule,
   ],
   controllers: [AppController],
   providers: [
@@ -48,4 +51,8 @@ import { validateEnvironment } from './config/validate-env';
     { provide: APP_FILTER, useClass: HttpExceptionFilter },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+  }
+}

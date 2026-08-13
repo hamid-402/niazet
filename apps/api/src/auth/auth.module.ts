@@ -6,6 +6,8 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { AuthSessionService } from './auth-session.service';
+import { AuthTokenService } from './auth-token.service';
 
 @Module({
   imports: [
@@ -15,7 +17,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
     NotificationsModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
-  exports: [AuthService],
+  providers: [AuthService, AuthSessionService, AuthTokenService, JwtStrategy],
+  exports: [AuthService, AuthSessionService, AuthTokenService],
 })
 export class AuthModule {}

@@ -11,6 +11,13 @@ async function bootstrap() {
   app.enableCors({
     origin: process.env.WEB_URL ?? 'http://localhost:3000',
     credentials: true,
+    allowedHeaders: [
+      'Authorization',
+      'Content-Type',
+      'Idempotency-Key',
+      'X-Correlation-Id',
+    ],
+    exposedHeaders: ['X-Correlation-Id'],
   });
   app.useGlobalPipes(
     new ValidationPipe({
@@ -34,7 +41,7 @@ async function bootstrap() {
     SwaggerModule.setup('docs', app, document);
   }
 
-  const port = process.env.APP_PORT ?? 3001;
+  const port = Number(process.env.APP_PORT ?? 3001);
   await app.listen(port);
 
   console.log(`API running on http://localhost:${port}`);

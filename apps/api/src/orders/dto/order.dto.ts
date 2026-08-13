@@ -12,6 +12,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+import { PaginationDto } from '../../common/dto/pagination.dto';
 
 export class CreateOrderDto {
   @IsString()
@@ -228,7 +229,7 @@ export class OrderMessageDto {
   visibility?: 'customer_visible' | 'internal_only';
 }
 
-export class ListOrdersQueryDto {
+export class ListOrdersQueryDto extends PaginationDto {
   @IsOptional()
   @IsString()
   status?: string;
@@ -242,12 +243,10 @@ export class ListOrdersQueryDto {
   search?: string;
 
   @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  page?: number;
+  @IsIn(['createdAt', 'updatedAt', 'code', 'quotedPrice'])
+  sortBy?: 'createdAt' | 'updatedAt' | 'code' | 'quotedPrice';
 
   @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  pageSize?: number;
+  @IsIn(['asc', 'desc'])
+  sortDirection?: 'asc' | 'desc';
 }

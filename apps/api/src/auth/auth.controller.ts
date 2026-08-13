@@ -22,11 +22,13 @@ import { Public } from '../common/decorators/public.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
 import { RateLimit } from '../common/decorators/rate-limit.decorator';
+import { AuthSessionService } from './auth-session.service';
 
 @Controller('v1/auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
+    private readonly sessions: AuthSessionService,
     private readonly config: ConfigService,
   ) {}
 
@@ -105,7 +107,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const refreshToken = this.readCookie(req, 'niazat_refresh');
-    const result = await this.authService.refresh(
+    const result = await this.sessions.refresh(
       refreshToken ?? '',
       this.sessionContext(req),
     );
@@ -157,12 +159,12 @@ export class AuthController {
   ) {
     const refreshToken = this.readCookie(req, 'niazat_refresh');
     res.clearCookie('niazat_refresh', { path: '/v1/auth' });
-    return this.authService.logout(user.id, refreshToken);
+    return this.sessions.logout(user.id, refreshToken);
   }
 
   @Get('me')
   me(@CurrentUser() user: AuthenticatedUser) {
-    return this.authService.me(user.id);
+    return this.sessions.loadUser(user.id);
   }
 
   private sessionContext(req: Request) {

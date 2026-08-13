@@ -305,13 +305,15 @@ export class FilesService {
     if (file.scanStatus !== 'clean') {
       throw new ForbiddenException('فایل هنوز از بررسی امنیتی عبور نکرده است.');
     }
+    const jti = randomUUID();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
     const token = await this.jwt.signAsync(
       {
         fileId,
         sub: user.id,
         role: user.role,
         typ: 'file-download',
-        jti: randomUUID(),
+        jti,
       },
       {
         secret: this.downloadTokenSecret(),
@@ -321,6 +323,14 @@ export class FilesService {
         expiresIn: '5m',
       },
     );
+    await this.prisma.signedUrlGrant.create({
+      data: {
+        fileId,
+        userId: user.id,
+        tokenHash: createHash('sha256').update(jti).digest('hex'),
+        expiresAt,
+      },
+    });
     await this.audit.record({
       actorUserId: user.id,
       actorRole: user.role,
@@ -339,6 +349,7 @@ export class FilesService {
         sub: string;
         typ: string;
         role: UserRole;
+        jti: string;
       }>(token, {
         secret: this.downloadTokenSecret(),
         audience: 'niazat-file-download',
@@ -347,6 +358,19 @@ export class FilesService {
       });
       if (payload.typ !== 'file-download') {
         throw new ForbiddenException('نوع توکن دانلود نامعتبر است.');
+      }
+      const tokenHash = createHash('sha256').update(payload.jti).digest('hex');
+      const grant = await this.prisma.signedUrlGrant.findUnique({
+        where: { tokenHash },
+      });
+      if (
+        !grant ||
+        grant.userId !== payload.sub ||
+        grant.fileId !== payload.fileId ||
+        grant.revokedAt ||
+        grant.expiresAt < new Date()
+      ) {
+        throw new ForbiddenException('مجوز دانلود منقضی یا لغو شده است.');
       }
       const file = await this.prisma.orderFile.findUnique({
         where: { id: payload.fileId },
@@ -366,6 +390,10 @@ export class FilesService {
         entityId: file.id,
         sensitivity: 'sensitive',
         ipAddress,
+      });
+      await this.prisma.signedUrlGrant.update({
+        where: { id: grant.id },
+        data: { usedAt: new Date() },
       });
       return file;
     } catch {

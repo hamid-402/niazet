@@ -100,21 +100,21 @@
 
 ## فاز ۳ — معماری، قرارداد و پردازش پس‌زمینه
 
-- [ ] شکستن `OrdersService` بزرگ به Use Caseهای دامنه با مرز تراکنش روشن
-- [ ] جداسازی Auth Session/Token، Order workflow، Assignment، Messaging و Dispute
-- [ ] Transactional Outbox واقعی با Worker، Retry، Backoff، Dead-letter و Idempotent consumer
-- [ ] Workerهای `payment_verify_recheck`، `release_eligible_escrows`،
+- [x] شکستن `OrdersService` بزرگ به Use Caseهای دامنه با مرز تراکنش روشن
+- [x] جداسازی Auth Session/Token، Order workflow، Assignment، Messaging و Dispute
+- [x] Transactional Outbox واقعی با Worker، Retry، Backoff، Dead-letter و Idempotent consumer
+- [x] Workerهای `payment_verify_recheck`، `release_eligible_escrows`،
   `escalate_overdue_tickets`، `recalculate_staff_performance`،
   `recalculate_executor_scores`، `send_outbox_notifications`، `file_antivirus_scan`،
   `expire_signed_urls` و `generate_periodic_reports`
-- [ ] قرارداد OpenAPI و Client تولیدشده یا Package مشترک Type/Schema بین API و Web
-- [ ] استاندارد واحد Pagination، Filter، Sort، Error envelope و Correlation ID
-- [ ] لایه مرکزی Fetch/Cache/Retry/Cancellation/Mutation و جلوگیری از درخواست‌های تکراری
-- [ ] کاهش Client Componentهای غیرضروری و SSR/ISR صفحات عمومی
-- [ ] Route handler یا BFF برای Session امن و مخفی‌ماندن API internals در صورت انتخاب این مسیر
-- [ ] Config schema تایپ‌شده، حذف مقدارهای جادویی و اصلاح فرمان Production
-- [ ] Indexهای DB مبتنی بر Queryهای واقعی و بررسی N+1/Over-fetch
-- [ ] ADR برای تصمیم‌های مهم و همگام‌سازی اسناد با کد و تست واقعی
+- [x] قرارداد OpenAPI و Client تولیدشده یا Package مشترک Type/Schema بین API و Web
+- [x] استاندارد واحد Pagination، Filter، Sort، Error envelope و Correlation ID
+- [x] لایه مرکزی Fetch/Cache/Retry/Cancellation/Mutation و جلوگیری از درخواست‌های تکراری
+- [x] کاهش Client Componentهای غیرضروری و SSR/ISR صفحات عمومی
+- [x] Route handler یا BFF برای Session امن و مخفی‌ماندن API internals در صورت انتخاب این مسیر
+- [x] Config schema تایپ‌شده، حذف مقدارهای جادویی و اصلاح فرمان Production
+- [x] Indexهای DB مبتنی بر Queryهای واقعی و بررسی N+1/Over-fetch
+- [x] ADR برای تصمیم‌های مهم و همگام‌سازی اسناد با کد و تست واقعی
 
 ## فاز ۴ — تکمیل کامل MVP محصول
 

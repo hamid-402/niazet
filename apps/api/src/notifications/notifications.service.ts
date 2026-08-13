@@ -1,11 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { NotificationChannel, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 /**
- * پیاده‌سازی پایه outbox (سند v4 §۲۱.۹ و §۱۸). برای MVP این نوبت، رویداد هم در
- * outbox_events ثبت می‌شود (برای پردازش‌های پس‌زمینه بعدی) و هم بلافاصله به‌صورت
- * in-app notification_log نوشته می‌شود تا در میز کار کاربر قابل نمایش باشد.
+ * تولیدکننده Transactional Outbox (سند v4 §۲۱.۹ و §۱۸). رویداد در همان
+ * تراکنش دامنه ذخیره می‌شود و Worker آن را با مصرف idempotent به اعلان تبدیل می‌کند.
  */
 @Injectable()
 export class NotificationsService {
@@ -24,19 +23,7 @@ export class NotificationsService {
     await client.outboxEvent.create({
       data: { eventType, payload: { userId, title, body } },
     });
-
-    await client.notificationLog.create({
-      data: {
-        userId,
-        channel: NotificationChannel.in_app,
-        eventType,
-        title,
-        body,
-        sentAt: new Date(),
-      },
-    });
-
-    this.logger.log(`[NOTIFY] ${eventType} -> ${userId}: ${title}`);
+    this.logger.log(`[NOTIFY_QUEUED] ${eventType} -> ${userId}: ${title}`);
   }
 
   async listForUser(userId: string, unreadOnly = false) {

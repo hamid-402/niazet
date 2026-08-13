@@ -9,45 +9,34 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 import {
   AuditSensitivity,
   LedgerAccountType,
-  Prisma,
   User,
   UserRole,
   UserStatus,
 } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { randomInt, randomUUID } from 'crypto';
+import { randomInt } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { SmsService } from '../notifications/sms.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { RequestOtpDto, VerifyOtpDto } from './dto/otp.dto';
 import { ResetPasswordDto } from './dto/password-reset.dto';
+import { AuthSessionService, SessionContext } from './auth-session.service';
 import { AuthenticatedUser } from '../common/types/authenticated-user';
-import {
-  createRefreshToken,
-  parseRefreshToken,
-  refreshTokenMatches,
-} from './refresh-token';
 
 const OTP_LENGTH = 6;
 const OTP_MAX_ATTEMPTS = 5;
-
-export interface SessionContext {
-  userAgent?: string;
-  ipAddress?: string;
-}
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly sms: SmsService,
+    private readonly sessions: AuthSessionService,
   ) {}
 
   // ---------------------------------------------------------------------
@@ -183,7 +172,7 @@ export class AuthService {
 
     this.assertLoginAllowed(user);
 
-    return this.issueSessionTokens(user, context);
+    return this.sessions.issue(user, context);
   }
 
   async requestPasswordReset(phone: string) {
@@ -351,145 +340,19 @@ export class AuthService {
       },
     });
 
-    return this.issueSessionTokens(user, context);
+    return this.sessions.issue(user, context);
   }
 
   async logout(userId: string, refreshToken?: string) {
-    if (!refreshToken) {
-      return { message: 'خروج با موفقیت انجام شد.' };
-    }
-
-    const parsed = parseRefreshToken(refreshToken);
-    if (!parsed) {
-      return { message: 'خروج با موفقیت انجام شد.' };
-    }
-
-    const session = await this.prisma.session.findUnique({
-      where: { id: parsed.sessionId },
-    });
-    if (
-      session &&
-      session.userId === userId &&
-      refreshTokenMatches(refreshToken, session.refreshTokenHash)
-    ) {
-      await this.prisma.session.updateMany({
-        where: { familyId: session.familyId, userId, revokedAt: null },
-        data: { revokedAt: new Date() },
-      });
-    }
-
-    return { message: 'خروج با موفقیت انجام شد.' };
+    return this.sessions.logout(userId, refreshToken);
   }
 
   async refresh(refreshToken: string, context: SessionContext = {}) {
-    const parsed = parseRefreshToken(refreshToken);
-    if (!parsed) {
-      throw new UnauthorizedException('نشست منقضی شده است. دوباره وارد شوید.');
-    }
-
-    const now = new Date();
-    const next = createRefreshToken();
-    let result:
-      { kind: 'invalid' | 'reuse' | 'expired' } | { kind: 'ok'; user: User };
-    try {
-      result = await this.prisma.$transaction(
-        async (tx) => {
-          const session = await tx.session.findUnique({
-            where: { id: parsed.sessionId },
-            include: { user: true },
-          });
-
-          if (
-            !session ||
-            !refreshTokenMatches(refreshToken, session.refreshTokenHash)
-          ) {
-            return { kind: 'invalid' as const };
-          }
-
-          if (session.revokedAt) {
-            await tx.session.updateMany({
-              where: { familyId: session.familyId, revokedAt: null },
-              data: { revokedAt: now },
-            });
-            return { kind: 'reuse' as const };
-          }
-
-          if (session.expiresAt <= now) {
-            await tx.session.update({
-              where: { id: session.id },
-              data: { revokedAt: now },
-            });
-            return { kind: 'expired' as const };
-          }
-
-          this.assertLoginAllowed(session.user);
-
-          const rotated = await tx.session.updateMany({
-            where: { id: session.id, revokedAt: null },
-            data: { revokedAt: now, replacedById: next.sessionId },
-          });
-          if (rotated.count !== 1) {
-            await tx.session.updateMany({
-              where: { familyId: session.familyId, revokedAt: null },
-              data: { revokedAt: now },
-            });
-            return { kind: 'reuse' as const };
-          }
-
-          await tx.session.create({
-            data: {
-              id: next.sessionId,
-              userId: session.userId,
-              familyId: session.familyId,
-              refreshTokenHash: next.tokenHash,
-              userAgent: context.userAgent,
-              ipAddress: context.ipAddress,
-              expiresAt: this.refreshExpiry(),
-            },
-          });
-
-          return { kind: 'ok' as const, user: session.user };
-        },
-        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
-      );
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2034'
-      ) {
-        const conflicted = await this.prisma.session.findUnique({
-          where: { id: parsed.sessionId },
-          select: { familyId: true },
-        });
-        if (conflicted) {
-          await this.prisma.session.updateMany({
-            where: { familyId: conflicted.familyId, revokedAt: null },
-            data: { revokedAt: new Date() },
-          });
-        }
-        throw new UnauthorizedException(
-          'استفاده هم‌زمان یا مجدد از نشست شناسایی شد؛ دوباره وارد شوید.',
-        );
-      }
-      throw error;
-    }
-
-    if (result.kind !== 'ok') {
-      const message =
-        result.kind === 'reuse'
-          ? 'استفاده مجدد از توکن نشست شناسایی شد؛ دوباره وارد شوید.'
-          : 'نشست منقضی یا نامعتبر است. دوباره وارد شوید.';
-      throw new UnauthorizedException(message);
-    }
-
-    return {
-      accessToken: await this.signAccessToken(result.user, next.sessionId),
-      refreshToken: next.token,
-    };
+    return this.sessions.refresh(refreshToken, context);
   }
 
   async me(userId: string) {
-    return this.loadAuthenticatedUser(userId);
+    return this.sessions.loadUser(userId);
   }
 
   // ---------------------------------------------------------------------
@@ -533,101 +396,14 @@ export class AuthService {
     });
   }
 
-  private async issueSessionTokens(user: User, context: SessionContext = {}) {
-    const refresh = createRefreshToken();
-    const familyId = randomUUID();
-
-    await this.prisma.session.create({
-      data: {
-        id: refresh.sessionId,
-        userId: user.id,
-        familyId,
-        refreshTokenHash: refresh.tokenHash,
-        userAgent: context.userAgent,
-        ipAddress: context.ipAddress,
-        expiresAt: this.refreshExpiry(),
-      },
-    });
-    const accessToken = await this.signAccessToken(user, refresh.sessionId);
-
-    return {
-      accessToken,
-      refreshToken: refresh.token,
-      user: await this.loadAuthenticatedUser(user.id),
-    };
-  }
-
-  private refreshExpiry() {
-    const ttlDays = Number(this.config.get('REFRESH_TOKEN_TTL_DAYS') ?? 30);
-    return new Date(Date.now() + ttlDays * 24 * 60 * 60 * 1000);
-  }
-
-  private async signAccessToken(user: User, sessionId: string) {
-    return this.jwt.signAsync(
-      {
-        sub: user.id,
-        sid: sessionId,
-        role: user.role,
-        adminScope: user.adminScope,
-      },
-      {
-        secret: this.config.get('JWT_ACCESS_SECRET'),
-        audience: 'niazat-api',
-        issuer: 'niazat-auth',
-        algorithm: 'HS256',
-        expiresIn: this.config.get('JWT_ACCESS_TTL') ?? '15m',
-      },
-    );
-  }
-
   async loadAuthenticatedUser(userId: string): Promise<AuthenticatedUser> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      include: { capabilities: true },
-    });
-
-    if (!user) {
-      throw new NotFoundException('کاربر یافت نشد.');
-    }
-
-    return {
-      id: user.id,
-      role: user.role,
-      adminScope: user.adminScope,
-      capabilities: user.capabilities.map((c) => c.capability),
-      fullName: user.fullName,
-      phone: user.phone,
-      email: user.email,
-    };
+    return this.sessions.loadUser(userId);
   }
 
   async loadAuthenticatedSessionUser(
     userId: string,
     sessionId: string,
   ): Promise<AuthenticatedUser> {
-    const session = await this.prisma.session.findFirst({
-      where: {
-        id: sessionId,
-        userId,
-        revokedAt: null,
-        expiresAt: { gt: new Date() },
-      },
-      include: { user: { include: { capabilities: true } } },
-    });
-
-    if (!session) {
-      throw new UnauthorizedException('نشست معتبر نیست. دوباره وارد شوید.');
-    }
-    this.assertLoginAllowed(session.user);
-
-    return {
-      id: session.user.id,
-      role: session.user.role,
-      adminScope: session.user.adminScope,
-      capabilities: session.user.capabilities.map((c) => c.capability),
-      fullName: session.user.fullName,
-      phone: session.user.phone,
-      email: session.user.email,
-    };
+    return this.sessions.loadSessionUser(userId, sessionId);
   }
 }
