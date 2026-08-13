@@ -6,9 +6,11 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
-import { AdminScope, UserRole, UserStatus } from '@prisma/client';
+import type { Request } from 'express';
+import { AdminScope, UserRole } from '@prisma/client';
 import { UsersService } from './users.service';
 import { AuditService } from '../audit/audit.service';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -17,9 +19,11 @@ import { AdminScopeGuard } from '../common/guards/admin-scope.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
-import { buildPagination, PaginationDto } from '../common/dto/pagination.dto';
+import { buildPagination } from '../common/dto/pagination.dto';
 import {
+  AuditLogQueryDto,
   CreateAdminDto,
+  ListUsersQueryDto,
   UpdateAdminScopeDto,
   UpdateUserStatusDto,
 } from './dto/user.dto';
@@ -28,20 +32,18 @@ import {
 @UseGuards(RolesGuard, AdminScopeGuard)
 @Roles(UserRole.admin)
 export class UsersAdminController {
-  constructor(
-    private readonly users: UsersService,
-    private readonly audit: AuditService,
-  ) {}
+  constructor(private readonly users: UsersService) {}
 
   @Get()
   @AdminScopes(AdminScope.super_admin, AdminScope.ops_admin)
-  list(
-    @Query() pagination: PaginationDto,
-    @Query('role') role?: UserRole,
-    @Query('status') status?: UserStatus,
-  ) {
-    const { skip, take } = buildPagination(pagination);
-    return this.users.listUsers({ role, status, skip, take });
+  list(@Query() query: ListUsersQueryDto) {
+    const { skip, take } = buildPagination(query);
+    return this.users.listUsers({
+      role: query.role,
+      status: query.status,
+      skip,
+      take,
+    });
   }
 
   @Get(':id')
@@ -56,18 +58,9 @@ export class UsersAdminController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
     @Body() dto: UpdateUserStatusDto,
+    @Req() req: Request,
   ) {
-    const result = await this.users.setStatus(id, dto.status);
-    await this.audit.record({
-      actorUserId: user.id,
-      actorRole: user.role,
-      action: 'user.status_changed',
-      entityType: 'user',
-      entityId: id,
-      after: { status: dto.status },
-      sensitivity: 'critical',
-    });
-    return result;
+    return this.users.setStatus(id, dto.status, user, req.ip);
   }
 }
 
@@ -76,10 +69,7 @@ export class UsersAdminController {
 @Roles(UserRole.admin)
 @AdminScopes(AdminScope.super_admin)
 export class AdminsAdminController {
-  constructor(
-    private readonly users: UsersService,
-    private readonly audit: AuditService,
-  ) {}
+  constructor(private readonly users: UsersService) {}
 
   @Get()
   list() {
@@ -90,18 +80,9 @@ export class AdminsAdminController {
   async create(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CreateAdminDto,
+    @Req() req: Request,
   ) {
-    const result = await this.users.createAdmin(dto);
-    await this.audit.record({
-      actorUserId: user.id,
-      actorRole: user.role,
-      action: 'admin.created',
-      entityType: 'user',
-      entityId: result.id,
-      after: { adminScope: dto.adminScope },
-      sensitivity: 'critical',
-    });
-    return result;
+    return this.users.createAdmin(dto, user, req.ip);
   }
 
   @Patch(':id/scope')
@@ -109,18 +90,9 @@ export class AdminsAdminController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
     @Body() dto: UpdateAdminScopeDto,
+    @Req() req: Request,
   ) {
-    const result = await this.users.updateAdminScope(id, dto.adminScope);
-    await this.audit.record({
-      actorUserId: user.id,
-      actorRole: user.role,
-      action: 'admin.scope_changed',
-      entityType: 'user',
-      entityId: id,
-      after: { adminScope: dto.adminScope },
-      sensitivity: 'critical',
-    });
-    return result;
+    return this.users.updateAdminScope(id, dto.adminScope, user, req.ip);
   }
 }
 
@@ -136,12 +108,13 @@ export class AuditLogAdminController {
     AdminScope.ops_admin,
     AdminScope.finance_admin,
   )
-  list(
-    @Query() pagination: PaginationDto,
-    @Query('entityType') entityType?: string,
-    @Query('actorUserId') actorUserId?: string,
-  ) {
-    const { skip, take } = buildPagination(pagination);
-    return this.audit.list({ entityType, actorUserId, skip, take });
+  list(@Query() query: AuditLogQueryDto) {
+    const { skip, take } = buildPagination(query);
+    return this.audit.list({
+      entityType: query.entityType,
+      actorUserId: query.actorUserId,
+      skip,
+      take,
+    });
   }
 }

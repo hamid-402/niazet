@@ -74,7 +74,7 @@
 - [x] جلوگیری از افشای OTP آزمایشی خارج از Development و حذف داده حساس از Log/Error
 - [x] سیاست Password، Lockout/Backoff، ثبت Login Attempt و بازیابی رمز امن با ابطال Sessionها
 - [x] Security headerها، CSP، CORS allowlist و محدودیت Swagger در محیط Production
-- [ ] Audit اجباری عملیات role/scope، block، download حساس، مالی و dispute
+- [x] Audit اجباری و اتمیک عملیات role/scope، block، download حساس، مالی و dispute
 - [ ] تست منفی ماتریس Role/Scope/Capability/Ownership برای تمام endpointهای حساس
 
 ## فاز ۲ — صحت مالی و دامنه سفارش P0/P1

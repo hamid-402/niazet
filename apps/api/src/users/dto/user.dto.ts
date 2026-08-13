@@ -1,5 +1,6 @@
-import { AdminScope, UserStatus } from '@prisma/client';
+import { AdminScope, UserRole, UserStatus } from '@prisma/client';
 import {
+  IsEnum,
   IsIn,
   IsOptional,
   IsString,
@@ -7,6 +8,28 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { PaginationDto } from '../../common/dto/pagination.dto';
+
+export class ListUsersQueryDto extends PaginationDto {
+  @IsOptional()
+  @IsEnum(UserRole)
+  role?: UserRole;
+
+  @IsOptional()
+  @IsEnum(UserStatus)
+  status?: UserStatus;
+}
+
+export class AuditLogQueryDto extends PaginationDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  entityType?: string;
+
+  @IsOptional()
+  @IsString()
+  actorUserId?: string;
+}
 
 const ADMIN_SCOPES: AdminScope[] = [
   'super_admin',

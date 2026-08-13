@@ -3,11 +3,17 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { AdminScope, UserRole, UserStatus } from '@prisma/client';
+import {
+  AdminScope,
+  AuditSensitivity,
+  UserRole,
+  UserStatus,
+} from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAdminDto } from './dto/user.dto';
 import { SAFE_USER_SELECT } from '../common/selects/safe-user.select';
+import type { AuthenticatedUser } from '../common/types/authenticated-user';
 
 @Injectable()
 export class UsersService {
@@ -44,12 +50,47 @@ export class UsersService {
     return user;
   }
 
-  async setStatus(id: string, status: UserStatus) {
-    await this.getUser(id);
-    return this.prisma.user.update({
-      where: { id },
-      data: { status },
-      select: SAFE_USER_SELECT,
+  async setStatus(
+    id: string,
+    status: UserStatus,
+    actor: AuthenticatedUser,
+    ipAddress?: string,
+  ) {
+    if (id === actor.id && status !== UserStatus.active) {
+      throw new BadRequestException(
+        'برای جلوگیری از قفل‌شدن مدیریت، وضعیت حساب خودتان را تغییر ندهید.',
+      );
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      const before = await tx.user.findUnique({ where: { id } });
+      if (!before) throw new NotFoundException('کاربر یافت نشد.');
+
+      const result = await tx.user.update({
+        where: { id },
+        data: { status },
+        select: SAFE_USER_SELECT,
+      });
+      if (status !== UserStatus.active) {
+        await tx.session.updateMany({
+          where: { userId: id, revokedAt: null },
+          data: { revokedAt: new Date() },
+        });
+      }
+      await tx.auditLog.create({
+        data: {
+          actorUserId: actor.id,
+          actorRole: actor.role,
+          action: 'user.status_changed',
+          entityType: 'user',
+          entityId: id,
+          before: { status: before.status },
+          after: { status, sessionsRevoked: status !== UserStatus.active },
+          sensitivity: AuditSensitivity.critical,
+          ipAddress,
+        },
+      });
+      return result;
     });
   }
 
@@ -68,7 +109,11 @@ export class UsersService {
     });
   }
 
-  async createAdmin(dto: CreateAdminDto) {
+  async createAdmin(
+    dto: CreateAdminDto,
+    actor: AuthenticatedUser,
+    ipAddress?: string,
+  ) {
     const existing = await this.prisma.user.findUnique({
       where: { phone: dto.phone },
       select: { id: true },
@@ -82,27 +127,76 @@ export class UsersService {
       ? await bcrypt.hash(dto.password, 10)
       : null;
 
-    return this.prisma.user.create({
-      data: {
-        phone: dto.phone,
-        fullName: dto.fullName,
-        role: UserRole.admin,
-        adminScope: dto.adminScope,
-        status: UserStatus.active,
-        passwordHash,
-      },
-      select: SAFE_USER_SELECT,
+    return this.prisma.$transaction(async (tx) => {
+      const result = await tx.user.create({
+        data: {
+          phone: dto.phone,
+          fullName: dto.fullName,
+          role: UserRole.admin,
+          adminScope: dto.adminScope,
+          status: UserStatus.active,
+          passwordHash,
+        },
+        select: SAFE_USER_SELECT,
+      });
+      await tx.auditLog.create({
+        data: {
+          actorUserId: actor.id,
+          actorRole: actor.role,
+          action: 'admin.created',
+          entityType: 'user',
+          entityId: result.id,
+          after: { role: UserRole.admin, adminScope: dto.adminScope },
+          sensitivity: AuditSensitivity.critical,
+          ipAddress,
+        },
+      });
+      return result;
     });
   }
 
-  async updateAdminScope(id: string, adminScope: AdminScope) {
-    const user = await this.getUser(id);
-    if (user.role !== UserRole.admin)
-      throw new BadRequestException('این کاربر ادمین نیست.');
-    return this.prisma.user.update({
-      where: { id },
-      data: { adminScope },
-      select: SAFE_USER_SELECT,
+  async updateAdminScope(
+    id: string,
+    adminScope: AdminScope,
+    actor: AuthenticatedUser,
+    ipAddress?: string,
+  ) {
+    if (id === actor.id && adminScope !== actor.adminScope) {
+      throw new BadRequestException(
+        'برای جلوگیری از قفل‌شدن مدیریت، سطح دسترسی حساب خودتان را تغییر ندهید.',
+      );
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      const before = await tx.user.findUnique({ where: { id } });
+      if (!before) throw new NotFoundException('کاربر یافت نشد.');
+      if (before.role !== UserRole.admin) {
+        throw new BadRequestException('این کاربر ادمین نیست.');
+      }
+
+      const result = await tx.user.update({
+        where: { id },
+        data: { adminScope },
+        select: SAFE_USER_SELECT,
+      });
+      await tx.session.updateMany({
+        where: { userId: id, revokedAt: null },
+        data: { revokedAt: new Date() },
+      });
+      await tx.auditLog.create({
+        data: {
+          actorUserId: actor.id,
+          actorRole: actor.role,
+          action: 'admin.scope_changed',
+          entityType: 'user',
+          entityId: id,
+          before: { adminScope: before.adminScope },
+          after: { adminScope, sessionsRevoked: true },
+          sensitivity: AuditSensitivity.critical,
+          ipAddress,
+        },
+      });
+      return result;
     });
   }
 }
