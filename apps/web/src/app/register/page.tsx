@@ -77,19 +77,22 @@ export default function RegisterPage() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="09xxxxxxxxx"
+                inputMode="tel"
+                autoComplete="tel"
                 dir="ltr"
                 required
               />
             </Field>
             <Field
               label="رمز عبور (اختیاری)"
-              hint="می‌توانید بعداً هم با OTP وارد شوید."
+              hint="حداقل ۱۰ کاراکتر شامل حرف بزرگ، حرف کوچک، عدد و نماد؛ یا خالی بگذارید و با OTP وارد شوید."
             >
               <input
                 type="password"
                 className={inputClass}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
               />
             </Field>
 
@@ -112,6 +115,9 @@ export default function RegisterPage() {
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 dir="ltr"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                maxLength={6}
                 required
               />
             </Field>
