@@ -770,6 +770,7 @@ model OrderFile {
   sizeBytes        Int            @map("size_bytes")
   checksum         String?
   scanStatus       FileScanStatus @default(pending) @map("scan_status")
+  purgedAt         DateTime?      @map("purged_at")
   createdAt        DateTime       @default(now()) @map("created_at")
 
   order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
@@ -778,6 +779,7 @@ model OrderFile {
   reports  OrderReport[]
   messages OrderMessage[]
 
+  @@index([scanStatus, purgedAt, createdAt])
   @@map("order_files")
 }
 

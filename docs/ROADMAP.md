@@ -67,7 +67,7 @@
   Refund، Escrow و عملیات مدیریتی حساس
 - [ ] محدودیت حجم Upload پیش از Buffer، whitelist پسوند، تشخیص Magic Bytes/MIME، نام UUID،
   Quarantine، اسکن آنتی‌ویروس و جلوگیری از Path Traversal
-- [ ] حذف فایل orphan و فایل ردشده با Job قابل تکرار و Audit نتیجه
+- [x] حذف فایل orphan و فایل ردشده با Job قابل تکرار، قفل هم‌زمانی و Audit نتیجه
 - [x] اعتبارسنجی Startup برای Secretها، CORS، محیط، Storage، Payment و SMS
 - [x] انتقال Session مرورگر از `localStorage` به Cookie امن HttpOnly/SameSite یا BFF و محافظت
   CSRF متناسب با معماری انتخابی
