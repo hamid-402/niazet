@@ -7,6 +7,7 @@ export async function createVersionedOrderReport(
     authorUserId: string;
     reportType: ReportType;
     summary: string;
+    progressPercent?: number;
     fileId?: string;
     visibleToCustomer: boolean;
     status?: ReportStatus;

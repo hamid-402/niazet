@@ -11,6 +11,7 @@ import {
   IsString,
   MinLength,
   Min,
+  Max,
   ValidateNested,
 } from 'class-validator';
 import { PaginationDto } from '../../common/dto/pagination.dto';
@@ -185,6 +186,12 @@ export class DeliverMilestoneDto {
 export class ProgressReportDto {
   @IsString()
   summary!: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(100)
+  progressPercent?: number;
 
   @IsOptional()
   @IsString()

@@ -69,12 +69,38 @@ export class OrderQueryService {
       where: { id: orderId },
       include: {
         serviceLine: true,
-        files: true,
+        files: {
+          where: {
+            scanStatus: 'clean',
+            purgedAt: null,
+            OR: [
+              { fileKind: 'input' },
+              {
+                uploadedByUserId: executorUserId,
+                fileKind: { in: ['output', 'revision', 'report'] },
+              },
+            ],
+          },
+          orderBy: { createdAt: 'asc' },
+        },
         messages: { orderBy: { createdAt: 'asc' } },
         acceptanceCriteria: true,
         statusHistory: { orderBy: { createdAt: 'asc' } },
         milestones: { orderBy: { sequence: 'asc' } },
         reports: { include: { file: true } },
+        assignments: {
+          where: { id: assignment.id },
+          include: {
+            executionChecklistItems: { orderBy: { createdAt: 'asc' } },
+          },
+        },
+        qcReviews: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+          include: {
+            items: { include: { checklistItem: true } },
+          },
+        },
       },
     });
   }

@@ -170,8 +170,9 @@ export interface OrderDetail extends OrderSummary {
     id: string;
     reportType: string;
     version: number;
-    status: string;
-    summary: string;
+      status: string;
+      summary: string;
+      progressPercent?: number | null;
     createdAt: string;
     visibleToCustomer: boolean;
     file?: OrderFile | null;
@@ -200,16 +201,35 @@ export interface OrderDetail extends OrderSummary {
     comment: string | null;
   }[];
   acceptanceCriteria?: { id: string; description: string; isMet: boolean }[];
-  assignments?: {
-    id: string;
-    unassignedAt: string | null;
-    executorProfile: {
+    assignments?: {
+      id: string;
+      acceptedAt?: string | null;
+      unassignedAt: string | null;
+      executionChecklistItems?: {
+        id: string;
+        label: string;
+        isCompleted: boolean;
+        completedAt: string | null;
+      }[];
+      executorProfile: {
       id: string;
       displayAlias: string;
       publicHandlerCode: string;
-    };
-  }[];
-}
+      };
+    }[];
+    qcReviews?: {
+      id: string;
+      result: string | null;
+      comment: string | null;
+      reviewedAt: string | null;
+      items: {
+        id: string;
+        passed: boolean;
+        note: string | null;
+        checklistItem: { label: string };
+      }[];
+    }[];
+  }
 
 export type TicketStatus =
   | "open"

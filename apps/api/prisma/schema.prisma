@@ -391,12 +391,12 @@ model User {
 
   statusChanges OrderStatusHistory[] @relation("StatusActor")
 
-  auditLogs       AuditLog[]        @relation("AuditActor")
-  notifications   NotificationLog[]
+  auditLogs              AuditLog[]              @relation("AuditActor")
+  notifications          NotificationLog[]
   notificationPreference NotificationPreference?
   customerProfile        CustomerProfile?
   privacyRequests        PrivacyRequest[]
-  signedUrlGrants SignedUrlGrant[]
+  signedUrlGrants        SignedUrlGrant[]
 
   systemSettingsUpdated SystemSetting[] @relation("SettingUpdatedBy")
 
@@ -404,8 +404,8 @@ model User {
 }
 
 model CustomerProfile {
-  id        String @id @default(uuid())
-  userId    String @unique @map("user_id")
+  id          String              @id @default(uuid())
+  userId      String              @unique @map("user_id")
   accountType CustomerAccountType @default(individual) @map("account_type")
 
   nationalId                String? @map("national_id")
@@ -415,17 +415,17 @@ model CustomerProfile {
   economicCode              String? @map("economic_code")
 
   billingRecipientName String? @map("billing_recipient_name")
-  invoiceEmail        String? @map("invoice_email")
-  province            String?
-  city                String?
-  addressLine         String? @map("address_line")
-  postalCode          String? @map("postal_code")
+  invoiceEmail         String? @map("invoice_email")
+  province             String?
+  city                 String?
+  addressLine          String? @map("address_line")
+  postalCode           String? @map("postal_code")
 
-  marketingConsent       Boolean   @default(false) @map("marketing_consent")
-  analyticsConsent       Boolean   @default(false) @map("analytics_consent")
+  marketingConsent        Boolean   @default(false) @map("marketing_consent")
+  analyticsConsent        Boolean   @default(false) @map("analytics_consent")
   privacyPolicyAcceptedAt DateTime? @map("privacy_policy_accepted_at")
-  createdAt              DateTime  @default(now()) @map("created_at")
-  updatedAt              DateTime  @updatedAt @map("updated_at")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -433,14 +433,14 @@ model CustomerProfile {
 }
 
 model PrivacyRequest {
-  id          String               @id @default(uuid())
-  userId      String               @map("user_id")
-  requestType PrivacyRequestType   @map("request_type")
-  status      PrivacyRequestStatus @default(pending)
-  reason      String?
-  requestedAt DateTime             @default(now()) @map("requested_at")
-  completedAt DateTime?            @map("completed_at")
-  decisionNote String?             @map("decision_note")
+  id           String               @id @default(uuid())
+  userId       String               @map("user_id")
+  requestType  PrivacyRequestType   @map("request_type")
+  status       PrivacyRequestStatus @default(pending)
+  reason       String?
+  requestedAt  DateTime             @default(now()) @map("requested_at")
+  completedAt  DateTime?            @map("completed_at")
+  decisionNote String?              @map("decision_note")
 
   user User @relation(fields: [userId], references: [id], onDelete: Restrict)
 
@@ -884,6 +884,7 @@ model OrderReport {
   reportType        ReportType   @map("report_type")
   version           Int          @default(1)
   summary           String
+  progressPercent   Int?         @map("progress_percent")
   fileId            String?      @map("file_id")
   visibleToCustomer Boolean      @default(false) @map("visible_to_customer")
   status            ReportStatus @default(draft)
@@ -943,17 +944,36 @@ model OrderAssignment {
   assignedByUserId  String         @map("assigned_by_user_id")
   assignmentRole    AssignmentRole @default(contributor) @map("assignment_role")
   assignedAt        DateTime       @default(now()) @map("assigned_at")
+  acceptedAt        DateTime?      @map("accepted_at")
   unassignedAt      DateTime?      @map("unassigned_at")
 
-  order           Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  executorProfile ExecutorProfile @relation(fields: [executorProfileId], references: [id])
-  team            Team?           @relation(fields: [teamId], references: [id])
-  assignedBy      User            @relation("AssignedBy", fields: [assignedByUserId], references: [id])
+  order                   Order                    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  executorProfile         ExecutorProfile          @relation(fields: [executorProfileId], references: [id])
+  team                    Team?                    @relation(fields: [teamId], references: [id])
+  assignedBy              User                     @relation("AssignedBy", fields: [assignedByUserId], references: [id])
+  executionChecklistItems ExecutionChecklistItem[]
 
   @@index([orderId])
   @@index([orderId, unassignedAt])
   @@index([executorProfileId])
   @@map("order_assignments")
+}
+
+model ExecutionChecklistItem {
+  id                    String    @id @default(uuid())
+  assignmentId          String    @map("assignment_id")
+  acceptanceCriterionId String    @map("acceptance_criterion_id")
+  label                 String
+  isCompleted           Boolean   @default(false) @map("is_completed")
+  completedAt           DateTime? @map("completed_at")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  assignment OrderAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, acceptanceCriterionId])
+  @@index([assignmentId, isCompleted])
+  @@map("execution_checklist_items")
 }
 
 // ---------------------------------------------------------------------------
@@ -1036,8 +1056,8 @@ model TicketMessage {
   visibility       MessageVisibility @default(customer_visible)
   createdAt        DateTime          @default(now()) @map("created_at")
 
-  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  sender User   @relation("TicketMessageSender", fields: [senderUserId], references: [id])
+  ticket     Ticket     @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  sender     User       @relation("TicketMessageSender", fields: [senderUserId], references: [id])
   attachment OrderFile? @relation(fields: [attachmentFileId], references: [id], onDelete: SetNull)
 
   @@index([attachmentFileId])
@@ -1235,15 +1255,15 @@ model Withdrawal {
 }
 
 model Invoice {
-  id            String    @id @default(uuid())
-  orderId       String    @map("order_id")
-  customerId    String    @map("customer_id")
-  invoiceNumber String    @unique @map("invoice_number")
-  amount        Int
-  issuedAt      DateTime  @default(now()) @map("issued_at")
-  pdfFileKey    String?   @map("pdf_file_key")
-  emailSentAt   DateTime? @map("email_sent_at")
-  billingSnapshot Json?   @map("billing_snapshot")
+  id              String    @id @default(uuid())
+  orderId         String    @map("order_id")
+  customerId      String    @map("customer_id")
+  invoiceNumber   String    @unique @map("invoice_number")
+  amount          Int
+  issuedAt        DateTime  @default(now()) @map("issued_at")
+  pdfFileKey      String?   @map("pdf_file_key")
+  emailSentAt     DateTime? @map("email_sent_at")
+  billingSnapshot Json?     @map("billing_snapshot")
 
   order    Order @relation(fields: [orderId], references: [id])
   customer User  @relation("InvoiceCustomer", fields: [customerId], references: [id])
@@ -1347,7 +1367,7 @@ model OutboxEvent {
   createdAt      DateTime     @default(now()) @map("created_at")
   sentAt         DateTime?    @map("sent_at")
 
-  deliveries   OutboxDelivery[]
+  deliveries    OutboxDelivery[]
   notifications NotificationLog[]
 
   @@index([status, availableAt])
@@ -1416,21 +1436,21 @@ model NotificationLog {
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   outboxEvent OutboxEvent? @relation(fields: [outboxEventId], references: [id], onDelete: SetNull)
 
+  @@unique([outboxEventId, channel])
   @@index([userId])
   @@index([channel, sentAt, createdAt])
-  @@unique([outboxEventId, channel])
   @@map("notification_logs")
 }
 
 model NotificationPreference {
-  id            String  @id @default(uuid())
-  userId        String  @unique @map("user_id")
-  inAppEnabled  Boolean @default(true) @map("in_app_enabled")
-  emailEnabled  Boolean @default(false) @map("email_enabled")
-  smsEnabled    Boolean @default(false) @map("sms_enabled")
-  eventOverrides Json?  @map("event_overrides")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  id             String   @id @default(uuid())
+  userId         String   @unique @map("user_id")
+  inAppEnabled   Boolean  @default(true) @map("in_app_enabled")
+  emailEnabled   Boolean  @default(false) @map("email_enabled")
+  smsEnabled     Boolean  @default(false) @map("sms_enabled")
+  eventOverrides Json?    @map("event_overrides")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

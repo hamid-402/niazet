@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -230,6 +231,114 @@ export class ExecutorService {
   // ---------------------------------------------------------------------
   // Executor self-service
   // ---------------------------------------------------------------------
+
+  async acceptOrder(userId: string, orderId: string) {
+    const profile = await this.getOwnProfile(userId);
+    return this.prisma.$transaction(async (tx) => {
+      const assignment = await tx.orderAssignment.findFirst({
+        where: {
+          orderId,
+          executorProfileId: profile.id,
+          unassignedAt: null,
+        },
+        include: {
+          order: { include: { acceptanceCriteria: true } },
+          executionChecklistItems: true,
+        },
+      });
+      if (!assignment) {
+        throw new ForbiddenException('این سفارش به شما ارجاع نشده است.');
+      }
+      if (assignment.order.status !== OrderStatus.assigned) {
+        if (assignment.acceptedAt) return assignment;
+        throw new BadRequestException('این سفارش در وضعیت پذیرش مجری نیست.');
+      }
+
+      if (!assignment.acceptedAt) {
+        await tx.executionChecklistItem.createMany({
+          data: assignment.order.acceptanceCriteria.map((criterion) => ({
+            assignmentId: assignment.id,
+            acceptanceCriterionId: criterion.id,
+            label: criterion.description,
+          })),
+          skipDuplicates: true,
+        });
+        await tx.orderAssignment.update({
+          where: { id: assignment.id },
+          data: { acceptedAt: new Date() },
+        });
+        await tx.auditLog.create({
+          data: {
+            actorUserId: userId,
+            actorRole: UserRole.executor,
+            action: 'order.assignment_accepted',
+            entityType: 'order',
+            entityId: orderId,
+            after: { assignmentId: assignment.id },
+          },
+        });
+      }
+
+      return tx.orderAssignment.findUniqueOrThrow({
+        where: { id: assignment.id },
+        include: { executionChecklistItems: { orderBy: { createdAt: 'asc' } } },
+      });
+    });
+  }
+
+  async updateChecklistItem(
+    userId: string,
+    orderId: string,
+    itemId: string,
+    completed: boolean,
+  ) {
+    const profile = await this.getOwnProfile(userId);
+    return this.prisma.$transaction(async (tx) => {
+      const assignment = await tx.orderAssignment.findFirst({
+        where: {
+          orderId,
+          executorProfileId: profile.id,
+          unassignedAt: null,
+        },
+        include: { order: { select: { status: true } } },
+      });
+      if (!assignment) {
+        throw new ForbiddenException('این سفارش به شما ارجاع نشده است.');
+      }
+      if (!assignment.acceptedAt) {
+        throw new BadRequestException('ابتدا پذیرش سفارش را ثبت کنید.');
+      }
+      if (
+        assignment.order.status !== OrderStatus.assigned &&
+        assignment.order.status !== OrderStatus.in_progress
+      ) {
+        throw new BadRequestException('چک‌لیست در این وضعیت قابل تغییر نیست.');
+      }
+      const item = await tx.executionChecklistItem.findFirst({
+        where: { id: itemId, assignmentId: assignment.id },
+      });
+      if (!item) throw new NotFoundException('آیتم چک‌لیست یافت نشد.');
+
+      const updated = await tx.executionChecklistItem.update({
+        where: { id: item.id },
+        data: {
+          isCompleted: completed,
+          completedAt: completed ? new Date() : null,
+        },
+      });
+      await tx.auditLog.create({
+        data: {
+          actorUserId: userId,
+          actorRole: UserRole.executor,
+          action: 'order.execution_checklist_updated',
+          entityType: 'order',
+          entityId: orderId,
+          after: { checklistItemId: item.id, completed },
+        },
+      });
+      return updated;
+    });
+  }
 
   async getOwnProfile(userId: string) {
     const profile = await this.prisma.executorProfile.findUnique({

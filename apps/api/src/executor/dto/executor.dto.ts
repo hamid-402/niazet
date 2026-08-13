@@ -1,5 +1,13 @@
 import { ExecutorStatus, ExecutorType } from '@prisma/client';
-import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  IsBoolean,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 
 const EXECUTOR_TYPES: ExecutorType[] = ['internal_staff', 'vetted_external'];
 const EXECUTOR_STATUSES: ExecutorStatus[] = [
@@ -51,4 +59,9 @@ export class CreateTeamDto {
   @IsOptional()
   @IsString()
   description?: string;
+}
+
+export class UpdateExecutionChecklistDto {
+  @IsBoolean()
+  completed!: boolean;
 }

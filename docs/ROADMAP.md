@@ -128,7 +128,7 @@
 - [x] پروفایل مشتری، اطلاعات شرکتی، آدرس فاکتور، اعلان‌ها، امنیت و حریم داده
 - [x] کیف پول، پرداخت‌های سفارش، Escrow، Refund و Invoice PDF برای مشتری
 - [x] شکایت، تشکر و Rating برای Order، Team، Executor، Support و QC با کد قابل ارجاع
-- [ ] پنل مجری: پذیرش کار، ورودی‌ها، معیار پذیرش، Checklist، Progress، Delivery و QC Rework
+- [x] پنل مجری: پذیرش کار، ورودی‌ها، معیار پذیرش، Checklist، Progress، Delivery و QC Rework
 - [ ] پنل پشتیبان: داشبورد، صف، My Tickets، SLA، Internal Note، Canned Reply و Performance
 - [ ] پنل Ops: Triage، Quote، Assignment، QC، Team/Staff، Service/Package/Form/QC Template
 - [ ] پنل Finance: Payment، Escrow، Refund، Invoice، Ledger export و Withdrawal

@@ -986,7 +986,15 @@ export class OrdersService {
   // ---------------------------------------------------------------------
 
   async executorStart(executorUserId: string, orderId: string) {
-    await this.assertExecutorOwnsOrder(orderId, executorUserId);
+    const assignment = await this.assertExecutorOwnsOrder(
+      orderId,
+      executorUserId,
+    );
+    if (!assignment.acceptedAt) {
+      throw new BadRequestException(
+        'ابتدا پذیرش سفارش و معیارهای آن را ثبت کنید.',
+      );
+    }
     const order = await this.prisma.order.findUniqueOrThrow({
       where: { id: orderId },
     });
@@ -1027,6 +1035,7 @@ export class OrdersService {
           authorUserId: executorUserId,
           reportType: 'progress',
           summary: dto.summary,
+          progressPercent: dto.progressPercent,
           fileId: dto.fileId,
           visibleToCustomer: true,
         });
@@ -1082,6 +1091,7 @@ export class OrdersService {
             unassignedAt: null,
             executorProfile: { userId: executorUserId },
           },
+          include: { executionChecklistItems: true },
         });
         if (!assignment)
           throw new ForbiddenException('این سفارش به شما ارجاع نشده است.');
@@ -1092,6 +1102,17 @@ export class OrdersService {
         if (!order) throw new NotFoundException('سفارش یافت نشد.');
         if (order.status !== OrderStatus.in_progress) {
           throw new BadRequestException('سفارش در وضعیت آماده تحویل نیست.');
+        }
+        if (!assignment.acceptedAt) {
+          throw new BadRequestException('پذیرش سفارش هنوز ثبت نشده است.');
+        }
+        const incompleteChecklist = assignment.executionChecklistItems.filter(
+          (item) => !item.isCompleted,
+        );
+        if (incompleteChecklist.length) {
+          throw new BadRequestException(
+            `پیش از تحویل، ${incompleteChecklist.length} مورد از چک‌لیست اجرا را تکمیل کنید.`,
+          );
         }
         const uniqueFileIds = [...new Set(dto.fileIds)];
         const validFiles = await tx.orderFile.count({

@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -20,6 +21,7 @@ import {
   DeliverOrderDto,
   ProgressReportDto,
 } from '../orders/dto/order.dto';
+import { UpdateExecutionChecklistDto } from './dto/executor.dto';
 
 @Controller('v1/executor')
 @UseGuards(RolesGuard)
@@ -62,6 +64,26 @@ export class ExecutorController {
   @Post('orders/:id/start')
   start(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
     return this.orders.executorStart(user.id, id);
+  }
+
+  @Post('orders/:id/accept')
+  accept(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
+    return this.executor.acceptOrder(user.id, id);
+  }
+
+  @Patch('orders/:id/checklist/:itemId')
+  updateChecklist(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Param('itemId') itemId: string,
+    @Body() dto: UpdateExecutionChecklistDto,
+  ) {
+    return this.executor.updateChecklistItem(
+      user.id,
+      id,
+      itemId,
+      dto.completed,
+    );
   }
 
   @Post('orders/:id/progress-report')
