@@ -51,7 +51,24 @@ export function buildInvoicePdf(input: {
 export class InvoicesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  issueForOrder(orderId: string, customerId: string, amount: number) {
+  async issueForOrder(orderId: string, customerId: string, amount: number) {
+    const billingSnapshot = await this.prisma.customerProfile.findUnique({
+      where: { userId: customerId },
+      select: {
+        accountType: true,
+        nationalId: true,
+        companyName: true,
+        companyNationalId: true,
+        companyRegistrationNumber: true,
+        economicCode: true,
+        billingRecipientName: true,
+        invoiceEmail: true,
+        province: true,
+        city: true,
+        addressLine: true,
+        postalCode: true,
+      },
+    });
     return this.prisma.invoice.upsert({
       where: { orderId },
       create: {
@@ -60,6 +77,7 @@ export class InvoicesService {
         invoiceNumber: `INV-${orderId.toUpperCase()}`,
         amount,
         pdfFileKey: `invoices/${orderId}.pdf`,
+        billingSnapshot: billingSnapshot ?? undefined,
       },
       update: {},
     });

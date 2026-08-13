@@ -295,6 +295,22 @@ enum BackgroundJobStatus {
   failed
 }
 
+enum CustomerAccountType {
+  individual
+  company
+}
+
+enum PrivacyRequestType {
+  data_export
+  account_deletion
+}
+
+enum PrivacyRequestStatus {
+  pending
+  completed
+  rejected
+}
+
 enum OnboardingStage {
   registered
   identity_verification
@@ -371,11 +387,58 @@ model User {
   auditLogs       AuditLog[]        @relation("AuditActor")
   notifications   NotificationLog[]
   notificationPreference NotificationPreference?
+  customerProfile        CustomerProfile?
+  privacyRequests        PrivacyRequest[]
   signedUrlGrants SignedUrlGrant[]
 
   systemSettingsUpdated SystemSetting[] @relation("SettingUpdatedBy")
 
   @@map("users")
+}
+
+model CustomerProfile {
+  id        String @id @default(uuid())
+  userId    String @unique @map("user_id")
+  accountType CustomerAccountType @default(individual) @map("account_type")
+
+  nationalId                String? @map("national_id")
+  companyName               String? @map("company_name")
+  companyNationalId         String? @map("company_national_id")
+  companyRegistrationNumber String? @map("company_registration_number")
+  economicCode              String? @map("economic_code")
+
+  billingRecipientName String? @map("billing_recipient_name")
+  invoiceEmail        String? @map("invoice_email")
+  province            String?
+  city                String?
+  addressLine         String? @map("address_line")
+  postalCode          String? @map("postal_code")
+
+  marketingConsent       Boolean   @default(false) @map("marketing_consent")
+  analyticsConsent       Boolean   @default(false) @map("analytics_consent")
+  privacyPolicyAcceptedAt DateTime? @map("privacy_policy_accepted_at")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("customer_profiles")
+}
+
+model PrivacyRequest {
+  id          String               @id @default(uuid())
+  userId      String               @map("user_id")
+  requestType PrivacyRequestType   @map("request_type")
+  status      PrivacyRequestStatus @default(pending)
+  reason      String?
+  requestedAt DateTime             @default(now()) @map("requested_at")
+  completedAt DateTime?            @map("completed_at")
+  decisionNote String?             @map("decision_note")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([userId, requestType, status])
+  @@map("privacy_requests")
 }
 
 model UserCapability {
@@ -1173,6 +1236,7 @@ model Invoice {
   issuedAt      DateTime  @default(now()) @map("issued_at")
   pdfFileKey    String?   @map("pdf_file_key")
   emailSentAt   DateTime? @map("email_sent_at")
+  billingSnapshot Json?   @map("billing_snapshot")
 
   order    Order @relation(fields: [orderId], references: [id])
   customer User  @relation("InvoiceCustomer", fields: [customerId], references: [id])

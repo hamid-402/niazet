@@ -10,6 +10,7 @@ const NAV = [
   { href: '/orders', label: 'سفارش‌ها' },
   { href: '/wallet', label: 'کیف پول و فاکتورها' },
   { href: '/tickets', label: 'تیکت‌ها' },
+  { href: '/account/profile', label: 'پروفایل و حریم داده' },
   { href: '/account/security', label: 'حساب و امنیت' },
 ];
 

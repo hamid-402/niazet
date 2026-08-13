@@ -259,6 +259,23 @@ export class PaymentsService {
           context: { paymentId: payment.id, escrowId: escrow.id },
         },
       });
+      const billingProfile = await tx.customerProfile.findUnique({
+        where: { userId: payment.customerId },
+        select: {
+          accountType: true,
+          nationalId: true,
+          companyName: true,
+          companyNationalId: true,
+          companyRegistrationNumber: true,
+          economicCode: true,
+          billingRecipientName: true,
+          invoiceEmail: true,
+          province: true,
+          city: true,
+          addressLine: true,
+          postalCode: true,
+        },
+      });
       await tx.invoice.upsert({
         where: { orderId: order.id },
         create: {
@@ -267,6 +284,7 @@ export class PaymentsService {
           invoiceNumber: `INV-${payment.id.toUpperCase()}`,
           amount: order.finalPrice ?? payment.amount,
           pdfFileKey: `invoices/${order.id}.pdf`,
+          billingSnapshot: billingProfile ?? undefined,
         },
         update: {},
       });

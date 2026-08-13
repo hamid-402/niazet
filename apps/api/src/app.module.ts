@@ -21,6 +21,7 @@ import { RateLimitGuard } from './common/guards/rate-limit.guard';
 import { validateEnvironment } from './config/validate-env';
 import { JobsModule } from './jobs/jobs.module';
 import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
+import { AccountModule } from './account/account.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { CorrelationIdMiddleware } from './common/middleware/correlation-id.midd
     FeedbackModule,
     FilesModule,
     JobsModule,
+    AccountModule,
   ],
   controllers: [AppController],
   providers: [
