@@ -3,7 +3,7 @@ import { Vazirmatn } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/lib/auth-context';
 import { ThemeProvider } from '@/components/theme-provider';
-import { DEFAULT_THEME, THEME_STORAGE_KEY } from '@/lib/themes';
+import { DEFAULT_THEME, THEMES, THEME_STORAGE_KEY } from '@/lib/themes';
 
 const vazirmatn = Vazirmatn({
   variable: '--font-vazirmatn',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 // flash-of-wrong-theme (FOUC). Kept tiny and inline on purpose.
 const NO_FOUC_SCRIPT = `(function(){try{var t=localStorage.getItem(${JSON.stringify(
   THEME_STORAGE_KEY,
-)});var v=t||${JSON.stringify(DEFAULT_THEME)};document.documentElement.setAttribute('data-theme',v);}catch(e){}})();`;
+)});var a=${JSON.stringify(THEMES.map((theme) => theme.id))};var v=a.indexOf(t)>-1?t:${JSON.stringify(DEFAULT_THEME)};document.documentElement.setAttribute('data-theme',v);}catch(e){document.documentElement.setAttribute('data-theme',${JSON.stringify(DEFAULT_THEME)});}})();`;
 
 export default function RootLayout({
   children,

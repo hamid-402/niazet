@@ -1,27 +1,16 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/v1';
-const TOKEN_KEY = 'niazat_access_token';
-const REFRESH_KEY = 'niazat_refresh_token';
+let accessToken: string | null = null;
 
 export function getAccessToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return window.localStorage.getItem(TOKEN_KEY);
+  return accessToken;
 }
 
-export function getRefreshToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return window.localStorage.getItem(REFRESH_KEY);
-}
-
-export function setTokens(accessToken: string, refreshToken?: string) {
-  window.localStorage.setItem(TOKEN_KEY, accessToken);
-  if (refreshToken) {
-    window.localStorage.setItem(REFRESH_KEY, refreshToken);
-  }
+export function setAccessToken(token: string) {
+  accessToken = token;
 }
 
 export function clearTokens() {
-  window.localStorage.removeItem(TOKEN_KEY);
-  window.localStorage.removeItem(REFRESH_KEY);
+  accessToken = null;
 }
 
 export class ApiError extends Error {
@@ -45,19 +34,19 @@ interface RequestOptions {
 let refreshPromise: Promise<string | null> | null = null;
 
 async function tryRefreshToken(): Promise<string | null> {
-  const refreshToken = getRefreshToken();
-  if (!refreshToken) return null;
-
   if (!refreshPromise) {
     refreshPromise = fetch(`${API_URL}/auth/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
+      credentials: 'include',
     })
       .then(async (res) => {
-        if (!res.ok) return null;
+        if (!res.ok) {
+          clearTokens();
+          return null;
+        }
         const data = (await res.json()) as { accessToken: string };
-        setTokens(data.accessToken);
+        setAccessToken(data.accessToken);
         return data.accessToken;
       })
       .catch(() => null)
@@ -87,6 +76,7 @@ export async function apiFetch<T = unknown>(
     fetch(`${API_URL}${path}`, {
       method,
       headers,
+      credentials: 'include',
       body: body
         ? isFormData
           ? (body as FormData)

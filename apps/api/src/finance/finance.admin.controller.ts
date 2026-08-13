@@ -34,6 +34,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
 import { AuditService } from '../audit/audit.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { RateLimit } from '../common/decorators/rate-limit.decorator';
 
 @Controller('v1/admin/finance')
 @UseGuards(RolesGuard, AdminScopeGuard)
@@ -109,6 +110,7 @@ export class FinanceAdminController {
   }
 
   @Post('escrow/:orderId/release')
+  @RateLimit({ name: 'finance-escrow-release', limit: 10, windowMs: 60 * 1000 })
   async releaseEscrow(
     @Param('orderId') orderId: string,
     @Body() dto: ReleaseEscrowDto,
@@ -133,6 +135,7 @@ export class FinanceAdminController {
   }
 
   @Post('escrow/:orderId/refund')
+  @RateLimit({ name: 'finance-escrow-refund', limit: 10, windowMs: 60 * 1000 })
   async refundEscrow(
     @Param('orderId') orderId: string,
     @Body() dto: RefundEscrowDto,
@@ -189,6 +192,11 @@ export class FinanceAdminController {
   }
 
   @Patch('withdrawals/:id/approve')
+  @RateLimit({
+    name: 'finance-withdrawal-approve',
+    limit: 10,
+    windowMs: 60 * 1000,
+  })
   async approveWithdrawal(
     @Param('id') id: string,
     @Body() dto: DecideWithdrawalDto,
@@ -207,6 +215,11 @@ export class FinanceAdminController {
   }
 
   @Patch('withdrawals/:id/reject')
+  @RateLimit({
+    name: 'finance-withdrawal-reject',
+    limit: 10,
+    windowMs: 60 * 1000,
+  })
   async rejectWithdrawal(
     @Param('id') id: string,
     @Body() dto: DecideWithdrawalDto,

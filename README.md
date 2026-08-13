@@ -5,6 +5,10 @@
 
 اسناد مرجع محصول/معماری در `docs/specs/` و نقشه راه پیاده‌سازی در `docs/ROADMAP.md` قرار دارد.
 
+فایل‌های حجیم قابل بازسازی مانند `node_modules` و Cache ساخت، از کد منبع جدا و داخل
+`_runtime` نگهداری می‌شوند. راهنمای اتصال، جداسازی و تشخیص فایل‌های واقعی پروژه در
+`docs/LOCAL_RUNTIME.md` است.
+
 ## ساختار مخزن
 
 ```
@@ -17,6 +21,20 @@ docs/
 ```
 
 ## اجرای محلی
+
+بار اول وابستگی‌ها را مستقیماً در محیط جداشده نصب کنید و سپس هر دو برنامه را بالا بیاورید:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\runtime.ps1 install
+powershell -ExecutionPolicy Bypass -File .\scripts\local.ps1 start
+```
+
+سایت در `http://localhost:3000` و API در `http://localhost:3001` در دسترس است. برای وضعیت یا توقف:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\local.ps1 status
+powershell -ExecutionPolicy Bypass -File .\scripts\local.ps1 stop
+```
 
 ### پیش‌نیاز: دیتابیس Postgres
 
@@ -31,7 +49,6 @@ docker compose up -d postgres
 ```bash
 cd apps/api
 cp .env.example .env   # و در صورت نیاز DATABASE_URL را اصلاح کنید
-npm install
 npx prisma migrate dev
 npx tsx prisma/seed.ts
 npm run start:dev       # http://localhost:3001 (مستندات Swagger در /docs)
@@ -50,7 +67,6 @@ bash scripts/e2e-smoke.sh
 ```bash
 cd apps/web
 cp .env.local.example .env.local
-npm install
 npm run dev              # http://localhost:3000
 ```
 

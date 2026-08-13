@@ -5,7 +5,11 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
+  Res,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -13,13 +17,23 @@ import { RequestOtpDto, VerifyOtpDto } from './dto/otp.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
+import { RateLimit } from '../common/decorators/rate-limit.decorator';
 
 @Controller('v1/auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly config: ConfigService,
+  ) {}
 
   @Public()
   @Post('register')
+  @RateLimit({
+    name: 'auth-register',
+    limit: 5,
+    windowMs: 60 * 60 * 1000,
+    identifierBodyField: 'phone',
+  })
   register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
   }
@@ -27,13 +41,31 @@ export class AuthController {
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  login(@Body() dto: LoginDto) {
-    return this.authService.login(dto);
+  @RateLimit({
+    name: 'auth-login',
+    limit: 10,
+    windowMs: 15 * 60 * 1000,
+    identifierBodyField: 'phone',
+  })
+  async login(
+    @Body() dto: LoginDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.login(dto, this.sessionContext(req));
+    this.setRefreshCookie(res, result.refreshToken);
+    return { accessToken: result.accessToken, user: result.user };
   }
 
   @Public()
   @Post('otp/request')
   @HttpCode(HttpStatus.OK)
+  @RateLimit({
+    name: 'auth-otp-request',
+    limit: 5,
+    windowMs: 10 * 60 * 1000,
+    identifierBodyField: 'phone',
+  })
   requestOtp(@Body() dto: RequestOtpDto) {
     return this.authService.requestOtp(dto);
   }
@@ -41,28 +73,84 @@ export class AuthController {
   @Public()
   @Post('otp/verify')
   @HttpCode(HttpStatus.OK)
-  verifyOtp(@Body() dto: VerifyOtpDto) {
-    return this.authService.verifyOtp(dto);
+  @RateLimit({
+    name: 'auth-otp-verify',
+    limit: 10,
+    windowMs: 10 * 60 * 1000,
+    identifierBodyField: 'phone',
+  })
+  async verifyOtp(
+    @Body() dto: VerifyOtpDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.verifyOtp(
+      dto,
+      this.sessionContext(req),
+    );
+    this.setRefreshCookie(res, result.refreshToken);
+    return { accessToken: result.accessToken, user: result.user };
   }
 
   @Public()
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  refresh(@Body('refreshToken') refreshToken: string) {
-    return this.authService.refresh(refreshToken);
+  @RateLimit({ name: 'auth-refresh', limit: 20, windowMs: 5 * 60 * 1000 })
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken = this.readCookie(req, 'niazat_refresh');
+    const result = await this.authService.refresh(
+      refreshToken ?? '',
+      this.sessionContext(req),
+    );
+    this.setRefreshCookie(res, result.refreshToken);
+    return { accessToken: result.accessToken };
   }
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   logout(
     @CurrentUser() user: AuthenticatedUser,
-    @Body('refreshToken') refreshToken?: string,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
   ) {
+    const refreshToken = this.readCookie(req, 'niazat_refresh');
+    res.clearCookie('niazat_refresh', { path: '/v1/auth' });
     return this.authService.logout(user.id, refreshToken);
   }
 
   @Get('me')
   me(@CurrentUser() user: AuthenticatedUser) {
     return this.authService.me(user.id);
+  }
+
+  private sessionContext(req: Request) {
+    return {
+      userAgent: req.get('user-agent'),
+      ipAddress: req.ip,
+    };
+  }
+
+  private setRefreshCookie(res: Response, token: string) {
+    const ttlDays = Number(this.config.get('REFRESH_TOKEN_TTL_DAYS') ?? 30);
+    res.cookie('niazat_refresh', token, {
+      httpOnly: true,
+      secure: this.config.get('NODE_ENV') === 'production',
+      sameSite: 'strict',
+      path: '/v1/auth',
+      maxAge: ttlDays * 24 * 60 * 60 * 1000,
+    });
+  }
+
+  private readCookie(req: Request, name: string): string | undefined {
+    const cookie = req.headers.cookie;
+    if (!cookie) return undefined;
+    for (const part of cookie.split(';')) {
+      const [key, ...value] = part.trim().split('=');
+      if (key === name) return decodeURIComponent(value.join('='));
+    }
+    return undefined;
   }
 }

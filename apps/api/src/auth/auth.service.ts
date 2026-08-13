@@ -2,24 +2,42 @@ import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { LedgerAccountType, User, UserRole, UserStatus } from '@prisma/client';
+import {
+  LedgerAccountType,
+  Prisma,
+  User,
+  UserRole,
+  UserStatus,
+} from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { randomBytes, randomInt } from 'crypto';
+import { randomInt, randomUUID } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { SmsService } from '../notifications/sms.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { RequestOtpDto, VerifyOtpDto } from './dto/otp.dto';
 import { AuthenticatedUser } from '../common/types/authenticated-user';
+import {
+  createRefreshToken,
+  parseRefreshToken,
+  refreshTokenMatches,
+} from './refresh-token';
 
 const OTP_LENGTH = 6;
 const OTP_MAX_ATTEMPTS = 5;
+
+export interface SessionContext {
+  userAgent?: string;
+  ipAddress?: string;
+}
 
 @Injectable()
 export class AuthService {
@@ -86,8 +104,21 @@ export class AuthService {
     });
 
     if (dto.purpose === 'login' && !existingUser) {
-      throw new NotFoundException('حسابی با این شماره موبایل یافت نشد.');
+      // پاسخ یکسان مانع تشخیص وجود یا عدم وجود حساب با شماره موبایل می‌شود.
+      return {
+        message: 'اگر حساب فعالی وجود داشته باشد، کد تایید ارسال می‌شود.',
+        expiresInSeconds: ttlSeconds,
+      };
     }
+
+    await this.prisma.otpCode.updateMany({
+      where: {
+        identifier: dto.phone,
+        purpose: dto.purpose,
+        consumedAt: null,
+      },
+      data: { consumedAt: new Date() },
+    });
 
     await this.prisma.otpCode.create({
       data: {
@@ -111,7 +142,7 @@ export class AuthService {
     };
   }
 
-  async verifyOtp(dto: VerifyOtpDto) {
+  async verifyOtp(dto: VerifyOtpDto, context: SessionContext = {}) {
     const otp = await this.prisma.otpCode.findFirst({
       where: { identifier: dto.phone, purpose: dto.purpose, consumedAt: null },
       orderBy: { createdAt: 'desc' },
@@ -143,10 +174,13 @@ export class AuthService {
       throw new BadRequestException('کد تایید نادرست است.');
     }
 
-    await this.prisma.otpCode.update({
-      where: { id: otp.id },
+    const consumed = await this.prisma.otpCode.updateMany({
+      where: { id: otp.id, consumedAt: null },
       data: { consumedAt: new Date() },
     });
+    if (consumed.count !== 1) {
+      throw new BadRequestException('این کد تایید قبلاً استفاده شده است.');
+    }
 
     let user = await this.prisma.user.findUnique({
       where: { phone: dto.phone },
@@ -173,20 +207,34 @@ export class AuthService {
 
     this.assertLoginAllowed(user);
 
-    return this.issueSessionTokens(user);
+    return this.issueSessionTokens(user, context);
   }
 
   // ---------------------------------------------------------------------
   // Password login
   // ---------------------------------------------------------------------
 
-  async login(dto: LoginDto) {
+  async login(dto: LoginDto, context: SessionContext = {}) {
     const user = await this.prisma.user.findUnique({
       where: { phone: dto.phone },
     });
 
     if (!user || !user.passwordHash) {
       throw new UnauthorizedException('شماره موبایل یا رمز عبور نادرست است.');
+    }
+
+    const recentFailures = await this.prisma.loginAttempt.count({
+      where: {
+        userId: user.id,
+        success: false,
+        createdAt: { gte: new Date(Date.now() - 15 * 60 * 1000) },
+      },
+    });
+    if (recentFailures >= 5) {
+      throw new HttpException(
+        'تلاش‌های ناموفق زیاد بوده است. کمی بعد دوباره امتحان کنید.',
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
     }
 
     const passwordMatches = await bcrypt.compare(
@@ -196,7 +244,13 @@ export class AuthService {
 
     if (!passwordMatches) {
       await this.prisma.loginAttempt.create({
-        data: { userId: user.id, identifier: dto.phone, success: false },
+        data: {
+          userId: user.id,
+          identifier: dto.phone,
+          success: false,
+          ipAddress: context.ipAddress,
+          userAgent: context.userAgent,
+        },
       });
       throw new UnauthorizedException('شماره موبایل یا رمز عبور نادرست است.');
     }
@@ -204,10 +258,16 @@ export class AuthService {
     this.assertLoginAllowed(user);
 
     await this.prisma.loginAttempt.create({
-      data: { userId: user.id, identifier: dto.phone, success: true },
+      data: {
+        userId: user.id,
+        identifier: dto.phone,
+        success: true,
+        ipAddress: context.ipAddress,
+        userAgent: context.userAgent,
+      },
     });
 
-    return this.issueSessionTokens(user);
+    return this.issueSessionTokens(user, context);
   }
 
   async logout(userId: string, refreshToken?: string) {
@@ -215,68 +275,133 @@ export class AuthService {
       return { message: 'خروج با موفقیت انجام شد.' };
     }
 
-    const sessions = await this.prisma.session.findMany({
-      where: { userId, revokedAt: null },
-    });
+    const parsed = parseRefreshToken(refreshToken);
+    if (!parsed) {
+      return { message: 'خروج با موفقیت انجام شد.' };
+    }
 
-    for (const session of sessions) {
-      const matches = await bcrypt.compare(
-        refreshToken,
-        session.refreshTokenHash,
-      );
-      if (matches) {
-        await this.prisma.session.update({
-          where: { id: session.id },
-          data: { revokedAt: new Date() },
-        });
-        break;
-      }
+    const session = await this.prisma.session.findUnique({
+      where: { id: parsed.sessionId },
+    });
+    if (
+      session &&
+      session.userId === userId &&
+      refreshTokenMatches(refreshToken, session.refreshTokenHash)
+    ) {
+      await this.prisma.session.updateMany({
+        where: { familyId: session.familyId, userId, revokedAt: null },
+        data: { revokedAt: new Date() },
+      });
     }
 
     return { message: 'خروج با موفقیت انجام شد.' };
   }
 
-  async refresh(refreshToken: string) {
-    let payload: { sub: string };
-    try {
-      payload = this.jwt.verify(refreshToken, {
-        secret: this.config.get('JWT_REFRESH_SECRET'),
-      });
-    } catch {
+  async refresh(refreshToken: string, context: SessionContext = {}) {
+    const parsed = parseRefreshToken(refreshToken);
+    if (!parsed) {
       throw new UnauthorizedException('نشست منقضی شده است. دوباره وارد شوید.');
     }
 
-    const sessions = await this.prisma.session.findMany({
-      where: {
-        userId: payload.sub,
-        revokedAt: null,
-        expiresAt: { gt: new Date() },
-      },
-    });
+    const now = new Date();
+    const next = createRefreshToken();
+    let result:
+      { kind: 'invalid' | 'reuse' | 'expired' } | { kind: 'ok'; user: User };
+    try {
+      result = await this.prisma.$transaction(
+        async (tx) => {
+          const session = await tx.session.findUnique({
+            where: { id: parsed.sessionId },
+            include: { user: true },
+          });
 
-    let matchedSession: (typeof sessions)[number] | null = null;
-    for (const session of sessions) {
-      if (await bcrypt.compare(refreshToken, session.refreshTokenHash)) {
-        matchedSession = session;
-        break;
+          if (
+            !session ||
+            !refreshTokenMatches(refreshToken, session.refreshTokenHash)
+          ) {
+            return { kind: 'invalid' as const };
+          }
+
+          if (session.revokedAt) {
+            await tx.session.updateMany({
+              where: { familyId: session.familyId, revokedAt: null },
+              data: { revokedAt: now },
+            });
+            return { kind: 'reuse' as const };
+          }
+
+          if (session.expiresAt <= now) {
+            await tx.session.update({
+              where: { id: session.id },
+              data: { revokedAt: now },
+            });
+            return { kind: 'expired' as const };
+          }
+
+          this.assertLoginAllowed(session.user);
+
+          const rotated = await tx.session.updateMany({
+            where: { id: session.id, revokedAt: null },
+            data: { revokedAt: now, replacedById: next.sessionId },
+          });
+          if (rotated.count !== 1) {
+            await tx.session.updateMany({
+              where: { familyId: session.familyId, revokedAt: null },
+              data: { revokedAt: now },
+            });
+            return { kind: 'reuse' as const };
+          }
+
+          await tx.session.create({
+            data: {
+              id: next.sessionId,
+              userId: session.userId,
+              familyId: session.familyId,
+              refreshTokenHash: next.tokenHash,
+              userAgent: context.userAgent,
+              ipAddress: context.ipAddress,
+              expiresAt: this.refreshExpiry(),
+            },
+          });
+
+          return { kind: 'ok' as const, user: session.user };
+        },
+        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+      );
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2034'
+      ) {
+        const conflicted = await this.prisma.session.findUnique({
+          where: { id: parsed.sessionId },
+          select: { familyId: true },
+        });
+        if (conflicted) {
+          await this.prisma.session.updateMany({
+            where: { familyId: conflicted.familyId, revokedAt: null },
+            data: { revokedAt: new Date() },
+          });
+        }
+        throw new UnauthorizedException(
+          'استفاده هم‌زمان یا مجدد از نشست شناسایی شد؛ دوباره وارد شوید.',
+        );
       }
+      throw error;
     }
 
-    if (!matchedSession) {
-      throw new UnauthorizedException('نشست معتبر نیست.');
+    if (result.kind !== 'ok') {
+      const message =
+        result.kind === 'reuse'
+          ? 'استفاده مجدد از توکن نشست شناسایی شد؛ دوباره وارد شوید.'
+          : 'نشست منقضی یا نامعتبر است. دوباره وارد شوید.';
+      throw new UnauthorizedException(message);
     }
 
-    const user = await this.prisma.user.findUnique({
-      where: { id: payload.sub },
-    });
-    if (!user) {
-      throw new UnauthorizedException('کاربر یافت نشد.');
-    }
-
-    this.assertLoginAllowed(user);
-
-    const accessToken = await this.signAccessToken(user);
-    return { accessToken };
+    return {
+      accessToken: await this.signAccessToken(result.user),
+      refreshToken: next.token,
+    };
   }
 
   async me(userId: string) {
@@ -324,26 +449,33 @@ export class AuthService {
     });
   }
 
-  private async issueSessionTokens(user: User) {
+  private async issueSessionTokens(user: User, context: SessionContext = {}) {
     const accessToken = await this.signAccessToken(user);
-
-    const refreshToken = randomBytes(48).toString('hex');
-    const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
-    const refreshTtlDays = 30;
+    const refresh = createRefreshToken();
+    const familyId = randomUUID();
 
     await this.prisma.session.create({
       data: {
+        id: refresh.sessionId,
         userId: user.id,
-        refreshTokenHash,
-        expiresAt: new Date(Date.now() + refreshTtlDays * 24 * 60 * 60 * 1000),
+        familyId,
+        refreshTokenHash: refresh.tokenHash,
+        userAgent: context.userAgent,
+        ipAddress: context.ipAddress,
+        expiresAt: this.refreshExpiry(),
       },
     });
 
     return {
       accessToken,
-      refreshToken,
+      refreshToken: refresh.token,
       user: await this.loadAuthenticatedUser(user.id),
     };
+  }
+
+  private refreshExpiry() {
+    const ttlDays = Number(this.config.get('REFRESH_TOKEN_TTL_DAYS') ?? 30);
+    return new Date(Date.now() + ttlDays * 24 * 60 * 60 * 1000);
   }
 
   private async signAccessToken(user: User) {
@@ -351,6 +483,9 @@ export class AuthService {
       { sub: user.id, role: user.role, adminScope: user.adminScope },
       {
         secret: this.config.get('JWT_ACCESS_SECRET'),
+        audience: 'niazat-api',
+        issuer: 'niazat-auth',
+        algorithm: 'HS256',
         expiresIn: this.config.get('JWT_ACCESS_TTL') ?? '15m',
       },
     );

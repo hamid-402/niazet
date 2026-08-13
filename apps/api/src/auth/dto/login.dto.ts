@@ -1,4 +1,4 @@
-import { IsString, Matches } from 'class-validator';
+import { IsString, Matches, MaxLength } from 'class-validator';
 
 export class LoginDto {
   @IsString()
@@ -6,5 +6,6 @@ export class LoginDto {
   phone!: string;
 
   @IsString()
+  @MaxLength(72)
   password!: string;
 }

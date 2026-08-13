@@ -13,3 +13,4 @@ apps/api/storage/
 playwright-report/
 test-results/
 screenshots/
+_runtime/

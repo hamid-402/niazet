@@ -8,7 +8,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { apiFetch, clearTokens, getRefreshToken, setTokens } from './api';
+import { apiFetch, clearTokens, setAccessToken } from './api';
 import type { AuthUser } from './types';
 
 interface AuthContextValue {
@@ -44,6 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const me = await apiFetch<AuthUser>('/auth/me');
       setUser(me);
     } catch {
+      clearTokens();
       setUser(null);
     }
   }, []);
@@ -65,14 +66,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (phone: string, password: string) => {
       const result = await apiFetch<{
         accessToken: string;
-        refreshToken: string;
         user: AuthUser;
       }>('/auth/login', {
         method: 'POST',
         body: { phone, password },
         auth: false,
       });
-      setTokens(result.accessToken, result.refreshToken);
+      setAccessToken(result.accessToken);
       setUser(result.user);
       return result.user;
     },
@@ -108,14 +108,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (phone: string, code: string, purpose: 'register' | 'login') => {
       const result = await apiFetch<{
         accessToken: string;
-        refreshToken: string;
         user: AuthUser;
       }>('/auth/otp/verify', {
         method: 'POST',
         body: { phone, code, purpose },
         auth: false,
       });
-      setTokens(result.accessToken, result.refreshToken);
+      setAccessToken(result.accessToken);
       setUser(result.user);
       return result.user;
     },
@@ -124,10 +123,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     try {
-      const refreshToken = getRefreshToken();
       await apiFetch('/auth/logout', {
         method: 'POST',
-        body: { refreshToken },
       });
     } catch {
       // ignore

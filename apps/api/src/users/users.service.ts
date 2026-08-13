@@ -7,6 +7,7 @@ import { AdminScope, UserRole, UserStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAdminDto } from './dto/user.dto';
+import { SAFE_USER_SELECT } from '../common/selects/safe-user.select';
 
 @Injectable()
 export class UsersService {
@@ -23,16 +24,7 @@ export class UsersService {
         ...(params.role ? { role: params.role } : {}),
         ...(params.status ? { status: params.status } : {}),
       },
-      select: {
-        id: true,
-        role: true,
-        adminScope: true,
-        status: true,
-        fullName: true,
-        phone: true,
-        email: true,
-        createdAt: true,
-      },
+      select: SAFE_USER_SELECT,
       orderBy: { createdAt: 'desc' },
       skip: params.skip,
       take: params.take,
@@ -42,7 +34,11 @@ export class UsersService {
   async getUser(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      include: { capabilities: true, executorProfile: true },
+      select: {
+        ...SAFE_USER_SELECT,
+        capabilities: true,
+        executorProfile: true,
+      },
     });
     if (!user) throw new NotFoundException('کاربر یافت نشد.');
     return user;
@@ -50,7 +46,11 @@ export class UsersService {
 
   async setStatus(id: string, status: UserStatus) {
     await this.getUser(id);
-    return this.prisma.user.update({ where: { id }, data: { status } });
+    return this.prisma.user.update({
+      where: { id },
+      data: { status },
+      select: SAFE_USER_SELECT,
+    });
   }
 
   listAdmins() {
@@ -71,6 +71,7 @@ export class UsersService {
   async createAdmin(dto: CreateAdminDto) {
     const existing = await this.prisma.user.findUnique({
       where: { phone: dto.phone },
+      select: { id: true },
     });
     if (existing)
       throw new BadRequestException(
@@ -90,6 +91,7 @@ export class UsersService {
         status: UserStatus.active,
         passwordHash,
       },
+      select: SAFE_USER_SELECT,
     });
   }
 
@@ -100,6 +102,7 @@ export class UsersService {
     return this.prisma.user.update({
       where: { id },
       data: { adminScope },
+      select: SAFE_USER_SELECT,
     });
   }
 }

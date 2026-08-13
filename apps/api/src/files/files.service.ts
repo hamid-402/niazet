@@ -6,13 +6,23 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { FileKind } from '@prisma/client';
+import { AdminScope, FileKind, FileScanStatus, UserRole } from '@prisma/client';
 import { createHash, randomUUID } from 'crypto';
-import { existsSync, mkdirSync, unlinkSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import {
+  existsSync,
+  mkdirSync,
+  renameSync,
+  unlinkSync,
+  writeFileSync,
+} from 'fs';
+import { basename, extname, join } from 'path';
 import { PrismaService } from '../prisma/prisma.service';
+import type { AuthenticatedUser } from '../common/types/authenticated-user';
+import { matchesDeclaredMime } from './file-signature';
+import { AuditService } from '../audit/audit.service';
 
 export const UPLOAD_ROOT = join(process.cwd(), 'storage', 'uploads');
+export const QUARANTINE_ROOT = join(process.cwd(), 'storage', 'quarantine');
 
 const ALLOWED_MIME_TYPES = new Set([
   'application/pdf',
@@ -28,13 +38,37 @@ const ALLOWED_MIME_TYPES = new Set([
   'text/csv',
 ]);
 
-const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024; // 25MB
+export const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024; // 25MB
+
+export function isAllowedMimeType(mimeType: string) {
+  return ALLOWED_MIME_TYPES.has(mimeType);
+}
+
+const MIME_EXTENSIONS: Record<string, string[]> = {
+  'application/pdf': ['.pdf'],
+  'application/zip': ['.zip'],
+  'application/msword': ['.doc'],
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [
+    '.docx',
+  ],
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': [
+    '.xlsx',
+  ],
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': [
+    '.pptx',
+  ],
+  'image/png': ['.png'],
+  'image/jpeg': ['.jpg', '.jpeg'],
+  'image/webp': ['.webp'],
+  'text/plain': ['.txt'],
+  'text/csv': ['.csv'],
+};
 
 /**
  * سیاست امنیت فایل سند v4 §۱۵.۲: whitelist نوع فایل، محدودیت حجم،
- * ذخیره با UUID، Signed URL. اسکن ویروس واقعی در این نوبت پیاده‌سازی نشده
- * (fileScanStatus='skipped')؛ hook آماده برای اتصال به ClamAV/سرویس ابری در
- * فاز بعد باقی می‌ماند (docs/ROADMAP.md).
+ * ذخیره با UUID و Signed URL. در توسعه، mock فایل را clean می‌کند؛ هر driver
+ * دیگر فایل را در quarantine و وضعیت pending نگه می‌دارد تا اسکنر واقعی آن را
+ * تعیین تکلیف کند. Startup محیط production استفاده از mock را ممنوع می‌کند.
  */
 @Injectable()
 export class FilesService {
@@ -42,9 +76,13 @@ export class FilesService {
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
+    private readonly audit: AuditService,
   ) {
     if (!existsSync(UPLOAD_ROOT)) {
       mkdirSync(UPLOAD_ROOT, { recursive: true });
+    }
+    if (!existsSync(QUARANTINE_ROOT)) {
+      mkdirSync(QUARANTINE_ROOT, { recursive: true });
     }
   }
 
@@ -54,11 +92,25 @@ export class FilesService {
     fileKind: FileKind;
     file: Express.Multer.File;
   }) {
-    if (!ALLOWED_MIME_TYPES.has(params.file.mimetype)) {
+    if (!params.file) {
+      throw new BadRequestException('فایلی ارسال نشده است.');
+    }
+    if (!isAllowedMimeType(params.file.mimetype)) {
       throw new BadRequestException('نوع فایل مجاز نیست.');
+    }
+    const extension = extname(params.file.originalname).toLowerCase();
+    if (!MIME_EXTENSIONS[params.file.mimetype]?.includes(extension)) {
+      throw new BadRequestException(
+        'پسوند فایل با نوع اعلام‌شده مطابقت ندارد.',
+      );
     }
     if (params.file.size > MAX_FILE_SIZE_BYTES) {
       throw new BadRequestException('حجم فایل بیش از حد مجاز است.');
+    }
+    if (!matchesDeclaredMime(params.file.buffer, params.file.mimetype)) {
+      throw new BadRequestException(
+        'محتوای واقعی فایل با نوع اعلام‌شده مطابقت ندارد.',
+      );
     }
 
     const order = await this.prisma.order.findUnique({
@@ -76,7 +128,10 @@ export class FilesService {
         a.unassignedAt === null &&
         a.executorProfile.userId === params.uploadedByUserId,
     );
-    const isStaff = uploader?.role === 'admin' || uploader?.role === 'support';
+    const hasRelatedTicket =
+      uploader?.role === UserRole.support &&
+      (await this.prisma.ticket.count({ where: { orderId: order.id } })) > 0;
+    const isStaff = uploader?.role === UserRole.admin || hasRelatedTicket;
 
     if (!isCustomer && !isAssignedExecutor && !isStaff) {
       throw new ForbiddenException(
@@ -84,72 +139,192 @@ export class FilesService {
       );
     }
 
+    const allowedKindsByRole: Partial<Record<UserRole, FileKind[]>> = {
+      [UserRole.customer]: [
+        FileKind.input,
+        FileKind.message_attachment,
+        FileKind.ticket_attachment,
+      ],
+      [UserRole.executor]: [
+        FileKind.output,
+        FileKind.revision,
+        FileKind.report,
+        FileKind.message_attachment,
+      ],
+      [UserRole.support]: [FileKind.ticket_attachment],
+      [UserRole.admin]: Object.values(FileKind),
+    };
+    if (
+      !uploader ||
+      !allowedKindsByRole[uploader.role]?.includes(params.fileKind)
+    ) {
+      throw new ForbiddenException('نوع فایل برای نقش شما مجاز نیست.');
+    }
+
     const storageKey = randomUUID();
     const checksum = createHash('sha256')
       .update(params.file.buffer)
       .digest('hex');
-    writeFileSync(join(UPLOAD_ROOT, storageKey), params.file.buffer);
+    const quarantinePath = join(QUARANTINE_ROOT, storageKey);
+    writeFileSync(quarantinePath, params.file.buffer, { flag: 'wx' });
 
-    return this.prisma.orderFile.create({
-      data: {
-        orderId: params.orderId,
-        uploadedByUserId: params.uploadedByUserId,
-        fileKind: params.fileKind,
-        storageKey,
-        originalName: params.file.originalname,
-        mimeType: params.file.mimetype,
-        sizeBytes: params.file.size,
-        checksum,
-        scanStatus: 'skipped',
-      },
-    });
+    const scanDriver = this.config.get<string>('FILE_SCAN_DRIVER') ?? 'mock';
+    const scanStatus =
+      scanDriver === 'mock' ? FileScanStatus.clean : FileScanStatus.pending;
+    if (scanStatus === FileScanStatus.clean) {
+      renameSync(quarantinePath, join(UPLOAD_ROOT, storageKey));
+    }
+
+    try {
+      return await this.prisma.orderFile.create({
+        data: {
+          orderId: params.orderId,
+          uploadedByUserId: params.uploadedByUserId,
+          fileKind: params.fileKind,
+          storageKey,
+          originalName: [...basename(params.file.originalname)]
+            .filter((character) => {
+              const codePoint = character.codePointAt(0) ?? 0;
+              return codePoint >= 32 && codePoint !== 127;
+            })
+            .join(''),
+          mimeType: params.file.mimetype,
+          sizeBytes: params.file.size,
+          checksum,
+          scanStatus,
+        },
+      });
+    } catch (error) {
+      const storedPath =
+        scanStatus === FileScanStatus.clean
+          ? join(UPLOAD_ROOT, storageKey)
+          : quarantinePath;
+      if (existsSync(storedPath)) unlinkSync(storedPath);
+      throw error;
+    }
   }
 
-  private async assertCanAccess(fileId: string, userId: string) {
+  private async assertCanAccess(fileId: string, user: AuthenticatedUser) {
     const file = await this.prisma.orderFile.findUnique({
       where: { id: fileId },
       include: {
         order: {
-          include: { assignments: { include: { executorProfile: true } } },
+          include: {
+            assignments: { include: { executorProfile: true } },
+            reports: { select: { fileId: true, visibleToCustomer: true } },
+          },
         },
       },
     });
     if (!file) throw new NotFoundException('فایل یافت نشد.');
 
-    const isOwner = file.uploadedByUserId === userId;
-    const isCustomer = file.order.customerId === userId;
+    const isOwner = file.uploadedByUserId === user.id;
+    const isCustomer =
+      file.order.customerId === user.id &&
+      (file.fileKind === FileKind.output ||
+        file.fileKind === FileKind.revision ||
+        file.fileKind === FileKind.invoice ||
+        file.order.reports.some(
+          (report) => report.fileId === file.id && report.visibleToCustomer,
+        ));
     const isAssignedExecutor = file.order.assignments.some(
-      (a) => a.unassignedAt === null && a.executorProfile.userId === userId,
+      (a) => a.unassignedAt === null && a.executorProfile.userId === user.id,
     );
+    const isOpsAdmin =
+      user.role === UserRole.admin &&
+      (user.adminScope === AdminScope.super_admin ||
+        user.adminScope === AdminScope.ops_admin);
+    const isFinanceInvoice =
+      user.role === UserRole.admin &&
+      user.adminScope === AdminScope.finance_admin &&
+      file.fileKind === FileKind.invoice;
+    const isRelatedSupport =
+      user.role === UserRole.support &&
+      (await this.prisma.ticket.count({
+        where: { orderId: file.orderId },
+      })) > 0;
 
-    if (!isOwner && !isCustomer && !isAssignedExecutor) {
+    if (
+      !isOwner &&
+      !isCustomer &&
+      !isAssignedExecutor &&
+      !isOpsAdmin &&
+      !isFinanceInvoice &&
+      !isRelatedSupport
+    ) {
       throw new ForbiddenException('دسترسی به این فایل ندارید.');
     }
 
     return file;
   }
 
-  async createSignedUrl(fileId: string, userId: string) {
-    await this.assertCanAccess(fileId, userId);
+  async createSignedUrl(fileId: string, user: AuthenticatedUser) {
+    const file = await this.assertCanAccess(fileId, user);
+    if (file.scanStatus !== 'clean') {
+      throw new ForbiddenException('فایل هنوز از بررسی امنیتی عبور نکرده است.');
+    }
     const token = await this.jwt.signAsync(
-      { fileId, sub: userId },
-      { secret: this.config.get('JWT_ACCESS_SECRET'), expiresIn: '5m' },
+      {
+        fileId,
+        sub: user.id,
+        role: user.role,
+        typ: 'file-download',
+        jti: randomUUID(),
+      },
+      {
+        secret: this.downloadTokenSecret(),
+        audience: 'niazat-file-download',
+        issuer: 'niazat-api',
+        algorithm: 'HS256',
+        expiresIn: '5m',
+      },
     );
+    await this.audit.record({
+      actorUserId: user.id,
+      actorRole: user.role,
+      action: 'file.signed_url_created',
+      entityType: 'order_file',
+      entityId: file.id,
+      sensitivity: 'sensitive',
+    });
     return { url: `/v1/files/download?token=${token}`, expiresInSeconds: 300 };
   }
 
-  async resolveSignedToken(token: string) {
+  async resolveSignedToken(token: string, ipAddress?: string) {
     try {
       const payload = await this.jwt.verifyAsync<{
         fileId: string;
         sub: string;
+        typ: string;
+        role: UserRole;
       }>(token, {
-        secret: this.config.get('JWT_ACCESS_SECRET'),
+        secret: this.downloadTokenSecret(),
+        audience: 'niazat-file-download',
+        issuer: 'niazat-api',
+        algorithms: ['HS256'],
       });
+      if (payload.typ !== 'file-download') {
+        throw new ForbiddenException('نوع توکن دانلود نامعتبر است.');
+      }
       const file = await this.prisma.orderFile.findUnique({
         where: { id: payload.fileId },
       });
       if (!file) throw new NotFoundException('فایل یافت نشد.');
+      if (file.scanStatus !== 'clean') {
+        throw new ForbiddenException('فایل برای دانلود امن نیست.');
+      }
+      if (!existsSync(join(UPLOAD_ROOT, file.storageKey))) {
+        throw new NotFoundException('محتوای فایل یافت نشد.');
+      }
+      await this.audit.record({
+        actorUserId: payload.sub,
+        actorRole: payload.role,
+        action: 'file.download',
+        entityType: 'order_file',
+        entityId: file.id,
+        sensitivity: 'sensitive',
+        ipAddress,
+      });
       return file;
     } catch {
       throw new ForbiddenException('لینک دانلود منقضی یا نامعتبر است.');
@@ -164,5 +339,18 @@ export class FilesService {
     const path = join(UPLOAD_ROOT, file.storageKey);
     if (existsSync(path)) unlinkSync(path);
     await this.prisma.orderFile.delete({ where: { id: fileId } });
+  }
+
+  private downloadTokenSecret(): string {
+    const secret = this.config.get<string>('DOWNLOAD_TOKEN_SECRET');
+    if (secret) return secret;
+    if (this.config.get('NODE_ENV') === 'production') {
+      throw new Error('DOWNLOAD_TOKEN_SECRET is required in production.');
+    }
+    const accessSecret = this.config.get<string>('JWT_ACCESS_SECRET');
+    if (!accessSecret) throw new Error('JWT_ACCESS_SECRET is required.');
+    return createHash('sha256')
+      .update(`${accessSecret}:file-download`)
+      .digest('hex');
   }
 }

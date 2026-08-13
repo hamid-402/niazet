@@ -37,12 +37,25 @@ function readInitialTheme(): ThemeId {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeId>(readInitialTheme);
+  // The server and the first client render must agree. The inline script in
+  // layout.tsx already applies the persisted CSS theme before paint; React
+  // adopts that value immediately after hydration to avoid a mismatch.
+  const [theme, setThemeState] = useState<ThemeId>(DEFAULT_THEME);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setThemeState(readInitialTheme());
+      setHydrated(true);
+    }, 0);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
     document.documentElement.dataset.theme = theme;
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);
-  }, [theme]);
+  }, [hydrated, theme]);
 
   const setTheme = useCallback((next: ThemeId) => {
     setThemeState(next);

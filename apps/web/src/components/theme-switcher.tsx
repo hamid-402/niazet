@@ -48,6 +48,7 @@ export function ThemeSwitcher({
     <div ref={ref} className="relative inline-block">
       <button
         type="button"
+        aria-label={`انتخاب پوسته؛ پوسته فعلی: ${activeMeta.label}`}
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}

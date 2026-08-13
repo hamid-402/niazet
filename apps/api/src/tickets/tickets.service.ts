@@ -33,7 +33,26 @@ export class TicketsService {
       if (!order || order.customerId !== customerId) {
         throw new ForbiddenException('این سفارش متعلق به شما نیست.');
       }
+      if (dto.relatedPublicHandlerCode) {
+        const handler = await this.prisma.orderPublicHandler.findFirst({
+          where: {
+            orderId: dto.orderId,
+            publicHandlerCode: dto.relatedPublicHandlerCode,
+            visibleToCustomer: true,
+            activeTo: null,
+          },
+          select: { id: true },
+        });
+        if (!handler) {
+          throw new ForbiddenException('کد مسئول برای این سفارش معتبر نیست.');
+        }
+      }
     }
+    await this.assertCustomerAttachment(
+      customerId,
+      dto.orderId,
+      dto.attachmentFileId,
+    );
 
     const priority = dto.priority ?? 'normal';
     const slaDueAt = addBusinessHours(
@@ -102,6 +121,11 @@ export class TicketsService {
     if (!ticket || ticket.customerId !== customerId) {
       throw new NotFoundException('تیکت یافت نشد.');
     }
+    await this.assertCustomerAttachment(
+      customerId,
+      ticket.orderId ?? undefined,
+      dto.attachmentFileId,
+    );
     const message = await this.prisma.ticketMessage.create({
       data: {
         ticketId,
@@ -182,6 +206,11 @@ export class TicketsService {
       dto.visibility === 'internal_only'
         ? MessageVisibility.internal_only
         : MessageVisibility.customer_visible;
+    await this.assertSupportAttachment(
+      supportUserId,
+      ticket.orderId ?? undefined,
+      dto.attachmentFileId,
+    );
 
     const message = await this.prisma.ticketMessage.create({
       data: {
@@ -256,6 +285,54 @@ export class TicketsService {
     const ticket = await this.prisma.ticket.findUnique({ where: { id } });
     if (!ticket) throw new NotFoundException('تیکت یافت نشد.');
     return ticket;
+  }
+
+  private async assertCustomerAttachment(
+    customerId: string,
+    orderId: string | undefined,
+    attachmentFileId: string | undefined,
+  ) {
+    if (!attachmentFileId) return;
+    if (!orderId) {
+      throw new ForbiddenException('پیوست تیکت باید به یک سفارش مرتبط باشد.');
+    }
+    const attachment = await this.prisma.orderFile.findFirst({
+      where: {
+        id: attachmentFileId,
+        orderId,
+        uploadedByUserId: customerId,
+        fileKind: 'ticket_attachment',
+        scanStatus: 'clean',
+      },
+      select: { id: true },
+    });
+    if (!attachment) {
+      throw new ForbiddenException('پیوست تیکت معتبر یا متعلق به شما نیست.');
+    }
+  }
+
+  private async assertSupportAttachment(
+    supportUserId: string,
+    orderId: string | undefined,
+    attachmentFileId: string | undefined,
+  ) {
+    if (!attachmentFileId) return;
+    if (!orderId) {
+      throw new ForbiddenException('پیوست پاسخ باید به یک سفارش مرتبط باشد.');
+    }
+    const attachment = await this.prisma.orderFile.findFirst({
+      where: {
+        id: attachmentFileId,
+        orderId,
+        uploadedByUserId: supportUserId,
+        fileKind: 'ticket_attachment',
+        scanStatus: 'clean',
+      },
+      select: { id: true },
+    });
+    if (!attachment) {
+      throw new ForbiddenException('پیوست پاسخ معتبر یا متعلق به شما نیست.');
+    }
   }
 
   /** برای job پس‌زمینه `escalate_overdue_tickets` (سند v4 §۲۳). */

@@ -144,7 +144,7 @@ export class OrdersAdminController {
     @Param('id') id: string,
     @Body() dto: OrderMessageDto,
   ) {
-    return this.orders.addMessage(
+    return this.orders.addAdminMessage(
       id,
       user.id,
       dto.body,

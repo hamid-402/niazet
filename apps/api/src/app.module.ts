@@ -17,10 +17,16 @@ import { FeedbackModule } from './feedback/feedback.module';
 import { FilesModule } from './files/files.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { RateLimitGuard } from './common/guards/rate-limit.guard';
+import { validateEnvironment } from './config/validate-env';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      cache: true,
+      validate: validateEnvironment,
+    }),
     PrismaModule,
     AuditModule,
     NotificationsModule,
@@ -38,6 +44,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
   controllers: [AppController],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: RateLimitGuard },
     { provide: APP_FILTER, useClass: HttpExceptionFilter },
   ],
 })

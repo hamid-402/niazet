@@ -12,6 +12,7 @@ import { OrdersService } from './orders.service';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { RateLimit } from '../common/decorators/rate-limit.decorator';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
 import { buildPagination } from '../common/dto/pagination.dto';
 import {
@@ -63,11 +64,13 @@ export class OrdersController {
   }
 
   @Post(':id/pay')
+  @RateLimit({ name: 'payment-initiate', limit: 10, windowMs: 60 * 1000 })
   pay(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
     return this.orders.initiatePayment(user.id, id);
   }
 
   @Post(':id/payments/:paymentId/verify')
+  @RateLimit({ name: 'payment-verify', limit: 15, windowMs: 60 * 1000 })
   verifyPayment(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
@@ -114,11 +117,10 @@ export class OrdersController {
     @Param('id') id: string,
     @Body() dto: OrderMessageDto,
   ) {
-    return this.orders.addMessage(
+    return this.orders.addCustomerMessage(
       id,
       user.id,
       dto.body,
-      'customer_visible',
       dto.attachmentFileId,
     );
   }

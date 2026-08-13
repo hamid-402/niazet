@@ -20,7 +20,7 @@ export function Card({
 }
 
 const BUTTON_BASE =
-  'inline-flex items-center justify-center gap-2 rounded-control px-4 py-2 text-sm font-medium transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed';
+  'inline-flex items-center justify-center gap-2 rounded-control px-4 py-2 text-sm font-bold transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed';
 
 const BUTTON_VARIANTS: Record<string, string> = {
   primary:
@@ -153,7 +153,9 @@ export function SectionTitle({
 }) {
   return (
     <div className="mb-4">
-      <h2 className="text-lg font-bold text-fg">{children}</h2>
+      <h2 className="text-heading-lg font-bold leading-heading text-fg">
+        {children}
+      </h2>
       {subtitle && <p className="mt-1 text-sm text-fg-muted">{subtitle}</p>}
     </div>
   );
@@ -178,4 +180,4 @@ export function Field({
 }
 
 export const inputClass =
-  'w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-fg outline-none transition-colors placeholder:text-fg-subtle focus:border-accent';
+  'w-full rounded-control border border-form-border bg-surface px-3 py-2 text-sm text-fg outline-none transition-colors placeholder:text-fg-subtle focus:border-accent';

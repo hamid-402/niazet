@@ -382,7 +382,9 @@ model UserCapability {
 model Session {
   id               String    @id @default(uuid())
   userId           String    @map("user_id")
+  familyId         String    @map("family_id")
   refreshTokenHash String    @map("refresh_token_hash")
+  replacedById     String?   @map("replaced_by_id")
   userAgent        String?   @map("user_agent")
   ipAddress        String?   @map("ip_address")
   createdAt        DateTime  @default(now()) @map("created_at")
@@ -391,6 +393,8 @@ model Session {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([familyId])
+  @@index([userId, revokedAt])
   @@map("sessions")
 }
 

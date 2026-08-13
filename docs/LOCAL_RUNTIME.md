@@ -1,0 +1,78 @@
+# فایل‌های حجیم محیط توسعه
+
+کد و اسناد اصلی پروژه چند مگابایت‌اند. افزایش حجم پروژه پس از نصب و اجرا مربوط به
+وابستگی‌ها، خروجی Build و Cacheهای قابل بازسازی است؛ این فایل‌ها جزو کد منبع نیستند.
+
+همه فایل‌های حجیم محلی در پوشه زیر نگهداری می‌شوند:
+
+```text
+_runtime/
+  apps/
+    api/
+      node_modules/
+      storage/
+    web/
+      node_modules/
+      .next/
+```
+
+پوشه `_runtime` در Git ثبت نمی‌شود و هنگام تحویل صرفاً کد می‌توان آن را کنار گذاشت.
+مسیرهای استاندارد `apps/*/node_modules`، `apps/web/.next` و `apps/api/storage` فقط Junctionهای سبک به همین
+پوشه‌اند تا دستورات معمول `npm` و Next.js همچنان کار کنند.
+
+خروجی کوچک `apps/api/dist` داخل خود شاخه API ساخته و در Git نادیده گرفته می‌شود؛ Nest هنگام هر build این
+پوشه را پاک و بازسازی می‌کند، بنابراین Junction کردن آن پایدار نیست. این پوشه کد منبع نیست و برای انتقال سورس
+می‌توان آن را کنار گذاشت.
+
+## مدیریت اتصال‌ها
+
+از ریشه پروژه اجرا کنید:
+
+```powershell
+# مشاهده وضعیت
+powershell -ExecutionPolicy Bypass -File .\scripts\runtime.ps1 status
+
+# نصب تمیز وابستگی‌ها، مستقیماً داخل _runtime
+powershell -ExecutionPolicy Bypass -File .\scripts\runtime.ps1 install
+
+# اتصال محیط حجیم برای توسعه
+powershell -ExecutionPolicy Bypass -File .\scripts\runtime.ps1 attach
+
+# جداکردن اتصال‌ها پیش از کپی دستیِ صرفاً کد
+powershell -ExecutionPolicy Bypass -File .\scripts\runtime.ps1 detach
+```
+
+`detach` فقط Junctionهای شناخته‌شده را برمی‌دارد و محتوای `_runtime` را حذف نمی‌کند.
+اگر در یکی از مسیرها یک پوشه واقعی وجود داشته باشد، اسکریپت برای جلوگیری از حذف اشتباه
+متوقف می‌شود.
+
+دستور `install` فایل‌های کوچک manifest را به محیط محلی کپی می‌کند، `npm ci` را همان‌جا اجرا می‌کند و سپس
+Junctionها را متصل می‌کند؛ بنابراین خود پکیج‌ها هیچ‌وقت داخل بخش کد منبع قرار نمی‌گیرند.
+
+## اجرای یکپارچه لوکال
+
+```powershell
+# اجرای API و Web در پنجره‌های مخفی و انتظار برای Health
+powershell -ExecutionPolicy Bypass -File .\scripts\local.ps1 start
+
+# مشاهده وضعیت فرایند و Health
+powershell -ExecutionPolicy Bypass -File .\scripts\local.ps1 status
+
+# توقف امن همان فرایندهایی که اسکریپت اجرا کرده است
+powershell -ExecutionPolicy Bypass -File .\scripts\local.ps1 stop
+```
+
+PID و Logها فقط در `_runtime/pids` و `_runtime/logs` ذخیره می‌شوند. اسکریپت پیش از توقف، شناسه و زمان
+شروع فرایند را تطبیق می‌دهد تا یک PID قدیمی باعث توقف برنامه نامرتبط نشود.
+
+## تشخیص کد واقعی
+
+فهرست قطعی فایل‌های پروژه همان خروجی Git است:
+
+```powershell
+git ls-files
+```
+
+برای انتقال صرفاً سورس، بعد از `detach` همه فایل‌ها به‌جز `_runtime` و `.git` قابل کپی‌اند.
+فایل‌های `package.json` و `package-lock.json` باید همراه سورس بمانند؛ خود پکیج‌ها بعداً با
+`npm ci` قابل بازسازی هستند.

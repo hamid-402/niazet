@@ -610,6 +610,10 @@ export class OrdersService {
       );
     }
 
+    if (dto.fileId) {
+      await this.assertExecutorFileIds(orderId, executorUserId, [dto.fileId]);
+    }
+
     const report = await this.prisma.orderReport.create({
       data: {
         orderId,
@@ -655,6 +659,7 @@ export class OrdersService {
     });
 
     if (dto.fileIds.length) {
+      await this.assertExecutorFileIds(orderId, executorUserId, dto.fileIds);
       await this.prisma.orderFile.updateMany({
         where: { id: { in: dto.fileIds }, orderId },
         data: { fileKind: 'output' },
@@ -804,6 +809,27 @@ export class OrdersService {
       include: { executorProfile: true },
     });
     return assignment?.executorProfile.userId ?? null;
+  }
+
+  private async assertExecutorFileIds(
+    orderId: string,
+    executorUserId: string,
+    fileIds: string[],
+  ) {
+    const uniqueIds = [...new Set(fileIds)];
+    const validFiles = await this.prisma.orderFile.count({
+      where: {
+        id: { in: uniqueIds },
+        orderId,
+        uploadedByUserId: executorUserId,
+        scanStatus: 'clean',
+      },
+    });
+    if (validFiles !== uniqueIds.length) {
+      throw new BadRequestException(
+        'تمام فایل‌ها باید امن، متعلق به همین سفارش و توسط مجری فعلی بارگذاری شده باشند.',
+      );
+    }
   }
 
   // ---------------------------------------------------------------------
@@ -1289,16 +1315,80 @@ export class OrdersService {
     return order;
   }
 
-  async addMessage(
+  async addCustomerMessage(
     orderId: string,
-    senderUserId: string,
+    customerId: string,
     body: string,
-    visibility: MessageVisibility = MessageVisibility.customer_visible,
     attachmentFileId?: string,
   ) {
+    await this.loadOwnedOrder(orderId, customerId);
+    await this.assertMessageAttachment(
+      orderId,
+      customerId,
+      attachmentFileId,
+      true,
+    );
     return this.prisma.orderMessage.create({
-      data: { orderId, senderUserId, body, visibility, attachmentFileId },
+      data: {
+        orderId,
+        senderUserId: customerId,
+        body,
+        visibility: MessageVisibility.customer_visible,
+        attachmentFileId,
+      },
     });
+  }
+
+  async addAdminMessage(
+    orderId: string,
+    adminId: string,
+    body: string,
+    visibility: MessageVisibility,
+    attachmentFileId?: string,
+  ) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      select: { id: true },
+    });
+    if (!order) throw new NotFoundException('سفارش یافت نشد.');
+    await this.assertMessageAttachment(
+      orderId,
+      adminId,
+      attachmentFileId,
+      false,
+    );
+    return this.prisma.orderMessage.create({
+      data: {
+        orderId,
+        senderUserId: adminId,
+        body,
+        visibility,
+        attachmentFileId,
+      },
+    });
+  }
+
+  private async assertMessageAttachment(
+    orderId: string,
+    senderUserId: string,
+    attachmentFileId: string | undefined,
+    requireUploaderOwnership: boolean,
+  ) {
+    if (!attachmentFileId) return;
+    const attachment = await this.prisma.orderFile.findFirst({
+      where: {
+        id: attachmentFileId,
+        orderId,
+        ...(requireUploaderOwnership ? { uploadedByUserId: senderUserId } : {}),
+        scanStatus: 'clean',
+      },
+      select: { id: true },
+    });
+    if (!attachment) {
+      throw new BadRequestException(
+        'پیوست باید فایل امن همان سفارش و متعلق به فرستنده باشد.',
+      );
+    }
   }
 
   private customerOrderInclude() {

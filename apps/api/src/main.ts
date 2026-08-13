@@ -16,22 +16,27 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true,
       transform: true,
-      forbidNonWhitelisted: false,
+      forbidNonWhitelisted: true,
     }),
   );
 
-  const config = new DocumentBuilder()
-    .setTitle('نیازت با ما — API')
-    .setDescription('Managed Service Platform API (نسخه اولیه MVP)')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
+  if (
+    process.env.NODE_ENV !== 'production' ||
+    process.env.ENABLE_SWAGGER === 'true'
+  ) {
+    const config = new DocumentBuilder()
+      .setTitle('نیازت با ما — API')
+      .setDescription('Managed Service Platform API (نسخه اولیه MVP)')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('docs', app, document);
+  }
 
   const port = process.env.APP_PORT ?? 3001;
   await app.listen(port);
 
-  console.log(`API running on http://localhost:${port} (docs at /docs)`);
+  console.log(`API running on http://localhost:${port}`);
 }
 void bootstrap();

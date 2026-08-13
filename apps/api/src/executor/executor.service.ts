@@ -14,6 +14,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AuthService } from '../auth/auth.service';
 import { generateReferenceCode } from '../common/utils/code-generator';
 import { CreateStaffDto, CreateTeamDto } from './dto/executor.dto';
+import { SAFE_USER_SELECT } from '../common/selects/safe-user.select';
 
 @Injectable()
 export class ExecutorService {
@@ -39,6 +40,7 @@ export class ExecutorService {
   async createStaff(dto: CreateStaffDto) {
     const existing = await this.prisma.user.findUnique({
       where: { phone: dto.phone },
+      select: { id: true },
     });
     if (existing) {
       throw new BadRequestException(
@@ -53,6 +55,7 @@ export class ExecutorService {
         role: UserRole.executor,
         status: UserStatus.active,
       },
+      select: SAFE_USER_SELECT,
     });
 
     await this.authService.ensureFinancialAccounts(user.id, UserRole.executor);

@@ -1,4 +1,4 @@
-export type ThemeId = 'simple-light' | 'simple-dark' | 'fluent' | 'linear';
+export type ThemeId = 'simple-light' | 'simple-dark';
 
 export interface ThemeMeta {
   id: ThemeId;
@@ -10,27 +10,14 @@ export interface ThemeMeta {
 export const THEMES: ThemeMeta[] = [
   {
     id: 'simple-light',
-    label: 'ساده روشن',
-    description: 'پس‌زمینه روشن، خوانایی بالا، مناسب استفاده روزانه',
+    label: 'لاجورد و عسل — روشن',
+    description: 'روشن، گرم و حرفه‌ای با تأکیدهای عسلی',
     isDark: false,
   },
   {
     id: 'simple-dark',
-    label: 'ساده تیره',
-    description: 'پس‌زمینه تیره، کم‌خستگی برای چشم در محیط‌های کم‌نور',
-    isDark: true,
-  },
-  {
-    id: 'fluent',
-    label: 'فلوئنت',
-    description: 'الهام از طراحی مایکروسافت فلوئنت؛ آبی-خاکستری و شیشه‌ای',
-    isDark: false,
-  },
-  {
-    id: 'linear',
-    label: 'لینیر',
-    description:
-      'الهام از Linear/Vercel؛ تیره، کنتراست بالا و مینیمال تکنولوژیک',
+    label: 'لاجورد و عسل — تیره',
+    description: 'لاجوردی عمیق با طلایی و فیروزه‌ای کنترل‌شده',
     isDark: true,
   },
 ];
