@@ -219,6 +219,7 @@ enum EscrowStatus {
   released
   partially_refunded
   refunded
+  settled
   disputed
 }
 
@@ -466,13 +467,15 @@ model ExecutorProfile {
   teamId             String?            @map("team_id")
   status             ExecutorStatus     @default(active)
 
-  capacityPercent    Int     @default(0) @map("capacity_percent")
-  qcPassRate         Decimal @default(0) @map("qc_pass_rate") @db.Decimal(5, 2)
-  onTimeDeliveryRate Decimal @default(0) @map("on_time_delivery_rate") @db.Decimal(5, 2)
-  customerRatingAvg  Decimal @default(0) @map("customer_rating_avg") @db.Decimal(3, 2)
-  complaintCount     Int     @default(0) @map("complaint_count")
-  complimentCount    Int     @default(0) @map("compliment_count")
-  riskScore          Decimal @default(0) @map("risk_score") @db.Decimal(5, 2)
+  capacityPercent    Int       @default(0) @map("capacity_percent")
+  qcPassRate         Decimal   @default(0) @map("qc_pass_rate") @db.Decimal(5, 2)
+  onTimeDeliveryRate Decimal   @default(0) @map("on_time_delivery_rate") @db.Decimal(5, 2)
+  customerRatingAvg  Decimal   @default(0) @map("customer_rating_avg") @db.Decimal(3, 2)
+  complaintCount     Int       @default(0) @map("complaint_count")
+  complimentCount    Int       @default(0) @map("compliment_count")
+  riskScore          Decimal   @default(0) @map("risk_score") @db.Decimal(5, 2)
+  shabaNumber        String?   @map("shaba_number")
+  shabaVerifiedAt    DateTime? @map("shaba_verified_at")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -670,7 +673,9 @@ model Order {
   revisionsAllowed Int @default(2) @map("revisions_allowed")
   revisionsUsed    Int @default(0) @map("revisions_used")
 
-  riskFlags Json? @map("risk_flags")
+  riskFlags       Json? @map("risk_flags")
+  packageSnapshot Json? @map("package_snapshot")
+  version         Int   @default(0)
 
   submittedAt DateTime? @map("submitted_at")
   quotedAt    DateTime? @map("quoted_at")
@@ -711,14 +716,17 @@ model Order {
 }
 
 model OrderStatusHistory {
-  id          String            @id @default(uuid())
-  orderId     String            @map("order_id")
-  fromStatus  OrderStatus?      @map("from_status")
-  toStatus    OrderStatus       @map("to_status")
-  actorUserId String?           @map("actor_user_id")
-  source      OrderStatusSource
-  note        String?
-  createdAt   DateTime          @default(now()) @map("created_at")
+  id                    String            @id @default(uuid())
+  orderId               String            @map("order_id")
+  fromStatus            OrderStatus?      @map("from_status")
+  toStatus              OrderStatus       @map("to_status")
+  actorUserId           String?           @map("actor_user_id")
+  source                OrderStatusSource
+  note                  String?
+  financialEffectType   String?           @map("financial_effect_type")
+  financialEffectAmount Int?              @map("financial_effect_amount")
+  context               Json?
+  createdAt             DateTime          @default(now()) @map("created_at")
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
   actor User? @relation("StatusActor", fields: [actorUserId], references: [id])
@@ -738,6 +746,8 @@ model OrderMilestone {
   paymentStatus      PaymentStatus @default(pending) @map("payment_status")
   deliveryStatus     String        @default("pending") @map("delivery_status")
   qcStatus           String        @default("not_required") @map("qc_status")
+  deliveredAt        DateTime?     @map("delivered_at")
+  approvedAt         DateTime?     @map("approved_at")
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -1001,10 +1011,13 @@ model LedgerEntry {
   idempotencyKey  String?             @unique @map("idempotency_key")
   createdByUserId String?             @map("created_by_user_id")
   createdAt       DateTime            @default(now()) @map("created_at")
+  correctionOfId  String?             @map("correction_of_id")
 
   debitAccount  LedgerAccount @relation("DebitAccount", fields: [debitAccountId], references: [id])
   creditAccount LedgerAccount @relation("CreditAccount", fields: [creditAccountId], references: [id])
   createdBy     User?         @relation("LedgerCreatedBy", fields: [createdByUserId], references: [id])
+  correctionOf  LedgerEntry?  @relation("LedgerCorrections", fields: [correctionOfId], references: [id])
+  corrections   LedgerEntry[] @relation("LedgerCorrections")
 
   walletTransactions WalletTransaction[]
 
@@ -1040,6 +1053,7 @@ model WalletTransaction {
   wallet      Wallet      @relation(fields: [walletId], references: [id], onDelete: Cascade)
   ledgerEntry LedgerEntry @relation(fields: [ledgerEntryId], references: [id])
 
+  @@unique([walletId, ledgerEntryId])
   @@index([walletId])
   @@map("wallet_transactions")
 }
@@ -1119,6 +1133,9 @@ model Withdrawal {
   decidedByUserId   String?          @map("decided_by_user_id")
   decidedAt         DateTime?        @map("decided_at")
   note              String?
+  shabaVerifiedAt   DateTime?        @map("shaba_verified_at")
+  processedAt       DateTime?        @map("processed_at")
+  idempotencyKey    String?          @unique @map("idempotency_key")
   createdAt         DateTime         @default(now()) @map("created_at")
 
   executorProfile ExecutorProfile @relation(fields: [executorProfileId], references: [id])
@@ -1140,6 +1157,7 @@ model Invoice {
   order    Order @relation(fields: [orderId], references: [id])
   customer User  @relation("InvoiceCustomer", fields: [customerId], references: [id])
 
+  @@unique([orderId])
   @@map("invoices")
 }
 
@@ -1247,12 +1265,17 @@ model NotificationLog {
 }
 
 model IdempotencyKey {
-  id               String   @id @default(uuid())
-  key              String   @unique
+  id               String    @id @default(uuid())
+  key              String
   scope            String
-  responseSnapshot Json?    @map("response_snapshot")
-  createdAt        DateTime @default(now()) @map("created_at")
+  requestHash      String    @map("request_hash")
+  responseSnapshot Json?     @map("response_snapshot")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  completedAt      DateTime? @map("completed_at")
+  expiresAt        DateTime  @map("expires_at")
 
+  @@unique([scope, key])
+  @@index([expiresAt])
   @@map("idempotency_keys")
 }
 

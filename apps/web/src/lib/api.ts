@@ -66,6 +66,7 @@ export async function apiFetch<T = unknown>(
 
   const headers: Record<string, string> = {};
   if (!isFormData) headers['Content-Type'] = 'application/json';
+  if (method !== 'GET') headers['Idempotency-Key'] = crypto.randomUUID();
 
   if (auth) {
     const token = getAccessToken();

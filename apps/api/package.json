@@ -19,6 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "security:matrix": "node scripts/security-access-matrix.mjs",
+    "phase2:db-integrity": "node scripts/phase2-db-integrity.mjs",
     "prisma:seed": "tsx prisma/seed.ts"
   },
   "prisma": {

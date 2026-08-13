@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -17,15 +18,17 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { PaymentsService } from '../finance/payments.service';
 import { EscrowService } from '../finance/escrow.service';
-import { InvoicesService } from '../finance/invoices.service';
+import { IdempotencyService } from '../finance/idempotency.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { AuditService } from '../audit/audit.service';
 import { generateReferenceCode } from '../common/utils/code-generator';
-import { isTransitionAllowed } from './order-state-machine';
+import { isTransitionAllowedForSource } from './order-state-machine';
 import {
   AssignOrderDto,
+  ConfigureMilestonesDto,
   CreateOrderDto,
   DeliverOrderDto,
+  DeliverMilestoneDto,
   DisputeOrderDto,
   ProgressReportDto,
   QuoteOrderDto,
@@ -42,9 +45,9 @@ export class OrdersService {
     private readonly prisma: PrismaService,
     private readonly payments: PaymentsService,
     private readonly escrow: EscrowService,
-    private readonly invoices: InvoicesService,
     private readonly notifications: NotificationsService,
     private readonly audit: AuditService,
+    private readonly idempotency: IdempotencyService,
   ) {}
 
   // ---------------------------------------------------------------------
@@ -59,34 +62,58 @@ export class OrdersService {
     note?: string,
     extraData: Prisma.OrderUpdateInput = {},
     tx?: Prisma.TransactionClient,
+    financialEffect?: {
+      type: string;
+      amount?: number;
+      context?: Prisma.InputJsonValue;
+    },
+    allowDisputeResolution = false,
   ): Promise<Order> {
-    const client = tx ?? this.prisma;
-    const order = await client.order.findUnique({ where: { id: orderId } });
-    if (!order) throw new NotFoundException('سفارش یافت نشد.');
+    const perform = async (client: Prisma.TransactionClient) => {
+      const order = await client.order.findUnique({ where: { id: orderId } });
+      if (!order) throw new NotFoundException('سفارش یافت نشد.');
+      if (order.status === OrderStatus.disputed && !allowDisputeResolution) {
+        throw new BadRequestException(
+          'خروج از وضعیت اختلاف فقط از مسیر resolve-dispute مجاز است.',
+        );
+      }
+      if (!isTransitionAllowedForSource(order.status, toStatus, source)) {
+        throw new BadRequestException(
+          `تغییر وضعیت سفارش از ${order.status} به ${toStatus} مجاز نیست.`,
+        );
+      }
 
-    if (!isTransitionAllowed(order.status, toStatus)) {
-      throw new BadRequestException(
-        `سفارش در این وضعیت (${order.status}) قابل تغییر به ${toStatus} نیست.`,
-      );
-    }
+      const claimed = await client.order.updateMany({
+        where: { id: orderId, status: order.status, version: order.version },
+        data: { status: toStatus, version: { increment: 1 }, ...extraData },
+      });
+      if (claimed.count !== 1) {
+        throw new ConflictException(
+          'سفارش هم‌زمان تغییر کرده است؛ اطلاعات را تازه کنید.',
+        );
+      }
+      await client.orderStatusHistory.create({
+        data: {
+          orderId,
+          fromStatus: order.status,
+          toStatus,
+          actorUserId,
+          source,
+          note:
+            note?.trim() ||
+            `گذار ${order.status} به ${toStatus} توسط ${source}`,
+          financialEffectType: financialEffect?.type ?? 'none',
+          financialEffectAmount: financialEffect?.amount,
+          context: financialEffect?.context,
+        },
+      });
+      return client.order.findUniqueOrThrow({ where: { id: orderId } });
+    };
 
-    const updated = await client.order.update({
-      where: { id: orderId },
-      data: { status: toStatus, ...extraData },
+    if (tx) return perform(tx);
+    return this.prisma.$transaction((trx) => perform(trx), {
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
     });
-
-    await client.orderStatusHistory.create({
-      data: {
-        orderId,
-        fromStatus: order.status,
-        toStatus,
-        actorUserId,
-        source,
-        note,
-      },
-    });
-
-    return updated;
   }
 
   private async loadOwnedOrder(orderId: string, customerId: string) {
@@ -117,6 +144,67 @@ export class OrdersService {
     return assignment;
   }
 
+  private async loadEligibleExecutor(
+    client: Prisma.TransactionClient,
+    order: { id: string; serviceId: string },
+    executorProfileId: string,
+    requestedTeamId?: string,
+    assignmentRole?: string,
+  ) {
+    const profile = await client.executorProfile.findUnique({
+      where: { id: executorProfileId },
+      include: { user: true, skills: { include: { skill: true } } },
+    });
+    if (!profile) throw new NotFoundException('مجری یافت نشد.');
+    if (
+      profile.status !== 'active' ||
+      profile.verificationStatus !== 'approved' ||
+      profile.user.status !== 'active' ||
+      profile.capacityPercent >= 100
+    ) {
+      throw new BadRequestException(
+        'مجری باید فعال، تأییدشده و دارای ظرفیت آزاد باشد.',
+      );
+    }
+    if (requestedTeamId && profile.teamId !== requestedTeamId) {
+      throw new BadRequestException('مجری عضو تیم انتخاب‌شده نیست.');
+    }
+
+    const service = await client.serviceLine.findUnique({
+      where: { id: order.serviceId },
+      select: { category: true },
+    });
+    const categorizedSkills = service
+      ? await client.skill.count({ where: { category: service.category } })
+      : 0;
+    if (
+      service &&
+      categorizedSkills > 0 &&
+      !profile.skills.some((item) => item.skill.category === service.category)
+    ) {
+      throw new BadRequestException(
+        'مهارت مجری با دسته خدمت سفارش سازگار نیست.',
+      );
+    }
+
+    if (assignmentRole === 'qc_reviewer') {
+      const activeExecutor = await client.orderAssignment.findFirst({
+        where: {
+          orderId: order.id,
+          unassignedAt: null,
+          assignmentRole: { not: 'qc_reviewer' },
+        },
+        include: { executorProfile: true },
+      });
+      if (activeExecutor?.executorProfile.userId === profile.userId) {
+        throw new BadRequestException(
+          'بازبین QC نمی‌تواند همان مجری سفارش باشد.',
+        );
+      }
+    }
+    return profile;
+  }
+
   // ---------------------------------------------------------------------
   // Customer: create / submit
   // ---------------------------------------------------------------------
@@ -124,10 +212,30 @@ export class OrdersService {
   async createDraft(customerId: string, dto: CreateOrderDto) {
     const service = await this.prisma.serviceLine.findUnique({
       where: { id: dto.serviceId },
+      include: { acceptanceCriteria: true },
     });
     if (!service || !service.isActive) {
       throw new NotFoundException('خدمت انتخابی یافت نشد.');
     }
+
+    const selectedPackage = dto.packageId
+      ? await this.prisma.servicePackage.findFirst({
+          where: {
+            id: dto.packageId,
+            serviceId: service.id,
+            isActive: true,
+          },
+        })
+      : null;
+    if (dto.packageId && !selectedPackage) {
+      throw new BadRequestException(
+        'پکیج انتخابی فعال نیست یا متعلق به این خدمت نیست.',
+      );
+    }
+
+    const criteria = dto.acceptanceCriteria?.length
+      ? dto.acceptanceCriteria
+      : service.acceptanceCriteria.map((item) => item.description);
 
     const order = await this.prisma.order.create({
       data: {
@@ -135,15 +243,26 @@ export class OrdersService {
         customerId,
         serviceId: dto.serviceId,
         packageId: dto.packageId,
+        packageSnapshot: selectedPackage
+          ? {
+              id: selectedPackage.id,
+              name: selectedPackage.name,
+              description: selectedPackage.description,
+              price: selectedPackage.price,
+              slaHours: selectedPackage.slaHours,
+              deliverables: selectedPackage.deliverables,
+              capturedAt: new Date().toISOString(),
+            }
+          : Prisma.JsonNull,
         title: dto.title,
         urgency: dto.urgency ?? 'normal',
         briefDescription: dto.briefDescription,
         formResponses: dto.formResponses as Prisma.InputJsonValue | undefined,
         budgetHint: dto.budgetHint,
         status: OrderStatus.draft,
-        acceptanceCriteria: dto.acceptanceCriteria
+        acceptanceCriteria: criteria.length
           ? {
-              create: dto.acceptanceCriteria.map((description) => ({
+              create: criteria.map((description) => ({
                 description,
               })),
             }
@@ -333,66 +452,79 @@ export class OrdersService {
   }
 
   async assign(adminId: string, orderId: string, dto: AssignOrderDto) {
-    const order = await this.prisma.order.findUnique({
-      where: { id: orderId },
-    });
-    if (!order) throw new NotFoundException('سفارش یافت نشد.');
-    if (order.status !== OrderStatus.paid) {
-      throw new BadRequestException('فقط سفارش پرداخت‌شده قابل تخصیص است.');
-    }
-
-    const executorProfile = await this.prisma.executorProfile.findUnique({
-      where: { id: dto.executorProfileId },
-    });
-    if (!executorProfile) throw new NotFoundException('مجری یافت نشد.');
-
-    const assignmentRole = dto.assignmentRole ?? 'pursuit_owner';
-
-    await this.prisma.orderAssignment.create({
-      data: {
-        orderId,
-        executorProfileId: dto.executorProfileId,
-        teamId: dto.teamId ?? executorProfile.teamId,
-        assignedByUserId: adminId,
-        assignmentRole,
+    return this.prisma.$transaction(
+      async (tx) => {
+        const order = await tx.order.findUnique({ where: { id: orderId } });
+        if (!order) throw new NotFoundException('سفارش یافت نشد.');
+        if (order.status !== OrderStatus.paid) {
+          throw new BadRequestException('فقط سفارش پرداخت‌شده قابل تخصیص است.');
+        }
+        const assignmentRole = dto.assignmentRole ?? 'pursuit_owner';
+        const profile = await this.loadEligibleExecutor(
+          tx,
+          order,
+          dto.executorProfileId,
+          dto.teamId,
+          assignmentRole,
+        );
+        await tx.orderAssignment.create({
+          data: {
+            orderId,
+            executorProfileId: profile.id,
+            teamId: dto.teamId ?? profile.teamId,
+            assignedByUserId: adminId,
+            assignmentRole,
+          },
+        });
+        await tx.orderPublicHandler.create({
+          data: {
+            orderId,
+            internalUserId: profile.userId,
+            teamId: dto.teamId ?? profile.teamId,
+            publicHandlerCode: profile.publicHandlerCode,
+            displayAlias: profile.displayAlias,
+            assignmentRole,
+            visibleToCustomer: true,
+          },
+        });
+        const updated = await this.transition(
+          orderId,
+          OrderStatus.assigned,
+          OrderStatusSource.admin,
+          adminId,
+          dto.note,
+          { assignedAt: new Date() },
+          tx,
+        );
+        await tx.auditLog.create({
+          data: {
+            actorUserId: adminId,
+            actorRole: UserRole.admin,
+            action: 'order.assigned',
+            entityType: 'order',
+            entityId: orderId,
+            after: { executorProfileId: profile.id, assignmentRole },
+            sensitivity: 'sensitive',
+          },
+        });
+        await this.notifications.notifyUser(
+          profile.userId,
+          'order.assigned',
+          'کار جدید به شما ارجاع شد',
+          `سفارش ${order.code} به شما تخصیص یافت.`,
+          tx,
+        );
+        await this.notifications.notifyUser(
+          order.customerId,
+          'order.assigned',
+          'سفارش شما به تیم اجرا سپرده شد',
+          `مسئول پیگیری: ${profile.displayAlias} (${profile.publicHandlerCode})`,
+          tx,
+        );
+        return updated;
       },
-    });
-
-    await this.prisma.orderPublicHandler.create({
-      data: {
-        orderId,
-        internalUserId: executorProfile.userId,
-        teamId: dto.teamId ?? executorProfile.teamId,
-        publicHandlerCode: executorProfile.publicHandlerCode,
-        displayAlias: executorProfile.displayAlias,
-        assignmentRole,
-        visibleToCustomer: true,
-      },
-    });
-
-    const updated = await this.transition(
-      orderId,
-      OrderStatus.assigned,
-      OrderStatusSource.admin,
-      adminId,
-      dto.note,
-      { assignedAt: new Date() },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
-
-    await this.notifications.notifyUser(
-      executorProfile.userId,
-      'order.assigned',
-      'کار جدید به شما ارجاع شد',
-      `سفارش ${order.code} به شما تخصیص یافت.`,
-    );
-    await this.notifications.notifyUser(
-      order.customerId,
-      'order.assigned',
-      'سفارش شما به تیم اجرا سپرده شد',
-      `مسئول پیگیری: ${executorProfile.displayAlias} (${executorProfile.publicHandlerCode})`,
-    );
-
-    return updated;
   }
 
   /**
@@ -402,168 +534,358 @@ export class OrdersService {
    * باقی می‌مانند تا کار از همان‌جا ادامه پیدا کند.
    */
   async reassign(adminId: string, orderId: string, dto: AssignOrderDto) {
-    const order = await this.prisma.order.findUnique({
-      where: { id: orderId },
-    });
-    if (!order) throw new NotFoundException('سفارش یافت نشد.');
-
-    const reassignableStatuses: OrderStatus[] = [
-      OrderStatus.assigned,
-      OrderStatus.in_progress,
-      OrderStatus.qc_rejected,
-    ];
-    if (!reassignableStatuses.includes(order.status)) {
-      throw new BadRequestException(
-        'فقط سفارش‌های ارجاع‌شده یا در حال اجرا قابل تغییر مسئول هستند.',
-      );
-    }
-
-    const currentAssignment = await this.prisma.orderAssignment.findFirst({
-      where: { orderId, unassignedAt: null },
-      include: { executorProfile: true },
-    });
-
-    if (currentAssignment?.executorProfileId === dto.executorProfileId) {
-      throw new BadRequestException(
-        'این سفارش از قبل به همین مجری تخصیص دارد.',
-      );
-    }
-
-    const newExecutorProfile = await this.prisma.executorProfile.findUnique({
-      where: { id: dto.executorProfileId },
-    });
-    if (!newExecutorProfile) throw new NotFoundException('مجری یافت نشد.');
-
-    const assignmentRole =
-      dto.assignmentRole ??
-      currentAssignment?.assignmentRole ??
-      'pursuit_owner';
-    const now = new Date();
-
-    await this.prisma.$transaction([
-      ...(currentAssignment
-        ? [
-            this.prisma.orderAssignment.update({
-              where: { id: currentAssignment.id },
-              data: { unassignedAt: now },
-            }),
-          ]
-        : []),
-      this.prisma.orderAssignment.create({
-        data: {
-          orderId,
-          executorProfileId: dto.executorProfileId,
-          teamId: dto.teamId ?? newExecutorProfile.teamId,
-          assignedByUserId: adminId,
+    return this.prisma.$transaction(
+      async (tx) => {
+        const order = await tx.order.findUnique({ where: { id: orderId } });
+        if (!order) throw new NotFoundException('سفارش یافت نشد.');
+        const reassignableStatuses: OrderStatus[] = [
+          OrderStatus.assigned,
+          OrderStatus.in_progress,
+          OrderStatus.qc_rejected,
+        ];
+        if (!reassignableStatuses.includes(order.status)) {
+          throw new BadRequestException(
+            'سفارش در این وضعیت قابل تغییر مجری نیست.',
+          );
+        }
+        const current = await tx.orderAssignment.findFirst({
+          where: { orderId, unassignedAt: null },
+          include: { executorProfile: true },
+        });
+        if (current?.executorProfileId === dto.executorProfileId) {
+          throw new BadRequestException(
+            'این سفارش از قبل به همین مجری تخصیص دارد.',
+          );
+        }
+        const assignmentRole =
+          dto.assignmentRole ?? current?.assignmentRole ?? 'pursuit_owner';
+        const profile = await this.loadEligibleExecutor(
+          tx,
+          order,
+          dto.executorProfileId,
+          dto.teamId,
           assignmentRole,
-        },
-      }),
-      this.prisma.orderPublicHandler.updateMany({
-        where: { orderId, activeTo: null },
-        data: { activeTo: now },
-      }),
-      this.prisma.orderPublicHandler.create({
-        data: {
-          orderId,
-          internalUserId: newExecutorProfile.userId,
-          teamId: dto.teamId ?? newExecutorProfile.teamId,
-          publicHandlerCode: newExecutorProfile.publicHandlerCode,
-          displayAlias: newExecutorProfile.displayAlias,
-          assignmentRole,
-          visibleToCustomer: true,
-          activeFrom: now,
-        },
-      }),
-    ]);
-
-    await this.prisma.orderMessage.create({
-      data: {
-        orderId,
-        senderUserId: adminId,
-        messageType: 'reassignment',
-        body:
-          dto.note ??
-          `مسئول اجرای سفارش از ${currentAssignment?.executorProfile.displayAlias ?? 'نامشخص'} به ${newExecutorProfile.displayAlias} تغییر کرد.`,
-        visibility: MessageVisibility.internal_only,
+        );
+        const now = new Date();
+        if (current) {
+          await tx.orderAssignment.update({
+            where: { id: current.id },
+            data: { unassignedAt: now },
+          });
+        }
+        await tx.orderAssignment.create({
+          data: {
+            orderId,
+            executorProfileId: profile.id,
+            teamId: dto.teamId ?? profile.teamId,
+            assignedByUserId: adminId,
+            assignmentRole,
+          },
+        });
+        await tx.orderPublicHandler.updateMany({
+          where: { orderId, activeTo: null },
+          data: { activeTo: now },
+        });
+        await tx.orderPublicHandler.create({
+          data: {
+            orderId,
+            internalUserId: profile.userId,
+            teamId: dto.teamId ?? profile.teamId,
+            publicHandlerCode: profile.publicHandlerCode,
+            displayAlias: profile.displayAlias,
+            assignmentRole,
+            visibleToCustomer: true,
+            activeFrom: now,
+          },
+        });
+        await tx.orderMessage.create({
+          data: {
+            orderId,
+            senderUserId: adminId,
+            messageType: 'reassignment',
+            body:
+              dto.note ??
+              `مسئول اجرا از ${current?.executorProfile.displayAlias ?? 'نامشخص'} به ${profile.displayAlias} تغییر کرد.`,
+            visibility: MessageVisibility.internal_only,
+          },
+        });
+        await this.audit.record(
+          {
+            actorUserId: adminId,
+            actorRole: UserRole.admin,
+            action: 'order.reassigned',
+            entityType: 'order',
+            entityId: orderId,
+            before: { executorProfileId: current?.executorProfileId ?? null },
+            after: { executorProfileId: profile.id },
+            sensitivity: 'sensitive',
+          },
+          tx,
+        );
+        if (current) {
+          await this.notifications.notifyUser(
+            current.executorProfile.userId,
+            'order.unassigned',
+            'یک سفارش از شما گرفته شد',
+            `سفارش ${order.code} به مجری دیگری واگذار شد.`,
+            tx,
+          );
+        }
+        await this.notifications.notifyUser(
+          profile.userId,
+          'order.assigned',
+          'کار جدید به شما ارجاع شد',
+          `سفارش ${order.code} به شما ارجاع شد.`,
+          tx,
+        );
+        await this.notifications.notifyUser(
+          order.customerId,
+          'order.reassigned',
+          'مسئول پیگیری سفارش شما تغییر کرد',
+          `مسئول پیگیری جدید: ${profile.displayAlias} (${profile.publicHandlerCode})`,
+          tx,
+        );
+        return tx.order.findUniqueOrThrow({ where: { id: orderId } });
       },
-    });
-
-    await this.audit.record({
-      actorUserId: adminId,
-      actorRole: UserRole.admin,
-      action: 'order.reassigned',
-      entityType: 'order',
-      entityId: orderId,
-      before: {
-        executorProfileId: currentAssignment?.executorProfileId ?? null,
-      },
-      after: { executorProfileId: dto.executorProfileId },
-      sensitivity: 'sensitive',
-    });
-
-    if (currentAssignment) {
-      await this.notifications.notifyUser(
-        currentAssignment.executorProfile.userId,
-        'order.unassigned',
-        'یک سفارش از شما گرفته شد',
-        `سفارش ${order.code} به مجری دیگری واگذار شد.`,
-      );
-    }
-    await this.notifications.notifyUser(
-      newExecutorProfile.userId,
-      'order.assigned',
-      'کار جدید به شما ارجاع شد',
-      `سفارش ${order.code} به شما ارجاع شد (ادامه یک کار قبلی).`,
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
-    await this.notifications.notifyUser(
-      order.customerId,
-      'order.reassigned',
-      'مسئول پیگیری سفارش شما تغییر کرد',
-      `مسئول پیگیری جدید: ${newExecutorProfile.displayAlias} (${newExecutorProfile.publicHandlerCode})`,
-    );
-
-    return this.prisma.order.findUnique({ where: { id: orderId } });
   }
 
   // ---------------------------------------------------------------------
   // Payment
   // ---------------------------------------------------------------------
 
-  async initiatePayment(customerId: string, orderId: string) {
-    const order = await this.loadOwnedOrder(orderId, customerId);
+  async initiatePayment(
+    customerId: string,
+    orderId: string,
+    idempotencyKey: string,
+    milestoneId?: string,
+  ) {
+    const order = await this.prisma.order.findFirst({
+      where: { id: orderId, customerId },
+      include: { milestones: { orderBy: { sequence: 'asc' } } },
+    });
+    if (!order) throw new NotFoundException('سفارش یافت نشد.');
     if (order.status !== OrderStatus.pending_payment) {
       throw new BadRequestException('سفارش آماده پرداخت نیست.');
     }
-    if (!order.finalPrice) {
+    const selectedMilestone = order.milestones.length
+      ? order.milestones.find(
+          (item) =>
+            item.id ===
+            (milestoneId ??
+              order.milestones.find((m) => m.paymentStatus !== 'succeeded')
+                ?.id),
+        )
+      : undefined;
+    if (order.milestones.length && !selectedMilestone) {
+      throw new BadRequestException(
+        'مرحله پرداخت معتبر و پرداخت‌نشده یافت نشد.',
+      );
+    }
+    if (!selectedMilestone && !order.finalPrice) {
       throw new BadRequestException('مبلغ نهایی سفارش هنوز تعیین نشده است.');
     }
     return this.payments.initiatePayment({
       orderId,
       customerId,
-      amount: order.finalPrice,
+      amount: selectedMilestone?.amount ?? order.finalPrice!,
+      milestoneId: selectedMilestone?.id,
+      idempotencyKey,
     });
   }
 
-  async verifyPayment(customerId: string, orderId: string, paymentId: string) {
-    const order = await this.loadOwnedOrder(orderId, customerId);
-    const result = await this.payments.verifyAndSettlePayment(paymentId);
-
-    if (order.status === OrderStatus.pending_payment) {
-      await this.transition(
-        orderId,
-        OrderStatus.paid,
-        OrderStatusSource.system,
-        null,
-        'پرداخت تایید شد',
-        {
-          paidAt: new Date(),
+  async configureMilestones(
+    adminId: string,
+    orderId: string,
+    dto: ConfigureMilestonesDto,
+  ) {
+    return this.prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({ where: { id: orderId } });
+      if (!order) throw new NotFoundException('سفارش یافت نشد.');
+      const configurableStatuses: OrderStatus[] = [
+        OrderStatus.quoted,
+        OrderStatus.pending_payment,
+      ];
+      if (!configurableStatuses.includes(order.status)) {
+        throw new BadRequestException(
+          'مراحل فقط پیش از اولین پرداخت قابل تنظیم‌اند.',
+        );
+      }
+      if (!order.finalPrice)
+        throw new BadRequestException('قیمت نهایی تعیین نشده است.');
+      const sequences = dto.milestones.map((item) => item.sequence);
+      if (new Set(sequences).size !== sequences.length) {
+        throw new BadRequestException('شماره ترتیب مراحل باید یکتا باشد.');
+      }
+      const total = dto.milestones.reduce((sum, item) => sum + item.amount, 0);
+      if (total !== order.finalPrice) {
+        throw new BadRequestException(
+          'جمع مبلغ مراحل باید دقیقاً برابر قیمت نهایی باشد.',
+        );
+      }
+      const paid = await tx.orderMilestone.count({
+        where: { orderId, paymentStatus: 'succeeded' },
+      });
+      if (paid)
+        throw new ConflictException(
+          'پس از اولین پرداخت، مراحل قابل بازنویسی نیستند.',
+        );
+      await tx.orderMilestone.deleteMany({ where: { orderId } });
+      await tx.orderMilestone.createMany({
+        data: dto.milestones.map((item) => ({
+          orderId,
+          sequence: item.sequence,
+          title: item.title,
+          amount: item.amount,
+          acceptanceCriteria: item.acceptanceCriteria,
+        })),
+      });
+      await tx.auditLog.create({
+        data: {
+          actorUserId: adminId,
+          actorRole: UserRole.admin,
+          action: 'order.milestones_configured',
+          entityType: 'order',
+          entityId: orderId,
+          after: { total, count: dto.milestones.length },
+          sensitivity: 'sensitive',
         },
-      );
-      await this.invoices.issueForOrder(
-        orderId,
-        customerId,
-        order.finalPrice ?? 0,
-      );
+      });
+      return tx.orderMilestone.findMany({
+        where: { orderId },
+        orderBy: { sequence: 'asc' },
+      });
+    });
+  }
+
+  async deliverMilestone(
+    executorUserId: string,
+    orderId: string,
+    milestoneId: string,
+    dto: DeliverMilestoneDto,
+  ) {
+    return this.prisma.$transaction(async (tx) => {
+      const assignment = await tx.orderAssignment.findFirst({
+        where: {
+          orderId,
+          unassignedAt: null,
+          executorProfile: { userId: executorUserId },
+        },
+      });
+      if (!assignment)
+        throw new ForbiddenException('این سفارش به شما ارجاع نشده است.');
+      const milestone = await tx.orderMilestone.findFirst({
+        where: { id: milestoneId, orderId },
+      });
+      if (!milestone || milestone.paymentStatus !== 'succeeded') {
+        throw new BadRequestException(
+          'مرحله باید متعلق به سفارش و پرداخت‌شده باشد.',
+        );
+      }
+      if (milestone.deliveryStatus !== 'pending') {
+        throw new ConflictException('این مرحله قبلاً تحویل شده است.');
+      }
+      const updated = await tx.orderMilestone.update({
+        where: { id: milestone.id },
+        data: { deliveryStatus: 'delivered', deliveredAt: new Date() },
+      });
+      await tx.orderMessage.create({
+        data: {
+          orderId,
+          senderUserId: executorUserId,
+          messageType: 'milestone_delivery',
+          body: dto.summary,
+          visibility: MessageVisibility.customer_visible,
+        },
+      });
+      await tx.outboxEvent.create({
+        data: {
+          eventType: 'milestone.delivered',
+          payload: { orderId, milestoneId: milestone.id },
+        },
+      });
+      return updated;
+    });
+  }
+
+  async approveMilestone(
+    customerId: string,
+    orderId: string,
+    milestoneId: string,
+    idempotencyKey: string,
+  ) {
+    return this.idempotency.execute({
+      key: idempotencyKey,
+      scope: `milestone.approve:${milestoneId}`,
+      request: { orderId, customerId },
+      work: async (tx) => {
+        const order = await tx.order.findFirst({
+          where: { id: orderId, customerId },
+        });
+        if (!order) throw new NotFoundException('سفارش یافت نشد.');
+        const milestone = await tx.orderMilestone.findFirst({
+          where: { id: milestoneId, orderId },
+        });
+        if (
+          !milestone ||
+          milestone.deliveryStatus !== 'delivered' ||
+          milestone.approvedAt
+        ) {
+          throw new BadRequestException(
+            'مرحله تحویل نشده یا قبلاً تأیید شده است.',
+          );
+        }
+        const settlement = await this.escrow.releaseInTransaction(
+          {
+            orderId,
+            milestoneId,
+            amount: milestone.amount,
+            decidedByUserId: customerId,
+            decidedByRole: UserRole.customer,
+            note: `تأیید مرحله ${milestone.sequence} توسط مشتری`,
+            idempotencyKey,
+          },
+          tx,
+        );
+        const updated = await tx.orderMilestone.update({
+          where: { id: milestone.id },
+          data: { deliveryStatus: 'approved', approvedAt: new Date() },
+        });
+        await tx.auditLog.create({
+          data: {
+            actorUserId: customerId,
+            actorRole: UserRole.customer,
+            action: 'milestone.approved',
+            entityType: 'order_milestone',
+            entityId: milestone.id,
+            after: {
+              amount: milestone.amount,
+              executorAmount: settlement.executorAmount,
+            },
+            sensitivity: 'critical',
+          },
+        });
+        return updated;
+      },
+    });
+  }
+
+  async verifyPayment(
+    customerId: string,
+    orderId: string,
+    paymentId: string,
+    idempotencyKey: string,
+  ) {
+    const order = await this.loadOwnedOrder(orderId, customerId);
+    const result = await this.payments.verifyAndSettlePayment({
+      paymentId,
+      orderId,
+      customerId,
+      idempotencyKey,
+    });
+
+    if (!result.alreadyProcessed) {
       await this.notifications.notifyUser(
         customerId,
         'payment.succeeded',
@@ -637,97 +959,131 @@ export class OrdersService {
   }
 
   async deliver(executorUserId: string, orderId: string, dto: DeliverOrderDto) {
-    await this.assertExecutorOwnsOrder(orderId, executorUserId);
-    const order = await this.prisma.order.findUnique({
-      where: { id: orderId },
-      include: { serviceLine: { include: { qcChecklistTemplates: true } } },
-    });
-    if (!order) throw new NotFoundException('سفارش یافت نشد.');
-    if (order.status !== OrderStatus.in_progress) {
-      throw new BadRequestException('سفارش در وضعیت آماده تحویل نیست.');
-    }
+    return this.prisma.$transaction(
+      async (tx) => {
+        const assignment = await tx.orderAssignment.findFirst({
+          where: {
+            orderId,
+            unassignedAt: null,
+            executorProfile: { userId: executorUserId },
+          },
+        });
+        if (!assignment)
+          throw new ForbiddenException('این سفارش به شما ارجاع نشده است.');
+        const order = await tx.order.findUnique({
+          where: { id: orderId },
+          include: { serviceLine: { include: { qcChecklistTemplates: true } } },
+        });
+        if (!order) throw new NotFoundException('سفارش یافت نشد.');
+        if (order.status !== OrderStatus.in_progress) {
+          throw new BadRequestException('سفارش در وضعیت آماده تحویل نیست.');
+        }
+        const uniqueFileIds = [...new Set(dto.fileIds)];
+        const validFiles = await tx.orderFile.count({
+          where: {
+            id: { in: uniqueFileIds },
+            orderId,
+            uploadedByUserId: executorUserId,
+            scanStatus: 'clean',
+          },
+        });
+        if (!uniqueFileIds.length || validFiles !== uniqueFileIds.length) {
+          throw new BadRequestException(
+            'تحویل نیازمند حداقل یک فایل خروجی امن و متعلق به مجری است.',
+          );
+        }
 
-    await this.prisma.orderReport.create({
-      data: {
-        orderId,
-        authorUserId: executorUserId,
-        reportType: 'delivery',
-        summary: dto.summary,
-        visibleToCustomer: true,
-        status: 'published',
+        await tx.orderReport.create({
+          data: {
+            orderId,
+            authorUserId: executorUserId,
+            reportType: 'delivery',
+            summary: dto.summary,
+            visibleToCustomer: true,
+            status: 'published',
+          },
+        });
+        await tx.orderFile.updateMany({
+          where: { id: { in: uniqueFileIds }, orderId },
+          data: { fileKind: 'output' },
+        });
+        await this.transition(
+          orderId,
+          OrderStatus.submitted_for_qc,
+          OrderStatusSource.executor,
+          executorUserId,
+          'ثبت خروجی و ارسال برای کنترل کیفیت',
+          {},
+          tx,
+        );
+        await this.transition(
+          orderId,
+          OrderStatus.qc_in_review,
+          OrderStatusSource.system,
+          null,
+          'ارسال خودکار به صف QC',
+          {},
+          tx,
+        );
+
+        if (!order.serviceLine.qcChecklistTemplates.length) {
+          await tx.orderAcceptanceCriteria.updateMany({
+            where: { orderId },
+            data: { isMet: true },
+          });
+          await this.transition(
+            orderId,
+            OrderStatus.ready_for_customer_review,
+            OrderStatusSource.system,
+            null,
+            'این خدمت نیازمند QC نیست',
+            {},
+            tx,
+          );
+          const delivered = await this.transition(
+            orderId,
+            OrderStatus.delivered,
+            OrderStatusSource.system,
+            null,
+            'نمایش خروجی به مشتری',
+            { deliveredAt: new Date() },
+            tx,
+          );
+          await this.notifications.notifyUser(
+            order.customerId,
+            'order.delivered',
+            'خروجی سفارش شما آماده است',
+            `سفارش ${order.code} برای بازبینی شما آماده است.`,
+            tx,
+          );
+          return delivered;
+        }
+
+        await tx.qcReview.create({ data: { orderId } });
+        await this.notifications.notifyUser(
+          order.customerId,
+          'order.submitted_for_qc',
+          'خروجی سفارش شما در حال بررسی کیفیت است',
+          `سفارش ${order.code} برای کنترل کیفیت ارسال شد.`,
+          tx,
+        );
+        return tx.order.findUniqueOrThrow({ where: { id: orderId } });
       },
-    });
-
-    if (dto.fileIds.length) {
-      await this.assertExecutorFileIds(orderId, executorUserId, dto.fileIds);
-      await this.prisma.orderFile.updateMany({
-        where: { id: { in: dto.fileIds }, orderId },
-        data: { fileKind: 'output' },
-      });
-    }
-
-    await this.transition(
-      orderId,
-      OrderStatus.submitted_for_qc,
-      OrderStatusSource.executor,
-      executorUserId,
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
-    await this.transition(
-      orderId,
-      OrderStatus.qc_in_review,
-      OrderStatusSource.system,
-      null,
-      'ارسال خودکار به صف QC',
-    );
-
-    const requiresQc = order.serviceLine.qcChecklistTemplates.length > 0;
-
-    if (!requiresQc) {
-      // خدمت QC اختصاصی ندارد؛ مسیر خودکار تا تحویل به مشتری طی می‌شود.
-      await this.transition(
-        orderId,
-        OrderStatus.ready_for_customer_review,
-        OrderStatusSource.system,
-        null,
-        'این خدمت نیازمند QC نیست',
-      );
-      const delivered = await this.transition(
-        orderId,
-        OrderStatus.delivered,
-        OrderStatusSource.system,
-        null,
-        undefined,
-        { deliveredAt: new Date() },
-      );
-      await this.notifications.notifyUser(
-        order.customerId,
-        'order.delivered',
-        'خروجی سفارش شما آماده است',
-        `سفارش ${order.code} برای بازبینی شما آماده است.`,
-      );
-      return delivered;
-    }
-
-    // در صف QC قرار می‌گیرد؛ reviewer بعداً از پنل ادمین انتخاب می‌شود و طبق
-    // بند ۱.۵ الحاقیه نباید همان executor سفارش باشد.
-    await this.prisma.qcReview.create({ data: { orderId } });
-
-    await this.notifications.notifyUser(
-      order.customerId,
-      'order.submitted_for_qc',
-      'خروجی سفارش شما در حال بررسی کیفیت است',
-      `سفارش ${order.code} برای کنترل کیفیت ارسال شد.`,
-    );
-
-    return this.prisma.order.findUnique({ where: { id: orderId } });
   }
 
   // ---------------------------------------------------------------------
   // QC decisions (triggered from QcModule, but state transition lives here)
   // ---------------------------------------------------------------------
 
-  async applyQcApproval(orderId: string, reviewerUserId: string) {
-    const order = await this.prisma.order.findUnique({
+  async applyQcApproval(
+    orderId: string,
+    reviewerUserId: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+    const order = await client.order.findUnique({
       where: { id: orderId },
     });
     if (!order) throw new NotFoundException('سفارش یافت نشد.');
@@ -741,6 +1097,8 @@ export class OrdersService {
       OrderStatusSource.admin,
       reviewerUserId,
       'تایید کیفیت',
+      {},
+      tx,
     );
 
     const delivered = await this.transition(
@@ -750,6 +1108,7 @@ export class OrdersService {
       null,
       'نمایش خودکار خروجی به مشتری پس از تایید QC',
       { deliveredAt: new Date() },
+      tx,
     );
 
     await this.notifications.notifyUser(
@@ -757,13 +1116,19 @@ export class OrdersService {
       'order.delivered',
       'خروجی سفارش شما آماده است',
       `سفارش ${order.code} برای بازبینی شما آماده است.`,
+      tx,
     );
 
     return delivered;
   }
 
-  async applyQcRejection(orderId: string, reviewerUserId: string) {
-    const order = await this.prisma.order.findUnique({
+  async applyQcRejection(
+    orderId: string,
+    reviewerUserId: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+    const order = await client.order.findUnique({
       where: { id: orderId },
     });
     if (!order) throw new NotFoundException('سفارش یافت نشد.');
@@ -777,6 +1142,8 @@ export class OrdersService {
       OrderStatusSource.admin,
       reviewerUserId,
       'نیازمند اصلاح طبق نتیجه QC',
+      {},
+      tx,
     );
 
     const backToProgress = await this.transition(
@@ -785,9 +1152,11 @@ export class OrdersService {
       OrderStatusSource.system,
       null,
       'بازگشت خودکار برای اصلاح پس از رد QC',
+      {},
+      tx,
     );
 
-    const assignment = await this.prisma.orderAssignment.findFirst({
+    const assignment = await client.orderAssignment.findFirst({
       where: { orderId, unassignedAt: null },
       include: { executorProfile: true },
     });
@@ -797,6 +1166,7 @@ export class OrdersService {
         'order.qc_rejected',
         'خروجی نیازمند اصلاح است',
         `کنترل کیفیت سفارش ${order.code} نیاز به اصلاح دارد.`,
+        tx,
       );
     }
 
@@ -836,39 +1206,60 @@ export class OrdersService {
   // Customer post-delivery actions
   // ---------------------------------------------------------------------
 
-  async confirm(customerId: string, orderId: string) {
-    const order = await this.loadOwnedOrder(orderId, customerId);
-    if (order.status !== OrderStatus.delivered) {
-      throw new BadRequestException('سفارش هنوز تحویل داده نشده است.');
-    }
-
-    await this.transition(
-      orderId,
-      OrderStatus.confirmed,
-      OrderStatusSource.customer,
-      customerId,
-      undefined,
-      {
-        confirmedAt: new Date(),
+  async confirm(customerId: string, orderId: string, idempotencyKey: string) {
+    return this.idempotency.execute({
+      key: idempotencyKey,
+      scope: `order.confirm:${orderId}:${customerId}`,
+      request: { orderId, customerId },
+      work: async (tx) => {
+        const order = await tx.order.findFirst({
+          where: { id: orderId, customerId },
+        });
+        if (!order) throw new NotFoundException('سفارش یافت نشد.');
+        if (order.status !== OrderStatus.delivered) {
+          throw new BadRequestException('سفارش هنوز تحویل داده نشده است.');
+        }
+        await this.transition(
+          orderId,
+          OrderStatus.confirmed,
+          OrderStatusSource.customer,
+          customerId,
+          'تأیید تحویل توسط مشتری',
+          { confirmedAt: new Date() },
+          tx,
+        );
+        const settlement = await this.escrow.releaseInTransaction(
+          {
+            orderId,
+            decidedByUserId: customerId,
+            decidedByRole: UserRole.customer,
+            note: 'تأیید تحویل توسط مشتری، آزادسازی خودکار حساب امانی',
+            idempotencyKey,
+          },
+          tx,
+        );
+        const closed = await this.transition(
+          orderId,
+          OrderStatus.closed,
+          OrderStatusSource.system,
+          null,
+          'بستن خودکار پس از تأیید و تسویه',
+          { closedAt: new Date() },
+          tx,
+          {
+            type: 'escrow_release',
+            amount: settlement.executorAmount + settlement.commissionAmount,
+          },
+        );
+        await tx.outboxEvent.create({
+          data: {
+            eventType: 'order.confirmed_and_settled',
+            payload: { orderId, customerId },
+          },
+        });
+        return closed;
       },
-    );
-
-    await this.escrow.release({
-      orderId,
-      decidedByUserId: customerId,
-      note: 'تایید تحویل توسط مشتری، آزادسازی خودکار escrow',
     });
-
-    const closed = await this.transition(
-      orderId,
-      OrderStatus.closed,
-      OrderStatusSource.system,
-      null,
-      'بستن خودکار پس از تایید و تسویه',
-      { closedAt: new Date() },
-    );
-
-    return closed;
   }
 
   async requestRevision(
@@ -876,68 +1267,88 @@ export class OrdersService {
     orderId: string,
     dto: RevisionRequestDto,
   ) {
-    const order = await this.loadOwnedOrder(orderId, customerId);
-    if (order.status !== OrderStatus.delivered) {
-      throw new BadRequestException('سفارش هنوز تحویل داده نشده است.');
-    }
-    if (order.revisionsUsed >= order.revisionsAllowed) {
-      throw new BadRequestException(
-        'تعداد اصلاحات مجاز این سفارش به پایان رسیده است.',
-      );
-    }
-
-    if (dto.unmetCriteriaIds?.length) {
-      await this.prisma.orderAcceptanceCriteria.updateMany({
-        where: { id: { in: dto.unmetCriteriaIds }, orderId },
-        data: { isMet: false },
-      });
-    }
-
-    await this.prisma.orderMessage.create({
-      data: {
-        orderId,
-        senderUserId: customerId,
-        messageType: 'revision_request',
-        body: dto.reason,
-        visibility: MessageVisibility.customer_visible,
+    return this.prisma.$transaction(
+      async (tx) => {
+        const order = await tx.order.findFirst({
+          where: { id: orderId, customerId },
+        });
+        if (!order) throw new NotFoundException('سفارش یافت نشد.');
+        if (order.status !== OrderStatus.delivered) {
+          throw new BadRequestException('سفارش هنوز تحویل داده نشده است.');
+        }
+        if (order.revisionsUsed >= order.revisionsAllowed) {
+          throw new BadRequestException(
+            'تعداد اصلاحات مجاز این سفارش به پایان رسیده است.',
+          );
+        }
+        const criteriaIds = [...new Set(dto.unmetCriteriaIds ?? [])];
+        if (criteriaIds.length) {
+          const ownedCount = await tx.orderAcceptanceCriteria.count({
+            where: { id: { in: criteriaIds }, orderId },
+          });
+          if (ownedCount !== criteriaIds.length) {
+            throw new BadRequestException('معیار پذیرش نامعتبر است.');
+          }
+          await tx.orderAcceptanceCriteria.updateMany({
+            where: { id: { in: criteriaIds }, orderId },
+            data: { isMet: false },
+          });
+        }
+        await tx.orderMessage.create({
+          data: {
+            orderId,
+            senderUserId: customerId,
+            messageType: 'revision_request',
+            body: dto.reason,
+            visibility: MessageVisibility.customer_visible,
+          },
+        });
+        await this.transition(
+          orderId,
+          OrderStatus.revision_requested,
+          OrderStatusSource.customer,
+          customerId,
+          dto.reason,
+          { revisionsUsed: { increment: 1 } },
+          tx,
+        );
+        const inProgress = await this.transition(
+          orderId,
+          OrderStatus.in_progress,
+          OrderStatusSource.system,
+          null,
+          'بازگشت خودکار برای اصلاح',
+          {},
+          tx,
+        );
+        const assignment = await tx.orderAssignment.findFirst({
+          where: { orderId, unassignedAt: null },
+          include: { executorProfile: true },
+        });
+        if (assignment) {
+          await this.notifications.notifyUser(
+            assignment.executorProfile.userId,
+            'order.revision_requested',
+            'درخواست اصلاح برای سفارش',
+            `مشتری برای سفارش ${order.code} درخواست اصلاح ثبت کرد.`,
+            tx,
+          );
+        }
+        await tx.auditLog.create({
+          data: {
+            actorUserId: customerId,
+            actorRole: UserRole.customer,
+            action: 'order.revision_requested',
+            entityType: 'order',
+            entityId: orderId,
+            after: { reason: dto.reason, unmetCriteriaIds: criteriaIds },
+            sensitivity: 'sensitive',
+          },
+        });
+        return inProgress;
       },
-    });
-
-    await this.transition(
-      orderId,
-      OrderStatus.revision_requested,
-      OrderStatusSource.customer,
-      customerId,
-      dto.reason,
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
-
-    await this.prisma.order.update({
-      where: { id: orderId },
-      data: { revisionsUsed: { increment: 1 } },
-    });
-
-    const inProgress = await this.transition(
-      orderId,
-      OrderStatus.in_progress,
-      OrderStatusSource.system,
-      null,
-      'بازگشت خودکار برای اصلاح',
-    );
-
-    const assignment = await this.prisma.orderAssignment.findFirst({
-      where: { orderId, unassignedAt: null },
-      include: { executorProfile: true },
-    });
-    if (assignment) {
-      await this.notifications.notifyUser(
-        assignment.executorProfile.userId,
-        'order.revision_requested',
-        'درخواست اصلاح برای سفارش',
-        `مشتری برای سفارش ${order.code} درخواست اصلاح ثبت کرد.`,
-      );
-    }
-
-    return inProgress;
   }
 
   async raiseDispute(
@@ -946,247 +1357,356 @@ export class OrdersService {
     orderId: string,
     dto: DisputeOrderDto,
   ) {
-    const order = await this.prisma.order.findUnique({
-      where: { id: orderId },
-    });
-    if (!order) throw new NotFoundException('سفارش یافت نشد.');
-
-    if (actorRole === UserRole.customer && order.customerId !== actorUserId) {
-      throw new ForbiddenException('این سفارش متعلق به شما نیست.');
-    }
-
-    const disputableStatuses: OrderStatus[] = [
-      OrderStatus.in_progress,
-      OrderStatus.delivered,
-    ];
-    if (!disputableStatuses.includes(order.status)) {
-      throw new BadRequestException(
-        'امکان ثبت dispute در این وضعیت سفارش وجود ندارد.',
-      );
-    }
-
-    const dispute = await this.prisma.dispute.create({
-      data: {
-        orderId,
-        raisedByUserId: actorUserId,
-        reason: dto.reason,
-        note: dto.note,
+    return this.prisma.$transaction(
+      async (tx) => {
+        const order = await tx.order.findUnique({ where: { id: orderId } });
+        if (!order) throw new NotFoundException('سفارش یافت نشد.');
+        if (
+          actorRole === UserRole.customer &&
+          order.customerId !== actorUserId
+        ) {
+          throw new ForbiddenException('این سفارش متعلق به شما نیست.');
+        }
+        const disputableStatuses: OrderStatus[] = [
+          OrderStatus.in_progress,
+          OrderStatus.delivered,
+        ];
+        if (!disputableStatuses.includes(order.status)) {
+          throw new BadRequestException(
+            'امکان ثبت اختلاف در این وضعیت سفارش وجود ندارد.',
+          );
+        }
+        const existing = await tx.dispute.findFirst({
+          where: { orderId, status: DisputeStatus.open },
+        });
+        if (existing)
+          throw new ConflictException(
+            'برای این سفارش پرونده اختلاف باز وجود دارد.',
+          );
+        const dispute = await tx.dispute.create({
+          data: {
+            orderId,
+            raisedByUserId: actorUserId,
+            reason: dto.reason,
+            note: dto.note,
+          },
+        });
+        await this.transition(
+          orderId,
+          OrderStatus.disputed,
+          actorRole === UserRole.customer
+            ? OrderStatusSource.customer
+            : OrderStatusSource.admin,
+          actorUserId,
+          dto.note,
+          {},
+          tx,
+        );
+        await this.audit.record(
+          {
+            actorUserId,
+            actorRole,
+            action: 'order.dispute_raised',
+            entityType: 'order',
+            entityId: orderId,
+            after: { reason: dto.reason, disputeId: dispute.id },
+            sensitivity: 'sensitive',
+          },
+          tx,
+        );
+        await tx.outboxEvent.create({
+          data: {
+            eventType: 'order.disputed',
+            payload: { orderId, disputeId: dispute.id },
+          },
+        });
+        return dispute;
       },
-    });
-
-    await this.transition(
-      orderId,
-      OrderStatus.disputed,
-      actorRole === UserRole.customer
-        ? OrderStatusSource.customer
-        : OrderStatusSource.admin,
-      actorUserId,
-      dto.note,
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
-
-    await this.audit.record({
-      actorUserId,
-      actorRole,
-      action: 'order.dispute_raised',
-      entityType: 'order',
-      entityId: orderId,
-      after: { reason: dto.reason },
-      sensitivity: 'sensitive',
-    });
-
-    return dispute;
   }
 
   async resolveDispute(
     adminId: string,
     orderId: string,
     dto: ResolveDisputeDto,
+    idempotencyKey: string,
   ) {
-    const order = await this.prisma.order.findUnique({
-      where: { id: orderId },
-    });
-    if (!order) throw new NotFoundException('سفارش یافت نشد.');
-    if (order.status !== OrderStatus.disputed) {
-      throw new BadRequestException('سفارش در وضعیت اختلاف نیست.');
-    }
-
-    const dispute = await this.prisma.dispute.findFirst({
-      where: { orderId, status: DisputeStatus.open },
-      orderBy: { createdAt: 'desc' },
-    });
-    if (!dispute) throw new NotFoundException('پرونده dispute باز یافت نشد.');
-
-    let resultOrder: Order;
-
-    switch (dto.resolutionType) {
-      case 'rework':
-        resultOrder = await this.transition(
-          orderId,
-          OrderStatus.in_progress,
-          OrderStatusSource.admin,
-          adminId,
-          dto.note,
-        );
-        break;
-      case 'refund_full':
-        await this.escrow.refund({
-          orderId,
-          reason: 'dispute_refund_full',
-          note: dto.note,
-          decidedByUserId: adminId,
+    return this.idempotency.execute({
+      key: idempotencyKey,
+      scope: `order.resolve-dispute:${orderId}`,
+      request: dto,
+      work: async (tx) => {
+        const order = await tx.order.findUnique({ where: { id: orderId } });
+        if (!order) throw new NotFoundException('سفارش یافت نشد.');
+        if (order.status !== OrderStatus.disputed) {
+          throw new BadRequestException('سفارش در وضعیت اختلاف نیست.');
+        }
+        const dispute = await tx.dispute.findFirst({
+          where: { orderId, status: DisputeStatus.open },
+          orderBy: { createdAt: 'desc' },
         });
-        resultOrder = await this.transition(
+        if (!dispute)
+          throw new NotFoundException('پرونده اختلاف باز یافت نشد.');
+
+        let resultOrder: Order;
+        let financialAmount: number | undefined;
+        const effect = (type: string, amount?: number) => ({ type, amount });
+        switch (dto.resolutionType) {
+          case 'rework':
+            resultOrder = await this.transition(
+              orderId,
+              OrderStatus.in_progress,
+              OrderStatusSource.admin,
+              adminId,
+              dto.note,
+              {},
+              tx,
+              effect('none'),
+              true,
+            );
+            break;
+          case 'refund_full': {
+            const refund = await this.escrow.refundInTransaction(
+              {
+                orderId,
+                reason: 'dispute_refund_full',
+                note: dto.note,
+                decidedByUserId: adminId,
+                idempotencyKey,
+              },
+              tx,
+            );
+            financialAmount = refund.refund.amount;
+            resultOrder = await this.transition(
+              orderId,
+              OrderStatus.cancelled,
+              OrderStatusSource.admin,
+              adminId,
+              dto.note,
+              { cancelledAt: new Date() },
+              tx,
+              effect('escrow_refund', financialAmount),
+              true,
+            );
+            break;
+          }
+          case 'refund_partial': {
+            if (!dto.amount)
+              throw new BadRequestException(
+                'برای بازپرداخت جزئی مبلغ الزامی است.',
+              );
+            const refund = await this.escrow.refundInTransaction(
+              {
+                orderId,
+                amount: dto.amount,
+                reason: 'dispute_refund_partial',
+                note: dto.note,
+                decidedByUserId: adminId,
+                idempotencyKey,
+              },
+              tx,
+            );
+            financialAmount = refund.refund.amount;
+            resultOrder = await this.transition(
+              orderId,
+              OrderStatus.closed,
+              OrderStatusSource.admin,
+              adminId,
+              dto.note,
+              { closedAt: new Date() },
+              tx,
+              effect('escrow_refund_partial', financialAmount),
+              true,
+            );
+            break;
+          }
+          case 'release_to_executor': {
+            const release = await this.escrow.releaseInTransaction(
+              {
+                orderId,
+                decidedByUserId: adminId,
+                note: dto.note,
+                idempotencyKey,
+              },
+              tx,
+            );
+            financialAmount = release.executorAmount + release.commissionAmount;
+            resultOrder = await this.transition(
+              orderId,
+              OrderStatus.confirmed,
+              OrderStatusSource.admin,
+              adminId,
+              dto.note,
+              { confirmedAt: new Date() },
+              tx,
+              effect('escrow_release', financialAmount),
+              true,
+            );
+            resultOrder = await this.transition(
+              orderId,
+              OrderStatus.closed,
+              OrderStatusSource.system,
+              null,
+              'بستن سفارش پس از حل اختلاف',
+              { closedAt: new Date() },
+              tx,
+            );
+            break;
+          }
+          case 'close':
+          default:
+            resultOrder = await this.transition(
+              orderId,
+              OrderStatus.closed,
+              OrderStatusSource.admin,
+              adminId,
+              dto.note,
+              { closedAt: new Date() },
+              tx,
+              effect('none'),
+              true,
+            );
+            break;
+        }
+        await tx.dispute.update({
+          where: { id: dispute.id },
+          data: {
+            status: DisputeStatus.resolved,
+            resolutionType: dto.resolutionType,
+            resolvedByUserId: adminId,
+            resolvedAt: new Date(),
+            financialEffectAmount: financialAmount,
+          },
+        });
+        await this.audit.record(
+          {
+            actorUserId: adminId,
+            actorRole: UserRole.admin,
+            action: 'order.dispute_resolved',
+            entityType: 'order',
+            entityId: orderId,
+            after: {
+              resolutionType: dto.resolutionType,
+              amount: financialAmount,
+              note: dto.note,
+            },
+            sensitivity: 'critical',
+          },
+          tx,
+        );
+        await tx.outboxEvent.create({
+          data: {
+            eventType: 'order.dispute_resolved',
+            payload: {
+              orderId,
+              disputeId: dispute.id,
+              resolutionType: dto.resolutionType,
+            },
+          },
+        });
+        return resultOrder;
+      },
+    });
+  }
+
+  async cancelByAdmin(
+    adminId: string,
+    orderId: string,
+    reason: string,
+    idempotencyKey: string,
+  ) {
+    return this.idempotency.execute({
+      key: idempotencyKey,
+      scope: `order.cancel:${orderId}`,
+      request: { reason },
+      work: async (tx) => {
+        const order = await tx.order.findUnique({ where: { id: orderId } });
+        if (!order) throw new NotFoundException('سفارش یافت نشد.');
+        if (order.status === OrderStatus.disputed) {
+          throw new BadRequestException(
+            'لغو سفارش مورد اختلاف فقط از resolve-dispute مجاز است.',
+          );
+        }
+        let refundAmount: number | undefined;
+        const financialStatuses: OrderStatus[] = [
+          OrderStatus.paid,
+          OrderStatus.assigned,
+          OrderStatus.in_progress,
+        ];
+        if (financialStatuses.includes(order.status)) {
+          const escrow = await tx.escrowHold.findFirst({
+            where: {
+              orderId,
+              status: {
+                in: ['held', 'partially_released', 'partially_refunded'],
+              },
+            },
+            orderBy: { heldAt: 'desc' },
+          });
+          if (escrow) {
+            const remaining =
+              escrow.amount - escrow.releasedAmount - escrow.refundedAmount;
+            const refundPolicy = await tx.systemSetting.findUnique({
+              where: { key: 'finance.cancel_in_progress_refund_rate' },
+            });
+            const configuredRate =
+              typeof refundPolicy?.value === 'number'
+                ? refundPolicy.value
+                : DEFAULT_IN_PROGRESS_CANCEL_REFUND_RATE;
+            if (configuredRate < 0 || configuredRate > 1) {
+              throw new BadRequestException(
+                'نرخ سیاست بازپرداخت باید بین صفر و یک باشد.',
+              );
+            }
+            const rate =
+              order.status === OrderStatus.in_progress ? configuredRate : 1;
+            refundAmount = Math.min(
+              remaining,
+              Math.round(escrow.amount * rate),
+            );
+            if (refundAmount > 0) {
+              await this.escrow.refundInTransaction(
+                {
+                  orderId,
+                  amount: refundAmount,
+                  reason: 'order_cancelled',
+                  note: reason,
+                  decidedByUserId: adminId,
+                  idempotencyKey,
+                },
+                tx,
+              );
+            }
+          }
+        }
+        const cancelled = await this.transition(
           orderId,
           OrderStatus.cancelled,
           OrderStatusSource.admin,
           adminId,
-          dto.note,
+          reason,
+          { cancelledAt: new Date() },
+          tx,
+          refundAmount
+            ? { type: 'escrow_refund', amount: refundAmount }
+            : { type: 'none' },
+        );
+        await this.audit.record(
           {
-            cancelledAt: new Date(),
+            actorUserId: adminId,
+            actorRole: UserRole.admin,
+            action: 'order.cancelled',
+            entityType: 'order',
+            entityId: orderId,
+            after: { reason, refundAmount: refundAmount ?? 0 },
+            sensitivity: 'sensitive',
           },
+          tx,
         );
-        break;
-      case 'refund_partial':
-        if (!dto.amount)
-          throw new BadRequestException('برای رفاند جزئی باید مبلغ مشخص شود.');
-        await this.escrow.refund({
-          orderId,
-          amount: dto.amount,
-          reason: 'dispute_refund_partial',
-          note: dto.note,
-          decidedByUserId: adminId,
-        });
-        resultOrder = await this.transition(
-          orderId,
-          OrderStatus.closed,
-          OrderStatusSource.admin,
-          adminId,
-          dto.note,
-          {
-            closedAt: new Date(),
-          },
-        );
-        break;
-      case 'release_to_executor':
-        await this.escrow.release({
-          orderId,
-          decidedByUserId: adminId,
-          note: dto.note,
-        });
-        resultOrder = await this.transition(
-          orderId,
-          OrderStatus.confirmed,
-          OrderStatusSource.admin,
-          adminId,
-          dto.note,
-          { confirmedAt: new Date() },
-        );
-        resultOrder = await this.transition(
-          orderId,
-          OrderStatus.closed,
-          OrderStatusSource.system,
-          null,
-          undefined,
-          {
-            closedAt: new Date(),
-          },
-        );
-        break;
-      case 'close':
-      default:
-        resultOrder = await this.transition(
-          orderId,
-          OrderStatus.closed,
-          OrderStatusSource.admin,
-          adminId,
-          dto.note,
-          {
-            closedAt: new Date(),
-          },
-        );
-        break;
-    }
-
-    await this.prisma.dispute.update({
-      where: { id: dispute.id },
-      data: {
-        status: DisputeStatus.resolved,
-        resolutionType: dto.resolutionType,
-        resolvedByUserId: adminId,
-        resolvedAt: new Date(),
-        financialEffectAmount: dto.amount,
+        return cancelled;
       },
     });
-
-    await this.audit.record({
-      actorUserId: adminId,
-      actorRole: UserRole.admin,
-      action: 'order.dispute_resolved',
-      entityType: 'order',
-      entityId: orderId,
-      after: {
-        resolutionType: dto.resolutionType,
-        amount: dto.amount,
-        note: dto.note,
-      },
-      sensitivity: 'critical',
-    });
-
-    return resultOrder;
-  }
-
-  async cancelByAdmin(adminId: string, orderId: string, reason: string) {
-    const order = await this.prisma.order.findUnique({
-      where: { id: orderId },
-    });
-    if (!order) throw new NotFoundException('سفارش یافت نشد.');
-
-    const financialStatuses: OrderStatus[] = [
-      OrderStatus.paid,
-      OrderStatus.assigned,
-      OrderStatus.in_progress,
-    ];
-
-    if (financialStatuses.includes(order.status)) {
-      const escrowHold = await this.prisma.escrowHold.findFirst({
-        where: { orderId, status: { in: ['held', 'partially_released'] } },
-      });
-      if (escrowHold) {
-        const refundRate =
-          order.status === OrderStatus.in_progress
-            ? DEFAULT_IN_PROGRESS_CANCEL_REFUND_RATE
-            : 1;
-        const refundAmount = Math.round(escrowHold.amount * refundRate);
-        await this.escrow.refund({
-          orderId,
-          amount: refundAmount,
-          reason: 'order_cancelled',
-          note: reason,
-          decidedByUserId: adminId,
-        });
-      }
-    }
-
-    const cancelled = await this.transition(
-      orderId,
-      OrderStatus.cancelled,
-      OrderStatusSource.admin,
-      adminId,
-      reason,
-      { cancelledAt: new Date() },
-    );
-
-    await this.audit.record({
-      actorUserId: adminId,
-      actorRole: UserRole.admin,
-      action: 'order.cancelled',
-      entityType: 'order',
-      entityId: orderId,
-      after: { reason },
-      sensitivity: 'sensitive',
-    });
-
-    return cancelled;
   }
 
   // ---------------------------------------------------------------------

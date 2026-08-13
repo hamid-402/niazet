@@ -55,9 +55,20 @@ export class TicketsService {
     );
 
     const priority = dto.priority ?? 'normal';
+    const holidaySetting = await this.prisma.systemSetting.findUnique({
+      where: { key: 'calendar.iran_holidays' },
+    });
+    const holidays = new Set(
+      Array.isArray(holidaySetting?.value)
+        ? holidaySetting.value.filter(
+            (value): value is string => typeof value === 'string',
+          )
+        : [],
+    );
     const slaDueAt = addBusinessHours(
       new Date(),
       slaTargetHoursForPriority(priority),
+      holidays,
     );
 
     const ticket = await this.prisma.ticket.create({

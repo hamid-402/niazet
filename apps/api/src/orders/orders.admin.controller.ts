@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   Param,
   Post,
   Query,
@@ -19,6 +20,7 @@ import { buildPagination } from '../common/dto/pagination.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   AssignOrderDto,
+  ConfigureMilestonesDto,
   CancelOrderDto,
   ListOrdersQueryDto,
   OrderMessageDto,
@@ -47,6 +49,16 @@ export class OrdersAdminController {
       skip,
       take,
     });
+  }
+
+  @Post(':id/milestones')
+  @AdminScopes(AdminScope.ops_admin)
+  configureMilestones(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: ConfigureMilestonesDto,
+  ) {
+    return this.orders.configureMilestones(user.id, id, dto);
   }
 
   @Get('dashboard')
@@ -123,8 +135,9 @@ export class OrdersAdminController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
     @Body() dto: ResolveDisputeDto,
+    @Headers('idempotency-key') idempotencyKey?: string,
   ) {
-    return this.orders.resolveDispute(user.id, id, dto);
+    return this.orders.resolveDispute(user.id, id, dto, idempotencyKey ?? '');
   }
 
   @Post(':id/cancel')
@@ -133,8 +146,14 @@ export class OrdersAdminController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
     @Body() dto: CancelOrderDto,
+    @Headers('idempotency-key') idempotencyKey?: string,
   ) {
-    return this.orders.cancelByAdmin(user.id, id, dto.reason);
+    return this.orders.cancelByAdmin(
+      user.id,
+      id,
+      dto.reason,
+      idempotencyKey ?? '',
+    );
   }
 
   @Post(':id/messages')

@@ -32,7 +32,7 @@ describe('escrow balance invariants', () => {
     [0, 300, 700, EscrowStatus.partially_refunded],
     [1_000, 0, 0, EscrowStatus.released],
     [0, 1_000, 0, EscrowStatus.refunded],
-    [600, 400, 0, EscrowStatus.released],
+    [600, 400, 0, EscrowStatus.settled],
   ])(
     'maps released=%i refunded=%i remaining=%i to %s',
     (released, refunded, remaining, expected) => {

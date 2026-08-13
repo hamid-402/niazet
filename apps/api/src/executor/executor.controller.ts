@@ -15,7 +15,11 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
 import { buildPagination, PaginationDto } from '../common/dto/pagination.dto';
-import { DeliverOrderDto, ProgressReportDto } from '../orders/dto/order.dto';
+import {
+  DeliverMilestoneDto,
+  DeliverOrderDto,
+  ProgressReportDto,
+} from '../orders/dto/order.dto';
 
 @Controller('v1/executor')
 @UseGuards(RolesGuard)
@@ -76,5 +80,15 @@ export class ExecutorController {
     @Body() dto: DeliverOrderDto,
   ) {
     return this.orders.deliver(user.id, id, dto);
+  }
+
+  @Post('orders/:id/milestones/:milestoneId/deliver')
+  deliverMilestone(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Param('milestoneId') milestoneId: string,
+    @Body() dto: DeliverMilestoneDto,
+  ) {
+    return this.orders.deliverMilestone(user.id, id, milestoneId, dto);
   }
 }

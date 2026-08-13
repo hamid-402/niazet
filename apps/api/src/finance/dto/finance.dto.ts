@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsInt, IsOptional, IsString, Matches, Min } from 'class-validator';
 
 export class ReleaseEscrowDto {
   @IsOptional()
@@ -27,4 +27,28 @@ export class DecideWithdrawalDto {
   @IsOptional()
   @IsString()
   note?: string;
+}
+
+export class RequestWithdrawalDto {
+  @IsInt()
+  @Min(1)
+  amount!: number;
+
+  @IsString()
+  @Matches(/^IR\d{24}$/)
+  shabaNumber!: string;
+}
+
+export class VerifyShabaDto {
+  @IsString()
+  executorProfileId!: string;
+
+  @IsString()
+  @Matches(/^IR\d{24}$/)
+  shabaNumber!: string;
+}
+
+export class CorrectLedgerEntryDto {
+  @IsString()
+  reason!: string;
 }

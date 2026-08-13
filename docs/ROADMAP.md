@@ -80,23 +80,23 @@
 ## فاز ۲ — صحت مالی و دامنه سفارش P0/P1
 
 - [x] اصلاح `released/refunded/remaining` در Escrow و ممنوعیت جمع بیش از مبلغ Hold
-- [ ] Idempotency پایدار مبتنی بر کلید درخواست؛ حذف کلیدهای وابسته به `Date.now()`
-- [ ] Lock/Serializable transaction یا Optimistic Concurrency برای Release، Refund و Payment
-- [ ] تراکنش واحد برای تغییر وضعیت، History، Audit، Outbox و اثر مالی
-- [ ] اتمیک‌کردن Confirm، Delivery، QC، Dispute، Assignment و Reassignment
-- [ ] محدودکردن گذارهای `disputed` فقط به Use Case اختصاصی `resolve-dispute`
-- [ ] اجرای دقیق جدول ۲۰ وضعیت، Actor مجاز، Note اجباری و اثر مالی هر گذار
-- [ ] اعتبارسنجی Package متعلق به Service، فعال‌بودن Service/Package و Snapshot قرارداد سفارش
-- [ ] اعتبارسنجی مجری فعال، ظرفیت، مهارت، Team و ممنوعیت reviewer برابر executor
-- [ ] اعتبارسنجی QC checklist، Acceptance Criteria، Attachment و Revision allowance
-- [ ] پشتیبانی صحیح Milestone، پرداخت/تحویل مرحله‌ای و تایید مرحله
-- [ ] Ledger کاملاً append-only با Correction entry و ممنوعیت Update/Delete
-- [ ] Wallet و WalletTransaction فقط Projection مشتق در همان تراکنش Ledger
-- [ ] Job شبانه تطبیق Wallet/Ledger و هشدار Critical به finance_admin
-- [ ] تفکیک دقیق GMV، Revenue، Commission، Escrow و Wallet در گزارش‌ها
-- [ ] Invoice یکتا و PDF، Refund policy، Withdrawal محدود و Shaba تأییدشده
-- [ ] Timezone صریح `Asia/Tehran`، تقویم/نمایش فارسی و SLA مبتنی بر ساعات کاری و تعطیلات
-- [ ] تست هم‌زمانی، retry، replay، partial release/refund و شکست میانی تراکنش‌ها
+- [x] Idempotency پایدار مبتنی بر کلید درخواست؛ حذف کلیدهای وابسته به `Date.now()`
+- [x] Lock/Serializable transaction یا Optimistic Concurrency برای Release، Refund و Payment
+- [x] تراکنش واحد برای تغییر وضعیت، History، Audit، Outbox و اثر مالی
+- [x] اتمیک‌کردن Confirm، Delivery، QC، Dispute، Assignment و Reassignment
+- [x] محدودکردن گذارهای `disputed` فقط به Use Case اختصاصی `resolve-dispute`
+- [x] اجرای دقیق جدول ۲۰ وضعیت، Actor مجاز، Note اجباری و اثر مالی هر گذار
+- [x] اعتبارسنجی Package متعلق به Service، فعال‌بودن Service/Package و Snapshot قرارداد سفارش
+- [x] اعتبارسنجی مجری فعال، ظرفیت، مهارت، Team و ممنوعیت reviewer برابر executor
+- [x] اعتبارسنجی QC checklist، Acceptance Criteria، Attachment و Revision allowance
+- [x] پشتیبانی صحیح Milestone، پرداخت/تحویل مرحله‌ای و تایید مرحله
+- [x] Ledger کاملاً append-only با Correction entry و ممنوعیت Update/Delete
+- [x] Wallet و WalletTransaction فقط Projection مشتق در همان تراکنش Ledger
+- [x] Job شبانه تطبیق Wallet/Ledger و هشدار Critical به finance_admin
+- [x] تفکیک دقیق GMV، Revenue، Commission، Escrow و Wallet در گزارش‌ها
+- [x] Invoice یکتا و PDF، Refund policy، Withdrawal محدود و Shaba تأییدشده
+- [x] Timezone صریح `Asia/Tehran`، تقویم/نمایش فارسی و SLA مبتنی بر ساعات کاری و تعطیلات
+- [x] تست هم‌زمانی، retry، replay، partial release/refund و شکست میانی تراکنش‌ها
 
 ## فاز ۳ — معماری، قرارداد و پردازش پس‌زمینه
 

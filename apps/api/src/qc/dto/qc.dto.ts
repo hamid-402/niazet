@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  ArrayMinSize,
   IsBoolean,
   IsOptional,
   IsString,
@@ -24,9 +25,9 @@ export class SubmitQcReviewDto {
   @IsString()
   comment?: string;
 
-  @IsOptional()
   @IsArray()
+  @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => QcReviewItemDto)
-  items?: QcReviewItemDto[];
+  items!: QcReviewItemDto[];
 }

@@ -1,8 +1,9 @@
-import { OrderStatus } from '@prisma/client';
+import { OrderStatus, OrderStatusSource } from '@prisma/client';
 import {
   FINAL_ORDER_STATUSES,
   isCancellable,
   isTransitionAllowed,
+  isTransitionAllowedForSource,
 } from './order-state-machine';
 
 describe('order-state-machine', () => {
@@ -69,5 +70,29 @@ describe('order-state-machine', () => {
     expect(
       isTransitionAllowed(OrderStatus.qc_in_review, OrderStatus.delivered),
     ).toBe(false);
+  });
+
+  it('enforces the actor/source for transitions', () => {
+    expect(
+      isTransitionAllowedForSource(
+        OrderStatus.assigned,
+        OrderStatus.in_progress,
+        OrderStatusSource.executor,
+      ),
+    ).toBe(true);
+    expect(
+      isTransitionAllowedForSource(
+        OrderStatus.assigned,
+        OrderStatus.in_progress,
+        OrderStatusSource.customer,
+      ),
+    ).toBe(false);
+    expect(
+      isTransitionAllowedForSource(
+        OrderStatus.disputed,
+        OrderStatus.closed,
+        OrderStatusSource.admin,
+      ),
+    ).toBe(true);
   });
 });

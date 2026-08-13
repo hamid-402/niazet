@@ -8,6 +8,9 @@ import { WithdrawalsService } from './withdrawals.service';
 import { MockPaymentGateway } from './payment-gateway';
 import { CustomerFinanceController } from './customer-finance.controller';
 import { FinanceAdminController } from './finance.admin.controller';
+import { IdempotencyService } from './idempotency.service';
+import { FinanceReportingService } from './finance-reporting.service';
+import { FinanceReconciliationService } from './finance-reconciliation.service';
 
 @Module({
   controllers: [CustomerFinanceController, FinanceAdminController],
@@ -19,6 +22,9 @@ import { FinanceAdminController } from './finance.admin.controller';
     InvoicesService,
     WithdrawalsService,
     MockPaymentGateway,
+    IdempotencyService,
+    FinanceReportingService,
+    FinanceReconciliationService,
   ],
   exports: [
     LedgerService,
@@ -27,6 +33,7 @@ import { FinanceAdminController } from './finance.admin.controller';
     EscrowService,
     InvoicesService,
     WithdrawalsService,
+    IdempotencyService,
   ],
 })
 export class FinanceModule {}

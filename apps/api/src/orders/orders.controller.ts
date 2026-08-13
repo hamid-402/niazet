@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   Param,
   Post,
   Query,
@@ -22,6 +23,7 @@ import {
   ListOrdersQueryDto,
   OrderMessageDto,
   RevisionRequestDto,
+  PaymentIntentDto,
 } from './dto/order.dto';
 
 @Controller('v1/customer/orders')
@@ -65,8 +67,33 @@ export class OrdersController {
 
   @Post(':id/pay')
   @RateLimit({ name: 'payment-initiate', limit: 10, windowMs: 60 * 1000 })
-  pay(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
-    return this.orders.initiatePayment(user.id, id);
+  pay(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Headers('idempotency-key') idempotencyKey?: string,
+    @Body() dto: PaymentIntentDto = {},
+  ) {
+    return this.orders.initiatePayment(
+      user.id,
+      id,
+      idempotencyKey ?? '',
+      dto.milestoneId,
+    );
+  }
+
+  @Post(':id/milestones/:milestoneId/approve')
+  approveMilestone(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Param('milestoneId') milestoneId: string,
+    @Headers('idempotency-key') idempotencyKey?: string,
+  ) {
+    return this.orders.approveMilestone(
+      user.id,
+      id,
+      milestoneId,
+      idempotencyKey ?? '',
+    );
   }
 
   @Post(':id/payments/:paymentId/verify')
@@ -75,13 +102,23 @@ export class OrdersController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
     @Param('paymentId') paymentId: string,
+    @Headers('idempotency-key') idempotencyKey?: string,
   ) {
-    return this.orders.verifyPayment(user.id, id, paymentId);
+    return this.orders.verifyPayment(
+      user.id,
+      id,
+      paymentId,
+      idempotencyKey ?? '',
+    );
   }
 
   @Post(':id/confirm')
-  confirm(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
-    return this.orders.confirm(user.id, id);
+  confirm(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Headers('idempotency-key') idempotencyKey?: string,
+  ) {
+    return this.orders.confirm(user.id, id, idempotencyKey ?? '');
   }
 
   @Post(':id/revision')

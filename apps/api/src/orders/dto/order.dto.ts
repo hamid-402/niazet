@@ -1,12 +1,16 @@
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  ArrayMinSize,
+  ArrayUnique,
   IsIn,
   IsInt,
   IsObject,
   IsOptional,
   IsString,
+  MinLength,
   Min,
+  ValidateNested,
 } from 'class-validator';
 
 export class CreateOrderDto {
@@ -102,6 +106,44 @@ export class AssignOrderDto {
   note?: string;
 }
 
+export class PaymentIntentDto {
+  @IsOptional()
+  @IsString()
+  milestoneId?: string;
+}
+
+class MilestoneInputDto {
+  @IsInt()
+  @Min(1)
+  sequence!: number;
+
+  @IsString()
+  @MinLength(2)
+  title!: string;
+
+  @IsInt()
+  @Min(1)
+  amount!: number;
+
+  @IsOptional()
+  @IsString()
+  acceptanceCriteria?: string;
+}
+
+export class ConfigureMilestonesDto {
+  @IsArray()
+  @ArrayMinSize(2)
+  @ValidateNested({ each: true })
+  @Type(() => MilestoneInputDto)
+  milestones!: MilestoneInputDto[];
+}
+
+export class DeliverMilestoneDto {
+  @IsString()
+  @MinLength(3)
+  summary!: string;
+}
+
 export class ProgressReportDto {
   @IsString()
   summary!: string;
@@ -113,19 +155,25 @@ export class ProgressReportDto {
 
 export class DeliverOrderDto {
   @IsString()
+  @MinLength(3)
   summary!: string;
 
   @IsArray()
+  @ArrayMinSize(1)
+  @ArrayUnique()
   @IsString({ each: true })
   fileIds!: string[];
 }
 
 export class RevisionRequestDto {
   @IsString()
+  @MinLength(3)
   reason!: string;
 
   @IsOptional()
   @IsArray()
+  @ArrayMinSize(1)
+  @ArrayUnique()
   @IsString({ each: true })
   unmetCriteriaIds?: string[];
 }

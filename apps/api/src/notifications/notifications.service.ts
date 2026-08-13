@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { NotificationChannel } from '@prisma/client';
+import { NotificationChannel, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 /**
@@ -18,12 +18,14 @@ export class NotificationsService {
     eventType: string,
     title: string,
     body: string,
+    tx?: Prisma.TransactionClient,
   ) {
-    await this.prisma.outboxEvent.create({
+    const client = tx ?? this.prisma;
+    await client.outboxEvent.create({
       data: { eventType, payload: { userId, title, body } },
     });
 
-    await this.prisma.notificationLog.create({
+    await client.notificationLog.create({
       data: {
         userId,
         channel: NotificationChannel.in_app,

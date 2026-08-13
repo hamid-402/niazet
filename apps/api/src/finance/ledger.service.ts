@@ -19,6 +19,7 @@ export interface PostEntryInput {
   referenceId: string;
   idempotencyKey?: string;
   createdByUserId?: string | null;
+  correctionOfId?: string;
 }
 
 /**
@@ -45,8 +46,12 @@ export class LedgerService {
   }
 
   /** حساب‌های سیستمی (platform_escrow, platform_commission, payment_gateway_clearing) در seed ساخته می‌شوند. */
-  async getSystemAccount(accountType: LedgerAccountType) {
-    const account = await this.prisma.ledgerAccount.findFirst({
+  async getSystemAccount(
+    accountType: LedgerAccountType,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+    const account = await client.ledgerAccount.findFirst({
       where: { accountType, ownerUserId: null },
     });
     if (!account) {
@@ -87,6 +92,7 @@ export class LedgerService {
           referenceId: input.referenceId,
           idempotencyKey: input.idempotencyKey,
           createdByUserId: input.createdByUserId ?? null,
+          correctionOfId: input.correctionOfId,
         },
       });
 
@@ -110,6 +116,59 @@ export class LedgerService {
       return exec(tx);
     }
     return this.prisma.$transaction((trx) => exec(trx));
+  }
+
+  async postCorrection(params: {
+    originalEntryId: string;
+    reason: string;
+    createdByUserId: string;
+    idempotencyKey: string;
+  }) {
+    if (!params.idempotencyKey) {
+      throw new BadRequestException(
+        'Idempotency-Key برای اصلاح سند الزامی است.',
+      );
+    }
+    const existing = await this.prisma.ledgerEntry.findUnique({
+      where: { idempotencyKey: `ledger-correction:${params.idempotencyKey}` },
+    });
+    if (existing) return existing;
+    return this.prisma.$transaction(
+      async (tx) => {
+        const original = await tx.ledgerEntry.findUnique({
+          where: { id: params.originalEntryId },
+        });
+        if (!original) throw new NotFoundException('سند مالی اصلی یافت نشد.');
+
+        const correction = await this.postEntry(
+          {
+            debitAccountId: original.creditAccountId,
+            creditAccountId: original.debitAccountId,
+            amount: original.amount,
+            referenceType: original.referenceType,
+            referenceId: original.referenceId,
+            correctionOfId: original.id,
+            idempotencyKey: `ledger-correction:${params.idempotencyKey}`,
+            createdByUserId: params.createdByUserId,
+          },
+          tx,
+        );
+        await tx.auditLog.create({
+          data: {
+            actorUserId: params.createdByUserId,
+            actorRole: 'admin',
+            action: 'ledger.correction',
+            entityType: 'ledger_entry',
+            entityId: correction.id,
+            before: { originalEntryId: original.id },
+            after: { reason: params.reason },
+            sensitivity: 'critical',
+          },
+        });
+        return correction;
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    );
   }
 
   private async projectToWallet(
@@ -157,23 +216,24 @@ export class LedgerService {
   }
 
   /** قانون طلایی الحاقیه §۲.۶: SUM(credit) - SUM(debit) باید با wallets.balance برابر باشد. */
-  async verifyWalletConsistency(userId: string) {
-    const account = await this.prisma.ledgerAccount.findUnique({
+  async verifyWalletConsistency(userId: string, tx?: Prisma.TransactionClient) {
+    const client = tx ?? this.prisma;
+    const account = await client.ledgerAccount.findUnique({
       where: { ownerUserId: userId },
     });
     if (!account)
       return { consistent: true, ledgerBalance: 0, walletBalance: 0 };
 
     const [creditSum, debitSum, wallet] = await Promise.all([
-      this.prisma.ledgerEntry.aggregate({
+      client.ledgerEntry.aggregate({
         _sum: { amount: true },
         where: { creditAccountId: account.id },
       }),
-      this.prisma.ledgerEntry.aggregate({
+      client.ledgerEntry.aggregate({
         _sum: { amount: true },
         where: { debitAccountId: account.id },
       }),
-      this.prisma.wallet.findUnique({ where: { userId } }),
+      client.wallet.findUnique({ where: { userId } }),
     ]);
 
     const ledgerBalance =
@@ -184,6 +244,67 @@ export class LedgerService {
       consistent: ledgerBalance === walletBalance,
       ledgerBalance,
       walletBalance,
+    };
+  }
+
+  async verifyAllWallets(tx?: Prisma.TransactionClient) {
+    const client = tx ?? this.prisma;
+    const wallets = await client.wallet.findMany({
+      select: { userId: true },
+    });
+    const results = await Promise.all(
+      wallets.map((wallet) => this.verifyWalletConsistency(wallet.userId, tx)),
+    );
+    const inconsistencies = results
+      .map((result, index) => ({ userId: wallets[index].userId, ...result }))
+      .filter((result) => !result.consistent);
+
+    if (inconsistencies.length) {
+      const report = async (trx: Prisma.TransactionClient) => {
+        const financeAdmins = await trx.user.findMany({
+          where: {
+            role: 'admin',
+            status: 'active',
+            adminScope: { in: ['finance_admin', 'super_admin'] },
+          },
+          select: { id: true },
+        });
+        await trx.auditLog.create({
+          data: {
+            action: 'finance.reconciliation_failed',
+            entityType: 'wallets',
+            entityId: 'all',
+            after: inconsistencies,
+            sensitivity: 'critical',
+          },
+        });
+        await trx.outboxEvent.create({
+          data: {
+            eventType: 'finance.critical_reconciliation_alert',
+            payload: { severity: 'CRITICAL', inconsistencies },
+          },
+        });
+        if (financeAdmins.length) {
+          await trx.notificationLog.createMany({
+            data: financeAdmins.map((admin) => ({
+              userId: admin.id,
+              channel: 'in_app',
+              eventType: 'finance.critical_reconciliation_alert',
+              title: 'هشدار بحرانی مغایرت مالی',
+              body: `${inconsistencies.length} مغایرت بین Ledger و Wallet شناسایی شد.`,
+              sentAt: new Date(),
+            })),
+          });
+        }
+      };
+      if (tx) await report(tx);
+      else await this.prisma.$transaction((trx) => report(trx));
+    }
+
+    return {
+      checked: wallets.length,
+      consistent: inconsistencies.length === 0,
+      inconsistencies,
     };
   }
 

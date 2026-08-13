@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { QcResult } from '@prisma/client';
+import { Prisma, QcResult } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { OrdersService } from '../orders/orders.service';
 import { SubmitQcReviewDto } from './dto/qc.dto';
@@ -45,7 +45,8 @@ export class QcService {
       include: {
         order: {
           include: {
-            files: { where: { fileKind: 'output' } },
+            files: { where: { fileKind: 'output', scanStatus: 'clean' } },
+            acceptanceCriteria: true,
             serviceLine: {
               include: { qcChecklistTemplates: { include: { items: true } } },
             },
@@ -58,111 +59,140 @@ export class QcService {
     return review;
   }
 
-  private async assertReviewerNotExecutor(
-    orderId: string,
-    reviewerUserId: string,
-  ) {
-    const executorUserId = await this.orders.getExecutorUserIdForOrder(orderId);
-    if (executorUserId === reviewerUserId) {
-      throw new ForbiddenException('reviewer نمی‌تواند همان مجری سفارش باشد.');
-    }
+  approve(reviewId: string, reviewerUserId: string, dto: SubmitQcReviewDto) {
+    return this.decide(reviewId, reviewerUserId, dto, QcResult.passed);
   }
 
-  private async saveItems(reviewId: string, dto: SubmitQcReviewDto) {
-    if (!dto.items?.length) return;
-    await this.prisma.qcReviewItem.deleteMany({
-      where: { qcReviewId: reviewId },
-    });
-    await this.prisma.qcReviewItem.createMany({
-      data: dto.items.map((item) => ({
-        qcReviewId: reviewId,
-        checklistItemId: item.checklistItemId,
-        passed: item.passed,
-        note: item.note,
-      })),
-    });
-  }
-
-  async approve(
+  requestRework(
     reviewId: string,
     reviewerUserId: string,
     dto: SubmitQcReviewDto,
   ) {
-    const review = await this.prisma.qcReview.findUnique({
-      where: { id: reviewId },
-    });
-    if (!review) throw new NotFoundException('پرونده QC یافت نشد.');
-    if (review.result)
-      throw new BadRequestException('این پرونده قبلاً بررسی شده است.');
-
-    await this.assertReviewerNotExecutor(review.orderId, reviewerUserId);
-    await this.saveItems(reviewId, dto);
-
-    await this.prisma.qcReview.update({
-      where: { id: reviewId },
-      data: {
-        reviewerUserId,
-        result: QcResult.passed,
-        comment: dto.comment,
-        reviewedAt: new Date(),
-      },
-    });
-
-    return this.orders.applyQcApproval(review.orderId, reviewerUserId);
+    return this.decide(reviewId, reviewerUserId, dto, QcResult.needs_rework);
   }
 
-  async requestRework(
-    reviewId: string,
-    reviewerUserId: string,
-    dto: SubmitQcReviewDto,
-  ) {
-    return this.rejectInternal(
-      reviewId,
-      reviewerUserId,
-      dto,
-      QcResult.needs_rework,
-    );
+  reject(reviewId: string, reviewerUserId: string, dto: SubmitQcReviewDto) {
+    return this.decide(reviewId, reviewerUserId, dto, QcResult.rejected);
   }
 
-  async reject(
-    reviewId: string,
-    reviewerUserId: string,
-    dto: SubmitQcReviewDto,
-  ) {
-    return this.rejectInternal(
-      reviewId,
-      reviewerUserId,
-      dto,
-      QcResult.rejected,
-    );
-  }
-
-  private async rejectInternal(
+  private decide(
     reviewId: string,
     reviewerUserId: string,
     dto: SubmitQcReviewDto,
     result: QcResult,
   ) {
-    const review = await this.prisma.qcReview.findUnique({
-      where: { id: reviewId },
-    });
-    if (!review) throw new NotFoundException('پرونده QC یافت نشد.');
-    if (review.result)
-      throw new BadRequestException('این پرونده قبلاً بررسی شده است.');
+    return this.prisma.$transaction(
+      async (tx) => {
+        const review = await tx.qcReview.findUnique({
+          where: { id: reviewId },
+          include: {
+            order: {
+              include: {
+                files: { where: { fileKind: 'output', scanStatus: 'clean' } },
+                serviceLine: {
+                  include: {
+                    qcChecklistTemplates: { include: { items: true } },
+                  },
+                },
+              },
+            },
+          },
+        });
+        if (!review) throw new NotFoundException('پرونده QC یافت نشد.');
+        if (review.result)
+          throw new BadRequestException('این پرونده قبلاً بررسی شده است.');
+        if (review.order.status !== 'qc_in_review') {
+          throw new BadRequestException('سفارش در وضعیت بررسی QC نیست.');
+        }
+        if (!review.order.files.length) {
+          throw new BadRequestException(
+            'QC بدون حداقل یک خروجی امن قابل ثبت نیست.',
+          );
+        }
 
-    await this.assertReviewerNotExecutor(review.orderId, reviewerUserId);
-    await this.saveItems(reviewId, dto);
+        const executor = await tx.orderAssignment.findFirst({
+          where: { orderId: review.orderId, unassignedAt: null },
+          include: { executorProfile: true },
+        });
+        if (executor?.executorProfile.userId === reviewerUserId) {
+          throw new ForbiddenException(
+            'بازبین QC نمی‌تواند همان مجری سفارش باشد.',
+          );
+        }
 
-    await this.prisma.qcReview.update({
-      where: { id: reviewId },
-      data: {
-        reviewerUserId,
-        result,
-        comment: dto.comment,
-        reviewedAt: new Date(),
+        const expectedIds =
+          review.order.serviceLine.qcChecklistTemplates.flatMap((template) =>
+            template.items.map((item) => item.id),
+          );
+        const submittedIds = dto.items.map((item) => item.checklistItemId);
+        if (
+          new Set(submittedIds).size !== submittedIds.length ||
+          expectedIds.length !== submittedIds.length ||
+          expectedIds.some((id) => !submittedIds.includes(id))
+        ) {
+          throw new BadRequestException(
+            'تمام و فقط آیتم‌های چک‌لیست این خدمت باید ثبت شوند.',
+          );
+        }
+        if (
+          result === QcResult.passed &&
+          dto.items.some((item) => !item.passed)
+        ) {
+          throw new BadRequestException(
+            'تأیید QC نیازمند قبولی همه آیتم‌ها است.',
+          );
+        }
+        if (
+          result !== QcResult.passed &&
+          dto.items.every((item) => item.passed)
+        ) {
+          throw new BadRequestException(
+            'برای رد یا بازکاری باید حداقل یک آیتم ناموفق باشد.',
+          );
+        }
+
+        await tx.qcReviewItem.createMany({
+          data: dto.items.map((item) => ({
+            qcReviewId: reviewId,
+            checklistItemId: item.checklistItemId,
+            passed: item.passed,
+            note: item.note,
+          })),
+        });
+        const claimed = await tx.qcReview.updateMany({
+          where: { id: reviewId, result: null },
+          data: {
+            reviewerUserId,
+            result,
+            comment: dto.comment,
+            reviewedAt: new Date(),
+          },
+        });
+        if (claimed.count !== 1)
+          throw new BadRequestException('پرونده هم‌زمان بررسی شده است.');
+
+        if (result === QcResult.passed) {
+          await tx.orderAcceptanceCriteria.updateMany({
+            where: { orderId: review.orderId },
+            data: { isMet: true },
+          });
+        }
+        await tx.auditLog.create({
+          data: {
+            actorUserId: reviewerUserId,
+            actorRole: 'admin',
+            action: `qc.${result}`,
+            entityType: 'qc_review',
+            entityId: reviewId,
+            after: { orderId: review.orderId, comment: dto.comment ?? null },
+            sensitivity: 'sensitive',
+          },
+        });
+        return result === QcResult.passed
+          ? this.orders.applyQcApproval(review.orderId, reviewerUserId, tx)
+          : this.orders.applyQcRejection(review.orderId, reviewerUserId, tx);
       },
-    });
-
-    return this.orders.applyQcRejection(review.orderId, reviewerUserId);
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    );
   }
 }

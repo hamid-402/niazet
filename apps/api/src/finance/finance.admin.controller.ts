@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   Param,
   Patch,
   Post,
@@ -29,12 +30,15 @@ import {
   ReleaseEscrowDto,
   RefundEscrowDto,
   DecideWithdrawalDto,
+  VerifyShabaDto,
+  CorrectLedgerEntryDto,
 } from './dto/finance.dto';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
 import { AuditService } from '../audit/audit.service';
-import { PrismaService } from '../prisma/prisma.service';
 import { RateLimit } from '../common/decorators/rate-limit.decorator';
+import { FinanceReportingService } from './finance-reporting.service';
+import { FinanceReconciliationService } from './finance-reconciliation.service';
 
 @Controller('v1/admin/finance')
 @UseGuards(RolesGuard, AdminScopeGuard)
@@ -42,53 +46,24 @@ import { RateLimit } from '../common/decorators/rate-limit.decorator';
 @AdminScopes(AdminScope.finance_admin)
 export class FinanceAdminController {
   constructor(
-    private readonly prisma: PrismaService,
     private readonly payments: PaymentsService,
     private readonly escrow: EscrowService,
     private readonly ledger: LedgerService,
     private readonly invoices: InvoicesService,
     private readonly withdrawals: WithdrawalsService,
     private readonly audit: AuditService,
+    private readonly reporting: FinanceReportingService,
+    private readonly reconciliation: FinanceReconciliationService,
   ) {}
 
   @Get('dashboard')
-  async dashboard() {
-    const [
-      pendingRefunds,
-      activeEscrow,
-      pendingWithdrawals,
-      failedPayments,
-      monthRevenue,
-    ] = await Promise.all([
-      this.prisma.refund.count({ where: { status: 'pending' } }),
-      this.prisma.escrowHold.aggregate({
-        _sum: { amount: true },
-        _count: true,
-        where: {
-          status: { in: [EscrowStatus.held, EscrowStatus.partially_released] },
-        },
-      }),
-      this.prisma.withdrawal.count({
-        where: { status: WithdrawalStatus.pending },
-      }),
-      this.prisma.payment.count({ where: { status: PaymentStatus.failed } }),
-      this.prisma.payment.aggregate({
-        _sum: { amount: true },
-        where: {
-          status: PaymentStatus.succeeded,
-          createdAt: { gte: new Date(new Date().setDate(1)) },
-        },
-      }),
-    ]);
+  dashboard() {
+    return this.reporting.dashboard();
+  }
 
-    return {
-      pendingRefunds,
-      activeEscrowAmount: activeEscrow._sum.amount ?? 0,
-      activeEscrowCount: activeEscrow._count,
-      pendingWithdrawals,
-      failedPayments,
-      monthRevenue: monthRevenue._sum.amount ?? 0,
-    };
+  @Post('reconciliation/run')
+  runReconciliation() {
+    return this.reconciliation.runNightly(true);
   }
 
   @Get('payments')
@@ -115,23 +90,15 @@ export class FinanceAdminController {
     @Param('orderId') orderId: string,
     @Body() dto: ReleaseEscrowDto,
     @CurrentUser() user: AuthenticatedUser,
+    @Headers('idempotency-key') idempotencyKey?: string,
   ) {
-    const result = await this.escrow.release({
+    return this.escrow.release({
       orderId,
       amount: dto.amount,
       decidedByUserId: user.id,
       note: dto.note,
+      idempotencyKey: idempotencyKey ?? '',
     });
-    await this.audit.record({
-      actorUserId: user.id,
-      actorRole: user.role,
-      action: 'escrow.release',
-      entityType: 'order',
-      entityId: orderId,
-      after: { amount: dto.amount, note: dto.note },
-      sensitivity: 'critical',
-    });
-    return result;
   }
 
   @Post('escrow/:orderId/refund')
@@ -140,24 +107,16 @@ export class FinanceAdminController {
     @Param('orderId') orderId: string,
     @Body() dto: RefundEscrowDto,
     @CurrentUser() user: AuthenticatedUser,
+    @Headers('idempotency-key') idempotencyKey?: string,
   ) {
-    const result = await this.escrow.refund({
+    return this.escrow.refund({
       orderId,
       amount: dto.amount,
       reason: dto.reason,
       note: dto.note,
       decidedByUserId: user.id,
+      idempotencyKey: idempotencyKey ?? '',
     });
-    await this.audit.record({
-      actorUserId: user.id,
-      actorRole: user.role,
-      action: 'escrow.refund',
-      entityType: 'order',
-      entityId: orderId,
-      after: { amount: dto.amount, reason: dto.reason, note: dto.note },
-      sensitivity: 'critical',
-    });
-    return result;
   }
 
   @Get('ledger')
@@ -178,6 +137,21 @@ export class FinanceAdminController {
       });
     }
     return this.ledger.listEntries({ referenceId, skip, take });
+  }
+
+  @Post('ledger/:id/correction')
+  correctLedgerEntry(
+    @Param('id') id: string,
+    @Body() dto: CorrectLedgerEntryDto,
+    @CurrentUser() user: AuthenticatedUser,
+    @Headers('idempotency-key') idempotencyKey?: string,
+  ) {
+    return this.ledger.postCorrection({
+      originalEntryId: id,
+      reason: dto.reason,
+      createdByUserId: user.id,
+      idempotencyKey: idempotencyKey ?? '',
+    });
   }
 
   @Get('invoices')
@@ -201,17 +175,15 @@ export class FinanceAdminController {
     @Param('id') id: string,
     @Body() dto: DecideWithdrawalDto,
     @CurrentUser() user: AuthenticatedUser,
+    @Headers('idempotency-key') idempotencyKey?: string,
   ) {
-    const result = await this.withdrawals.decide(id, true, user.id, dto.note);
-    await this.audit.record({
-      actorUserId: user.id,
-      actorRole: user.role,
-      action: 'withdrawal.approve',
-      entityType: 'withdrawal',
-      entityId: id,
-      sensitivity: 'critical',
-    });
-    return result;
+    return this.withdrawals.decide(
+      id,
+      true,
+      user.id,
+      dto.note,
+      idempotencyKey ?? '',
+    );
   }
 
   @Patch('withdrawals/:id/reject')
@@ -224,16 +196,26 @@ export class FinanceAdminController {
     @Param('id') id: string,
     @Body() dto: DecideWithdrawalDto,
     @CurrentUser() user: AuthenticatedUser,
+    @Headers('idempotency-key') idempotencyKey?: string,
   ) {
-    const result = await this.withdrawals.decide(id, false, user.id, dto.note);
-    await this.audit.record({
-      actorUserId: user.id,
-      actorRole: user.role,
-      action: 'withdrawal.reject',
-      entityType: 'withdrawal',
-      entityId: id,
-      sensitivity: 'critical',
-    });
-    return result;
+    return this.withdrawals.decide(
+      id,
+      false,
+      user.id,
+      dto.note,
+      idempotencyKey ?? '',
+    );
+  }
+
+  @Post('withdrawals/verify-shaba')
+  verifyShaba(
+    @Body() dto: VerifyShabaDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.withdrawals.verifyShaba(
+      dto.executorProfileId,
+      dto.shabaNumber,
+      user.id,
+    );
   }
 }
