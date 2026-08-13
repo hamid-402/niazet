@@ -28,7 +28,11 @@ export class NotificationsService {
 
   async listForUser(userId: string, unreadOnly = false) {
     return this.prisma.notificationLog.findMany({
-      where: { userId, ...(unreadOnly ? { readAt: null } : {}) },
+      where: {
+        userId,
+        channel: 'in_app',
+        ...(unreadOnly ? { readAt: null } : {}),
+      },
       orderBy: { createdAt: 'desc' },
       take: 50,
     });
@@ -38,6 +42,46 @@ export class NotificationsService {
     return this.prisma.notificationLog.updateMany({
       where: { id, userId },
       data: { readAt: new Date() },
+    });
+  }
+
+  async markAllRead(userId: string) {
+    return this.prisma.notificationLog.updateMany({
+      where: { userId, channel: 'in_app', readAt: null },
+      data: { readAt: new Date() },
+    });
+  }
+
+  async getPreferences(userId: string) {
+    return this.prisma.notificationPreference.upsert({
+      where: { userId },
+      create: { userId },
+      update: {},
+      select: {
+        inAppEnabled: true,
+        emailEnabled: true,
+        smsEnabled: true,
+      },
+    });
+  }
+
+  async updatePreferences(
+    userId: string,
+    input: {
+      inAppEnabled: boolean;
+      emailEnabled: boolean;
+      smsEnabled: boolean;
+    },
+  ) {
+    return this.prisma.notificationPreference.upsert({
+      where: { userId },
+      create: { userId, ...input },
+      update: input,
+      select: {
+        inAppEnabled: true,
+        emailEnabled: true,
+        smsEnabled: true,
+      },
     });
   }
 }

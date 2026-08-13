@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { Button, Card, ErrorBanner, Field, inputClass } from '@/components/ui';
 import { roleHomePath } from '@/lib/role-paths';
+import { PasswordInput } from '@/components/password-input';
 
 export default function RegisterPage() {
   const { register, loginWithOtp } = useAuth();
@@ -87,9 +88,7 @@ export default function RegisterPage() {
               label="رمز عبور (اختیاری)"
               hint="حداقل ۱۰ کاراکتر شامل حرف بزرگ، حرف کوچک، عدد و نماد؛ یا خالی بگذارید و با OTP وارد شوید."
             >
-              <input
-                type="password"
-                className={inputClass}
+              <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="new-password"

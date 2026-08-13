@@ -123,8 +123,8 @@
 - [x] Upload/Download واقعی و امن در سفارش، پیام، تیکت، گزارش، QC و Invoice
 - [x] Timeline مشترک سفارش، Milestone، History و نمایش واضح «اقدام بعدی»
 - [x] گزارش پیشرفت، QC، تحویل، مدیریتی و پشتیبانی با Version و Visibility
-- [ ] Notification Center با unread، preference و کانال‌های in-app/email/SMS
-- [ ] ورود OTP کامل، بازیابی رمز، نمایش رمز، Autocomplete و مدیریت Sessionهای فعال
+- [x] Notification Center با unread، preference و کانال‌های in-app/email/SMS
+- [x] ورود OTP کامل، بازیابی رمز، نمایش رمز، Autocomplete و مدیریت Sessionهای فعال
 - [ ] پروفایل مشتری، اطلاعات شرکتی، آدرس فاکتور، اعلان‌ها، امنیت و حریم داده
 - [ ] کیف پول، پرداخت‌های سفارش، Escrow، Refund و Invoice PDF برای مشتری
 - [ ] شکایت، تشکر و Rating برای Order، Team، Executor، Support و QC با کد قابل ارجاع

@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
   Post,
+  Param,
   Req,
   Res,
 } from '@nestjs/common';
@@ -165,6 +167,24 @@ export class AuthController {
   @Get('me')
   me(@CurrentUser() user: AuthenticatedUser) {
     return this.sessions.loadUser(user.id);
+  }
+
+  @Get('sessions')
+  activeSessions(@CurrentUser() user: AuthenticatedUser) {
+    return this.sessions.listActive(user.id, user.sessionId);
+  }
+
+  @Delete('sessions/others')
+  revokeOtherSessions(@CurrentUser() user: AuthenticatedUser) {
+    return this.sessions.revokeOthers(user.id, user.sessionId);
+  }
+
+  @Delete('sessions/:id')
+  revokeSession(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+  ) {
+    return this.sessions.revoke(user.id, id);
   }
 
   private sessionContext(req: Request) {

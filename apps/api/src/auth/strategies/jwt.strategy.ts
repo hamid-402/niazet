@@ -29,6 +29,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: JwtPayload) {
     if (!payload.sid) return null;
-    return this.sessions.loadSessionUser(payload.sub, payload.sid);
+    return {
+      ...(await this.sessions.loadSessionUser(payload.sub, payload.sid)),
+      sessionId: payload.sid,
+    };
   }
 }

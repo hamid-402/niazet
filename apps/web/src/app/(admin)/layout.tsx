@@ -10,6 +10,7 @@ const OPS_NAV = [
   { href: '/admin/orders', label: 'مدیریت سفارش‌ها' },
   { href: '/admin/qc', label: 'کنترل کیفیت QC' },
   { href: '/admin/staff', label: 'کارمندان و مجریان' },
+  { href: '/account/security', label: 'حساب و امنیت' },
 ];
 
 const FINANCE_NAV = [
@@ -17,6 +18,7 @@ const FINANCE_NAV = [
   { href: '/admin/finance/payments', label: 'پرداخت‌ها' },
   { href: '/admin/finance/escrow', label: 'Escrow' },
   { href: '/admin/finance/ledger', label: 'Ledger' },
+  { href: '/account/security', label: 'حساب و امنیت' },
 ];
 
 const SUPER_NAV = [

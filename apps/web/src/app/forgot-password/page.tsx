@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Button, Card, ErrorBanner, Field, inputClass } from '@/components/ui';
 import { apiFetch } from '@/lib/api';
+import { PasswordInput } from '@/components/password-input';
 
 type Step = 'request' | 'reset' | 'success';
 
@@ -136,9 +137,7 @@ export default function ForgotPasswordPage() {
                 label="رمز عبور جدید"
                 hint="حداقل ۱۰ کاراکتر؛ شامل حرف کوچک، حرف بزرگ، عدد و نماد"
               >
-                <input
-                  type="password"
-                  className={inputClass}
+                <PasswordInput
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   autoComplete="new-password"
@@ -147,9 +146,7 @@ export default function ForgotPasswordPage() {
                 />
               </Field>
               <Field label="تکرار رمز عبور جدید">
-                <input
-                  type="password"
-                  className={inputClass}
+                <PasswordInput
                   value={passwordConfirmation}
                   onChange={(event) =>
                     setPasswordConfirmation(event.target.value)

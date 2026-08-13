@@ -370,6 +370,7 @@ model User {
 
   auditLogs       AuditLog[]        @relation("AuditActor")
   notifications   NotificationLog[]
+  notificationPreference NotificationPreference?
   signedUrlGrants SignedUrlGrant[]
 
   systemSettingsUpdated SystemSetting[] @relation("SettingUpdatedBy")
@@ -1269,7 +1270,7 @@ model OutboxEvent {
   sentAt         DateTime?    @map("sent_at")
 
   deliveries   OutboxDelivery[]
-  notification NotificationLog?
+  notifications NotificationLog[]
 
   @@index([status, availableAt])
   @@map("outbox_events")
@@ -1330,13 +1331,32 @@ model NotificationLog {
   readAt        DateTime?           @map("read_at")
   sentAt        DateTime?           @map("sent_at")
   createdAt     DateTime            @default(now()) @map("created_at")
-  outboxEventId String?             @unique @map("outbox_event_id")
+  outboxEventId String?             @map("outbox_event_id")
+  attemptCount  Int                 @default(0) @map("attempt_count")
+  lastError     String?             @map("last_error")
 
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   outboxEvent OutboxEvent? @relation(fields: [outboxEventId], references: [id], onDelete: SetNull)
 
   @@index([userId])
+  @@index([channel, sentAt, createdAt])
+  @@unique([outboxEventId, channel])
   @@map("notification_logs")
+}
+
+model NotificationPreference {
+  id            String  @id @default(uuid())
+  userId        String  @unique @map("user_id")
+  inAppEnabled  Boolean @default(true) @map("in_app_enabled")
+  emailEnabled  Boolean @default(false) @map("email_enabled")
+  smsEnabled    Boolean @default(false) @map("sms_enabled")
+  eventOverrides Json?  @map("event_overrides")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_preferences")
 }
 
 model IdempotencyKey {

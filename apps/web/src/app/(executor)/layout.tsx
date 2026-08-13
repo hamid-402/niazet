@@ -8,6 +8,7 @@ const NAV = [
   { href: '/executor', label: 'کارهای من' },
   { href: '/executor/orders', label: 'سفارش‌های ارجاع‌شده' },
   { href: '/executor/performance', label: 'عملکرد من' },
+  { href: '/account/security', label: 'حساب و امنیت' },
 ];
 
 export default function ExecutorLayout({ children }: { children: ReactNode }) {

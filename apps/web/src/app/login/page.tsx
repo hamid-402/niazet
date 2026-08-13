@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { Button, Card, ErrorBanner, Field, inputClass } from '@/components/ui';
 import { roleHomePath } from '@/lib/role-paths';
+import { PasswordInput } from '@/components/password-input';
 
 type LoginMode = 'password' | 'otp';
 
@@ -103,7 +104,7 @@ export default function LoginPage() {
               <input className={inputClass} value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="09xxxxxxxxx" inputMode="tel" autoComplete="tel" dir="ltr" required />
             </Field>
             <Field label="رمز عبور">
-              <input type="password" className={inputClass} value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" required />
+              <PasswordInput value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" required />
             </Field>
             <Link href="/forgot-password" className="-mt-2 text-sm font-bold text-accent hover:underline">رمز عبور را فراموش کرده‌اید؟</Link>
             {error && <ErrorBanner message={error} />}

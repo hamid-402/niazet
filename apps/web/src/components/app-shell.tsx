@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useState, type ReactNode } from 'react';
-import { useAuth } from '@/lib/auth-context';
-import { ThemeSwitcher } from './theme-switcher';
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, type ReactNode } from "react";
+import { useAuth } from "@/lib/auth-context";
+import { ThemeSwitcher } from "./theme-switcher";
+import { NotificationCenter } from "./notification-center";
 
 export interface NavItem {
   href: string;
@@ -55,11 +56,11 @@ function NavLinks({
             key={item.href}
             href={item.href}
             onClick={onNavigate}
-            aria-current={active ? 'page' : undefined}
+            aria-current={active ? "page" : undefined}
             className={`relative rounded-control px-3 py-2 text-sm font-medium transition-colors ${
               active
-                ? 'bg-accent-subtle text-accent'
-                : 'text-fg-muted hover:bg-bg-subtle hover:text-fg'
+                ? "bg-accent-subtle text-accent"
+                : "text-fg-muted hover:bg-bg-subtle hover:text-fg"
             }`}
           >
             {item.label}
@@ -85,7 +86,7 @@ export function AppShell({
 
   async function handleLogout() {
     await logout();
-    router.push('/login');
+    router.push("/login");
   }
 
   return (
@@ -161,16 +162,19 @@ export function AppShell({
       )}
 
       <div className="flex-1">
-        <header className="sticky top-0 z-sticky flex items-center justify-between border-b border-border bg-surface/90 px-4 py-3 backdrop-blur md:hidden">
+        <header className="sticky top-0 z-sticky flex items-center justify-between border-b border-border bg-surface/90 px-4 py-3 backdrop-blur md:px-8">
           <button
             onClick={() => setMobileOpen(true)}
             aria-label="باز کردن منو"
-            className="rounded-control p-1.5 text-fg-muted hover:bg-bg-subtle"
+            className="rounded-control p-1.5 text-fg-muted hover:bg-bg-subtle md:hidden"
           >
             <MenuIcon />
           </button>
-          <span className="font-bold text-fg">نیازت با ما</span>
-          <span className="text-sm text-fg-muted">{user?.fullName}</span>
+          <span className="font-bold text-fg md:hidden">نیازت با ما</span>
+          <span className="hidden text-sm font-bold text-fg md:block">
+            {title}
+          </span>
+          <NotificationCenter />
         </header>
         <main className="mx-auto max-w-6xl px-4 py-6 md:px-8 md:py-8">
           {children}

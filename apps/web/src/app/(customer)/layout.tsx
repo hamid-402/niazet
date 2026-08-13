@@ -10,6 +10,7 @@ const NAV = [
   { href: '/orders', label: 'سفارش‌ها' },
   { href: '/wallet', label: 'کیف پول و فاکتورها' },
   { href: '/tickets', label: 'تیکت‌ها' },
+  { href: '/account/security', label: 'حساب و امنیت' },
 ];
 
 export default function CustomerLayout({ children }: { children: ReactNode }) {

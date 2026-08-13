@@ -21,6 +21,7 @@
     "security:matrix": "node scripts/security-access-matrix.mjs",
     "phase2:db-integrity": "node scripts/phase2-db-integrity.mjs",
     "phase4:file-contract": "node scripts/phase4-file-contract.mjs",
+    "phase4:notification-contract": "node scripts/phase4-notification-contract.mjs",
     "prisma:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {

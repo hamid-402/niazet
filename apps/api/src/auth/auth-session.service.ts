@@ -190,6 +190,54 @@ export class AuthSessionService {
     return this.toAuthenticatedUser(session.user);
   }
 
+  async listActive(userId: string, currentSessionId?: string) {
+    const sessions = await this.prisma.session.findMany({
+      where: {
+        userId,
+        revokedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+      select: {
+        id: true,
+        userAgent: true,
+        ipAddress: true,
+        createdAt: true,
+        expiresAt: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    return sessions.map((session) => ({
+      ...session,
+      isCurrent: session.id === currentSessionId,
+    }));
+  }
+
+  async revoke(userId: string, sessionId: string) {
+    const result = await this.prisma.session.updateMany({
+      where: { id: sessionId, userId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+    if (!result.count) throw new NotFoundException('نشست فعال یافت نشد.');
+    return { message: 'نشست انتخاب‌شده باطل شد.' };
+  }
+
+  async revokeOthers(userId: string, currentSessionId?: string) {
+    if (!currentSessionId)
+      throw new UnauthorizedException('شناسه نشست فعلی معتبر نیست.');
+    const result = await this.prisma.session.updateMany({
+      where: {
+        userId,
+        id: { not: currentSessionId },
+        revokedAt: null,
+      },
+      data: { revokedAt: new Date() },
+    });
+    return {
+      message: 'تمام نشست‌های دیگر باطل شدند.',
+      revokedCount: result.count,
+    };
+  }
+
   assertLoginAllowed(user: User) {
     if (user.status === UserStatus.blocked)
       throw new ForbiddenException('حساب شما مسدود شده است.');

@@ -65,6 +65,7 @@ export function validateEnvironment(
     for (const driver of [
       'PAYMENT_GATEWAY_DRIVER',
       'SMS_DRIVER',
+      'EMAIL_DRIVER',
       'FILE_SCAN_DRIVER',
     ]) {
       if (!config[driver] || config[driver] === 'mock') {

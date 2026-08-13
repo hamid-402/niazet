@@ -15,6 +15,8 @@ import { OrdersService } from '../orders/orders.service';
 import { JobRunnerService } from './job-runner.service';
 import type { JobName, JobResult } from './job.types';
 import { OutboxWorkerService } from './outbox-worker.service';
+import { SmsService } from '../notifications/sms.service';
+import { EmailService } from '../notifications/email.service';
 
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
@@ -32,6 +34,8 @@ export class JobsService implements OnModuleInit {
     private readonly antivirus: AntivirusService,
     private readonly reporting: FinanceReportingService,
     private readonly orders: OrdersService,
+    private readonly sms: SmsService,
+    private readonly email: EmailService,
   ) {}
 
   onModuleInit() {
@@ -42,19 +46,42 @@ export class JobsService implements OnModuleInit {
         typeof payload.title === 'string' &&
         typeof payload.body === 'string'
       ) {
-        await tx.notificationLog.upsert({
-          where: { outboxEventId: event.id },
-          update: { sentAt: new Date() },
-          create: {
-            userId: payload.userId,
-            channel: NotificationChannel.in_app,
-            eventType: event.eventType,
-            title: payload.title,
-            body: payload.body,
-            sentAt: new Date(),
-            outboxEventId: event.id,
-          },
+        const preference = await tx.notificationPreference.findUnique({
+          where: { userId: payload.userId },
         });
+        const user = await tx.user.findUnique({
+          where: { id: payload.userId },
+          select: { email: true, phone: true },
+        });
+        const channels = [
+          ...(preference?.inAppEnabled !== false
+            ? [NotificationChannel.in_app]
+            : []),
+          ...(preference?.emailEnabled && user?.email
+            ? [NotificationChannel.email]
+            : []),
+          ...(preference?.smsEnabled && user?.phone
+            ? [NotificationChannel.sms]
+            : []),
+        ];
+        for (const channel of channels) {
+          await tx.notificationLog.upsert({
+            where: {
+              outboxEventId_channel: { outboxEventId: event.id, channel },
+            },
+            update: {},
+            create: {
+              userId: payload.userId,
+              channel,
+              eventType: event.eventType,
+              title: payload.title,
+              body: payload.body,
+              sentAt:
+                channel === NotificationChannel.in_app ? new Date() : null,
+              outboxEventId: event.id,
+            },
+          });
+        }
       }
     });
     this.runner.register({
@@ -87,7 +114,11 @@ export class JobsService implements OnModuleInit {
       intervalMs: MINUTE,
       run: async (now) => {
         const result = await this.outbox.processBatch(now);
-        return { processed: result.sent, details: result };
+        const dispatched = await this.dispatchNotificationChannels();
+        return {
+          processed: result.sent + dispatched,
+          details: { ...result, dispatched },
+        };
       },
     });
     this.runner.register({
@@ -106,6 +137,64 @@ export class JobsService implements OnModuleInit {
       run: (now) => this.generatePeriodicReports(now),
     });
     this.runner.start();
+  }
+
+  private async dispatchNotificationChannels() {
+    const pending = await this.prisma.notificationLog.findMany({
+      where: {
+        channel: { in: [NotificationChannel.email, NotificationChannel.sms] },
+        sentAt: null,
+        attemptCount: { lt: 5 },
+      },
+      include: { user: { select: { email: true, phone: true } } },
+      orderBy: { createdAt: 'asc' },
+      take: 50,
+    });
+    let sent = 0;
+    for (const item of pending) {
+      try {
+        if (item.channel === NotificationChannel.email && item.user.email) {
+          await this.email.send(
+            item.user.email,
+            item.title,
+            item.body,
+            item.id,
+          );
+        } else if (
+          item.channel === NotificationChannel.sms &&
+          item.user.phone
+        ) {
+          await this.sms.send(
+            item.user.phone,
+            `${item.title}\n${item.body}`,
+            item.id,
+          );
+        } else {
+          throw new Error('نشانی کانال اعلان در پروفایل موجود نیست.');
+        }
+        const updated = await this.prisma.notificationLog.updateMany({
+          where: { id: item.id, sentAt: null },
+          data: {
+            sentAt: new Date(),
+            attemptCount: { increment: 1 },
+            lastError: null,
+          },
+        });
+        sent += updated.count;
+      } catch (error) {
+        await this.prisma.notificationLog.update({
+          where: { id: item.id },
+          data: {
+            attemptCount: { increment: 1 },
+            lastError:
+              error instanceof Error
+                ? error.message.slice(0, 500)
+                : 'خطای نامشخص ارسال',
+          },
+        });
+      }
+    }
+    return sent;
   }
 
   run(name: JobName) {

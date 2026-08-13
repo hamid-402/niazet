@@ -8,15 +8,17 @@ import { ConfigService } from '@nestjs/config';
  * same interface when ready; no call-site changes should be needed.
  */
 export interface SmsProvider {
-  send(phone: string, message: string): Promise<void>;
+  send(phone: string, message: string, idempotencyKey?: string): Promise<void>;
 }
 
 @Injectable()
 export class MockSmsProvider implements SmsProvider {
   private readonly logger = new Logger('MockSmsProvider');
 
-  send(phone: string, message: string): Promise<void> {
-    this.logger.log(`[MOCK SMS] to ${phone}: ${message}`);
+  send(phone: string, message: string, idempotencyKey?: string): Promise<void> {
+    this.logger.log(
+      `[MOCK SMS] ${idempotencyKey ?? 'direct'} -> ${phone}: ${message}`,
+    );
     return Promise.resolve();
   }
 }
@@ -34,7 +36,7 @@ export class SmsService {
     void this.config.get('SMS_DRIVER');
   }
 
-  send(phone: string, message: string): Promise<void> {
-    return this.driver.send(phone, message);
+  send(phone: string, message: string, idempotencyKey?: string): Promise<void> {
+    return this.driver.send(phone, message, idempotencyKey);
   }
 }
