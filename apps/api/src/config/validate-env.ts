@@ -48,6 +48,14 @@ export function validateEnvironment(config: Record<string, unknown>) {
     if (!webUrl.startsWith('https://')) {
       throw new Error('WEB_URL must use HTTPS in production.');
     }
+    if (config.FILE_SCAN_DRIVER !== 'clamav') {
+      throw new Error('FILE_SCAN_DRIVER must be clamav in production.');
+    }
+    requireValue(config, 'CLAMAV_HOST');
+    const clamAvPort = Number(config.CLAMAV_PORT);
+    if (!Number.isInteger(clamAvPort) || clamAvPort < 1 || clamAvPort > 65535) {
+      throw new Error('CLAMAV_PORT must be a valid TCP port.');
+    }
   }
 
   return config;

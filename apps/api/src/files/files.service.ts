@@ -6,7 +6,14 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { AdminScope, FileKind, FileScanStatus, UserRole } from '@prisma/client';
+import {
+  AdminScope,
+  AuditSensitivity,
+  FileKind,
+  FileScanStatus,
+  type OrderFile,
+  UserRole,
+} from '@prisma/client';
 import { createHash, randomUUID } from 'crypto';
 import {
   existsSync,
@@ -20,6 +27,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
 import { matchesDeclaredMime } from './file-signature';
 import { AuditService } from '../audit/audit.service';
+import { AntivirusService, type ScanResult } from './antivirus.service';
 
 export const UPLOAD_ROOT = join(process.cwd(), 'storage', 'uploads');
 export const QUARANTINE_ROOT = join(process.cwd(), 'storage', 'quarantine');
@@ -77,6 +85,7 @@ export class FilesService {
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly audit: AuditService,
+    private readonly antivirus: AntivirusService,
   ) {
     if (!existsSync(UPLOAD_ROOT)) {
       mkdirSync(UPLOAD_ROOT, { recursive: true });
@@ -168,32 +177,60 @@ export class FilesService {
     const quarantinePath = join(QUARANTINE_ROOT, storageKey);
     writeFileSync(quarantinePath, params.file.buffer, { flag: 'wx' });
 
-    const scanDriver = this.config.get<string>('FILE_SCAN_DRIVER') ?? 'mock';
+    let scanResult: ScanResult;
+    try {
+      scanResult = await this.antivirus.scan(params.file.buffer);
+    } catch (error) {
+      if (existsSync(quarantinePath)) unlinkSync(quarantinePath);
+      throw error;
+    }
     const scanStatus =
-      scanDriver === 'mock' ? FileScanStatus.clean : FileScanStatus.pending;
-    if (scanStatus === FileScanStatus.clean) {
+      scanResult.status === 'clean'
+        ? FileScanStatus.clean
+        : FileScanStatus.infected;
+    if (scanResult.status === 'clean') {
       renameSync(quarantinePath, join(UPLOAD_ROOT, storageKey));
     }
 
+    const fileData = {
+      orderId: params.orderId,
+      uploadedByUserId: params.uploadedByUserId,
+      fileKind: params.fileKind,
+      storageKey,
+      originalName: [...basename(params.file.originalname)]
+        .filter((character) => {
+          const codePoint = character.codePointAt(0) ?? 0;
+          return codePoint >= 32 && codePoint !== 127;
+        })
+        .join(''),
+      mimeType: params.file.mimetype,
+      sizeBytes: params.file.size,
+      checksum,
+      scanStatus,
+    };
+
+    let file: OrderFile;
     try {
-      return await this.prisma.orderFile.create({
-        data: {
-          orderId: params.orderId,
-          uploadedByUserId: params.uploadedByUserId,
-          fileKind: params.fileKind,
-          storageKey,
-          originalName: [...basename(params.file.originalname)]
-            .filter((character) => {
-              const codePoint = character.codePointAt(0) ?? 0;
-              return codePoint >= 32 && codePoint !== 127;
+      file =
+        scanResult.status === 'infected'
+          ? await this.prisma.$transaction(async (tx) => {
+              const infectedFile = await tx.orderFile.create({
+                data: fileData,
+              });
+              await tx.auditLog.create({
+                data: {
+                  actorUserId: params.uploadedByUserId,
+                  actorRole: uploader.role,
+                  action: 'file.malware_detected',
+                  entityType: 'order_file',
+                  entityId: infectedFile.id,
+                  sensitivity: AuditSensitivity.critical,
+                  after: { signature: scanResult.signature, storageKey },
+                },
+              });
+              return infectedFile;
             })
-            .join(''),
-          mimeType: params.file.mimetype,
-          sizeBytes: params.file.size,
-          checksum,
-          scanStatus,
-        },
-      });
+          : await this.prisma.orderFile.create({ data: fileData });
     } catch (error) {
       const storedPath =
         scanStatus === FileScanStatus.clean
@@ -202,6 +239,11 @@ export class FilesService {
       if (existsSync(storedPath)) unlinkSync(storedPath);
       throw error;
     }
+
+    if (scanResult.status === 'infected') {
+      throw new BadRequestException('فایل به‌دلیل محتوای ناامن پذیرفته نشد.');
+    }
+    return file;
   }
 
   private async assertCanAccess(fileId: string, user: AuthenticatedUser) {

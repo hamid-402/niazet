@@ -65,7 +65,7 @@
 - [x] کنترل مالکیت سفارش، فایل، گزارش، Invoice و Signed URL بر اساس role/scope/assignment
 - [x] Rate limit مجزا برای Login، OTP request/verify، Refresh، Upload، Signed URL، Payment،
   Refund، Escrow و عملیات مدیریتی حساس
-- [ ] محدودیت حجم Upload پیش از Buffer، whitelist پسوند، تشخیص Magic Bytes/MIME، نام UUID،
+- [x] محدودیت حجم Upload پیش از Buffer، whitelist پسوند، تشخیص Magic Bytes/MIME، نام UUID،
   Quarantine، اسکن آنتی‌ویروس و جلوگیری از Path Traversal
 - [x] حذف فایل orphan و فایل ردشده با Job قابل تکرار، قفل هم‌زمانی و Audit نتیجه
 - [x] اعتبارسنجی Startup برای Secretها، CORS، محیط، Storage، Payment و SMS
