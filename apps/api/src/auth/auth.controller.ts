@@ -14,6 +14,10 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RequestOtpDto, VerifyOtpDto } from './dto/otp.dto';
+import {
+  RequestPasswordResetDto,
+  ResetPasswordDto,
+} from './dto/password-reset.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
@@ -107,6 +111,41 @@ export class AuthController {
     );
     this.setRefreshCookie(res, result.refreshToken);
     return { accessToken: result.accessToken };
+  }
+
+  @Public()
+  @Post('password/forgot')
+  @HttpCode(HttpStatus.OK)
+  @RateLimit({
+    name: 'auth-password-forgot',
+    limit: 3,
+    windowMs: 60 * 60 * 1000,
+    identifierBodyField: 'phone',
+  })
+  forgotPassword(@Body() dto: RequestPasswordResetDto) {
+    return this.authService.requestPasswordReset(dto.phone);
+  }
+
+  @Public()
+  @Post('password/reset')
+  @HttpCode(HttpStatus.OK)
+  @RateLimit({
+    name: 'auth-password-reset',
+    limit: 5,
+    windowMs: 15 * 60 * 1000,
+    identifierBodyField: 'phone',
+  })
+  async resetPassword(
+    @Body() dto: ResetPasswordDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.resetPassword(
+      dto,
+      this.sessionContext(req),
+    );
+    res.clearCookie('niazat_refresh', { path: '/v1/auth' });
+    return result;
   }
 
   @Post('logout')

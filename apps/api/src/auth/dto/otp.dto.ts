@@ -1,6 +1,6 @@
 import { IsIn, IsOptional, IsString, Matches } from 'class-validator';
 
-export type OtpPurpose = 'register' | 'login';
+export type OtpPurpose = 'register' | 'login' | 'password_reset';
 
 export class RequestOtpDto {
   @IsString()

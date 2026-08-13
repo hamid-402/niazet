@@ -60,6 +60,13 @@ export default function LoginPage() {
             />
           </Field>
 
+          <Link
+            href="/forgot-password"
+            className="-mt-2 text-sm font-bold text-accent hover:underline"
+          >
+            رمز عبور را فراموش کرده‌اید؟
+          </Link>
+
           {error && <ErrorBanner message={error} />}
 
           <Button type="submit" disabled={loading} className="w-full">

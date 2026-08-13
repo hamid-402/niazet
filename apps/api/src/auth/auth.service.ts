@@ -11,6 +11,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import {
+  AuditSensitivity,
   LedgerAccountType,
   Prisma,
   User,
@@ -24,6 +25,7 @@ import { SmsService } from '../notifications/sms.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { RequestOtpDto, VerifyOtpDto } from './dto/otp.dto';
+import { ResetPasswordDto } from './dto/password-reset.dto';
 import { AuthenticatedUser } from '../common/types/authenticated-user';
 import {
   createRefreshToken,
@@ -103,7 +105,10 @@ export class AuthService {
       where: { phone: dto.phone },
     });
 
-    if (dto.purpose === 'login' && !existingUser) {
+    if (
+      (dto.purpose === 'login' || dto.purpose === 'password_reset') &&
+      (!existingUser || existingUser.status === UserStatus.pending_verification)
+    ) {
       // پاسخ یکسان مانع تشخیص وجود یا عدم وجود حساب با شماره موبایل می‌شود.
       return {
         message: 'اگر حساب فعالی وجود داشته باشد، کد تایید ارسال می‌شود.',
@@ -143,36 +148,7 @@ export class AuthService {
   }
 
   async verifyOtp(dto: VerifyOtpDto, context: SessionContext = {}) {
-    const otp = await this.prisma.otpCode.findFirst({
-      where: { identifier: dto.phone, purpose: dto.purpose, consumedAt: null },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    if (!otp) {
-      throw new BadRequestException(
-        'کد تاییدی برای این شماره یافت نشد. دوباره درخواست دهید.',
-      );
-    }
-
-    if (otp.expiresAt.getTime() < Date.now()) {
-      throw new BadRequestException('کد تایید منقضی شده است.');
-    }
-
-    if (otp.attempts >= OTP_MAX_ATTEMPTS) {
-      throw new BadRequestException(
-        'تعداد تلاش مجاز برای این کد به پایان رسیده است.',
-      );
-    }
-
-    const isValid = await bcrypt.compare(dto.code, otp.codeHash);
-
-    if (!isValid) {
-      await this.prisma.otpCode.update({
-        where: { id: otp.id },
-        data: { attempts: { increment: 1 } },
-      });
-      throw new BadRequestException('کد تایید نادرست است.');
-    }
+    const otp = await this.findValidOtp(dto.phone, dto.purpose, dto.code);
 
     const consumed = await this.prisma.otpCode.updateMany({
       where: { id: otp.id, consumedAt: null },
@@ -208,6 +184,114 @@ export class AuthService {
     this.assertLoginAllowed(user);
 
     return this.issueSessionTokens(user, context);
+  }
+
+  async requestPasswordReset(phone: string) {
+    const result = await this.requestOtp({
+      phone,
+      purpose: 'password_reset',
+    });
+    return {
+      message: 'اگر حساب فعالی وجود داشته باشد، کد بازیابی ارسال می‌شود.',
+      expiresInSeconds: result.expiresInSeconds,
+      ...('devOtp' in result ? { devOtp: result.devOtp } : {}),
+    };
+  }
+
+  async resetPassword(dto: ResetPasswordDto, context: SessionContext = {}) {
+    const otp = await this.findValidOtp(dto.phone, 'password_reset', dto.code);
+    if (!otp.userId) {
+      throw new BadRequestException('کد بازیابی معتبر نیست.');
+    }
+
+    const passwordHash = await bcrypt.hash(dto.password, 12);
+    const now = new Date();
+
+    await this.prisma.$transaction(async (tx) => {
+      const consumed = await tx.otpCode.updateMany({
+        where: { id: otp.id, consumedAt: null },
+        data: { consumedAt: now },
+      });
+      if (consumed.count !== 1) {
+        throw new BadRequestException('این کد بازیابی قبلاً استفاده شده است.');
+      }
+
+      const user = await tx.user.findUnique({ where: { id: otp.userId! } });
+      if (!user || user.phone !== dto.phone) {
+        throw new BadRequestException('کد بازیابی معتبر نیست.');
+      }
+
+      await tx.user.update({
+        where: { id: user.id },
+        data: { passwordHash },
+      });
+      await tx.session.updateMany({
+        where: { userId: user.id, revokedAt: null },
+        data: { revokedAt: now },
+      });
+      await tx.otpCode.updateMany({
+        where: {
+          userId: user.id,
+          consumedAt: null,
+        },
+        data: { consumedAt: now },
+      });
+      await tx.auditLog.create({
+        data: {
+          actorUserId: user.id,
+          actorRole: user.role,
+          action: 'auth.password_reset',
+          entityType: 'user',
+          entityId: user.id,
+          sensitivity: AuditSensitivity.critical,
+          ipAddress: context.ipAddress,
+          after: { sessionsRevoked: true, userAgent: context.userAgent },
+        },
+      });
+    });
+
+    return {
+      message: 'رمز عبور تغییر کرد. اکنون با رمز جدید وارد شوید.',
+    };
+  }
+
+  private async findValidOtp(
+    identifier: string,
+    purpose: string,
+    code: string,
+  ) {
+    const otp = await this.prisma.otpCode.findFirst({
+      where: { identifier, purpose, consumedAt: null },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!otp) {
+      throw new BadRequestException(
+        'کد تاییدی برای این شماره یافت نشد. دوباره درخواست دهید.',
+      );
+    }
+
+    if (otp.expiresAt.getTime() < Date.now()) {
+      throw new BadRequestException('کد تایید منقضی شده است.');
+    }
+
+    if (otp.attempts >= OTP_MAX_ATTEMPTS) {
+      throw new BadRequestException(
+        'تعداد تلاش مجاز برای این کد به پایان رسیده است.',
+      );
+    }
+
+    const isValid = await bcrypt.compare(code, otp.codeHash);
+
+    if (!isValid) {
+      await this.prisma.otpCode.update({
+        where: { id: otp.id },
+        data: { attempts: { increment: 1 } },
+      });
+      throw new BadRequestException('کد تایید نادرست است.');
+    }
+
+    return otp;
   }
 
   // ---------------------------------------------------------------------
@@ -399,7 +483,7 @@ export class AuthService {
     }
 
     return {
-      accessToken: await this.signAccessToken(result.user),
+      accessToken: await this.signAccessToken(result.user, next.sessionId),
       refreshToken: next.token,
     };
   }
@@ -450,7 +534,6 @@ export class AuthService {
   }
 
   private async issueSessionTokens(user: User, context: SessionContext = {}) {
-    const accessToken = await this.signAccessToken(user);
     const refresh = createRefreshToken();
     const familyId = randomUUID();
 
@@ -465,6 +548,7 @@ export class AuthService {
         expiresAt: this.refreshExpiry(),
       },
     });
+    const accessToken = await this.signAccessToken(user, refresh.sessionId);
 
     return {
       accessToken,
@@ -478,9 +562,14 @@ export class AuthService {
     return new Date(Date.now() + ttlDays * 24 * 60 * 60 * 1000);
   }
 
-  private async signAccessToken(user: User) {
+  private async signAccessToken(user: User, sessionId: string) {
     return this.jwt.signAsync(
-      { sub: user.id, role: user.role, adminScope: user.adminScope },
+      {
+        sub: user.id,
+        sid: sessionId,
+        role: user.role,
+        adminScope: user.adminScope,
+      },
       {
         secret: this.config.get('JWT_ACCESS_SECRET'),
         audience: 'niazat-api',
@@ -509,6 +598,36 @@ export class AuthService {
       fullName: user.fullName,
       phone: user.phone,
       email: user.email,
+    };
+  }
+
+  async loadAuthenticatedSessionUser(
+    userId: string,
+    sessionId: string,
+  ): Promise<AuthenticatedUser> {
+    const session = await this.prisma.session.findFirst({
+      where: {
+        id: sessionId,
+        userId,
+        revokedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+      include: { user: { include: { capabilities: true } } },
+    });
+
+    if (!session) {
+      throw new UnauthorizedException('نشست معتبر نیست. دوباره وارد شوید.');
+    }
+    this.assertLoginAllowed(session.user);
+
+    return {
+      id: session.user.id,
+      role: session.user.role,
+      adminScope: session.user.adminScope,
+      capabilities: session.user.capabilities.map((c) => c.capability),
+      fullName: session.user.fullName,
+      phone: session.user.phone,
+      email: session.user.email,
     };
   }
 }

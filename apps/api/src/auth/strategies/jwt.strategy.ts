@@ -6,6 +6,7 @@ import { AuthService } from '../auth.service';
 
 interface JwtPayload {
   sub: string;
+  sid: string;
   role: string;
   adminScope: string | null;
 }
@@ -27,6 +28,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload) {
-    return this.authService.loadAuthenticatedUser(payload.sub);
+    if (!payload.sid) return null;
+    return this.authService.loadAuthenticatedSessionUser(
+      payload.sub,
+      payload.sid,
+    );
   }
 }
