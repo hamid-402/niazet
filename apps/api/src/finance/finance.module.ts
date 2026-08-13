@@ -11,6 +11,7 @@ import { FinanceAdminController } from './finance.admin.controller';
 import { IdempotencyService } from './idempotency.service';
 import { FinanceReportingService } from './finance-reporting.service';
 import { FinanceReconciliationService } from './finance-reconciliation.service';
+import { CustomerFinanceOverviewService } from './customer-finance-overview.service';
 
 @Module({
   controllers: [CustomerFinanceController, FinanceAdminController],
@@ -25,6 +26,7 @@ import { FinanceReconciliationService } from './finance-reconciliation.service';
     IdempotencyService,
     FinanceReportingService,
     FinanceReconciliationService,
+    CustomerFinanceOverviewService,
   ],
   exports: [
     LedgerService,

@@ -17,6 +17,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
 import { WithdrawalsService } from './withdrawals.service';
 import { RequestWithdrawalDto } from './dto/finance.dto';
+import { CustomerFinanceOverviewService } from './customer-finance-overview.service';
 
 @Controller('v1/customer')
 @UseGuards(RolesGuard)
@@ -25,7 +26,14 @@ export class CustomerFinanceController {
     private readonly wallet: WalletService,
     private readonly invoices: InvoicesService,
     private readonly withdrawals: WithdrawalsService,
+    private readonly overview: CustomerFinanceOverviewService,
   ) {}
+
+  @Get('finance/overview')
+  @Roles(UserRole.customer)
+  financeOverview(@CurrentUser() user: AuthenticatedUser) {
+    return this.overview.get(user.id);
+  }
 
   // کیف پول برای مشتری و مجری هر دو معنا دارد (مشتری: اعتبار/رفاند، مجری: تسویه).
   @Get('wallet')

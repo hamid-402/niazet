@@ -126,7 +126,7 @@
 - [x] Notification Center با unread، preference و کانال‌های in-app/email/SMS
 - [x] ورود OTP کامل، بازیابی رمز، نمایش رمز، Autocomplete و مدیریت Sessionهای فعال
 - [x] پروفایل مشتری، اطلاعات شرکتی، آدرس فاکتور، اعلان‌ها، امنیت و حریم داده
-- [ ] کیف پول، پرداخت‌های سفارش، Escrow، Refund و Invoice PDF برای مشتری
+- [x] کیف پول، پرداخت‌های سفارش، Escrow، Refund و Invoice PDF برای مشتری
 - [ ] شکایت، تشکر و Rating برای Order، Team، Executor، Support و QC با کد قابل ارجاع
 - [ ] پنل مجری: پذیرش کار، ورودی‌ها، معیار پذیرش، Checklist، Progress، Delivery و QC Rework
 - [ ] پنل پشتیبان: داشبورد، صف، My Tickets، SLA، Internal Note، Canned Reply و Performance
