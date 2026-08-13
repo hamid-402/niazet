@@ -110,6 +110,7 @@ export class TicketsService {
       include: {
         messages: {
           where: { visibility: MessageVisibility.customer_visible },
+          include: { attachment: true },
           orderBy: { createdAt: 'asc' },
         },
         order: { select: { code: true, title: true } },
@@ -189,7 +190,10 @@ export class TicketsService {
     const ticket = await this.prisma.ticket.findUnique({
       where: { id },
       include: {
-        messages: { orderBy: { createdAt: 'asc' } },
+        messages: {
+          include: { attachment: true },
+          orderBy: { createdAt: 'asc' },
+        },
         escalations: true,
         order: { select: { code: true, title: true, publicHandlers: true } },
         customer: { select: { fullName: true, phone: true } },

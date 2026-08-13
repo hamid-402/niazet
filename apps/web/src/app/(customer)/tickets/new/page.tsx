@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { Suspense, useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { apiFetch, ApiError } from '@/lib/api';
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { apiFetch, ApiError } from "@/lib/api";
 import {
   Button,
   Card,
@@ -10,57 +10,61 @@ import {
   Field,
   inputClass,
   SectionTitle,
-} from '@/components/ui';
-import type { OrderSummary } from '@/lib/types';
+} from "@/components/ui";
+import type { OrderSummary } from "@/lib/types";
+import type { OrderFile } from "@/lib/types";
+import { SecureFileUpload } from "@/components/secure-file";
 
 const CATEGORIES: { value: string; label: string }[] = [
-  { value: 'payment', label: 'مشکل پرداخت' },
-  { value: 'quality', label: 'مشکل کیفیت' },
-  { value: 'delay', label: 'تأخیر' },
-  { value: 'file', label: 'فایل یا دانلود' },
-  { value: 'report', label: 'سوال درباره گزارش' },
-  { value: 'complaint', label: 'شکایت از مسئول یا تیم' },
-  { value: 'compliment', label: 'تشکر از مسئول یا تیم' },
-  { value: 'support', label: 'درخواست توضیح بیشتر' },
-  { value: 'other', label: 'سایر' },
+  { value: "payment", label: "مشکل پرداخت" },
+  { value: "quality", label: "مشکل کیفیت" },
+  { value: "delay", label: "تأخیر" },
+  { value: "file", label: "فایل یا دانلود" },
+  { value: "report", label: "سوال درباره گزارش" },
+  { value: "complaint", label: "شکایت از مسئول یا تیم" },
+  { value: "compliment", label: "تشکر از مسئول یا تیم" },
+  { value: "support", label: "درخواست توضیح بیشتر" },
+  { value: "other", label: "سایر" },
 ];
 
 function NewTicketForm() {
   const router = useRouter();
   const params = useSearchParams();
   const [orders, setOrders] = useState<OrderSummary[]>([]);
-  const [orderId, setOrderId] = useState(params.get('orderId') ?? '');
-  const [category, setCategory] = useState('support');
-  const [subject, setSubject] = useState('');
-  const [message, setMessage] = useState('');
-  const [priority, setPriority] = useState('normal');
-  const [error, setError] = useState('');
+  const [orderId, setOrderId] = useState(params.get("orderId") ?? "");
+  const [category, setCategory] = useState("support");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  const [priority, setPriority] = useState("normal");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [attachment, setAttachment] = useState<OrderFile | null>(null);
 
   useEffect(() => {
-    apiFetch<OrderSummary[]>('/customer/orders')
+    apiFetch<OrderSummary[]>("/customer/orders")
       .then(setOrders)
       .catch(() => undefined);
   }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
     try {
-      const ticket = await apiFetch<{ id: string }>('/customer/tickets', {
-        method: 'POST',
+      const ticket = await apiFetch<{ id: string }>("/customer/tickets", {
+        method: "POST",
         body: {
           orderId: orderId || undefined,
           category,
           subject,
           message,
           priority,
+          attachmentFileId: attachment?.id,
         },
       });
       router.push(`/tickets/${ticket.id}`);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'خطا در ثبت تیکت');
+      setError(err instanceof ApiError ? err.message : "خطا در ثبت تیکت");
     } finally {
       setLoading(false);
     }
@@ -89,7 +93,10 @@ function NewTicketForm() {
               <select
                 className={inputClass}
                 value={orderId}
-                onChange={(e) => setOrderId(e.target.value)}
+                onChange={(e) => {
+                  setOrderId(e.target.value);
+                  setAttachment(null);
+                }}
               >
                 <option value="">بدون سفارش مرتبط</option>
                 {orders.map((o) => (
@@ -130,12 +137,34 @@ function NewTicketForm() {
               />
             </Field>
           </div>
+          <div className="mt-4">
+            {orderId ? (
+              <>
+                <SecureFileUpload
+                  orderId={orderId}
+                  fileKind="ticket_attachment"
+                  label={attachment ? "تغییر پیوست تیکت" : "افزودن پیوست تیکت"}
+                  disabled={loading}
+                  onUploaded={setAttachment}
+                />
+                {attachment && (
+                  <p className="mt-2 text-xs text-emerald-700">
+                    پیوست آماده است: {attachment.originalName}
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="text-xs text-fg-muted">
+                برای افزودن پیوست، ابتدا سفارش مرتبط را انتخاب کنید.
+              </p>
+            )}
+          </div>
         </Card>
 
         {error && <ErrorBanner message={error} />}
 
         <Button type="submit" disabled={loading}>
-          {loading ? 'در حال ارسال...' : 'ثبت تیکت'}
+          {loading ? "در حال ارسال..." : "ثبت تیکت"}
         </Button>
       </form>
     </div>

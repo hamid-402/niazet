@@ -799,6 +799,7 @@ model OrderFile {
 
   reports         OrderReport[]
   messages        OrderMessage[]
+  ticketMessages  TicketMessage[]
   signedUrlGrants SignedUrlGrant[]
 
   @@index([scanStatus, purgedAt, createdAt])
@@ -965,7 +966,9 @@ model TicketMessage {
 
   ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   sender User   @relation("TicketMessageSender", fields: [senderUserId], references: [id])
+  attachment OrderFile? @relation(fields: [attachmentFileId], references: [id], onDelete: SetNull)
 
+  @@index([attachmentFileId])
   @@map("ticket_messages")
 }
 

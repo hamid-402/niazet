@@ -12,8 +12,10 @@ import {
   PageLoading,
   SectionTitle,
 } from "@/components/ui";
+import { SecureFileLink, SecureFileUpload } from "@/components/secure-file";
 import type {
   OrderDetail,
+  OrderFile,
   OrderSummary,
   ServiceFormField,
   ServiceLine,
@@ -278,6 +280,8 @@ function NewOrderForm() {
   const [reviewing, setReviewing] = useState(false);
   const [ready, setReady] = useState(false);
   const [resumedDraft, setResumedDraft] = useState(false);
+  const [draftId, setDraftId] = useState<string | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<OrderFile[]>([]);
   const [error, setError] = useState("");
   const [saveState, setSaveState] = useState<
     "idle" | "saving" | "saved" | "error"
@@ -317,6 +321,7 @@ function NewOrderForm() {
             draft.serviceLine.id === preselectedServiceId;
           if (canResume) {
             draftIdRef.current = draft.id;
+            setDraftId(draft.id);
             versionRef.current = draft.version ?? 0;
             setServiceId(draft.serviceLine.id);
             setPackageId(draft.packageId ?? "");
@@ -332,6 +337,7 @@ function NewOrderForm() {
                 .join("\n") ?? "",
             );
             setFormResponses(answersFromSnapshot(draft.formResponses));
+            setUploadedFiles(draft.files ?? []);
             setSaveState("saved");
             setResumedDraft(true);
           }
@@ -378,6 +384,7 @@ function NewOrderForm() {
           idempotencyKey: createKeyRef.current,
         });
         draftIdRef.current = created.id;
+        setDraftId(created.id);
         versionRef.current = created.version;
         return created;
       }
@@ -586,6 +593,8 @@ function NewOrderForm() {
                     setPackageId("");
                     setFormResponses({});
                     setResumedDraft(false);
+                    setDraftId(null);
+                    setUploadedFiles([]);
                     draftIdRef.current = null;
                     versionRef.current = 0;
                     createKeyRef.current = null;
@@ -693,6 +702,36 @@ function NewOrderForm() {
               </div>
             </Card>
           )}
+          <Card>
+            <h2 className="mb-1 text-base font-extrabold text-fg">
+              فایل‌های ورودی
+            </h2>
+            <p className="mb-4 text-sm text-fg-muted">
+              نمونه، بریف، داده یا هر فایل لازم برای اجرای سفارش را از مسیر امن
+              اضافه کنید.
+            </p>
+            {draftId ? (
+              <SecureFileUpload
+                orderId={draftId}
+                fileKind="input"
+                label="آپلود فایل ورودی"
+                onUploaded={(file) =>
+                  setUploadedFiles((current) => [...current, file])
+                }
+              />
+            ) : (
+              <p className="text-sm text-fg-muted">
+                پس از انتخاب خدمت و ذخیره خودکار پیش‌نویس، آپلود فعال می‌شود.
+              </p>
+            )}
+            {uploadedFiles.length > 0 && (
+              <div className="mt-4 space-y-2">
+                {uploadedFiles.map((file) => (
+                  <SecureFileLink key={file.id} file={file} />
+                ))}
+              </div>
+            )}
+          </Card>
           <Card>
             <Field
               label="معیارهای پذیرش (اختیاری)"

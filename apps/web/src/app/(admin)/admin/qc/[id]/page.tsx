@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { use, useCallback, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { apiFetch, ApiError } from '@/lib/api';
+import { use, useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { apiFetch, ApiError } from "@/lib/api";
 import {
   Button,
   Card,
@@ -10,7 +10,9 @@ import {
   inputClass,
   PageLoading,
   SectionTitle,
-} from '@/components/ui';
+} from "@/components/ui";
+import { SecureFileLink } from "@/components/secure-file";
+import type { OrderFile } from "@/lib/types";
 
 interface ChecklistItem {
   id: string;
@@ -24,7 +26,7 @@ interface QcReviewDetail {
     code: string;
     title: string;
     briefDescription: string;
-    files: { id: string; originalName: string }[];
+    files: OrderFile[];
     serviceLine: { qcChecklistTemplates: { items: ChecklistItem[] }[] };
   };
 }
@@ -37,8 +39,8 @@ export default function AdminQcDetailPage({
   const { id } = use(params);
   const router = useRouter();
   const [review, setReview] = useState<QcReviewDetail | null>(null);
-  const [error, setError] = useState('');
-  const [comment, setComment] = useState('');
+  const [error, setError] = useState("");
+  const [comment, setComment] = useState("");
   const [checked, setChecked] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState(false);
 
@@ -58,12 +60,12 @@ export default function AdminQcDetailPage({
     (t) => t.items,
   );
 
-  async function submit(action: 'approve' | 'request-rework' | 'reject') {
+  async function submit(action: "approve" | "request-rework" | "reject") {
     setBusy(true);
-    setError('');
+    setError("");
     try {
       await apiFetch(`/admin/qc/${id}/${action}`, {
-        method: 'POST',
+        method: "POST",
         body: {
           comment,
           items: checklistItems.map((item) => ({
@@ -72,9 +74,9 @@ export default function AdminQcDetailPage({
           })),
         },
       });
-      router.push('/admin/qc');
+      router.push("/admin/qc");
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'خطا در ثبت نتیجه QC');
+      setError(err instanceof ApiError ? err.message : "خطا در ثبت نتیجه QC");
     } finally {
       setBusy(false);
     }
@@ -104,9 +106,11 @@ export default function AdminQcDetailPage({
         {review.order.files.length === 0 ? (
           <p className="text-sm text-slate-400">فایلی ثبت نشده است.</p>
         ) : (
-          <ul className="list-inside list-disc text-sm text-slate-600">
+          <ul className="space-y-2 text-sm text-slate-600">
             {review.order.files.map((f) => (
-              <li key={f.id}>{f.originalName}</li>
+              <li key={f.id}>
+                <SecureFileLink file={f} />
+              </li>
             ))}
           </ul>
         )}
@@ -146,20 +150,20 @@ export default function AdminQcDetailPage({
           onChange={(e) => setComment(e.target.value)}
         />
         <div className="flex flex-wrap gap-2">
-          <Button disabled={busy} onClick={() => submit('approve')}>
+          <Button disabled={busy} onClick={() => submit("approve")}>
             تایید برای مشتری
           </Button>
           <Button
             variant="secondary"
             disabled={busy}
-            onClick={() => submit('request-rework')}
+            onClick={() => submit("request-rework")}
           >
             درخواست اصلاح
           </Button>
           <Button
             variant="danger"
             disabled={busy}
-            onClick={() => submit('reject')}
+            onClick={() => submit("reject")}
           >
             رد
           </Button>

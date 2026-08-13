@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { apiFetch } from '@/lib/api';
+import { useEffect, useState } from "react";
+import { apiFetch, downloadAuthenticated } from "@/lib/api";
 import {
   Card,
   EmptyState,
   ErrorBanner,
   PageLoading,
   SectionTitle,
-} from '@/components/ui';
-import type { WalletSummary } from '@/lib/types';
-import { formatDate, formatToman } from '@/lib/format';
+} from "@/components/ui";
+import type { WalletSummary } from "@/lib/types";
+import { formatDate, formatToman } from "@/lib/format";
 
 interface Invoice {
   id: string;
@@ -22,13 +22,14 @@ interface Invoice {
 export default function WalletPage() {
   const [wallet, setWallet] = useState<WalletSummary | null>(null);
   const [invoices, setInvoices] = useState<Invoice[] | null>(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+  const [downloadingInvoiceId, setDownloadingInvoiceId] = useState("");
 
   useEffect(() => {
-    apiFetch<WalletSummary>('/customer/wallet')
+    apiFetch<WalletSummary>("/customer/wallet")
       .then(setWallet)
       .catch((e) => setError(e.message));
-    apiFetch<Invoice[]>('/customer/invoices')
+    apiFetch<Invoice[]>("/customer/invoices")
       .then(setInvoices)
       .catch(() => undefined);
   }, []);
@@ -61,12 +62,12 @@ export default function WalletPage() {
                   >
                     <span
                       className={
-                        t.direction === 'credit'
-                          ? 'text-emerald-700'
-                          : 'text-red-700'
+                        t.direction === "credit"
+                          ? "text-emerald-700"
+                          : "text-red-700"
                       }
                     >
-                      {t.direction === 'credit' ? '+' : '-'}
+                      {t.direction === "credit" ? "+" : "-"}
                       {formatToman(t.amount)}
                     </span>
                     <span className="text-xs text-slate-400">
@@ -94,6 +95,33 @@ export default function WalletPage() {
                     <span className="text-xs text-slate-400">
                       {formatDate(inv.issuedAt)}
                     </span>
+                    <button
+                      type="button"
+                      disabled={downloadingInvoiceId === inv.id}
+                      className="text-xs font-bold text-accent hover:underline disabled:opacity-50"
+                      onClick={async () => {
+                        setDownloadingInvoiceId(inv.id);
+                        setError("");
+                        try {
+                          await downloadAuthenticated(
+                            `/customer/invoices/${inv.id}/pdf`,
+                            `${inv.invoiceNumber}.pdf`,
+                          );
+                        } catch (cause) {
+                          setError(
+                            cause instanceof Error
+                              ? cause.message
+                              : "دریافت فاکتور ممکن نشد.",
+                          );
+                        } finally {
+                          setDownloadingInvoiceId("");
+                        }
+                      }}
+                    >
+                      {downloadingInvoiceId === inv.id
+                        ? "در حال دریافت…"
+                        : "دانلود PDF"}
+                    </button>
                   </li>
                 ))}
               </ul>

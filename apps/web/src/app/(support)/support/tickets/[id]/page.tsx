@@ -1,17 +1,18 @@
-'use client';
+"use client";
 
-import { use, useCallback, useEffect, useState } from 'react';
-import { apiFetch, ApiError } from '@/lib/api';
+import { use, useCallback, useEffect, useState } from "react";
+import { apiFetch, ApiError } from "@/lib/api";
 import {
   Button,
   Card,
   ErrorBanner,
   inputClass,
   PageLoading,
-} from '@/components/ui';
-import { TicketStatusBadge } from '@/components/status-badge';
-import type { Ticket, TicketMessage } from '@/lib/types';
-import { formatDate } from '@/lib/format';
+} from "@/components/ui";
+import { TicketStatusBadge } from "@/components/status-badge";
+import type { OrderFile, Ticket, TicketMessage } from "@/lib/types";
+import { SecureFileLink, SecureFileUpload } from "@/components/secure-file";
+import { formatDate } from "@/lib/format";
 
 export default function SupportTicketDetailPage({
   params,
@@ -22,11 +23,12 @@ export default function SupportTicketDetailPage({
   const [ticket, setTicket] = useState<
     (Ticket & { messages: TicketMessage[] }) | null
   >(null);
-  const [error, setError] = useState('');
-  const [body, setBody] = useState('');
+  const [error, setError] = useState("");
+  const [body, setBody] = useState("");
   const [internal, setInternal] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [escalateReason, setEscalateReason] = useState('');
+  const [escalateReason, setEscalateReason] = useState("");
+  const [attachment, setAttachment] = useState<OrderFile | null>(null);
 
   const load = useCallback(() => {
     apiFetch<Ticket & { messages: TicketMessage[] }>(`/support/tickets/${id}`)
@@ -39,13 +41,13 @@ export default function SupportTicketDetailPage({
   }, [load]);
 
   async function runAction(fn: () => Promise<unknown>) {
-    setError('');
+    setError("");
     setBusy(true);
     try {
       await fn();
       load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'خطا در انجام عملیات');
+      setError(err instanceof ApiError ? err.message : "خطا در انجام عملیات");
     } finally {
       setBusy(false);
     }
@@ -76,9 +78,9 @@ export default function SupportTicketDetailPage({
           {ticket.messages.map((m) => (
             <div
               key={m.id}
-              className={`rounded-xl p-3 text-sm ${m.visibility === 'internal_only' ? 'bg-amber-50' : 'bg-slate-50'}`}
+              className={`rounded-xl p-3 text-sm ${m.visibility === "internal_only" ? "bg-amber-50" : "bg-slate-50"}`}
             >
-              {m.visibility === 'internal_only' && (
+              {m.visibility === "internal_only" && (
                 <p className="mb-1 text-xs font-bold text-amber-700">
                   یادداشت داخلی
                 </p>
@@ -87,6 +89,14 @@ export default function SupportTicketDetailPage({
               <p className="mt-1 text-xs text-slate-400">
                 {formatDate(m.createdAt)}
               </p>
+              {m.attachment && (
+                <div className="mt-2">
+                  <SecureFileLink
+                    file={m.attachment}
+                    label={`پیوست: ${m.attachment.originalName}`}
+                  />
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -111,21 +121,43 @@ export default function SupportTicketDetailPage({
               onClick={() =>
                 runAction(async () => {
                   await apiFetch(`/support/tickets/${id}/reply`, {
-                    method: 'POST',
+                    method: "POST",
                     body: {
                       body,
                       visibility: internal
-                        ? 'internal_only'
-                        : 'customer_visible',
+                        ? "internal_only"
+                        : "customer_visible",
+                      attachmentFileId: attachment?.id,
                     },
                   });
-                  setBody('');
+                  setBody("");
+                  setAttachment(null);
                 })
               }
             >
               ارسال
             </Button>
           </div>
+          {ticket.orderId ? (
+            <>
+              <SecureFileUpload
+                orderId={ticket.orderId}
+                fileKind="ticket_attachment"
+                label={attachment ? "تغییر پیوست" : "افزودن پیوست پاسخ"}
+                disabled={busy}
+                onUploaded={setAttachment}
+              />
+              {attachment && (
+                <p className="text-xs text-emerald-700">
+                  پیوست آماده ارسال: {attachment.originalName}
+                </p>
+              )}
+            </>
+          ) : (
+            <p className="text-xs text-fg-muted">
+              پیوست فقط برای تیکت مرتبط با سفارش فعال است.
+            </p>
+          )}
         </div>
       </Card>
 
@@ -144,7 +176,7 @@ export default function SupportTicketDetailPage({
             onClick={() =>
               runAction(() =>
                 apiFetch(`/support/tickets/${id}/escalate`, {
-                  method: 'POST',
+                  method: "POST",
                   body: { reason: escalateReason },
                 }),
               )
@@ -157,7 +189,7 @@ export default function SupportTicketDetailPage({
             disabled={busy}
             onClick={() =>
               runAction(() =>
-                apiFetch(`/support/tickets/${id}/resolve`, { method: 'POST' }),
+                apiFetch(`/support/tickets/${id}/resolve`, { method: "POST" }),
               )
             }
           >
@@ -168,7 +200,7 @@ export default function SupportTicketDetailPage({
             disabled={busy}
             onClick={() =>
               runAction(() =>
-                apiFetch(`/support/tickets/${id}/close`, { method: 'POST' }),
+                apiFetch(`/support/tickets/${id}/close`, { method: "POST" }),
               )
             }
           >

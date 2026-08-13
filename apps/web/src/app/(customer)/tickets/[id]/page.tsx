@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { use, useCallback, useEffect, useState } from 'react';
-import { apiFetch, ApiError } from '@/lib/api';
+import { use, useCallback, useEffect, useState } from "react";
+import { apiFetch, ApiError } from "@/lib/api";
 import {
   Button,
   Card,
@@ -9,10 +9,12 @@ import {
   inputClass,
   PageLoading,
   SectionTitle,
-} from '@/components/ui';
-import { TicketStatusBadge } from '@/components/status-badge';
-import type { Ticket, TicketMessage } from '@/lib/types';
-import { formatDate } from '@/lib/format';
+} from "@/components/ui";
+import { TicketStatusBadge } from "@/components/status-badge";
+import type { Ticket, TicketMessage } from "@/lib/types";
+import type { OrderFile } from "@/lib/types";
+import { SecureFileLink, SecureFileUpload } from "@/components/secure-file";
+import { formatDate } from "@/lib/format";
 
 export default function CustomerTicketDetailPage({
   params,
@@ -23,9 +25,10 @@ export default function CustomerTicketDetailPage({
   const [ticket, setTicket] = useState<
     (Ticket & { messages: TicketMessage[] }) | null
   >(null);
-  const [error, setError] = useState('');
-  const [body, setBody] = useState('');
+  const [error, setError] = useState("");
+  const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
+  const [attachment, setAttachment] = useState<OrderFile | null>(null);
 
   const load = useCallback(() => {
     apiFetch<Ticket & { messages: TicketMessage[] }>(`/customer/tickets/${id}`)
@@ -61,38 +64,70 @@ export default function CustomerTicketDetailPage({
               <p className="mt-1 text-xs text-slate-400">
                 {formatDate(m.createdAt)}
               </p>
+              {m.attachment && (
+                <div className="mt-2">
+                  <SecureFileLink
+                    file={m.attachment}
+                    label={`پیوست: ${m.attachment.originalName}`}
+                  />
+                </div>
+              )}
             </div>
           ))}
         </div>
-        <div className="flex gap-2">
-          <input
-            className={inputClass}
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            placeholder="پیام خود را بنویسید..."
-          />
-          <Button
-            disabled={busy || !body}
-            onClick={async () => {
-              setBusy(true);
-              try {
-                await apiFetch(`/customer/tickets/${id}/messages`, {
-                  method: 'POST',
-                  body: { body },
-                });
-                setBody('');
-                load();
-              } catch (err) {
-                setError(
-                  err instanceof ApiError ? err.message : 'خطا در ارسال پیام',
-                );
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
-            ارسال
-          </Button>
+        <div className="flex flex-col gap-3">
+          <div className="flex gap-2">
+            <input
+              className={inputClass}
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              placeholder="پیام خود را بنویسید..."
+            />
+            <Button
+              disabled={busy || !body}
+              onClick={async () => {
+                setBusy(true);
+                try {
+                  await apiFetch(`/customer/tickets/${id}/messages`, {
+                    method: "POST",
+                    body: { body, attachmentFileId: attachment?.id },
+                  });
+                  setBody("");
+                  setAttachment(null);
+                  load();
+                } catch (err) {
+                  setError(
+                    err instanceof ApiError ? err.message : "خطا در ارسال پیام",
+                  );
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              ارسال
+            </Button>
+          </div>
+          {ticket.orderId ? (
+            <>
+              <SecureFileUpload
+                orderId={ticket.orderId}
+                fileKind="ticket_attachment"
+                label={attachment ? "تغییر پیوست" : "افزودن پیوست"}
+                disabled={busy}
+                onUploaded={setAttachment}
+              />
+              {attachment && (
+                <p className="text-xs text-emerald-700">
+                  پیوست آماده ارسال: {attachment.originalName}
+                </p>
+              )}
+            </>
+          ) : (
+            <p className="text-xs text-fg-muted">
+              این تیکت سفارش مرتبط ندارد؛ پیوست فقط برای تیکت‌های مرتبط با سفارش
+              فعال است.
+            </p>
+          )}
         </div>
       </Card>
     </div>

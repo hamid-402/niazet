@@ -368,6 +368,7 @@ export class FilesService {
         grant.userId !== payload.sub ||
         grant.fileId !== payload.fileId ||
         grant.revokedAt ||
+        grant.usedAt ||
         grant.expiresAt < new Date()
       ) {
         throw new ForbiddenException('مجوز دانلود منقضی یا لغو شده است.');

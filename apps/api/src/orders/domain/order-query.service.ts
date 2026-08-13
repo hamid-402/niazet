@@ -9,7 +9,7 @@ export class OrderQueryService {
   async findOneForCustomer(customerId: string, orderId: string) {
     const order = await this.prisma.order.findUnique({
       where: { id: orderId },
-      include: this.customerInclude(),
+      include: this.customerInclude(customerId),
     });
     if (!order || order.customerId !== customerId)
       throw new NotFoundException('سفارش یافت نشد.');
@@ -72,7 +72,7 @@ export class OrderQueryService {
         files: true,
         messages: { orderBy: { createdAt: 'asc' } },
         acceptanceCriteria: true,
-        reports: true,
+        reports: { include: { file: true } },
       },
     });
   }
@@ -149,7 +149,7 @@ export class OrderQueryService {
     return order;
   }
 
-  private customerInclude() {
+  private customerInclude(customerId: string) {
     return {
       serviceLine: true,
       package: true,
@@ -158,11 +158,25 @@ export class OrderQueryService {
       publicHandlers: { where: { visibleToCustomer: true, activeTo: null } },
       milestones: true,
       files: {
-        where: { fileKind: { in: [FileKind.output, FileKind.revision] } },
+        where: {
+          OR: [
+            { uploadedByUserId: customerId },
+            {
+              fileKind: {
+                in: [FileKind.output, FileKind.revision, FileKind.invoice],
+              },
+            },
+          ],
+          scanStatus: 'clean' as const,
+        },
       },
-      reports: { where: { visibleToCustomer: true } },
+      reports: {
+        where: { visibleToCustomer: true },
+        include: { file: true },
+      },
       messages: {
         where: { visibility: MessageVisibility.customer_visible },
+        include: { attachment: true },
         orderBy: { createdAt: 'asc' as const },
       },
       payments: true,

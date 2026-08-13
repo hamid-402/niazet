@@ -111,6 +111,17 @@ export interface PublicHandler {
   visibleToCustomer: boolean;
 }
 
+export interface OrderFile {
+  id: string;
+  orderId: string;
+  fileKind: string;
+  originalName: string;
+  mimeType: string;
+  sizeBytes: number;
+  scanStatus: string;
+  createdAt: string;
+}
+
 export interface OrderSummary {
   id: string;
   code: string;
@@ -140,18 +151,14 @@ export interface OrderDetail extends OrderSummary {
     createdAt: string;
     source: string;
   }[];
-  files?: {
-    id: string;
-    originalName: string;
-    fileKind: string;
-    createdAt: string;
-  }[];
+  files?: OrderFile[];
   reports?: {
     id: string;
     reportType: string;
     summary: string;
     createdAt: string;
     visibleToCustomer: boolean;
+    file?: OrderFile | null;
   }[];
   messages?: {
     id: string;
@@ -159,6 +166,8 @@ export interface OrderDetail extends OrderSummary {
     senderUserId: string;
     createdAt: string;
     visibility: string;
+    attachmentFileId?: string | null;
+    attachment?: OrderFile | null;
   }[];
   payments?: {
     id: string;
@@ -209,6 +218,7 @@ export const TICKET_STATUS_LABELS_FA: Record<TicketStatus, string> = {
 
 export interface Ticket {
   id: string;
+  orderId?: string | null;
   code: string;
   subject: string;
   category: string;
@@ -226,6 +236,8 @@ export interface TicketMessage {
   senderUserId: string;
   visibility: "customer_visible" | "internal_only";
   createdAt: string;
+  attachmentFileId?: string | null;
+  attachment?: OrderFile | null;
 }
 
 export interface WalletSummary {
