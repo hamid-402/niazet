@@ -74,12 +74,12 @@
 - [x] جلوگیری از افشای OTP آزمایشی خارج از Development و حذف داده حساس از Log/Error
 - [x] سیاست Password، Lockout/Backoff، ثبت Login Attempt و بازیابی رمز امن با ابطال Sessionها
 - [x] Security headerها، CSP، CORS allowlist و محدودیت Swagger در محیط Production
-- [x] Audit اجباری و اتمیک عملیات role/scope، block، download حساس، مالی و dispute
+- [x] Audit اجباری عملیات role/scope، block، download حساس، مالی و dispute؛ اتمیک برای مدیریت کاربر
 - [x] تست منفی ماتریس Role/Scope/Capability و مسیرهای حساس؛ Ownership با Policyهای سفارش، تیکت و فایل
 
 ## فاز ۲ — صحت مالی و دامنه سفارش P0/P1
 
-- [ ] اصلاح `released/refunded/remaining` در Escrow و ممنوعیت جمع بیش از مبلغ Hold
+- [x] اصلاح `released/refunded/remaining` در Escrow و ممنوعیت جمع بیش از مبلغ Hold
 - [ ] Idempotency پایدار مبتنی بر کلید درخواست؛ حذف کلیدهای وابسته به `Date.now()`
 - [ ] Lock/Serializable transaction یا Optimistic Concurrency برای Release، Refund و Payment
 - [ ] تراکنش واحد برای تغییر وضعیت، History، Audit، Outbox و اثر مالی

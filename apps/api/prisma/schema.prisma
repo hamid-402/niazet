@@ -1070,15 +1070,17 @@ model Payment {
 }
 
 model EscrowHold {
-  id         String       @id @default(uuid())
-  orderId    String       @map("order_id")
-  paymentId  String       @unique @map("payment_id")
-  amount     Int
-  currency   String       @default("IRT")
-  status     EscrowStatus @default(held)
-  heldAt     DateTime     @default(now()) @map("held_at")
-  releasedAt DateTime?    @map("released_at")
-  refundedAt DateTime?    @map("refunded_at")
+  id             String       @id @default(uuid())
+  orderId        String       @map("order_id")
+  paymentId      String       @unique @map("payment_id")
+  amount         Int
+  releasedAmount Int          @default(0) @map("released_amount")
+  refundedAmount Int          @default(0) @map("refunded_amount")
+  currency       String       @default("IRT")
+  status         EscrowStatus @default(held)
+  heldAt         DateTime     @default(now()) @map("held_at")
+  releasedAt     DateTime?    @map("released_at")
+  refundedAt     DateTime?    @map("refunded_at")
 
   order   Order   @relation(fields: [orderId], references: [id])
   payment Payment @relation(fields: [paymentId], references: [id])
