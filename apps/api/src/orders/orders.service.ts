@@ -38,7 +38,9 @@ import {
   ResolveDisputeDto,
   RevisionRequestDto,
   TriageDecisionDto,
+  UpdateOrderDraftDto,
 } from './dto/order.dto';
+import { answersFromSnapshot, snapshotServiceForm } from './service-form';
 
 const DEFAULT_IN_PROGRESS_CANCEL_REFUND_RATE = 0.5;
 
@@ -138,105 +140,256 @@ export class OrdersService {
   // Customer: create / submit
   // ---------------------------------------------------------------------
 
-  async createDraft(customerId: string, dto: CreateOrderDto) {
-    const service = await this.prisma.serviceLine.findUnique({
-      where: { id: dto.serviceId },
-      include: { acceptanceCriteria: true },
-    });
-    if (!service || !service.isActive) {
-      throw new NotFoundException('خدمت انتخابی یافت نشد.');
-    }
-
-    const selectedPackage = dto.packageId
-      ? await this.prisma.servicePackage.findFirst({
-          where: {
-            id: dto.packageId,
-            serviceId: service.id,
-            isActive: true,
+  async createDraft(
+    customerId: string,
+    dto: CreateOrderDto,
+    idempotencyKey: string,
+  ) {
+    return this.idempotency.execute({
+      key: idempotencyKey,
+      scope: `order.draft.create:${customerId}`,
+      request: dto,
+      work: async (tx) => {
+        const service = await tx.serviceLine.findUnique({
+          where: { id: dto.serviceId },
+          include: {
+            acceptanceCriteria: true,
+            formFields: { orderBy: { sortOrder: 'asc' } },
           },
-        })
-      : null;
-    if (dto.packageId && !selectedPackage) {
-      throw new BadRequestException(
-        'پکیج انتخابی فعال نیست یا متعلق به این خدمت نیست.',
-      );
-    }
-
-    const criteria = dto.acceptanceCriteria?.length
-      ? dto.acceptanceCriteria
-      : service.acceptanceCriteria.map((item) => item.description);
-
-    const order = await this.prisma.order.create({
-      data: {
-        code: generateReferenceCode('ORD'),
-        customerId,
-        serviceId: dto.serviceId,
-        packageId: dto.packageId,
-        packageSnapshot: selectedPackage
-          ? {
-              id: selectedPackage.id,
-              name: selectedPackage.name,
-              description: selectedPackage.description,
-              price: selectedPackage.price,
-              slaHours: selectedPackage.slaHours,
-              deliverables: selectedPackage.deliverables,
-              capturedAt: new Date().toISOString(),
-            }
-          : Prisma.JsonNull,
-        title: dto.title,
-        urgency: dto.urgency ?? 'normal',
-        briefDescription: dto.briefDescription,
-        formResponses: dto.formResponses as Prisma.InputJsonValue | undefined,
-        budgetHint: dto.budgetHint,
-        status: OrderStatus.draft,
-        acceptanceCriteria: criteria.length
-          ? {
-              create: criteria.map((description) => ({
-                description,
-              })),
-            }
-          : undefined,
+        });
+        if (!service || !service.isActive)
+          throw new NotFoundException('خدمت انتخابی یافت نشد.');
+        const selectedPackage = dto.packageId
+          ? await tx.servicePackage.findFirst({
+              where: {
+                id: dto.packageId,
+                serviceId: service.id,
+                isActive: true,
+              },
+            })
+          : null;
+        if (dto.packageId && !selectedPackage)
+          throw new BadRequestException(
+            'پکیج انتخابی فعال نیست یا متعلق به این خدمت نیست.',
+          );
+        const criteria = dto.acceptanceCriteria?.length
+          ? dto.acceptanceCriteria
+          : service.acceptanceCriteria.map((item) => item.description);
+        const formResponses = snapshotServiceForm(
+          service,
+          service.formFields,
+          dto.formResponses,
+          false,
+        );
+        return tx.order.create({
+          data: {
+            code: generateReferenceCode('ORD'),
+            customerId,
+            serviceId: dto.serviceId,
+            packageId: dto.packageId,
+            packageSnapshot: selectedPackage
+              ? {
+                  id: selectedPackage.id,
+                  name: selectedPackage.name,
+                  description: selectedPackage.description,
+                  price: selectedPackage.price,
+                  slaHours: selectedPackage.slaHours,
+                  deliverables: selectedPackage.deliverables,
+                  capturedAt: new Date().toISOString(),
+                }
+              : Prisma.JsonNull,
+            title: dto.title,
+            urgency: dto.urgency ?? 'normal',
+            briefDescription: dto.briefDescription,
+            formResponses,
+            budgetHint: dto.budgetHint,
+            status: OrderStatus.draft,
+            acceptanceCriteria: criteria.length
+              ? { create: criteria.map((description) => ({ description })) }
+              : undefined,
+          },
+          include: {
+            acceptanceCriteria: true,
+            serviceLine: true,
+            package: true,
+          },
+        });
       },
-      include: { acceptanceCriteria: true, serviceLine: true, package: true },
     });
-
-    return order;
   }
 
-  async submit(customerId: string, orderId: string) {
-    const order = await this.loadOwnedOrder(orderId, customerId);
-    if (order.status !== OrderStatus.draft) {
-      throw new BadRequestException('فقط پیش‌نویس قابل ارسال است.');
-    }
-
-    await this.transition(
-      orderId,
-      OrderStatus.submitted,
-      OrderStatusSource.customer,
-      customerId,
-      undefined,
-      {
-        submittedAt: new Date(),
+  async updateDraft(
+    customerId: string,
+    orderId: string,
+    dto: UpdateOrderDraftDto,
+  ) {
+    return this.prisma.$transaction(
+      async (tx) => {
+        const order = await tx.order.findFirst({
+          where: { id: orderId, customerId },
+          include: {
+            serviceLine: {
+              include: {
+                formFields: { orderBy: { sortOrder: 'asc' } },
+                acceptanceCriteria: true,
+              },
+            },
+          },
+        });
+        if (!order) throw new NotFoundException('پیش‌نویس یافت نشد.');
+        if (order.status !== OrderStatus.draft)
+          throw new BadRequestException('فقط پیش‌نویس قابل ویرایش است.');
+        const selectedPackage = dto.packageId
+          ? await tx.servicePackage.findFirst({
+              where: {
+                id: dto.packageId,
+                serviceId: order.serviceId,
+                isActive: true,
+              },
+            })
+          : null;
+        if (dto.packageId && !selectedPackage)
+          throw new BadRequestException(
+            'پکیج انتخابی فعال نیست یا متعلق به این خدمت نیست.',
+          );
+        const formResponses = dto.formResponses
+          ? snapshotServiceForm(
+              order.serviceLine,
+              order.serviceLine.formFields,
+              dto.formResponses,
+              false,
+            )
+          : (order.formResponses ?? Prisma.JsonNull);
+        const claimed = await tx.order.updateMany({
+          where: {
+            id: orderId,
+            customerId,
+            status: OrderStatus.draft,
+            version: dto.version,
+          },
+          data: {
+            ...(dto.packageId !== undefined
+              ? {
+                  packageId: dto.packageId,
+                  packageSnapshot: selectedPackage
+                    ? {
+                        id: selectedPackage.id,
+                        name: selectedPackage.name,
+                        description: selectedPackage.description,
+                        price: selectedPackage.price,
+                        slaHours: selectedPackage.slaHours,
+                        deliverables: selectedPackage.deliverables,
+                        capturedAt: new Date().toISOString(),
+                      }
+                    : Prisma.JsonNull,
+                }
+              : {}),
+            ...(dto.title !== undefined ? { title: dto.title } : {}),
+            ...(dto.urgency !== undefined ? { urgency: dto.urgency } : {}),
+            ...(dto.briefDescription !== undefined
+              ? { briefDescription: dto.briefDescription }
+              : {}),
+            ...(dto.budgetHint !== undefined
+              ? { budgetHint: dto.budgetHint }
+              : {}),
+            formResponses,
+            version: { increment: 1 },
+          },
+        });
+        if (claimed.count !== 1)
+          throw new ConflictException(
+            'پیش‌نویس هم‌زمان تغییر کرده است؛ صفحه را تازه کنید.',
+          );
+        if (dto.acceptanceCriteria) {
+          const criteria = dto.acceptanceCriteria.length
+            ? dto.acceptanceCriteria
+            : order.serviceLine.acceptanceCriteria.map(
+                (item) => item.description,
+              );
+          await tx.orderAcceptanceCriteria.deleteMany({ where: { orderId } });
+          if (criteria.length) {
+            await tx.orderAcceptanceCriteria.createMany({
+              data: criteria.map((description) => ({
+                orderId,
+                description,
+              })),
+            });
+          }
+        }
+        return tx.order.findUniqueOrThrow({
+          where: { id: orderId },
+          include: {
+            acceptanceCriteria: true,
+            serviceLine: true,
+            package: true,
+          },
+        });
       },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
+  }
 
-    // گذار خودکار سیستمی مطابق جدول گذار (submitted -> pending_triage)
-    const finalOrder = await this.transition(
-      orderId,
-      OrderStatus.pending_triage,
-      OrderStatusSource.system,
-      null,
-      'ثبت خودکار در صف تریاژ',
-    );
-
-    await this.notifications.notifyUser(
-      customerId,
-      'order.submitted',
-      'درخواست شما ثبت شد',
-      `سفارش ${order.code} برای بررسی ثبت شد.`,
-    );
-
-    return finalOrder;
+  async submit(customerId: string, orderId: string, idempotencyKey: string) {
+    return this.idempotency.execute({
+      key: idempotencyKey,
+      scope: `order.submit:${orderId}`,
+      request: { customerId, orderId },
+      work: async (tx) => {
+        const order = await tx.order.findFirst({
+          where: { id: orderId, customerId },
+          include: {
+            serviceLine: {
+              include: { formFields: { orderBy: { sortOrder: 'asc' } } },
+            },
+          },
+        });
+        if (!order) throw new NotFoundException('سفارش یافت نشد.');
+        if (order.status !== OrderStatus.draft)
+          throw new BadRequestException('فقط پیش‌نویس قابل ارسال است.');
+        if (order.title.trim().length < 3)
+          throw new BadRequestException(
+            'عنوان درخواست باید حداقل ۳ کاراکتر باشد.',
+          );
+        if (order.briefDescription.trim().length < 10)
+          throw new BadRequestException('شرح نیاز باید حداقل ۱۰ کاراکتر باشد.');
+        const formResponses = snapshotServiceForm(
+          order.serviceLine,
+          order.serviceLine.formFields,
+          answersFromSnapshot(order.formResponses),
+          true,
+        );
+        await tx.order.update({
+          where: { id: orderId },
+          data: { formResponses },
+        });
+        await this.transition(
+          orderId,
+          OrderStatus.submitted,
+          OrderStatusSource.customer,
+          customerId,
+          undefined,
+          { submittedAt: new Date() },
+          tx,
+        );
+        const finalOrder = await this.transition(
+          orderId,
+          OrderStatus.pending_triage,
+          OrderStatusSource.system,
+          null,
+          'ثبت خودکار در صف تریاژ',
+          {},
+          tx,
+        );
+        await this.notifications.notifyUser(
+          customerId,
+          'order.submitted',
+          'درخواست شما ثبت شد',
+          `سفارش ${order.code} برای بررسی ثبت شد.`,
+          tx,
+        );
+        return finalOrder;
+      },
+    });
   }
 
   async cancelByCustomer(customerId: string, orderId: string, reason: string) {

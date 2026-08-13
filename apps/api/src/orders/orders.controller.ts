@@ -4,6 +4,7 @@ import {
   Get,
   Headers,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -24,6 +25,7 @@ import {
   OrderMessageDto,
   RevisionRequestDto,
   PaymentIntentDto,
+  UpdateOrderDraftDto,
 } from './dto/order.dto';
 
 @Controller('v1/customer/orders')
@@ -46,8 +48,21 @@ export class OrdersController {
   }
 
   @Post()
-  create(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateOrderDto) {
-    return this.orders.createDraft(user.id, dto);
+  create(
+    @CurrentUser() user: AuthenticatedUser,
+    @Headers('idempotency-key') idempotencyKey: string | undefined,
+    @Body() dto: CreateOrderDto,
+  ) {
+    return this.orders.createDraft(user.id, dto, idempotencyKey ?? '');
+  }
+
+  @Patch(':id/draft')
+  updateDraft(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: UpdateOrderDraftDto,
+  ) {
+    return this.orders.updateDraft(user.id, id, dto);
   }
 
   @Get(':id')
@@ -56,8 +71,12 @@ export class OrdersController {
   }
 
   @Post(':id/submit')
-  submit(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
-    return this.orders.submit(user.id, id);
+  submit(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Headers('idempotency-key') idempotencyKey?: string,
+  ) {
+    return this.orders.submit(user.id, id, idempotencyKey ?? '');
   }
 
   @Post(':id/accept-quote')

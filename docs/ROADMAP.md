@@ -118,8 +118,8 @@
 
 ## فاز ۴ — تکمیل کامل MVP محصول
 
-- [ ] فرم‌های پویای Service شامل تمام Field typeها، Optionها، Validation و پاسخ‌های Snapshotشده
-- [ ] Autosave پیش‌نویس، Resume، Summary پیش از ارسال و Submit اتمیک/Idempotent
+- [x] فرم‌های پویای Service شامل تمام Field typeها، Optionها، Validation و پاسخ‌های Snapshotشده
+- [x] Autosave پیش‌نویس، Resume، Summary پیش از ارسال و Submit اتمیک/Idempotent
 - [ ] Upload/Download واقعی و امن در سفارش، پیام، تیکت، گزارش، QC و Invoice
 - [ ] Timeline مشترک سفارش، Milestone، History و نمایش واضح «اقدام بعدی»
 - [ ] گزارش پیشرفت، QC، تحویل، مدیریتی و پشتیبانی با Version و Visibility

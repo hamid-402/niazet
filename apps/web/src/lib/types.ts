@@ -1,59 +1,59 @@
-export type UserRole = 'customer' | 'executor' | 'support' | 'admin';
-export type AdminScope = 'super_admin' | 'ops_admin' | 'finance_admin' | null;
+export type UserRole = "customer" | "executor" | "support" | "admin";
+export type AdminScope = "super_admin" | "ops_admin" | "finance_admin" | null;
 
 export interface AuthUser {
   id: string;
   role: UserRole;
   adminScope: AdminScope;
-  capabilities: ('customer' | 'executor')[];
+  capabilities: ("customer" | "executor")[];
   fullName: string;
   phone: string;
   email: string | null;
 }
 
 export type OrderStatus =
-  | 'draft'
-  | 'submitted'
-  | 'pending_triage'
-  | 'triaging'
-  | 'pending_quote'
-  | 'quoted'
-  | 'pending_payment'
-  | 'paid'
-  | 'assigned'
-  | 'in_progress'
-  | 'submitted_for_qc'
-  | 'qc_in_review'
-  | 'qc_rejected'
-  | 'ready_for_customer_review'
-  | 'delivered'
-  | 'revision_requested'
-  | 'confirmed'
-  | 'disputed'
-  | 'cancelled'
-  | 'closed';
+  | "draft"
+  | "submitted"
+  | "pending_triage"
+  | "triaging"
+  | "pending_quote"
+  | "quoted"
+  | "pending_payment"
+  | "paid"
+  | "assigned"
+  | "in_progress"
+  | "submitted_for_qc"
+  | "qc_in_review"
+  | "qc_rejected"
+  | "ready_for_customer_review"
+  | "delivered"
+  | "revision_requested"
+  | "confirmed"
+  | "disputed"
+  | "cancelled"
+  | "closed";
 
 export const ORDER_STATUS_LABELS_FA: Record<OrderStatus, string> = {
-  draft: 'پیش‌نویس',
-  submitted: 'ثبت‌شده',
-  pending_triage: 'در صف بررسی',
-  triaging: 'در حال بررسی',
-  pending_quote: 'در انتظار قیمت‌گذاری',
-  quoted: 'قیمت‌گذاری‌شده',
-  pending_payment: 'در انتظار پرداخت',
-  paid: 'پرداخت‌شده',
-  assigned: 'ارجاع‌شده',
-  in_progress: 'در حال اجرا',
-  submitted_for_qc: 'ارسال‌شده به QC',
-  qc_in_review: 'در حال بررسی کیفیت',
-  qc_rejected: 'نیازمند اصلاح (QC)',
-  ready_for_customer_review: 'آماده بازبینی',
-  delivered: 'تحویل‌شده',
-  revision_requested: 'اصلاح خواسته‌شده',
-  confirmed: 'تاییدشده',
-  disputed: 'در حال اختلاف',
-  cancelled: 'لغوشده',
-  closed: 'بسته‌شده',
+  draft: "پیش‌نویس",
+  submitted: "ثبت‌شده",
+  pending_triage: "در صف بررسی",
+  triaging: "در حال بررسی",
+  pending_quote: "در انتظار قیمت‌گذاری",
+  quoted: "قیمت‌گذاری‌شده",
+  pending_payment: "در انتظار پرداخت",
+  paid: "پرداخت‌شده",
+  assigned: "ارجاع‌شده",
+  in_progress: "در حال اجرا",
+  submitted_for_qc: "ارسال‌شده به QC",
+  qc_in_review: "در حال بررسی کیفیت",
+  qc_rejected: "نیازمند اصلاح (QC)",
+  ready_for_customer_review: "آماده بازبینی",
+  delivered: "تحویل‌شده",
+  revision_requested: "اصلاح خواسته‌شده",
+  confirmed: "تاییدشده",
+  disputed: "در حال اختلاف",
+  cancelled: "لغوشده",
+  closed: "بسته‌شده",
 };
 
 export interface ServicePackage {
@@ -65,6 +65,27 @@ export interface ServicePackage {
   deliverables: string | null;
 }
 
+export interface ServiceFormField {
+  id: string;
+  label: string;
+  fieldKey: string;
+  fieldType:
+    | "text"
+    | "textarea"
+    | "number"
+    | "select"
+    | "radio"
+    | "checkbox"
+    | "multiselect"
+    | "date"
+    | "email"
+    | "url"
+    | string;
+  required: boolean;
+  options: unknown;
+  sortOrder: number;
+}
+
 export interface ServiceLine {
   id: string;
   slug: string;
@@ -72,19 +93,13 @@ export interface ServiceLine {
   category: string;
   description: string;
   deliverables: string | null;
-  pricingModel: 'fixed' | 'formula' | 'manual_quote';
+  pricingModel: "fixed" | "formula" | "manual_quote";
   basePrice: number | null;
   slaHours: number | null;
   revisionPolicy: string | null;
   isActive: boolean;
   packages: ServicePackage[];
-  formFields?: {
-    id: string;
-    label: string;
-    fieldKey: string;
-    fieldType: string;
-    required: boolean;
-  }[];
+  formFields?: ServiceFormField[];
   acceptanceCriteria?: { id: string; description: string }[];
 }
 
@@ -110,6 +125,10 @@ export interface OrderSummary {
 
 export interface OrderDetail extends OrderSummary {
   briefDescription: string;
+  packageId?: string | null;
+  budgetHint?: number | null;
+  formResponses?: unknown;
+  version?: number;
   customerId: string;
   revisionsAllowed: number;
   revisionsUsed: number;
@@ -159,29 +178,33 @@ export interface OrderDetail extends OrderSummary {
   assignments?: {
     id: string;
     unassignedAt: string | null;
-    executorProfile: { id: string; displayAlias: string; publicHandlerCode: string };
+    executorProfile: {
+      id: string;
+      displayAlias: string;
+      publicHandlerCode: string;
+    };
   }[];
 }
 
 export type TicketStatus =
-  | 'open'
-  | 'assigned'
-  | 'in_progress'
-  | 'waiting_customer'
-  | 'waiting_internal'
-  | 'resolved'
-  | 'closed'
-  | 'escalated';
+  | "open"
+  | "assigned"
+  | "in_progress"
+  | "waiting_customer"
+  | "waiting_internal"
+  | "resolved"
+  | "closed"
+  | "escalated";
 
 export const TICKET_STATUS_LABELS_FA: Record<TicketStatus, string> = {
-  open: 'باز',
-  assigned: 'اختصاص‌یافته',
-  in_progress: 'در حال بررسی',
-  waiting_customer: 'منتظر مشتری',
-  waiting_internal: 'منتظر داخلی',
-  resolved: 'حل‌شده',
-  closed: 'بسته‌شده',
-  escalated: 'ارجاع‌شده (escalation)',
+  open: "باز",
+  assigned: "اختصاص‌یافته",
+  in_progress: "در حال بررسی",
+  waiting_customer: "منتظر مشتری",
+  waiting_internal: "منتظر داخلی",
+  resolved: "حل‌شده",
+  closed: "بسته‌شده",
+  escalated: "ارجاع‌شده (escalation)",
 };
 
 export interface Ticket {
@@ -201,7 +224,7 @@ export interface TicketMessage {
   id: string;
   body: string;
   senderUserId: string;
-  visibility: 'customer_visible' | 'internal_only';
+  visibility: "customer_visible" | "internal_only";
   createdAt: string;
 }
 
@@ -210,7 +233,7 @@ export interface WalletSummary {
   currency: string;
   transactions: {
     id: string;
-    direction: 'debit' | 'credit';
+    direction: "debit" | "credit";
     amount: number;
     balanceAfter: number;
     referenceType: string;

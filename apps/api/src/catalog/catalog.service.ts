@@ -13,7 +13,11 @@ export class CatalogService {
   listPublic() {
     return this.prisma.serviceLine.findMany({
       where: { isActive: true },
-      include: { packages: { where: { isActive: true } } },
+      include: {
+        packages: { where: { isActive: true } },
+        formFields: { orderBy: { sortOrder: 'asc' } },
+        acceptanceCriteria: true,
+      },
       orderBy: { title: 'asc' },
     });
   }

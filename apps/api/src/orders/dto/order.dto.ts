@@ -20,7 +20,7 @@ export class CreateOrderDto {
 
   @IsOptional()
   @IsString()
-  packageId?: string;
+  packageId?: string | null;
 
   @IsString()
   title!: string;
@@ -39,7 +39,7 @@ export class CreateOrderDto {
   @IsOptional()
   @IsInt()
   @Min(0)
-  budgetHint?: number;
+  budgetHint?: number | null;
 
   @IsOptional()
   @IsArray()
@@ -52,6 +52,42 @@ export class SubmitOrderDto {
   @IsArray()
   @IsString({ each: true })
   acceptanceCriteria?: string[];
+}
+
+export class UpdateOrderDraftDto {
+  @IsOptional()
+  @IsString()
+  packageId?: string | null;
+
+  @IsOptional()
+  @IsString()
+  title?: string;
+
+  @IsOptional()
+  @IsIn(['low', 'normal', 'high', 'urgent'])
+  urgency?: string;
+
+  @IsOptional()
+  @IsString()
+  briefDescription?: string;
+
+  @IsOptional()
+  @IsObject()
+  formResponses?: Record<string, unknown>;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  budgetHint?: number | null;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  acceptanceCriteria?: string[];
+
+  @IsInt()
+  @Min(0)
+  version!: number;
 }
 
 export class TriageDecisionDto {
