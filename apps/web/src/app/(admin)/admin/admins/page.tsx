@@ -28,11 +28,15 @@ export default function AdminsPage() {
   const [phone, setPhone] = useState('');
   const [fullName, setFullName] = useState('');
   const [scope, setScope] = useState('ops_admin');
+  const [scopeDrafts, setScopeDrafts] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
 
   function load() {
     apiFetch<AdminRow[]>('/admin/admins')
-      .then(setAdmins)
+      .then((result) => {
+        setAdmins(result);
+        setScopeDrafts(Object.fromEntries(result.map((admin) => [admin.id, admin.adminScope])));
+      })
       .catch((e) => setError(e.message));
   }
 
@@ -53,6 +57,24 @@ export default function AdminsPage() {
       load();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'خطا در ایجاد ادمین');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function updateScope(admin: AdminRow) {
+    const adminScope = scopeDrafts[admin.id];
+    if (!adminScope || adminScope === admin.adminScope) return;
+    setBusy(true);
+    setError('');
+    try {
+      await apiFetch(`/admin/admins/${admin.id}/scope`, {
+        method: 'PATCH',
+        body: { adminScope },
+      });
+      load();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'خطا در تغییر سطح دسترسی');
     } finally {
       setBusy(false);
     }
@@ -120,6 +142,7 @@ export default function AdminsPage() {
                 <th className="px-4 py-3 font-medium">موبایل</th>
                 <th className="px-4 py-3 font-medium">دسترسی</th>
                 <th className="px-4 py-3 font-medium">وضعیت</th>
+                <th className="px-4 py-3 font-medium">تغییر Scope</th>
               </tr>
             </thead>
             <tbody>
@@ -139,6 +162,18 @@ export default function AdminsPage() {
                     <Badge color={a.status === 'active' ? 'green' : 'red'}>
                       {a.status}
                     </Badge>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex gap-2">
+                      <select className={inputClass} value={scopeDrafts[a.id] ?? a.adminScope} onChange={(event) => setScopeDrafts((current) => ({ ...current, [a.id]: event.target.value }))}>
+                        <option value="ops_admin">ops_admin</option>
+                        <option value="finance_admin">finance_admin</option>
+                        <option value="super_admin">super_admin</option>
+                      </select>
+                      <Button variant="secondary" disabled={busy || (scopeDrafts[a.id] ?? a.adminScope) === a.adminScope} onClick={() => void updateScope(a)}>
+                        اعمال
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}

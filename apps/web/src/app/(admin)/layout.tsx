@@ -29,6 +29,10 @@ const FINANCE_NAV = [
 const SUPER_NAV = [
   { href: '/admin/users', label: 'کاربران' },
   { href: '/admin/admins', label: 'ادمین‌ها' },
+  { href: '/admin/settings', label: 'تنظیمات سامانه' },
+  { href: '/admin/ai-controls', label: 'کنترل‌های AI' },
+  { href: '/admin/security', label: 'امنیت و سلامت' },
+  { href: '/admin/audit', label: 'گزارش Audit' },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {

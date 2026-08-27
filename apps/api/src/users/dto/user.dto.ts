@@ -1,5 +1,6 @@
 import { AdminScope, UserRole, UserStatus } from '@prisma/client';
 import {
+  IsDefined,
   IsEnum,
   IsIn,
   IsOptional,
@@ -74,4 +75,25 @@ export class UpdateAdminScopeDto {
 export class UpdateUserStatusDto {
   @IsIn(USER_STATUSES)
   status!: UserStatus;
+}
+
+export const SYSTEM_SETTING_KEYS = [
+  'finance.commission_rate',
+  'finance.withdrawal_min',
+  'finance.withdrawal_max',
+  'finance.cancel_in_progress_refund_rate',
+  'calendar.iran_holidays',
+  'ai.enabled',
+  'ai.order_triage_enabled',
+  'ai.support_draft_enabled',
+  'ai.human_approval_required',
+] as const;
+
+export class UpdateSettingDto {
+  @IsString()
+  @IsIn(SYSTEM_SETTING_KEYS)
+  key!: (typeof SYSTEM_SETTING_KEYS)[number];
+
+  @IsDefined()
+  value!: unknown;
 }

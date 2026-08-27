@@ -6,7 +6,10 @@ import {
   AdminsAdminController,
   AuditLogAdminController,
 } from './users.admin.controller';
-import { SettingsController } from './settings.controller';
+import {
+  SecurityAdminController,
+  SettingsController,
+} from './settings.controller';
 
 @Module({
   controllers: [
@@ -14,6 +17,7 @@ import { SettingsController } from './settings.controller';
     AdminsAdminController,
     AuditLogAdminController,
     SettingsController,
+    SecurityAdminController,
   ],
   providers: [UsersService, SettingsService],
   exports: [UsersService],

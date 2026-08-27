@@ -132,7 +132,7 @@
 - [x] پنل پشتیبان: داشبورد، صف، My Tickets، SLA، Internal Note، Canned Reply و Performance
 - [x] پنل Ops: Triage، Quote، Assignment، QC، Team/Staff، Service/Package/Form/QC Template
 - [x] پنل Finance: Payment، Escrow، Refund، Invoice، Ledger export و Withdrawal
-- [ ] پنل Super Admin: Users، Admin/Scope، Settings، AI controls، Security و Audit
+- [x] پنل Super Admin: Users، Admin/Scope، Settings، AI controls، Security و Audit
 - [ ] Confirmation Modal استاندارد با خلاصه اثر، Note اجباری و جلوگیری از کلیک تکراری
 - [ ] Status Page برای وضعیت سرویس‌های کلیدی و رخدادهای عملیاتی
 
