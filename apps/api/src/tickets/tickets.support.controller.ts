@@ -33,22 +33,41 @@ export class TicketsSupportController {
 
   @Get()
   list(
+    @CurrentUser() user: AuthenticatedUser,
     @Query('status') status?: TicketStatus,
     @Query('priority') priority?: TicketPriority,
     @Query('category') category?: TicketCategory,
     @Query('assignedToUserId') assignedToUserId?: string,
+    @Query('view') view?: 'queue' | 'mine',
   ) {
     return this.tickets.listQueue({
       status,
       priority,
       category,
-      assignedToUserId,
+      assignedToUserId:
+        view === 'mine'
+          ? user.id
+          : user.role === UserRole.admin
+            ? assignedToUserId
+            : undefined,
     });
   }
 
+  @Get('dashboard/summary')
+  dashboard(@CurrentUser() user: AuthenticatedUser) {
+    return this.tickets.supportDashboard(user.id);
+  }
+
+  @Get('canned-replies')
+  cannedReplies() {
+    return this.tickets.listCannedReplies();
+  }
+
   @Get('performance')
-  performance() {
-    return this.tickets.supportPerformance();
+  performance(@CurrentUser() user: AuthenticatedUser) {
+    return this.tickets.supportPerformance(
+      user.role === UserRole.support ? user.id : undefined,
+    );
   }
 
   @Get(':id')
@@ -57,8 +76,17 @@ export class TicketsSupportController {
   }
 
   @Patch(':id/assign')
-  assign(@Param('id') id: string, @Body() dto: AssignTicketDto) {
-    return this.tickets.assign(id, dto.assignedToUserId);
+  assign(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: AssignTicketDto,
+  ) {
+    return this.tickets.assign(id, dto.assignedToUserId, user);
+  }
+
+  @Post(':id/claim')
+  claim(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
+    return this.tickets.assign(id, user.id, user);
   }
 
   @Post(':id/reply')
@@ -67,7 +95,7 @@ export class TicketsSupportController {
     @Param('id') id: string,
     @Body() dto: AddTicketMessageDto,
   ) {
-    return this.tickets.reply(user.id, id, dto);
+    return this.tickets.reply(user, id, dto);
   }
 
   @Post(':id/escalate')
@@ -76,16 +104,16 @@ export class TicketsSupportController {
     @Param('id') id: string,
     @Body() dto: EscalateTicketDto,
   ) {
-    return this.tickets.escalate(id, user.id, dto.reason);
+    return this.tickets.escalate(id, user, dto.reason);
   }
 
   @Post(':id/resolve')
   resolve(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
-    return this.tickets.resolve(id, user.id);
+    return this.tickets.resolve(id, user);
   }
 
   @Post(':id/close')
-  close(@Param('id') id: string) {
-    return this.tickets.close(id);
+  close(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
+    return this.tickets.close(id, user);
   }
 }

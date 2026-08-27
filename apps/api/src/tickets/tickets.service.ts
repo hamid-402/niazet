@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -8,6 +9,7 @@ import {
   TicketCategory,
   TicketPriority,
   TicketStatus,
+  UserRole,
 } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
@@ -18,6 +20,28 @@ import {
 } from '../common/utils/business-hours';
 import { AddTicketMessageDto, CreateTicketDto } from './dto/ticket.dto';
 import { createVersionedOrderReport } from '../orders/domain/order-reports';
+import type { AuthenticatedUser } from '../common/types/authenticated-user';
+
+const CANNED_REPLIES = [
+  {
+    id: 'need-more-information',
+    title: 'درخواست اطلاعات تکمیلی',
+    category: 'general',
+    body: 'برای بررسی دقیق‌تر، لطفاً جزئیات و در صورت امکان تصویر یا فایل مرتبط را ارسال کنید.',
+  },
+  {
+    id: 'under-review',
+    title: 'در حال بررسی',
+    category: 'general',
+    body: 'درخواست شما در حال بررسی است و نتیجه از همین تیکت اطلاع‌رسانی خواهد شد.',
+  },
+  {
+    id: 'payment-followup',
+    title: 'پیگیری پرداخت',
+    category: 'payment',
+    body: 'وضعیت تراکنش در حال بررسی است. لطفاً کد پیگیری پرداخت و زمان تقریبی تراکنش را ارسال کنید.',
+  },
+] as const;
 
 @Injectable()
 export class TicketsService {
@@ -198,32 +222,78 @@ export class TicketsService {
         escalations: true,
         order: { select: { code: true, title: true, publicHandlers: true } },
         customer: { select: { fullName: true, phone: true } },
+        assignedTo: { select: { id: true, fullName: true } },
       },
     });
     if (!ticket) throw new NotFoundException('تیکت یافت نشد.');
     return ticket;
   }
 
-  async assign(id: string, assignedToUserId: string) {
-    await this.ensureExists(id);
-    return this.prisma.ticket.update({
-      where: { id },
-      data: { assignedToUserId, status: TicketStatus.assigned },
+  listCannedReplies() {
+    return CANNED_REPLIES;
+  }
+
+  async assign(id: string, assignedToUserId: string, actor: AuthenticatedUser) {
+    const ticket = await this.ensureExists(id);
+    if (actor.role === UserRole.support && actor.id !== assignedToUserId) {
+      throw new ForbiddenException(
+        'پشتیبان فقط می‌تواند تیکت را برای خودش بردارد.',
+      );
+    }
+    if (
+      ticket.status === TicketStatus.resolved ||
+      ticket.status === TicketStatus.closed
+    ) {
+      throw new BadRequestException('تیکت بسته یا حل‌شده قابل تخصیص نیست.');
+    }
+    const assignee = await this.prisma.user.findFirst({
+      where: { id: assignedToUserId, role: UserRole.support, status: 'active' },
+      select: { id: true },
+    });
+    if (!assignee) throw new BadRequestException('پشتیبان فعال یافت نشد.');
+
+    return this.prisma.$transaction(async (tx) => {
+      const updated = await tx.ticket.update({
+        where: { id },
+        data: { assignedToUserId, status: TicketStatus.assigned },
+      });
+      await tx.auditLog.create({
+        data: {
+          actorUserId: actor.id,
+          actorRole: actor.role,
+          action: 'ticket.assigned',
+          entityType: 'ticket',
+          entityId: id,
+          before: { assignedToUserId: ticket.assignedToUserId },
+          after: { assignedToUserId },
+        },
+      });
+      return updated;
     });
   }
 
   async reply(
-    supportUserId: string,
+    actor: AuthenticatedUser,
     ticketId: string,
     dto: AddTicketMessageDto,
   ) {
     const ticket = await this.ensureExists(ticketId);
+    if (
+      actor.role === UserRole.support &&
+      ticket.assignedToUserId !== actor.id
+    ) {
+      throw new ForbiddenException(
+        ticket.assignedToUserId
+          ? 'این تیکت به پشتیبان دیگری تخصیص دارد.'
+          : 'ابتدا تیکت را برای خودتان بردارید.',
+      );
+    }
     const visibility =
       dto.visibility === 'internal_only'
         ? MessageVisibility.internal_only
         : MessageVisibility.customer_visible;
     await this.assertSupportAttachment(
-      supportUserId,
+      actor.id,
       ticket.orderId ?? undefined,
       dto.attachmentFileId,
     );
@@ -231,7 +301,7 @@ export class TicketsService {
     const message = await this.prisma.ticketMessage.create({
       data: {
         ticketId,
-        senderUserId: supportUserId,
+        senderUserId: actor.id,
         body: dto.body,
         attachmentFileId: dto.attachmentFileId,
         visibility,
@@ -254,8 +324,9 @@ export class TicketsService {
     return message;
   }
 
-  async escalate(ticketId: string, escalatedByUserId: string, reason: string) {
-    await this.ensureExists(ticketId);
+  async escalate(ticketId: string, actor: AuthenticatedUser, reason: string) {
+    const ticket = await this.ensureExists(ticketId);
+    this.assertSupportCanAct(ticket, actor);
     await this.prisma.ticket.update({
       where: { id: ticketId },
       data: { status: TicketStatus.escalated },
@@ -264,14 +335,15 @@ export class TicketsService {
       data: { ticketId, eventType: 'escalated' },
     });
     return this.prisma.ticketEscalation.create({
-      data: { ticketId, escalatedByUserId, reason },
+      data: { ticketId, escalatedByUserId: actor.id, reason },
     });
   }
 
-  async resolve(ticketId: string, supportUserId: string) {
+  async resolve(ticketId: string, actor: AuthenticatedUser) {
     return this.prisma.$transaction(async (tx) => {
       const ticket = await tx.ticket.findUnique({ where: { id: ticketId } });
       if (!ticket) throw new NotFoundException('تیکت یافت نشد.');
+      this.assertSupportCanAct(ticket, actor);
       const resolved = await tx.ticket.update({
         where: { id: ticketId },
         data: { status: TicketStatus.resolved, resolvedAt: new Date() },
@@ -279,7 +351,7 @@ export class TicketsService {
       if (ticket.orderId) {
         await createVersionedOrderReport(tx, {
           orderId: ticket.orderId,
-          authorUserId: supportUserId,
+          authorUserId: actor.id,
           reportType: 'support',
           summary: `تیکت ${ticket.code} با موضوع «${ticket.subject}» حل شد.`,
           visibleToCustomer: true,
@@ -289,23 +361,80 @@ export class TicketsService {
     });
   }
 
-  async close(ticketId: string) {
-    await this.ensureExists(ticketId);
+  async close(ticketId: string, actor: AuthenticatedUser) {
+    const ticket = await this.ensureExists(ticketId);
+    this.assertSupportCanAct(ticket, actor);
+    if (ticket.status !== TicketStatus.resolved) {
+      throw new BadRequestException('فقط تیکت حل‌شده قابل بستن است.');
+    }
     return this.prisma.ticket.update({
       where: { id: ticketId },
       data: { status: TicketStatus.closed, closedAt: new Date() },
     });
   }
 
-  async supportPerformance() {
+  async supportDashboard(userId: string) {
+    const now = new Date();
+    const riskWindow = new Date(now.getTime() + 60 * 60 * 1000);
+    const activeStatuses = [
+      TicketStatus.open,
+      TicketStatus.assigned,
+      TicketStatus.waiting_internal,
+      TicketStatus.waiting_customer,
+      TicketStatus.escalated,
+    ];
+    const [unassigned, mine, slaAtRisk, breached, nextTickets] =
+      await Promise.all([
+        this.prisma.ticket.count({
+          where: { assignedToUserId: null, status: { in: activeStatuses } },
+        }),
+        this.prisma.ticket.count({
+          where: { assignedToUserId: userId, status: { in: activeStatuses } },
+        }),
+        this.prisma.ticket.count({
+          where: {
+            assignedToUserId: userId,
+            status: { in: activeStatuses },
+            slaDueAt: { gt: now, lte: riskWindow },
+          },
+        }),
+        this.prisma.ticket.count({
+          where: {
+            assignedToUserId: userId,
+            status: { in: activeStatuses },
+            slaDueAt: { lt: now },
+          },
+        }),
+        this.prisma.ticket.findMany({
+          where: { assignedToUserId: userId, status: { in: activeStatuses } },
+          include: { customer: { select: { fullName: true } } },
+          orderBy: [{ slaDueAt: 'asc' }, { priority: 'desc' }],
+          take: 5,
+        }),
+      ]);
+    return { unassigned, mine, slaAtRisk, breached, nextTickets };
+  }
+
+  async supportPerformance(userId?: string) {
     const [totalReplied, resolved, slaBreaches] = await Promise.all([
       this.prisma.ticketMessage.count({
-        where: { visibility: MessageVisibility.customer_visible },
+        where: {
+          visibility: MessageVisibility.customer_visible,
+          ...(userId ? { senderUserId: userId } : {}),
+        },
       }),
       this.prisma.ticket.count({
-        where: { status: { in: [TicketStatus.resolved, TicketStatus.closed] } },
+        where: {
+          status: { in: [TicketStatus.resolved, TicketStatus.closed] },
+          ...(userId ? { assignedToUserId: userId } : {}),
+        },
       }),
-      this.prisma.ticketSlaEvent.count({ where: { eventType: 'breach' } }),
+      this.prisma.ticketSlaEvent.count({
+        where: {
+          eventType: 'breach',
+          ...(userId ? { ticket: { assignedToUserId: userId } } : {}),
+        },
+      }),
     ]);
     return { totalReplied, resolved, slaBreaches };
   }
@@ -314,6 +443,22 @@ export class TicketsService {
     const ticket = await this.prisma.ticket.findUnique({ where: { id } });
     if (!ticket) throw new NotFoundException('تیکت یافت نشد.');
     return ticket;
+  }
+
+  private assertSupportCanAct(
+    ticket: { assignedToUserId: string | null },
+    actor: AuthenticatedUser,
+  ) {
+    if (
+      actor.role === UserRole.support &&
+      ticket.assignedToUserId !== actor.id
+    ) {
+      throw new ForbiddenException(
+        ticket.assignedToUserId
+          ? 'این تیکت به پشتیبان دیگری تخصیص دارد.'
+          : 'ابتدا تیکت را برای خودتان بردارید.',
+      );
+    }
   }
 
   private async assertCustomerAttachment(

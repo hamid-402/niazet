@@ -20,8 +20,8 @@ $Services = @(
   @{
     Name = 'web'
     WorkDir = Join-Path $RepoRoot 'apps\web'
-    Arguments = @('run', 'dev')
-    HealthUrl = 'http://localhost:3000/'
+    Arguments = @('run', 'dev', '--', '--port', '3002')
+    HealthUrl = 'http://localhost:3002/'
   }
 )
 

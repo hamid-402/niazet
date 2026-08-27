@@ -129,7 +129,7 @@
 - [x] کیف پول، پرداخت‌های سفارش، Escrow، Refund و Invoice PDF برای مشتری
 - [x] شکایت، تشکر و Rating برای Order، Team، Executor، Support و QC با کد قابل ارجاع
 - [x] پنل مجری: پذیرش کار، ورودی‌ها، معیار پذیرش، Checklist، Progress، Delivery و QC Rework
-- [ ] پنل پشتیبان: داشبورد، صف، My Tickets، SLA، Internal Note، Canned Reply و Performance
+- [x] پنل پشتیبان: داشبورد، صف، My Tickets، SLA، Internal Note، Canned Reply و Performance
 - [ ] پنل Ops: Triage، Quote، Assignment، QC، Team/Staff، Service/Package/Form/QC Template
 - [ ] پنل Finance: Payment، Escrow، Refund، Invoice، Ledger export و Withdrawal
 - [ ] پنل Super Admin: Users، Admin/Scope، Settings، AI controls، Security و Audit

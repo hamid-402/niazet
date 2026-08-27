@@ -29,7 +29,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\runtime.ps1 install
 powershell -ExecutionPolicy Bypass -File .\scripts\local.ps1 start
 ```
 
-سایت در `http://localhost:3000` و API در `http://localhost:3001` در دسترس است. برای وضعیت یا توقف:
+سایت در `http://localhost:3002` و API در `http://localhost:3001` در دسترس است. پورت ۳۰۰۲ عمداً ثابت شده تا با برنامه‌های دیگری که معمولاً روی ۳۰۰۰ اجرا می‌شوند برخورد نکند. برای وضعیت یا توقف:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\local.ps1 status

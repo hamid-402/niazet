@@ -1,5 +1,5 @@
 const API_ORIGIN = process.env.API_ORIGIN ?? 'http://localhost:3001';
-const WEB_ORIGIN = process.env.WEB_ORIGIN ?? 'http://localhost:3000';
+const WEB_ORIGIN = process.env.WEB_ORIGIN ?? 'http://localhost:3002';
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);

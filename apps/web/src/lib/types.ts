@@ -260,11 +260,14 @@ export interface Ticket {
   category: string;
   priority: string;
   status: TicketStatus;
-  slaDueAt: string | null;
-  createdAt: string;
-  customer?: { fullName: string; phone: string };
-  order?: { code: string } | null;
-}
+    slaDueAt: string | null;
+    assignedToUserId?: string | null;
+    createdAt: string;
+    updatedAt?: string;
+    customer?: { fullName: string; phone: string };
+    order?: { code: string } | null;
+    assignedTo?: { id: string; fullName: string } | null;
+  }
 
 export interface TicketMessage {
   id: string;
