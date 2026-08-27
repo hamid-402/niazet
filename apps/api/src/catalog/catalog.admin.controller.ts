@@ -13,7 +13,11 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { AdminScopes } from '../common/decorators/admin-scopes.decorator';
 import { AdminScopeGuard } from '../common/guards/admin-scope.guard';
 import {
+  CreateAcceptanceCriterionDto,
+  CreateFormFieldDto,
   CreatePackageDto,
+  CreateQcItemDto,
+  CreateQcTemplateDto,
   CreateServiceDto,
   UpdateServiceDto,
 } from './dto/service.dto';
@@ -53,5 +57,32 @@ export class CatalogAdminController {
   @Post(':id/packages')
   addPackage(@Param('id') id: string, @Body() dto: CreatePackageDto) {
     return this.catalog.addPackage(id, dto);
+  }
+
+  @Post(':id/form-fields')
+  addFormField(@Param('id') id: string, @Body() dto: CreateFormFieldDto) {
+    return this.catalog.addFormField(id, dto);
+  }
+
+  @Post(':id/acceptance-criteria')
+  addAcceptanceCriterion(
+    @Param('id') id: string,
+    @Body() dto: CreateAcceptanceCriterionDto,
+  ) {
+    return this.catalog.addAcceptanceCriterion(id, dto);
+  }
+
+  @Post(':id/qc-templates')
+  addQcTemplate(@Param('id') id: string, @Body() dto: CreateQcTemplateDto) {
+    return this.catalog.addQcTemplate(id, dto);
+  }
+
+  @Post(':id/qc-templates/:templateId/items')
+  addQcItem(
+    @Param('id') id: string,
+    @Param('templateId') templateId: string,
+    @Body() dto: CreateQcItemDto,
+  ) {
+    return this.catalog.addQcItem(id, templateId, dto);
   }
 }

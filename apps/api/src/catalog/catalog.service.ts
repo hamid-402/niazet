@@ -1,7 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
+  CreateAcceptanceCriterionDto,
+  CreateFormFieldDto,
   CreatePackageDto,
+  CreateQcItemDto,
+  CreateQcTemplateDto,
   CreateServiceDto,
   UpdateServiceDto,
 } from './dto/service.dto';
@@ -43,7 +47,8 @@ export class CatalogService {
     return this.prisma.serviceLine.findMany({
       include: {
         packages: true,
-        formFields: true,
+        formFields: { orderBy: { sortOrder: 'asc' } },
+        acceptanceCriteria: true,
         qcChecklistTemplates: { include: { items: true } },
       },
       orderBy: { createdAt: 'desc' },
@@ -86,5 +91,48 @@ export class CatalogService {
   async addPackage(serviceId: string, dto: CreatePackageDto) {
     await this.getForAdmin(serviceId);
     return this.prisma.servicePackage.create({ data: { ...dto, serviceId } });
+  }
+
+  async addFormField(serviceId: string, dto: CreateFormFieldDto) {
+    await this.getForAdmin(serviceId);
+    const { options, ...data } = dto;
+    return this.prisma.serviceFormField.create({
+      data: {
+        ...data,
+        serviceId,
+        options: options?.length ? options : undefined,
+      },
+    });
+  }
+
+  async addAcceptanceCriterion(
+    serviceId: string,
+    dto: CreateAcceptanceCriterionDto,
+  ) {
+    await this.getForAdmin(serviceId);
+    return this.prisma.serviceAcceptanceCriteria.create({
+      data: { serviceId, description: dto.description },
+    });
+  }
+
+  async addQcTemplate(serviceId: string, dto: CreateQcTemplateDto) {
+    await this.getForAdmin(serviceId);
+    return this.prisma.qcChecklistTemplate.create({
+      data: { serviceId, name: dto.name },
+      include: { items: true },
+    });
+  }
+
+  async addQcItem(serviceId: string, templateId: string, dto: CreateQcItemDto) {
+    const template = await this.prisma.qcChecklistTemplate.findFirst({
+      where: { id: templateId, serviceId },
+      select: { id: true },
+    });
+    if (!template) {
+      throw new NotFoundException('قالب کنترل کیفیت برای این خدمت یافت نشد.');
+    }
+    return this.prisma.qcChecklistItem.create({
+      data: { templateId, label: dto.label, sortOrder: dto.sortOrder ?? 0 },
+    });
   }
 }

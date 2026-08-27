@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/auth-context';
 const OPS_NAV = [
   { href: '/admin', label: 'داشبورد عملیات' },
   { href: '/admin/orders', label: 'مدیریت سفارش‌ها' },
+  { href: '/admin/services', label: 'خدمات و فرم‌ها' },
   { href: '/admin/qc', label: 'کنترل کیفیت QC' },
   { href: '/admin/staff', label: 'کارمندان و مجریان' },
   { href: '/admin/feedback', label: 'بازخورد و شکایت‌ها' },

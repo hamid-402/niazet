@@ -130,7 +130,7 @@
 - [x] شکایت، تشکر و Rating برای Order، Team، Executor، Support و QC با کد قابل ارجاع
 - [x] پنل مجری: پذیرش کار، ورودی‌ها، معیار پذیرش، Checklist، Progress، Delivery و QC Rework
 - [x] پنل پشتیبان: داشبورد، صف، My Tickets، SLA، Internal Note، Canned Reply و Performance
-- [ ] پنل Ops: Triage، Quote، Assignment، QC، Team/Staff، Service/Package/Form/QC Template
+- [x] پنل Ops: Triage، Quote، Assignment، QC، Team/Staff، Service/Package/Form/QC Template
 - [ ] پنل Finance: Payment، Escrow، Refund، Invoice، Ledger export و Withdrawal
 - [ ] پنل Super Admin: Users، Admin/Scope، Settings، AI controls، Security و Audit
 - [ ] Confirmation Modal استاندارد با خلاصه اثر، Note اجباری و جلوگیری از کلیک تکراری
