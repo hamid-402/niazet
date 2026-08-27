@@ -6,12 +6,15 @@ import { Card, ErrorBanner, PageLoading, SectionTitle } from '@/components/ui';
 import { formatToman } from '@/lib/format';
 
 interface FinanceDashboard {
-  pendingRefunds: number;
-  activeEscrowAmount: number;
-  activeEscrowCount: number;
+  period: { timeZone: string; startUtc: string };
+  gmv: number;
+  revenue: number;
+  commission: number;
+  escrow: { held: number; total: number; count: number };
+  walletLiability: { balance: number; count: number };
+  refunds: number;
   pendingWithdrawals: number;
   failedPayments: number;
-  monthRevenue: number;
 }
 
 export default function AdminFinanceDashboardPage() {
@@ -32,37 +35,50 @@ export default function AdminFinanceDashboardPage() {
       <SectionTitle>داشبورد مالی</SectionTitle>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
         <Card>
-          <p className="text-xs text-slate-400">گردش این ماه</p>
+          <p className="text-xs text-slate-400">GMV این ماه</p>
           <p className="mt-1 text-xl font-bold text-slate-900">
-            {formatToman(data.monthRevenue)}
+            {formatToman(data.gmv)}
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">escrow فعال</p>
+          <p className="text-xs text-slate-400">درآمد و کارمزد این ماه</p>
           <p className="mt-1 text-xl font-bold text-slate-900">
-            {formatToman(data.activeEscrowAmount)}
+            {formatToman(data.revenue)}
+          </p>
+        </Card>
+        <Card>
+          <p className="text-xs text-slate-400">مانده Escrow</p>
+          <p className="mt-1 text-xl font-bold text-slate-900">
+            {formatToman(data.escrow.held)}
           </p>
           <p className="text-xs text-slate-400">
-            {data.activeEscrowCount} مورد
+            {data.escrow.count.toLocaleString('fa-IR')} حساب امانی
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">refund در انتظار</p>
+          <p className="text-xs text-slate-400">بازپرداخت این ماه</p>
           <p className="mt-1 text-xl font-bold text-slate-900">
-            {data.pendingRefunds}
+            {formatToman(data.refunds)}
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">withdrawal در انتظار</p>
+          <p className="text-xs text-slate-400">برداشت در انتظار</p>
           <p className="mt-1 text-xl font-bold text-slate-900">
-            {data.pendingWithdrawals}
+            {data.pendingWithdrawals.toLocaleString('fa-IR')}
           </p>
         </Card>
         <Card>
           <p className="text-xs text-slate-400">پرداخت ناموفق</p>
           <p className="mt-1 text-xl font-bold text-slate-900">
-            {data.failedPayments}
+            {data.failedPayments.toLocaleString('fa-IR')}
           </p>
+        </Card>
+        <Card>
+          <p className="text-xs text-slate-400">تعهد کیف پول‌ها</p>
+          <p className="mt-1 text-xl font-bold text-slate-900">
+            {formatToman(data.walletLiability.balance)}
+          </p>
+          <p className="text-xs text-slate-400">{data.walletLiability.count.toLocaleString('fa-IR')} کیف پول</p>
         </Card>
       </div>
     </div>

@@ -388,4 +388,24 @@ export class EscrowService {
       take: params.take,
     });
   }
+
+  listRefundsForAdmin(params: {
+    status?: RefundStatus;
+    skip?: number;
+    take?: number;
+  }) {
+    return this.prisma.refund.findMany({
+      where: params.status ? { status: params.status } : {},
+      include: {
+        order: { select: { code: true, title: true } },
+        decidedBy: { select: { fullName: true } },
+        escrowHold: {
+          select: { amount: true, releasedAmount: true, refundedAmount: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      skip: params.skip,
+      take: params.take,
+    });
+  }
 }

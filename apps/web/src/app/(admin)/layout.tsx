@@ -19,6 +19,9 @@ const FINANCE_NAV = [
   { href: '/admin/finance', label: 'داشبورد مالی' },
   { href: '/admin/finance/payments', label: 'پرداخت‌ها' },
   { href: '/admin/finance/escrow', label: 'Escrow' },
+  { href: '/admin/finance/refunds', label: 'بازپرداخت‌ها' },
+  { href: '/admin/finance/invoices', label: 'فاکتورها' },
+  { href: '/admin/finance/withdrawals', label: 'برداشت‌ها' },
   { href: '/admin/finance/ledger', label: 'Ledger' },
   { href: '/account/security', label: 'حساب و امنیت' },
 ];

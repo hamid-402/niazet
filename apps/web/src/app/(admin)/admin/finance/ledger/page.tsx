@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, downloadAuthenticated } from '@/lib/api';
 import {
+  Button,
   Card,
   EmptyState,
   ErrorBanner,
@@ -31,6 +32,7 @@ const ACCOUNT_LABELS: Record<string, string> = {
 export default function AdminLedgerPage() {
   const [entries, setEntries] = useState<LedgerEntry[] | null>(null);
   const [error, setError] = useState('');
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     apiFetch<LedgerEntry[]>('/admin/finance/ledger')
@@ -38,11 +40,27 @@ export default function AdminLedgerPage() {
       .catch((e) => setError(e.message));
   }, []);
 
+  async function exportCsv() {
+    setExporting(true);
+    setError('');
+    try {
+      await downloadAuthenticated(
+        '/admin/finance/ledger/export',
+        `niazat-ledger-${new Date().toISOString().slice(0, 10)}.csv`,
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'خروجی Ledger دریافت نشد.');
+    } finally {
+      setExporting(false);
+    }
+  }
+
   return (
     <div>
-      <SectionTitle subtitle="فقط نمایش؛ بدون امکان ویرایش مستقیم">
-        Ledger
-      </SectionTitle>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <SectionTitle subtitle="فقط نمایش؛ بدون امکان ویرایش مستقیم">Ledger</SectionTitle>
+        <Button variant="secondary" disabled={exporting} onClick={() => void exportCsv()}>{exporting ? 'در حال تهیه...' : 'خروجی CSV'}</Button>
+      </div>
       {error && <ErrorBanner message={error} />}
       {!entries && !error && <PageLoading />}
       {entries && entries.length === 0 && (

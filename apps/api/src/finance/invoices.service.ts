@@ -107,6 +107,23 @@ export class InvoicesService {
     };
   }
 
+  async pdfForAdmin(invoiceId: string) {
+    const invoice = await this.prisma.invoice.findUnique({
+      where: { id: invoiceId },
+      include: { order: { select: { code: true } } },
+    });
+    if (!invoice) throw new NotFoundException('فاکتور یافت نشد.');
+    return {
+      filename: `${invoice.invoiceNumber}.pdf`,
+      content: buildInvoicePdf({
+        invoiceNumber: invoice.invoiceNumber,
+        orderCode: invoice.order.code,
+        amount: invoice.amount,
+        issuedAt: invoice.issuedAt,
+      }),
+    };
+  }
+
   listForAdmin(params: { skip?: number; take?: number }) {
     return this.prisma.invoice.findMany({
       include: {

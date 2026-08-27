@@ -7,12 +7,14 @@ import {
   Patch,
   Post,
   Query,
+  StreamableFile,
   UseGuards,
 } from '@nestjs/common';
 import {
   AdminScope,
   EscrowStatus,
   PaymentStatus,
+  RefundStatus,
   UserRole,
   WithdrawalStatus,
 } from '@prisma/client';
@@ -119,6 +121,35 @@ export class FinanceAdminController {
     });
   }
 
+  @Get('refunds')
+  refundsList(
+    @Query() pagination: PaginationDto,
+    @Query('status') status?: RefundStatus,
+  ) {
+    const { skip, take } = buildPagination(pagination);
+    return this.escrow.listRefundsForAdmin({ status, skip, take });
+  }
+
+  @Get('ledger/export')
+  async ledgerExport(
+    @Query('referenceId') referenceId: string | undefined,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    await this.audit.record({
+      actorUserId: user.id,
+      actorRole: user.role,
+      action: 'ledger.export',
+      entityType: 'ledger_entries',
+      entityId: referenceId ?? 'all',
+      sensitivity: 'sensitive',
+    });
+    const content = await this.ledger.exportCsv({ referenceId });
+    return new StreamableFile(Buffer.from(content, 'utf8'), {
+      type: 'text/csv; charset=utf-8',
+      disposition: 'attachment; filename="niazat-ledger.csv"',
+    });
+  }
+
   @Get('ledger')
   async ledgerList(
     @Query() pagination: PaginationDto,
@@ -158,6 +189,26 @@ export class FinanceAdminController {
   invoicesList(@Query() pagination: PaginationDto) {
     const { skip, take } = buildPagination(pagination);
     return this.invoices.listForAdmin({ skip, take });
+  }
+
+  @Get('invoices/:id/pdf')
+  async invoicePdf(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    const pdf = await this.invoices.pdfForAdmin(id);
+    await this.audit.record({
+      actorUserId: user.id,
+      actorRole: user.role,
+      action: 'invoice.download',
+      entityType: 'invoice',
+      entityId: id,
+      sensitivity: 'sensitive',
+    });
+    return new StreamableFile(pdf.content, {
+      type: 'application/pdf',
+      disposition: `attachment; filename="${pdf.filename}"`,
+    });
   }
 
   @Get('withdrawals')

@@ -26,6 +26,7 @@
     "phase4:customer-finance-contract": "node scripts/phase4-customer-finance-contract.mjs",
     "phase4:support-contract": "node scripts/phase4-support-contract.mjs",
     "phase4:ops-contract": "node scripts/phase4-ops-contract.mjs",
+    "phase4:finance-contract": "node scripts/phase4-finance-contract.mjs",
     "prisma:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {

@@ -22,6 +22,52 @@ export interface PostEntryInput {
   correctionOfId?: string;
 }
 
+type LedgerCsvEntry = {
+  id: string;
+  createdAt: Date;
+  amount: number;
+  referenceType: string;
+  referenceId: string;
+  correctionOfId: string | null;
+  createdByUserId: string | null;
+  debitAccount: { accountType: string };
+  creditAccount: { accountType: string };
+};
+
+function csvCell(value: string | number | null) {
+  const raw = value == null ? '' : String(value);
+  const protectedValue = /^[=+\-@]/.test(raw.trimStart()) ? `'${raw}` : raw;
+  return `"${protectedValue.replaceAll('"', '""')}"`;
+}
+
+export function buildLedgerCsv(entries: LedgerCsvEntry[]) {
+  const header = [
+    'id',
+    'created_at',
+    'debit_account',
+    'credit_account',
+    'amount_irt',
+    'reference_type',
+    'reference_id',
+    'correction_of_id',
+    'created_by_user_id',
+  ];
+  const rows = entries.map((entry) => [
+    entry.id,
+    entry.createdAt.toISOString(),
+    entry.debitAccount.accountType,
+    entry.creditAccount.accountType,
+    entry.amount,
+    entry.referenceType,
+    entry.referenceId,
+    entry.correctionOfId,
+    entry.createdByUserId,
+  ]);
+  return [header, ...rows]
+    .map((row) => row.map(csvCell).join(','))
+    .join('\r\n');
+}
+
 /**
  * پیاده‌سازی الحاقیه v4 بخش ۲: `ledger_entries` منبع حقیقت مالی و
  * append-only است؛ `wallets`/`wallet_transactions` صرفاً یک cache مشتق‌شده
@@ -326,5 +372,14 @@ export class LedgerService {
       skip: params.skip,
       take: params.take,
     });
+  }
+
+  async exportCsv(params: { referenceId?: string }) {
+    const entries = await this.listEntries({
+      referenceId: params.referenceId,
+      take: 10_000,
+    });
+    // BOM باعث می‌شود Excel متن UTF-8 را بدون به‌هم‌ریختگی باز کند.
+    return `\uFEFF${buildLedgerCsv(entries)}`;
   }
 }
