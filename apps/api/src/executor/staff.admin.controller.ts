@@ -63,9 +63,13 @@ export class StaffAdminController {
     return this.executor.getProfileForAdmin(id);
   }
 
-  @Get(':id/performance')
-  performance(@Param('id') id: string) {
-    return this.executor.recalculatePerformance(id);
+  @Post(':id/performance/recalculate')
+  performance(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Req() req: Request,
+  ) {
+    return this.executor.recalculatePerformanceForAdmin(id, user, req.ip);
   }
 
   @Patch(':id/status')

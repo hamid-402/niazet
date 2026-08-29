@@ -626,6 +626,7 @@ model StaffPerformanceSnapshot {
 
   executorProfile ExecutorProfile @relation(fields: [executorProfileId], references: [id], onDelete: Cascade)
 
+  @@unique([executorProfileId, periodEnd])
   @@map("staff_performance_snapshots")
 }
 

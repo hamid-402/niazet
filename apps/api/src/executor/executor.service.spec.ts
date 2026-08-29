@@ -236,4 +236,43 @@ describe('ExecutorService staff operations', () => {
       ),
     ).rejects.toThrow(BadRequestException);
   });
+
+  it('upserts one performance snapshot per executor and UTC day', async () => {
+    const upsert = jest.fn().mockResolvedValue({
+      id: 'snapshot-1',
+      periodEnd: new Date('2026-08-29T00:00:00.000Z'),
+    });
+    const tx = {
+      executorProfile: { update: jest.fn() },
+      staffPerformanceSnapshot: { upsert },
+    };
+    const prisma = {
+      executorProfile: {
+        findUnique: jest.fn().mockResolvedValue({ id: 'profile-1' }),
+      },
+      orderAssignment: { findMany: jest.fn().mockResolvedValue([]) },
+      qcReview: { findMany: jest.fn().mockResolvedValue([]) },
+      feedback: { findMany: jest.fn().mockResolvedValue([]) },
+      $transaction: jest.fn((callback: (client: typeof tx) => unknown) =>
+        callback(tx),
+      ),
+    };
+    const service = new ExecutorService(prisma as never, {} as never);
+
+    await service.recalculatePerformance(
+      'profile-1',
+      new Date('2026-08-29T12:00:00.000Z'),
+    );
+
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          executorProfileId_periodEnd: {
+            executorProfileId: 'profile-1',
+            periodEnd: new Date('2026-08-29T00:00:00.000Z'),
+          },
+        },
+      }),
+    );
+  });
 });

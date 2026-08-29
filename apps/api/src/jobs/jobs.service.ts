@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, renameSync } from 'node:fs';
 import { join } from 'node:path';
 import { ExecutorService } from '../executor/executor.service';
+import { runPerformanceBatch } from '../executor/performance-metrics';
 import { AntivirusService } from '../files/antivirus.service';
 import { QUARANTINE_ROOT, UPLOAD_ROOT } from '../files/files.service';
 import { FinanceReportingService } from '../finance/finance-reporting.service';
@@ -102,7 +103,7 @@ export class JobsService implements OnModuleInit {
     this.runner.register({
       name: 'recalculate_staff_performance',
       intervalMs: 24 * HOUR,
-      run: () => this.recalculateStaffPerformance(),
+      run: (now) => this.recalculateStaffPerformance(now),
     });
     this.runner.register({
       name: 'recalculate_executor_scores',
@@ -259,15 +260,17 @@ export class JobsService implements OnModuleInit {
     return { processed, skipped };
   }
 
-  private async recalculateStaffPerformance(): Promise<JobResult> {
+  private async recalculateStaffPerformance(now: Date): Promise<JobResult> {
     const profiles = await this.prisma.executorProfile.findMany({
       where: { status: { not: 'blocked' } },
       select: { id: true },
     });
-    for (const profile of profiles) {
-      await this.executor.recalculatePerformance(profile.id);
-    }
-    return { processed: profiles.length };
+    return runPerformanceBatch(
+      profiles.map((profile) => profile.id),
+      now,
+      (profileId, calculationTime) =>
+        this.executor.recalculatePerformance(profileId, calculationTime),
+    );
   }
 
   private async recalculateExecutorScores(): Promise<JobResult> {

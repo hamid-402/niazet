@@ -140,7 +140,7 @@
 
 - [x] Team، Skill، Executor type، Verification، حضور، ظرفیت و دسترسی‌ها
 - [x] پروفایل کامل داخلی با تب‌های سفارش، عملکرد، امتیاز، شکایت/تشکر، مهارت، ظرفیت و History
-- [ ] Snapshot و Job محاسبه On-time، QC pass، Rating، Complaint، Compliment و Risk
+- [x] Snapshot و Job محاسبه On-time، QC pass، Rating، Complaint، Compliment و Risk
 - [ ] هشدار Over-capacity، Burnout risk، SLA risk و Quality regression
 - [ ] حفظ محرمانگی: مجری فقط عملکرد شخصی محدود و داده لازم برای اجرا را می‌بیند
 - [ ] گزارش فروش، درآمد، Escrow، Refund، QC، SLA، تیم‌ها، کارکنان، رضایت، تبدیل و زمان تحویل

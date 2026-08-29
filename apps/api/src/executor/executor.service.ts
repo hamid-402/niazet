@@ -28,6 +28,12 @@ import {
 } from './dto/executor.dto';
 import { SAFE_USER_SELECT } from '../common/selects/safe-user.select';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
+import {
+  calculateRiskScore,
+  isAssignmentOnTime,
+  rollingPeriod,
+  round2,
+} from './performance-metrics';
 
 @Injectable()
 export class ExecutorService {
@@ -669,46 +675,76 @@ export class ExecutorService {
     return parsed;
   }
 
-  /**
-   * محاسبه شاخص‌های عملکرد (سند v4 §۱۱.۳). برای MVP این نوبت به‌صورت
-   * synchronous فراخوانی می‌شود؛ در فاز بعد باید job پس‌زمینه
-   * `recalculate_staff_performance` این کار را دوره‌ای انجام دهد.
-   */
-  async recalculatePerformance(executorProfileId: string) {
+  async recalculatePerformance(executorProfileId: string, now = new Date()) {
     const profile = await this.prisma.executorProfile.findUnique({
       where: { id: executorProfileId },
     });
     if (!profile) throw new NotFoundException('پروفایل مجری یافت نشد.');
 
+    const { periodStart, periodEnd } = rollingPeriod(now);
+
     const assignments = await this.prisma.orderAssignment.findMany({
-      where: { executorProfileId },
-      include: { order: true },
+      where: {
+        executorProfileId,
+        OR: [
+          {
+            unassignedAt: null,
+            order: {
+              status: { notIn: [OrderStatus.closed, OrderStatus.cancelled] },
+            },
+          },
+          { order: { closedAt: { gte: periodStart, lte: now } } },
+        ],
+      },
+      include: {
+        order: {
+          include: {
+            serviceLine: { select: { slaHours: true } },
+            milestones: { select: { dueAt: true, deliveredAt: true } },
+          },
+        },
+      },
     });
 
     const completed = assignments.filter(
-      (a) => a.order.status === OrderStatus.closed,
+      (assignment) => assignment.order.status === OrderStatus.closed,
     );
     const active = assignments.filter(
-      (a) => a.unassignedAt === null && a.order.status !== OrderStatus.closed,
+      (assignment) =>
+        assignment.unassignedAt === null &&
+        assignment.order.status !== OrderStatus.closed &&
+        assignment.order.status !== OrderStatus.cancelled,
     );
-
-    const onTimeCount = completed.filter(
-      (a) =>
-        a.order.deliveredAt &&
-        a.order.confirmedAt &&
-        a.order.deliveredAt <= a.order.confirmedAt,
-    ).length;
+    const deadlineResults = completed
+      .map((assignment) => isAssignmentOnTime(assignment))
+      .filter((value): value is boolean => value !== null);
+    const onTimeCount = deadlineResults.filter(Boolean).length;
 
     const qcReviews = await this.prisma.qcReview.findMany({
       where: {
         order: { assignments: { some: { executorProfileId } } },
         result: { not: null },
+        reviewedAt: { gte: periodStart, lte: now },
       },
+      orderBy: [{ reviewedAt: 'asc' }, { createdAt: 'asc' }],
     });
-    const qcPassed = qcReviews.filter((r) => r.result === 'passed').length;
+    const firstQcByOrder = new Map<string, (typeof qcReviews)[number]>();
+    for (const review of qcReviews) {
+      if (!firstQcByOrder.has(review.orderId)) {
+        firstQcByOrder.set(review.orderId, review);
+      }
+    }
+    const firstQcReviews = [...firstQcByOrder.values()];
+    const qcPassed = firstQcReviews.filter(
+      (review) => review.result === 'passed',
+    ).length;
 
     const feedback = await this.prisma.feedback.findMany({
-      where: { targetType: 'executor', targetInternalId: executorProfileId },
+      where: {
+        targetType: 'executor',
+        targetInternalId: executorProfileId,
+        createdAt: { gte: periodStart, lte: now },
+      },
     });
     const ratings = feedback
       .filter((f) => f.rating != null)
@@ -723,44 +759,87 @@ export class ExecutorService {
       (f) => f.feedbackType === 'compliment',
     ).length;
 
-    const onTimeRate = completed.length
-      ? (onTimeCount / completed.length) * 100
+    const onTimeRate = deadlineResults.length
+      ? round2((onTimeCount / deadlineResults.length) * 100)
       : 0;
-    const qcPassRate = qcReviews.length
-      ? (qcPassed / qcReviews.length) * 100
+    const qcPassRate = firstQcReviews.length
+      ? round2((qcPassed / firstQcReviews.length) * 100)
       : 0;
-    const riskScore = Math.max(
-      0,
-      complaints * 10 - compliments * 2 - onTimeRate * 0.1,
-    );
-
-    await this.prisma.executorProfile.update({
-      where: { id: executorProfileId },
-      data: {
-        qcPassRate,
-        onTimeDeliveryRate: onTimeRate,
-        customerRatingAvg: avgRating,
-        complaintCount: complaints,
-        complimentCount: compliments,
-        riskScore,
-      },
+    const roundedRating = round2(avgRating);
+    const riskScore = calculateRiskScore({
+      onTimeRate,
+      onTimeSamples: deadlineResults.length,
+      qcPassRate,
+      qcSamples: firstQcReviews.length,
+      avgRating: roundedRating,
+      ratingSamples: ratings.length,
+      complaints,
+      compliments,
     });
 
-    return this.prisma.staffPerformanceSnapshot.create({
+    return this.prisma.$transaction(async (tx) => {
+      await tx.executorProfile.update({
+        where: { id: executorProfileId },
+        data: {
+          qcPassRate,
+          onTimeDeliveryRate: onTimeRate,
+          customerRatingAvg: roundedRating,
+          complaintCount: complaints,
+          complimentCount: compliments,
+          riskScore,
+        },
+      });
+
+      return tx.staffPerformanceSnapshot.upsert({
+        where: {
+          executorProfileId_periodEnd: { executorProfileId, periodEnd },
+        },
+        update: {
+          periodStart,
+          completedOrders: completed.length,
+          activeOrders: active.length,
+          onTimeRate,
+          qcPassRate,
+          avgCustomerRating: roundedRating,
+          complaintCount: complaints,
+          complimentCount: compliments,
+          riskScore,
+        },
+        create: {
+          executorProfileId,
+          periodStart,
+          periodEnd,
+          completedOrders: completed.length,
+          activeOrders: active.length,
+          onTimeRate,
+          qcPassRate,
+          avgCustomerRating: roundedRating,
+          complaintCount: complaints,
+          complimentCount: compliments,
+          riskScore,
+        },
+      });
+    });
+  }
+
+  async recalculatePerformanceForAdmin(
+    executorProfileId: string,
+    actor: AuthenticatedUser,
+    ipAddress?: string,
+  ) {
+    const snapshot = await this.recalculatePerformance(executorProfileId);
+    await this.prisma.auditLog.create({
       data: {
-        executorProfileId,
-        periodStart: new Date(new Date().setDate(1)),
-        periodEnd: new Date(),
-        completedOrders: completed.length,
-        activeOrders: active.length,
-        onTimeRate,
-        qcPassRate,
-        avgCustomerRating: avgRating,
-        complaintCount: complaints,
-        complimentCount: compliments,
-        riskScore,
+        actorUserId: actor.id,
+        actorRole: actor.role,
+        action: 'staff.performance_recalculated',
+        entityType: 'executor_profile',
+        entityId: executorProfileId,
+        after: { snapshotId: snapshot.id, periodEnd: snapshot.periodEnd },
+        ipAddress,
       },
     });
+    return snapshot;
   }
 
   // ---------------------------------------------------------------------

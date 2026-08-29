@@ -164,6 +164,7 @@ export default function AdminStaffDetailPage({
   const [attendanceNote, setAttendanceNote] = useState('');
   const [userStatus, setUserStatus] = useState('active');
   const [customerCapability, setCustomerCapability] = useState(false);
+  const [recalculating, setRecalculating] = useState(false);
 
   async function load() {
     setError('');
@@ -261,6 +262,23 @@ export default function AdminStaffDetailPage({
     } catch (err) {
       setError(err instanceof Error ? err.message : 'ثبت تغییر ممکن نشد.');
       throw err;
+    }
+  }
+
+  async function recalculatePerformance() {
+    setError('');
+    setMessage('');
+    setRecalculating(true);
+    try {
+      await apiFetch(`/admin/staff/${id}/performance/recalculate`, {
+        method: 'POST',
+      });
+      setMessage('شاخص‌ها و Snapshot امروز با موفقیت محاسبه شدند.');
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'محاسبه عملکرد ممکن نشد.');
+    } finally {
+      setRecalculating(false);
     }
   }
 
@@ -730,13 +748,22 @@ export default function AdminStaffDetailPage({
                   Snapshotهای ثبت‌شده، تغییر کیفیت و ریسک عملکرد را در طول زمان نشان می‌دهند.
                 </p>
               </div>
-              <Badge color={Number(profile.riskScore) >= 50 ? 'red' : 'green'}>
-                ریسک فعلی: {Number(profile.riskScore).toFixed(0)}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge color={Number(profile.riskScore) >= 50 ? 'red' : 'green'}>
+                  ریسک فعلی: {Number(profile.riskScore).toFixed(0)}
+                </Badge>
+                <Button
+                  variant="secondary"
+                  disabled={recalculating}
+                  onClick={() => void recalculatePerformance()}
+                >
+                  {recalculating ? 'در حال محاسبه…' : 'محاسبه اکنون'}
+                </Button>
+              </div>
             </div>
             {profile.performanceSnapshots.length === 0 ? (
               <div className="mt-4 rounded-control bg-slate-50 p-4 text-sm text-slate-500">
-                هنوز Snapshot عملکردی ثبت نشده است. محاسبه دوره‌ای در گام بعدی فاز ۵ فعال می‌شود.
+                هنوز Snapshot عملکردی ثبت نشده است؛ Job روزانه یا دکمه «محاسبه اکنون» اولین Snapshot را می‌سازد.
               </div>
             ) : (
               <div className="mt-4 overflow-x-auto">

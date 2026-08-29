@@ -32,7 +32,10 @@ const ops = demo.accounts.find((account) => account.phone === '09120000002');
 const finance = demo.accounts.find(
   (account) => account.phone === '09120000003',
 );
-assert(ops && finance, 'Required demo accounts are missing.');
+const superAdmin = demo.accounts.find(
+  (account) => account.phone === '09120000001',
+);
+assert(ops && finance && superAdmin, 'Required demo accounts are missing.');
 
 const opsLogin = await login(ops);
 const headers = {
@@ -56,6 +59,18 @@ assert(
 );
 
 const target = staff[0];
+const performance = await json(
+  await fetch(
+    `${API_ORIGIN}/v1/admin/staff/${target.id}/performance/recalculate`,
+    { method: 'POST', headers },
+  ),
+);
+assert(
+  performance.executorProfileId === target.id &&
+    Number(performance.riskScore) >= 0 &&
+    Number(performance.riskScore) <= 100,
+  'Manual performance calculation is malformed.',
+);
 const detail = await json(
   await fetch(`${API_ORIGIN}/v1/admin/staff/${target.id}`, { headers }),
 );
@@ -63,6 +78,10 @@ assert(Array.isArray(detail.user.capabilities), 'Access capabilities are missing
 assert(Array.isArray(detail.attendanceRecords), 'Attendance records are missing.');
 assert(Array.isArray(detail.capacitySnapshots), 'Capacity history is missing.');
 assert(Array.isArray(detail.performanceSnapshots), 'Performance history is missing.');
+assert(
+  detail.performanceSnapshots.some((item) => item.id === performance.id),
+  'Daily performance snapshot was not persisted.',
+);
 assert(Array.isArray(detail.feedback), 'Executor feedback history is missing.');
 assert(Array.isArray(detail.history), 'Staff audit history is missing.');
 assert(
@@ -96,6 +115,34 @@ const forbidden = await fetch(`${API_ORIGIN}/v1/admin/staff`, {
 });
 assert(forbidden.status === 403, 'Finance scope must not access staff management.');
 
+const superLogin = await login(superAdmin);
+const superHeaders = {
+  authorization: `Bearer ${superLogin.accessToken}`,
+  'content-type': 'application/json',
+};
+const jobs = await json(
+  await fetch(`${API_ORIGIN}/v1/admin/jobs`, { headers: superHeaders }),
+);
+const performanceJob = jobs.find(
+  (item) => item.name === 'recalculate_staff_performance',
+);
+assert(
+  performanceJob?.intervalMs === 24 * 60 * 60 * 1000,
+  'Daily staff performance job is not registered.',
+);
+const jobResult = await json(
+  await fetch(
+    `${API_ORIGIN}/v1/admin/jobs/recalculate_staff_performance/run`,
+    { method: 'POST', headers: superHeaders },
+  ),
+);
+assert(
+  Number.isInteger(jobResult.processed) && Number.isInteger(jobResult.skipped ?? 0),
+  'Performance job result is malformed.',
+);
+const opsJobForbidden = await fetch(`${API_ORIGIN}/v1/admin/jobs`, { headers });
+assert(opsJobForbidden.status === 403, 'Ops scope must not run global jobs.');
+
 const detailPage = await readFile(
   '../web/src/app/(admin)/admin/staff/[id]/page.tsx',
   'utf8',
@@ -109,5 +156,10 @@ assert(
     detailPage.includes("activeTab === 'history'"),
   'Tabbed staff performance, feedback and history UI contracts are missing.',
 );
+assert(
+  detailPage.includes('/performance/recalculate') &&
+    detailPage.includes('محاسبه اکنون'),
+  'Manual performance recalculation UI contract is missing.',
+);
 
-console.log('Phase 5 staff contract passed: team, skill, verification, attendance, capacity, access, profile tabs, feedback/history, required-note and scope isolation.');
+console.log('Phase 5 staff contract passed: team, skill, verification, attendance, capacity, access, profile tabs, feedback/history, daily performance snapshots/job, required-note and scope isolation.');
