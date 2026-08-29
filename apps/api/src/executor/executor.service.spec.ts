@@ -85,3 +85,155 @@ describe('ExecutorService execution workflow', () => {
     ).rejects.toThrow(BadRequestException);
   });
 });
+
+describe('ExecutorService staff operations', () => {
+  const actor = {
+    id: 'ops-1',
+    role: 'admin',
+    adminScope: 'ops_admin',
+    capabilities: [],
+    fullName: 'مدیر عملیات',
+    phone: '09120000002',
+    email: null,
+  } as const;
+
+  it('stores a capacity snapshot and marks an available executor over-capacity', async () => {
+    let capacityInput:
+      | {
+          data: {
+            executorProfileId: string;
+            capacityPercent: number;
+            activeOrders: number;
+          };
+        }
+      | undefined;
+    const tx = {
+      executorProfile: {
+        findUnique: jest.fn().mockResolvedValue({
+          id: 'profile-1',
+          userId: 'executor-1',
+          status: 'active',
+          capacityPercent: 40,
+        }),
+        update: jest.fn().mockResolvedValue({ id: 'profile-1' }),
+      },
+      orderAssignment: { count: jest.fn().mockResolvedValue(3) },
+      staffCapacitySnapshot: {
+        create: jest.fn((input: NonNullable<typeof capacityInput>) => {
+          capacityInput = input;
+        }),
+      },
+      auditLog: { create: jest.fn() },
+    };
+    const prisma = {
+      $transaction: jest.fn((callback: (client: typeof tx) => unknown) =>
+        callback(tx),
+      ),
+    };
+    const service = new ExecutorService(prisma as never, {} as never);
+
+    await service.setCapacity(
+      'profile-1',
+      100,
+      'تکمیل ظرفیت',
+      actor as never,
+      '127.0.0.1',
+    );
+
+    expect(tx.executorProfile.update).toHaveBeenCalledWith({
+      where: { id: 'profile-1' },
+      data: { capacityPercent: 100, status: 'over_capacity' },
+    });
+    expect(capacityInput?.data.executorProfileId).toBe('profile-1');
+    expect(capacityInput?.data.capacityPercent).toBe(100);
+    expect(capacityInput?.data.activeOrders).toBe(3);
+    expect(tx.auditLog.create).toHaveBeenCalled();
+  });
+
+  it('revokes sessions whenever staff account access changes', async () => {
+    let sessionInput:
+      | {
+          where: { userId: string; revokedAt: null };
+          data: { revokedAt: unknown };
+        }
+      | undefined;
+    let auditInput:
+      { data: { action: string; sensitivity: string } } | undefined;
+    const tx = {
+      user: {
+        update: jest.fn(),
+        findUniqueOrThrow: jest.fn().mockResolvedValue({ id: 'executor-1' }),
+      },
+      userCapability: { upsert: jest.fn(), deleteMany: jest.fn() },
+      session: {
+        updateMany: jest.fn((input: NonNullable<typeof sessionInput>) => {
+          sessionInput = input;
+        }),
+      },
+      auditLog: {
+        create: jest.fn((input: NonNullable<typeof auditInput>) => {
+          auditInput = input;
+        }),
+      },
+    };
+    const prisma = {
+      executorProfile: {
+        findUnique: jest.fn().mockResolvedValue({
+          id: 'profile-1',
+          userId: 'executor-1',
+          user: { status: 'active', capabilities: [] },
+        }),
+      },
+      $transaction: jest.fn((callback: (client: typeof tx) => unknown) =>
+        callback(tx),
+      ),
+    };
+    const service = new ExecutorService(prisma as never, {} as never);
+
+    await service.updateAccess(
+      'profile-1',
+      {
+        userStatus: 'suspended',
+        customerCapability: true,
+        note: 'تعلیق موقت تا بررسی',
+      },
+      actor as never,
+      '127.0.0.1',
+    );
+
+    expect(tx.userCapability.upsert).toHaveBeenCalled();
+    expect(sessionInput?.where).toEqual({
+      userId: 'executor-1',
+      revokedAt: null,
+    });
+    expect(sessionInput?.data.revokedAt).toBeInstanceOf(Date);
+    expect(auditInput?.data.action).toBe('staff.access_changed');
+    expect(auditInput?.data.sensitivity).toBe('critical');
+  });
+
+  it('rejects duplicate skill assignments before replacing existing skills', async () => {
+    const prisma = {
+      executorProfile: {
+        findUnique: jest.fn().mockResolvedValue({
+          id: 'profile-1',
+          skills: [],
+        }),
+      },
+    };
+    const service = new ExecutorService(prisma as never, {} as never);
+
+    await expect(
+      service.updateSkills(
+        'profile-1',
+        {
+          skills: [
+            { skillId: 'skill-1', level: 2 },
+            { skillId: 'skill-1', level: 4 },
+          ],
+          note: 'ثبت مهارت‌ها',
+        },
+        actor as never,
+      ),
+    ).rejects.toThrow(BadRequestException);
+  });
+});

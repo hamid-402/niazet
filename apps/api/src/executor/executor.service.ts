@@ -5,6 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import {
+  AuditSensitivity,
+  CapabilityType,
   ExecutorStatus,
   ExecutorType,
   OrderStatus,
@@ -14,8 +16,18 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthService } from '../auth/auth.service';
 import { generateReferenceCode } from '../common/utils/code-generator';
-import { CreateStaffDto, CreateTeamDto } from './dto/executor.dto';
+import {
+  AttendanceQueryDto,
+  CreateSkillDto,
+  CreateStaffDto,
+  CreateTeamDto,
+  UpdateStaffAccessDto,
+  UpdateStaffProfileDto,
+  UpdateStaffSkillsDto,
+  UpsertAttendanceDto,
+} from './dto/executor.dto';
 import { SAFE_USER_SELECT } from '../common/selects/safe-user.select';
+import type { AuthenticatedUser } from '../common/types/authenticated-user';
 
 @Injectable()
 export class ExecutorService {
@@ -28,17 +40,83 @@ export class ExecutorService {
   // Admin: staff & team management
   // ---------------------------------------------------------------------
 
-  async createTeam(dto: CreateTeamDto) {
-    return this.prisma.team.create({ data: dto });
+  async createTeam(
+    dto: CreateTeamDto,
+    actor: AuthenticatedUser,
+    ipAddress?: string,
+  ) {
+    const duplicate = await this.prisma.team.findFirst({
+      where: { OR: [{ code: dto.code }, { name: dto.name }] },
+      select: { id: true },
+    });
+    if (duplicate) {
+      throw new BadRequestException('نام یا کد تیم قبلاً ثبت شده است.');
+    }
+    return this.prisma.$transaction(async (tx) => {
+      const team = await tx.team.create({ data: dto });
+      await tx.auditLog.create({
+        data: {
+          actorUserId: actor.id,
+          actorRole: actor.role,
+          action: 'staff.team_created',
+          entityType: 'team',
+          entityId: team.id,
+          after: { name: team.name, code: team.code },
+          ipAddress,
+        },
+      });
+      return team;
+    });
   }
 
   listTeams() {
     return this.prisma.team.findMany({
       include: { _count: { select: { members: true } } },
+      orderBy: { name: 'asc' },
     });
   }
 
-  async createStaff(dto: CreateStaffDto) {
+  async createSkill(
+    dto: CreateSkillDto,
+    actor: AuthenticatedUser,
+    ipAddress?: string,
+  ) {
+    const duplicate = await this.prisma.skill.findUnique({
+      where: { name: dto.name },
+      select: { id: true },
+    });
+    if (duplicate) {
+      throw new BadRequestException('این مهارت قبلاً ثبت شده است.');
+    }
+    return this.prisma.$transaction(async (tx) => {
+      const skill = await tx.skill.create({ data: dto });
+      await tx.auditLog.create({
+        data: {
+          actorUserId: actor.id,
+          actorRole: actor.role,
+          action: 'staff.skill_created',
+          entityType: 'skill',
+          entityId: skill.id,
+          after: { name: skill.name, category: skill.category },
+          ipAddress,
+        },
+      });
+      return skill;
+    });
+  }
+
+  listSkills() {
+    return this.prisma.skill.findMany({
+      include: { _count: { select: { executorSkills: true } } },
+      orderBy: [{ category: 'asc' }, { name: 'asc' }],
+    });
+  }
+
+  async createStaff(
+    dto: CreateStaffDto,
+    actor: AuthenticatedUser,
+    ipAddress?: string,
+  ) {
     const existing = await this.prisma.user.findUnique({
       where: { phone: dto.phone },
       select: { id: true },
@@ -48,6 +126,7 @@ export class ExecutorService {
         'کاربری با این شماره موبایل قبلاً ثبت شده است.',
       );
     }
+    await this.assertTeamExists(dto.teamId);
 
     const user = await this.prisma.user.create({
       data: {
@@ -61,14 +140,34 @@ export class ExecutorService {
 
     await this.authService.ensureFinancialAccounts(user.id, UserRole.executor);
 
-    const profile = await this.prisma.executorProfile.create({
-      data: {
-        userId: user.id,
-        executorType: dto.executorType ?? ExecutorType.internal_staff,
-        publicHandlerCode: generateReferenceCode('OPS'),
-        displayAlias: dto.displayAlias,
-        teamId: dto.teamId,
-      },
+    const executorType = dto.executorType ?? ExecutorType.internal_staff;
+    const profile = await this.prisma.$transaction(async (tx) => {
+      const created = await tx.executorProfile.create({
+        data: {
+          userId: user.id,
+          executorType,
+          verificationStatus:
+            executorType === ExecutorType.internal_staff
+              ? 'approved'
+              : 'pending',
+          publicHandlerCode: generateReferenceCode('OPS'),
+          displayAlias: dto.displayAlias,
+          teamId: dto.teamId,
+        },
+      });
+      await tx.auditLog.create({
+        data: {
+          actorUserId: actor.id,
+          actorRole: actor.role,
+          action: 'staff.created',
+          entityType: 'executor_profile',
+          entityId: created.id,
+          after: { userId: user.id, executorType, teamId: dto.teamId },
+          sensitivity: AuditSensitivity.critical,
+          ipAddress,
+        },
+      });
+      return created;
     });
 
     return { user, profile };
@@ -101,7 +200,15 @@ export class ExecutorService {
     const profile = await this.prisma.executorProfile.findUnique({
       where: { id },
       include: {
-        user: { select: { fullName: true, phone: true, status: true } },
+        user: {
+          select: {
+            id: true,
+            fullName: true,
+            phone: true,
+            status: true,
+            capabilities: true,
+          },
+        },
         team: true,
         skills: { include: { skill: true } },
         assignments: {
@@ -109,29 +216,421 @@ export class ExecutorService {
             order: { select: { code: true, title: true, status: true } },
           },
         },
+        capacitySnapshots: { orderBy: { snapshotDate: 'desc' }, take: 31 },
+        attendanceRecords: {
+          orderBy: { workDate: 'desc' },
+          take: 31,
+          include: { recordedBy: { select: { fullName: true } } },
+        },
         performanceSnapshots: { orderBy: { periodEnd: 'desc' }, take: 12 },
+        onboarding: true,
       },
     });
     if (!profile) throw new NotFoundException('پروفایل مجری یافت نشد.');
     return profile;
   }
 
-  async setStatus(id: string, status: ExecutorStatus) {
-    await this.getProfileForAdmin(id);
-    return this.prisma.executorProfile.update({
-      where: { id },
-      data: { status },
+  async setStatus(
+    id: string,
+    status: ExecutorStatus,
+    note: string,
+    actor: AuthenticatedUser,
+    ipAddress?: string,
+  ) {
+    return this.prisma.$transaction(async (tx) => {
+      const before = await tx.executorProfile.findUnique({ where: { id } });
+      if (!before) throw new NotFoundException('پروفایل مجری یافت نشد.');
+      const result = await tx.executorProfile.update({
+        where: { id },
+        data: { status },
+      });
+      if (status === ExecutorStatus.blocked) {
+        await tx.session.updateMany({
+          where: { userId: before.userId, revokedAt: null },
+          data: { revokedAt: new Date() },
+        });
+      }
+      await tx.auditLog.create({
+        data: {
+          actorUserId: actor.id,
+          actorRole: actor.role,
+          action: 'staff.status_changed',
+          entityType: 'executor_profile',
+          entityId: id,
+          before: { status: before.status },
+          after: { status, note, sessionsRevoked: status === 'blocked' },
+          sensitivity: AuditSensitivity.critical,
+          ipAddress,
+        },
+      });
+      return result;
     });
   }
 
-  async setCapacity(id: string, capacityPercent: number) {
-    await this.getProfileForAdmin(id);
-    const status: ExecutorStatus | undefined =
-      capacityPercent >= 100 ? 'over_capacity' : undefined;
-    return this.prisma.executorProfile.update({
-      where: { id },
-      data: { capacityPercent, ...(status ? { status } : {}) },
+  async setCapacity(
+    id: string,
+    capacityPercent: number,
+    note: string,
+    actor: AuthenticatedUser,
+    ipAddress?: string,
+  ) {
+    return this.prisma.$transaction(async (tx) => {
+      const before = await tx.executorProfile.findUnique({ where: { id } });
+      if (!before) throw new NotFoundException('پروفایل مجری یافت نشد.');
+      const autoManaged = ['active', 'over_capacity'].includes(before.status);
+      const status = autoManaged
+        ? capacityPercent >= 100
+          ? ExecutorStatus.over_capacity
+          : ExecutorStatus.active
+        : before.status;
+      const activeOrders = await tx.orderAssignment.count({
+        where: {
+          executorProfileId: id,
+          unassignedAt: null,
+          order: {
+            status: { notIn: [OrderStatus.closed, OrderStatus.cancelled] },
+          },
+        },
+      });
+      const result = await tx.executorProfile.update({
+        where: { id },
+        data: { capacityPercent, status },
+      });
+      await tx.staffCapacitySnapshot.create({
+        data: {
+          executorProfileId: id,
+          snapshotDate: new Date(),
+          capacityPercent,
+          activeOrders,
+        },
+      });
+      await tx.auditLog.create({
+        data: {
+          actorUserId: actor.id,
+          actorRole: actor.role,
+          action: 'staff.capacity_changed',
+          entityType: 'executor_profile',
+          entityId: id,
+          before: {
+            capacityPercent: before.capacityPercent,
+            status: before.status,
+          },
+          after: { capacityPercent, status, activeOrders, note },
+          ipAddress,
+        },
+      });
+      return result;
     });
+  }
+
+  async updateProfile(
+    id: string,
+    dto: UpdateStaffProfileDto,
+    actor: AuthenticatedUser,
+    ipAddress?: string,
+  ) {
+    const { note, ...changes } = dto;
+    const hasChange = Object.values(changes).some(
+      (value) => value !== undefined,
+    );
+    if (!hasChange) {
+      throw new BadRequestException('تغییری برای ثبت ارسال نشده است.');
+    }
+    if (changes.teamId) await this.assertTeamExists(changes.teamId);
+
+    return this.prisma.$transaction(async (tx) => {
+      const before = await tx.executorProfile.findUnique({ where: { id } });
+      if (!before) throw new NotFoundException('پروفایل مجری یافت نشد.');
+      const result = await tx.executorProfile.update({
+        where: { id },
+        data: changes,
+      });
+      await tx.auditLog.create({
+        data: {
+          actorUserId: actor.id,
+          actorRole: actor.role,
+          action: 'staff.profile_changed',
+          entityType: 'executor_profile',
+          entityId: id,
+          before: {
+            displayAlias: before.displayAlias,
+            teamId: before.teamId,
+            executorType: before.executorType,
+            verificationStatus: before.verificationStatus,
+          },
+          after: { ...changes, note },
+          sensitivity: AuditSensitivity.critical,
+          ipAddress,
+        },
+      });
+      return result;
+    });
+  }
+
+  async updateSkills(
+    id: string,
+    dto: UpdateStaffSkillsDto,
+    actor: AuthenticatedUser,
+    ipAddress?: string,
+  ) {
+    const profile = await this.prisma.executorProfile.findUnique({
+      where: { id },
+      include: { skills: true },
+    });
+    if (!profile) throw new NotFoundException('پروفایل مجری یافت نشد.');
+    const ids = dto.skills.map((item) => item.skillId);
+    if (new Set(ids).size !== ids.length) {
+      throw new BadRequestException('هر مهارت فقط یک‌بار قابل انتخاب است.');
+    }
+    const existingSkills = ids.length
+      ? await this.prisma.skill.count({ where: { id: { in: ids } } })
+      : 0;
+    if (existingSkills !== ids.length) {
+      throw new BadRequestException('یک یا چند مهارت معتبر نیست.');
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      await tx.executorSkill.deleteMany({
+        where: { executorProfileId: id },
+      });
+      if (dto.skills.length) {
+        await tx.executorSkill.createMany({
+          data: dto.skills.map((item) => ({
+            executorProfileId: id,
+            skillId: item.skillId,
+            level: item.level,
+          })),
+        });
+      }
+      await tx.auditLog.create({
+        data: {
+          actorUserId: actor.id,
+          actorRole: actor.role,
+          action: 'staff.skills_changed',
+          entityType: 'executor_profile',
+          entityId: id,
+          before: {
+            skills: profile.skills.map((item) => ({
+              skillId: item.skillId,
+              level: item.level,
+            })),
+          },
+          after: {
+            skills: dto.skills.map((item) => ({
+              skillId: item.skillId,
+              level: item.level,
+            })),
+            note: dto.note,
+          },
+          ipAddress,
+        },
+      });
+      return tx.executorProfile.findUniqueOrThrow({
+        where: { id },
+        include: { skills: { include: { skill: true } } },
+      });
+    });
+  }
+
+  async listAttendance(id: string, query: AttendanceQueryDto) {
+    const profile = await this.prisma.executorProfile.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+    if (!profile) throw new NotFoundException('پروفایل مجری یافت نشد.');
+    const to = query.to
+      ? this.parseWorkDate(query.to)
+      : this.parseWorkDate(new Date().toISOString());
+    const from = query.from
+      ? this.parseWorkDate(query.from)
+      : new Date(to.getTime() - 30 * 24 * 60 * 60 * 1000);
+    if (
+      from > to ||
+      to.getTime() - from.getTime() > 366 * 24 * 60 * 60 * 1000
+    ) {
+      throw new BadRequestException(
+        'بازه حضور باید معتبر و حداکثر ۳۶۶ روز باشد.',
+      );
+    }
+    return this.prisma.staffAttendanceRecord.findMany({
+      where: {
+        executorProfileId: id,
+        workDate: { gte: from, lte: to },
+      },
+      include: { recordedBy: { select: { fullName: true } } },
+      orderBy: { workDate: 'desc' },
+    });
+  }
+
+  async upsertAttendance(
+    id: string,
+    dto: UpsertAttendanceDto,
+    actor: AuthenticatedUser,
+    ipAddress?: string,
+  ) {
+    const profile = await this.prisma.executorProfile.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+    if (!profile) throw new NotFoundException('پروفایل مجری یافت نشد.');
+    const workDate = this.parseWorkDate(dto.workDate);
+    const workDateIso = workDate.toISOString().slice(0, 10);
+    return this.prisma.$transaction(async (tx) => {
+      const before = await tx.staffAttendanceRecord.findUnique({
+        where: {
+          executorProfileId_workDate: {
+            executorProfileId: id,
+            workDate,
+          },
+        },
+      });
+      const result = await tx.staffAttendanceRecord.upsert({
+        where: {
+          executorProfileId_workDate: {
+            executorProfileId: id,
+            workDate,
+          },
+        },
+        create: {
+          executorProfileId: id,
+          workDate,
+          status: dto.status,
+          note: dto.note,
+          recordedByUserId: actor.id,
+        },
+        update: {
+          status: dto.status,
+          note: dto.note,
+          recordedByUserId: actor.id,
+        },
+        include: { recordedBy: { select: { fullName: true } } },
+      });
+      await tx.auditLog.create({
+        data: {
+          actorUserId: actor.id,
+          actorRole: actor.role,
+          action: 'staff.attendance_recorded',
+          entityType: 'executor_profile',
+          entityId: id,
+          before: before
+            ? {
+                workDate: before.workDate.toISOString().slice(0, 10),
+                status: before.status,
+                note: before.note,
+              }
+            : undefined,
+          after: {
+            workDate: workDateIso,
+            status: dto.status,
+            note: dto.note,
+            reason: dto.reason,
+          },
+          ipAddress,
+        },
+      });
+      return result;
+    });
+  }
+
+  async updateAccess(
+    id: string,
+    dto: UpdateStaffAccessDto,
+    actor: AuthenticatedUser,
+    ipAddress?: string,
+  ) {
+    const profile = await this.prisma.executorProfile.findUnique({
+      where: { id },
+      include: { user: { include: { capabilities: true } } },
+    });
+    if (!profile) throw new NotFoundException('پروفایل مجری یافت نشد.');
+    const hadCustomerCapability = profile.user.capabilities.some(
+      (item) => item.capability === CapabilityType.customer,
+    );
+    return this.prisma.$transaction(async (tx) => {
+      await tx.user.update({
+        where: { id: profile.userId },
+        data: { status: dto.userStatus },
+      });
+      if (dto.customerCapability) {
+        await tx.userCapability.upsert({
+          where: {
+            userId_capability: {
+              userId: profile.userId,
+              capability: CapabilityType.customer,
+            },
+          },
+          create: {
+            userId: profile.userId,
+            capability: CapabilityType.customer,
+          },
+          update: {},
+        });
+      } else {
+        await tx.userCapability.deleteMany({
+          where: {
+            userId: profile.userId,
+            capability: CapabilityType.customer,
+          },
+        });
+      }
+      await tx.session.updateMany({
+        where: { userId: profile.userId, revokedAt: null },
+        data: { revokedAt: new Date() },
+      });
+      await tx.auditLog.create({
+        data: {
+          actorUserId: actor.id,
+          actorRole: actor.role,
+          action: 'staff.access_changed',
+          entityType: 'executor_profile',
+          entityId: id,
+          before: {
+            userStatus: profile.user.status,
+            customerCapability: hadCustomerCapability,
+          },
+          after: {
+            userStatus: dto.userStatus,
+            customerCapability: dto.customerCapability,
+            note: dto.note,
+            sessionsRevoked: true,
+          },
+          sensitivity: AuditSensitivity.critical,
+          ipAddress,
+        },
+      });
+      return tx.user.findUniqueOrThrow({
+        where: { id: profile.userId },
+        select: {
+          id: true,
+          fullName: true,
+          phone: true,
+          status: true,
+          capabilities: true,
+        },
+      });
+    });
+  }
+
+  private async assertTeamExists(teamId?: string | null) {
+    if (!teamId) return;
+    const team = await this.prisma.team.findUnique({
+      where: { id: teamId },
+      select: { id: true },
+    });
+    if (!team) throw new BadRequestException('تیم انتخاب‌شده معتبر نیست.');
+  }
+
+  private parseWorkDate(value: string) {
+    const datePart = value.slice(0, 10);
+    const parsed = new Date(`${datePart}T00:00:00.000Z`);
+    if (
+      !/^\d{4}-\d{2}-\d{2}$/.test(datePart) ||
+      Number.isNaN(parsed.getTime()) ||
+      parsed.toISOString().slice(0, 10) !== datePart
+    ) {
+      throw new BadRequestException('تاریخ حضور معتبر نیست.');
+    }
+    return parsed;
   }
 
   /**

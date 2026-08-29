@@ -130,6 +130,22 @@ async function main() {
     update: {},
   });
 
+  const webDesignSkill = await prisma.skill.upsert({
+    where: { name: 'طراحی رابط وب' },
+    create: { name: 'طراحی رابط وب', category: 'طراحی و توسعه' },
+    update: {},
+  });
+  const frontendSkill = await prisma.skill.upsert({
+    where: { name: 'توسعه فرانت‌اند' },
+    create: { name: 'توسعه فرانت‌اند', category: 'طراحی و توسعه' },
+    update: {},
+  });
+  const contentSkill = await prisma.skill.upsert({
+    where: { name: 'تولید محتوای سئو' },
+    create: { name: 'تولید محتوای سئو', category: 'محتوا' },
+    update: {},
+  });
+
   const executor1User = await ensureUserWithWallet({
     phone: '09120000005',
     fullName: 'کارمند اجرای وب یک',
@@ -146,13 +162,41 @@ async function main() {
     },
     update: {},
   });
+  await prisma.executorSkill.upsert({
+    where: {
+      executorProfileId_skillId: {
+        executorProfileId: executorProfile1.id,
+        skillId: webDesignSkill.id,
+      },
+    },
+    create: {
+      executorProfileId: executorProfile1.id,
+      skillId: webDesignSkill.id,
+      level: 4,
+    },
+    update: {},
+  });
+  await prisma.executorSkill.upsert({
+    where: {
+      executorProfileId_skillId: {
+        executorProfileId: executorProfile1.id,
+        skillId: frontendSkill.id,
+      },
+    },
+    create: {
+      executorProfileId: executorProfile1.id,
+      skillId: frontendSkill.id,
+      level: 4,
+    },
+    update: {},
+  });
 
   const executor2User = await ensureUserWithWallet({
     phone: '09120000006',
     fullName: 'کارمند محتوا یک',
     role: UserRole.executor,
   });
-  await prisma.executorProfile.upsert({
+  const executorProfile2 = await prisma.executorProfile.upsert({
     where: { userId: executor2User.id },
     create: {
       userId: executor2User.id,
@@ -160,6 +204,20 @@ async function main() {
       displayAlias: 'کارشناس پیگیری ۲۱',
       teamId: contentTeam.id,
       capacityPercent: 20,
+    },
+    update: {},
+  });
+  await prisma.executorSkill.upsert({
+    where: {
+      executorProfileId_skillId: {
+        executorProfileId: executorProfile2.id,
+        skillId: contentSkill.id,
+      },
+    },
+    create: {
+      executorProfileId: executorProfile2.id,
+      skillId: contentSkill.id,
+      level: 4,
     },
     update: {},
   });

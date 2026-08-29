@@ -30,6 +30,7 @@
     "phase4:super-admin-contract": "node scripts/phase4-super-admin-contract.mjs",
     "phase4:confirmation-contract": "node scripts/phase4-confirmation-contract.mjs",
     "phase4:status-contract": "node scripts/phase4-status-contract.mjs",
+    "phase5:staff-contract": "node scripts/phase5-staff-contract.mjs",
     "prisma:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {

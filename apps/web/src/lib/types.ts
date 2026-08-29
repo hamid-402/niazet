@@ -292,12 +292,45 @@ export interface WalletSummary {
   }[];
 }
 
+export interface StaffTeam {
+  id: string;
+  name: string;
+  code: string;
+  description: string | null;
+  _count?: { members: number };
+}
+
+export interface StaffSkill {
+  id: string;
+  name: string;
+  category: string | null;
+  _count?: { executorSkills: number };
+}
+
+export interface StaffAttendanceRecord {
+  id: string;
+  workDate: string;
+  status: 'present' | 'remote' | 'leave' | 'sick_leave' | 'absent';
+  note: string | null;
+  recordedBy?: { fullName: string };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ExecutorSkillAssignment {
+  id: string;
+  level: number;
+  skillId: string;
+  skill: StaffSkill;
+}
+
 export interface ExecutorProfile {
   id: string;
   publicHandlerCode: string;
   displayAlias: string;
   executorType: string;
   status: string;
+  verificationStatus: string;
   capacityPercent: number;
   qcPassRate: number;
   onTimeDeliveryRate: number;
@@ -305,6 +338,21 @@ export interface ExecutorProfile {
   complaintCount: number;
   complimentCount: number;
   riskScore: number;
-  team?: { name: string; code: string } | null;
-  user?: { fullName: string; phone: string; status: string };
+  teamId?: string | null;
+  team?: StaffTeam | null;
+  skills?: ExecutorSkillAssignment[];
+  attendanceRecords?: StaffAttendanceRecord[];
+  capacitySnapshots?: {
+    id: string;
+    snapshotDate: string;
+    capacityPercent: number;
+    activeOrders: number;
+  }[];
+  user?: {
+    id?: string;
+    fullName: string;
+    phone: string;
+    status: string;
+    capabilities?: { id: string; capability: 'customer' | 'executor' }[];
+  };
 }

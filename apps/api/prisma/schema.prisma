@@ -61,6 +61,14 @@ enum ExecutorStatus {
   blocked
 }
 
+enum AttendanceStatus {
+  present
+  remote
+  leave
+  sick_leave
+  absent
+}
+
 enum PricingModel {
   fixed
   formula
@@ -391,12 +399,13 @@ model User {
 
   statusChanges OrderStatusHistory[] @relation("StatusActor")
 
-  auditLogs              AuditLog[]              @relation("AuditActor")
-  notifications          NotificationLog[]
-  notificationPreference NotificationPreference?
-  customerProfile        CustomerProfile?
-  privacyRequests        PrivacyRequest[]
-  signedUrlGrants        SignedUrlGrant[]
+  auditLogs               AuditLog[]              @relation("AuditActor")
+  notifications           NotificationLog[]
+  notificationPreference  NotificationPreference?
+  customerProfile         CustomerProfile?
+  privacyRequests         PrivacyRequest[]
+  signedUrlGrants         SignedUrlGrant[]
+  staffAttendanceRecorded StaffAttendanceRecord[] @relation("StaffAttendanceRecordedBy")
 
   systemSettingsUpdated SystemSetting[] @relation("SettingUpdatedBy")
 
@@ -566,6 +575,7 @@ model ExecutorProfile {
   skills               ExecutorSkill[]
   capacitySnapshots    StaffCapacitySnapshot[]
   performanceSnapshots StaffPerformanceSnapshot[]
+  attendanceRecords    StaffAttendanceRecord[]
   assignments          OrderAssignment[]
   onboarding           ExecutorOnboarding?
   withdrawals          Withdrawal[]
@@ -617,6 +627,24 @@ model StaffPerformanceSnapshot {
   executorProfile ExecutorProfile @relation(fields: [executorProfileId], references: [id], onDelete: Cascade)
 
   @@map("staff_performance_snapshots")
+}
+
+model StaffAttendanceRecord {
+  id                String           @id @default(uuid())
+  executorProfileId String           @map("executor_profile_id")
+  workDate          DateTime         @map("work_date") @db.Date
+  status            AttendanceStatus
+  note              String?
+  recordedByUserId  String           @map("recorded_by_user_id")
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+
+  executorProfile ExecutorProfile @relation(fields: [executorProfileId], references: [id], onDelete: Cascade)
+  recordedBy      User            @relation("StaffAttendanceRecordedBy", fields: [recordedByUserId], references: [id], onDelete: Restrict)
+
+  @@unique([executorProfileId, workDate])
+  @@index([workDate, status])
+  @@map("staff_attendance_records")
 }
 
 // فاز بعد: جذب مجری بیرونی
