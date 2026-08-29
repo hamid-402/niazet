@@ -60,7 +60,7 @@ export class UsersAdminController {
     @Body() dto: UpdateUserStatusDto,
     @Req() req: Request,
   ) {
-    return this.users.setStatus(id, dto.status, user, req.ip);
+    return this.users.setStatus(id, dto.status, dto.note, user, req.ip);
   }
 }
 
@@ -92,7 +92,13 @@ export class AdminsAdminController {
     @Body() dto: UpdateAdminScopeDto,
     @Req() req: Request,
   ) {
-    return this.users.updateAdminScope(id, dto.adminScope, user, req.ip);
+    return this.users.updateAdminScope(
+      id,
+      dto.adminScope,
+      dto.note,
+      user,
+      req.ip,
+    );
   }
 }
 

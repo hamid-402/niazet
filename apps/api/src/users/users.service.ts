@@ -53,6 +53,7 @@ export class UsersService {
   async setStatus(
     id: string,
     status: UserStatus,
+    note: string,
     actor: AuthenticatedUser,
     ipAddress?: string,
   ) {
@@ -85,7 +86,11 @@ export class UsersService {
           entityType: 'user',
           entityId: id,
           before: { status: before.status },
-          after: { status, sessionsRevoked: status !== UserStatus.active },
+          after: {
+            status,
+            note,
+            sessionsRevoked: status !== UserStatus.active,
+          },
           sensitivity: AuditSensitivity.critical,
           ipAddress,
         },
@@ -158,6 +163,7 @@ export class UsersService {
   async updateAdminScope(
     id: string,
     adminScope: AdminScope,
+    note: string,
     actor: AuthenticatedUser,
     ipAddress?: string,
   ) {
@@ -191,7 +197,7 @@ export class UsersService {
           entityType: 'user',
           entityId: id,
           before: { adminScope: before.adminScope },
-          after: { adminScope, sessionsRevoked: true },
+          after: { adminScope, note, sessionsRevoked: true },
           sensitivity: AuditSensitivity.critical,
           ipAddress,
         },

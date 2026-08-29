@@ -133,8 +133,8 @@
 - [x] پنل Ops: Triage، Quote، Assignment، QC، Team/Staff، Service/Package/Form/QC Template
 - [x] پنل Finance: Payment، Escrow، Refund، Invoice، Ledger export و Withdrawal
 - [x] پنل Super Admin: Users، Admin/Scope، Settings، AI controls، Security و Audit
-- [ ] Confirmation Modal استاندارد با خلاصه اثر، Note اجباری و جلوگیری از کلیک تکراری
-- [ ] Status Page برای وضعیت سرویس‌های کلیدی و رخدادهای عملیاتی
+- [x] Confirmation Modal استاندارد با خلاصه اثر، Note اجباری و جلوگیری از کلیک تکراری
+- [x] Status Page برای وضعیت سرویس‌های کلیدی و رخدادهای عملیاتی
 
 ## فاز ۵ — مدیریت کارکنان، عملکرد و گزارش‌ها
 

@@ -70,11 +70,19 @@ export class CreateAdminDto {
 export class UpdateAdminScopeDto {
   @IsIn(ADMIN_SCOPES)
   adminScope!: AdminScope;
+
+  @IsString()
+  @MinLength(3)
+  note!: string;
 }
 
 export class UpdateUserStatusDto {
   @IsIn(USER_STATUSES)
   status!: UserStatus;
+
+  @IsString()
+  @MinLength(3)
+  note!: string;
 }
 
 export const SYSTEM_SETTING_KEYS = [

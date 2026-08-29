@@ -1,4 +1,5 @@
 import { IsInt, IsOptional, IsString, Matches, Min } from 'class-validator';
+import { MinLength } from 'class-validator';
 
 export class ReleaseEscrowDto {
   @IsOptional()
@@ -7,6 +8,7 @@ export class ReleaseEscrowDto {
   amount?: number;
 
   @IsString()
+  @MinLength(3)
   note!: string;
 }
 
@@ -19,14 +21,15 @@ export class RefundEscrowDto {
   @IsString()
   reason!: string;
 
+  @MinLength(3)
   @IsString()
   note!: string;
 }
 
 export class DecideWithdrawalDto {
-  @IsOptional()
   @IsString()
-  note?: string;
+  @MinLength(3)
+  note!: string;
 }
 
 export class RequestWithdrawalDto {

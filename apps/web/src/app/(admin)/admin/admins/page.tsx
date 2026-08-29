@@ -12,6 +12,7 @@ import {
   PageLoading,
   SectionTitle,
 } from '@/components/ui';
+import { ConfirmationModal } from '@/components/confirmation-modal';
 
 interface AdminRow {
   id: string;
@@ -30,6 +31,7 @@ export default function AdminsPage() {
   const [scope, setScope] = useState('ops_admin');
   const [scopeDrafts, setScopeDrafts] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const [pendingScope, setPendingScope] = useState<AdminRow | null>(null);
 
   function load() {
     apiFetch<AdminRow[]>('/admin/admins')
@@ -62,7 +64,7 @@ export default function AdminsPage() {
     }
   }
 
-  async function updateScope(admin: AdminRow) {
+  async function updateScope(admin: AdminRow, note: string) {
     const adminScope = scopeDrafts[admin.id];
     if (!adminScope || adminScope === admin.adminScope) return;
     setBusy(true);
@@ -70,9 +72,10 @@ export default function AdminsPage() {
     try {
       await apiFetch(`/admin/admins/${admin.id}/scope`, {
         method: 'PATCH',
-        body: { adminScope },
+        body: { adminScope, note },
       });
       load();
+      setPendingScope(null);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'خطا در تغییر سطح دسترسی');
     } finally {
@@ -170,7 +173,7 @@ export default function AdminsPage() {
                         <option value="finance_admin">finance_admin</option>
                         <option value="super_admin">super_admin</option>
                       </select>
-                      <Button variant="secondary" disabled={busy || (scopeDrafts[a.id] ?? a.adminScope) === a.adminScope} onClick={() => void updateScope(a)}>
+                      <Button variant="secondary" disabled={busy || (scopeDrafts[a.id] ?? a.adminScope) === a.adminScope} onClick={() => setPendingScope(a)}>
                         اعمال
                       </Button>
                     </div>
@@ -180,6 +183,20 @@ export default function AdminsPage() {
             </tbody>
           </table>
         </Card>
+      )}
+      {pendingScope && (
+        <ConfirmationModal
+          open
+          title="تغییر سطح دسترسی ادمین"
+          description={`${pendingScope.fullName} — ${pendingScope.phone}`}
+          impacts={[
+            `Scope از ${pendingScope.adminScope} به ${scopeDrafts[pendingScope.id]} تغییر می‌کند.`,
+            'همه Sessionهای فعال این ادمین باطل می‌شوند.',
+          ]}
+          confirmLabel="اعمال Scope جدید"
+          onCancel={() => setPendingScope(null)}
+          onConfirm={(note) => updateScope(pendingScope, note)}
+        />
       )}
     </div>
   );

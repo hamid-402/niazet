@@ -8,12 +8,11 @@ import {
   Card,
   EmptyState,
   ErrorBanner,
-  Field,
-  inputClass,
   PageLoading,
   SectionTitle,
 } from '@/components/ui';
 import { formatToman } from '@/lib/format';
+import { ConfirmationModal } from '@/components/confirmation-modal';
 
 interface Escrow {
   id: string;
@@ -27,7 +26,10 @@ export default function AdminEscrowPage() {
   const [items, setItems] = useState<Escrow[] | null>(null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-  const [note, setNote] = useState<Record<string, string>>({});
+  const [pending, setPending] = useState<{
+    item: Escrow;
+    action: 'release' | 'refund';
+  } | null>(null);
 
   function load() {
     apiFetch<Escrow[]>('/admin/finance/escrow')
@@ -37,15 +39,15 @@ export default function AdminEscrowPage() {
 
   useEffect(load, []);
 
-  async function act(orderId: string, action: 'release' | 'refund') {
+  async function act(orderId: string, action: 'release' | 'refund', note: string) {
     setBusy(true);
     setError('');
     try {
       const body =
         action === 'release'
-          ? { note: note[orderId] || 'آزادسازی توسط ادمین مالی' }
+          ? { note }
           : {
-              note: note[orderId] || 'رفاند توسط ادمین مالی',
+              note,
               reason: 'admin_decision',
             };
       await apiFetch(`/admin/finance/escrow/${orderId}/${action}`, {
@@ -53,6 +55,7 @@ export default function AdminEscrowPage() {
         body,
       });
       load();
+      setPending(null);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'خطا در انجام عملیات');
     } finally {
@@ -86,28 +89,16 @@ export default function AdminEscrowPage() {
             </p>
             {(e.status === 'held' || e.status === 'partially_released') && (
               <div className="flex flex-wrap items-end gap-2">
-                <Field label="یادداشت (اجباری)">
-                  <input
-                    className={inputClass}
-                    value={note[e.orderId] ?? ''}
-                    onChange={(ev) =>
-                      setNote((prev) => ({
-                        ...prev,
-                        [e.orderId]: ev.target.value,
-                      }))
-                    }
-                  />
-                </Field>
                 <Button
                   disabled={busy}
-                  onClick={() => act(e.orderId, 'release')}
+                  onClick={() => setPending({ item: e, action: 'release' })}
                 >
                   آزادسازی
                 </Button>
                 <Button
                   variant="danger"
                   disabled={busy}
-                  onClick={() => act(e.orderId, 'refund')}
+                  onClick={() => setPending({ item: e, action: 'refund' })}
                 >
                   رفاند
                 </Button>
@@ -116,6 +107,20 @@ export default function AdminEscrowPage() {
           </Card>
         ))}
       </div>
+      {pending && (
+        <ConfirmationModal
+          open
+          title={pending.action === 'release' ? 'تأیید آزادسازی Escrow' : 'تأیید بازپرداخت Escrow'}
+          description={`سفارش ${pending.item.order.code} — ${pending.item.order.title}`}
+          impacts={pending.action === 'release'
+            ? [`انتقال ${formatToman(pending.item.amount)} از حساب امانی`, 'ثبت سند Ledger و Audit غیرقابل‌ویرایش']
+            : [`بازگشت ${formatToman(pending.item.amount)} به کیف پول مشتری`, 'ثبت Refund و سند Ledger غیرقابل‌ویرایش']}
+          confirmLabel={pending.action === 'release' ? 'آزادسازی مبلغ' : 'ثبت بازپرداخت'}
+          tone={pending.action === 'release' ? 'primary' : 'danger'}
+          onCancel={() => setPending(null)}
+          onConfirm={(note) => act(pending.item.orderId, pending.action, note)}
+        />
+      )}
     </div>
   );
 }

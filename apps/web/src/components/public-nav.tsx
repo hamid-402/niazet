@@ -28,6 +28,9 @@ export function PublicNav() {
           <Link href="/#faq" className="transition-colors hover:text-fg">
             سوالات پرتکرار
           </Link>
+          <Link href="/status" className="transition-colors hover:text-fg">
+            وضعیت سرویس
+          </Link>
         </nav>
         <div className="flex items-center gap-3">
           <ThemeSwitcher variant="compact" />

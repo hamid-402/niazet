@@ -11,6 +11,7 @@ import {
   SectionTitle,
 } from '@/components/ui';
 import { formatDate } from '@/lib/format';
+import { ConfirmationModal } from '@/components/confirmation-modal';
 
 interface UserRow {
   id: string;
@@ -25,6 +26,7 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<UserRow[] | null>(null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [pending, setPending] = useState<UserRow | null>(null);
 
   function load() {
     apiFetch<UserRow[]>('/admin/users')
@@ -34,14 +36,15 @@ export default function AdminUsersPage() {
 
   useEffect(load, []);
 
-  async function toggleStatus(user: UserRow) {
+  async function toggleStatus(user: UserRow, note: string) {
     const next = user.status === 'blocked' ? 'active' : 'blocked';
     setBusy(true);
     try {
       await apiFetch(`/admin/users/${user.id}/status`, {
         method: 'PATCH',
-        body: { status: next },
+        body: { status: next, note },
       });
+      setPending(null);
       load();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'خطا در تغییر وضعیت');
@@ -92,7 +95,7 @@ export default function AdminUsersPage() {
                     <Button
                       variant="secondary"
                       disabled={busy}
-                      onClick={() => toggleStatus(u)}
+                      onClick={() => setPending(u)}
                     >
                       {u.status === 'blocked' ? 'فعال‌سازی' : 'مسدودسازی'}
                     </Button>
@@ -102,6 +105,20 @@ export default function AdminUsersPage() {
             </tbody>
           </table>
         </Card>
+      )}
+      {pending && (
+        <ConfirmationModal
+          open
+          title={pending.status === 'blocked' ? 'فعال‌سازی دوباره کاربر' : 'مسدودسازی کاربر'}
+          description={`${pending.fullName} — ${pending.phone}`}
+          impacts={pending.status === 'blocked'
+            ? ['کاربر دوباره امکان ورود و استفاده از حساب را خواهد داشت.']
+            : ['همه Sessionهای فعال کاربر باطل می‌شوند.', 'ورود و استفاده از حساب تا فعال‌سازی مجدد متوقف می‌شود.']}
+          confirmLabel={pending.status === 'blocked' ? 'فعال‌سازی کاربر' : 'مسدودکردن کاربر'}
+          tone={pending.status === 'blocked' ? 'primary' : 'danger'}
+          onCancel={() => setPending(null)}
+          onConfirm={(note) => toggleStatus(pending, note)}
+        />
       )}
     </div>
   );

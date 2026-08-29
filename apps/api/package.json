@@ -28,6 +28,8 @@
     "phase4:ops-contract": "node scripts/phase4-ops-contract.mjs",
     "phase4:finance-contract": "node scripts/phase4-finance-contract.mjs",
     "phase4:super-admin-contract": "node scripts/phase4-super-admin-contract.mjs",
+    "phase4:confirmation-contract": "node scripts/phase4-confirmation-contract.mjs",
+    "phase4:status-contract": "node scripts/phase4-status-contract.mjs",
     "prisma:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
