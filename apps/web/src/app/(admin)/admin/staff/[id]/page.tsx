@@ -25,7 +25,63 @@ interface StaffDetail extends ExecutorProfile {
     id?: string;
     order: { code: string; title: string; status: string };
   }[];
+  performanceSnapshots: {
+    id: string;
+    periodStart: string;
+    periodEnd: string;
+    completedOrders: number;
+    activeOrders: number;
+    onTimeRate: number;
+    qcPassRate: number;
+    avgCustomerRating: number;
+    complaintCount: number;
+    complimentCount: number;
+    riskScore: number;
+  }[];
+  feedback: {
+    id: string;
+    code: string;
+    rating: number | null;
+    satisfactionPercent: number | null;
+    feedbackType: string;
+    comment: string | null;
+    status: string;
+    resolutionNote: string | null;
+    resolvedAt: string | null;
+    createdAt: string;
+    order: { id: string; code: string; title: string };
+    customer: { fullName: string };
+  }[];
+  history: {
+    id: string;
+    action: string;
+    before: unknown;
+    after: unknown;
+    sensitivity: string;
+    actorRole: string | null;
+    createdAt: string;
+    actor: { fullName: string } | null;
+  }[];
 }
+
+type StaffTab =
+  | 'summary'
+  | 'orders'
+  | 'performance'
+  | 'feedback'
+  | 'skills'
+  | 'capacity'
+  | 'history';
+
+const STAFF_TABS: { value: StaffTab; label: string }[] = [
+  { value: 'summary', label: 'خلاصه و دسترسی' },
+  { value: 'orders', label: 'سفارش‌ها' },
+  { value: 'performance', label: 'عملکرد' },
+  { value: 'feedback', label: 'امتیاز و بازخورد' },
+  { value: 'skills', label: 'مهارت‌ها' },
+  { value: 'capacity', label: 'ظرفیت و حضور' },
+  { value: 'history', label: 'تاریخچه' },
+];
 
 type PendingAction = {
   title: string;
@@ -62,6 +118,22 @@ const ATTENDANCE_LABELS: Record<string, string> = {
   absent: 'غایب',
 };
 
+const FEEDBACK_LABELS: Record<string, string> = {
+  rating: 'امتیاز',
+  complaint: 'شکایت',
+  compliment: 'تشکر',
+};
+
+const HISTORY_ACTION_LABELS: Record<string, string> = {
+  'staff.created': 'ایجاد پروفایل مجری',
+  'staff.profile_changed': 'تغییر مشخصات و احراز',
+  'staff.status_changed': 'تغییر وضعیت کاری',
+  'staff.capacity_changed': 'تغییر ظرفیت',
+  'staff.skills_changed': 'تغییر مهارت‌ها',
+  'staff.attendance_recorded': 'ثبت یا اصلاح حضور',
+  'staff.access_changed': 'تغییر دسترسی حساب',
+};
+
 export default function AdminStaffDetailPage({
   params,
 }: {
@@ -69,6 +141,7 @@ export default function AdminStaffDetailPage({
 }) {
   const { id } = use(params);
   const [profile, setProfile] = useState<StaffDetail | null>(null);
+  const [activeTab, setActiveTab] = useState<StaffTab>('summary');
   const [teams, setTeams] = useState<StaffTeam[]>([]);
   const [allSkills, setAllSkills] = useState<StaffSkill[]>([]);
   const [attendance, setAttendance] = useState<StaffAttendanceRecord[]>([]);
@@ -234,8 +307,28 @@ export default function AdminStaffDetailPage({
         <Metric label="ریسک عملکرد" value={Number(profile.riskScore).toFixed(0)} />
       </div>
 
+      <div
+        className="mb-4 flex gap-2 overflow-x-auto rounded-card border border-border bg-surface p-2"
+        role="tablist"
+        aria-label="بخش‌های پروفایل داخلی مجری"
+      >
+        {STAFF_TABS.map((tab) => (
+          <button
+            key={tab.value}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab.value}
+            onClick={() => setActiveTab(tab.value)}
+            className={`shrink-0 rounded-control px-4 py-2 text-sm font-bold transition-colors ${activeTab === tab.value ? 'bg-accent text-fg-on-accent' : 'text-fg-muted hover:bg-bg-subtle hover:text-fg'}`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       <div className="grid gap-4 xl:grid-cols-2">
-        <Card>
+        {activeTab === 'summary' && (
+          <Card>
           <h3 className="font-bold text-slate-800">مشخصات همکاری و احراز</h3>
           <p className="mt-1 text-xs leading-6 text-slate-500">
             مجری تأییدنشده در تخصیص سفارش قابل انتخاب نیست.
@@ -312,9 +405,11 @@ export default function AdminStaffDetailPage({
           >
             ذخیره مشخصات
           </Button>
-        </Card>
+          </Card>
+        )}
 
-        <Card>
+        {activeTab === 'capacity' && (
+          <Card>
           <h3 className="font-bold text-slate-800">وضعیت کاری و ظرفیت</h3>
           <p className="mt-1 text-xs leading-6 text-slate-500">
             ظرفیت ۱۰۰٪ یا بیشتر، وضعیت را خودکار روی بیش‌ازظرفیت می‌گذارد.
@@ -390,9 +485,11 @@ export default function AdminStaffDetailPage({
               </Button>
             </div>
           </div>
-        </Card>
+          </Card>
+        )}
 
-        <Card>
+        {activeTab === 'skills' && (
+          <Card className="xl:col-span-2">
           <h3 className="font-bold text-slate-800">مهارت‌ها و سطح تسلط</h3>
           <p className="mt-1 text-xs leading-6 text-slate-500">
             سطح ۱ مقدماتی و سطح ۵ خبره است. تخصص با دسته خدمت در تخصیص کنترل می‌شود.
@@ -477,9 +574,11 @@ export default function AdminStaffDetailPage({
           >
             ذخیره مهارت‌ها
           </Button>
-        </Card>
+          </Card>
+        )}
 
-        <Card>
+        {activeTab === 'capacity' && (
+          <Card>
           <h3 className="font-bold text-slate-800">حضور روزانه</h3>
           <p className="mt-1 text-xs leading-6 text-slate-500">
             برای هر روز فقط یک رکورد نگهداری می‌شود و ثبت دوباره همان روز را اصلاح می‌کند.
@@ -562,9 +661,11 @@ export default function AdminStaffDetailPage({
               </ul>
             )}
           </div>
-        </Card>
+          </Card>
+        )}
 
-        <Card>
+        {activeTab === 'summary' && (
+          <Card>
           <h3 className="font-bold text-slate-800">دسترسی حساب</h3>
           <p className="mt-1 text-xs leading-6 text-slate-500">
             تغییر دسترسی همه نشست‌های فعال را باطل می‌کند تا سیاست جدید فوری اعمال شود.
@@ -617,9 +718,180 @@ export default function AdminStaffDetailPage({
           >
             اعمال دسترسی
           </Button>
-        </Card>
+          </Card>
+        )}
 
-        <Card>
+        {activeTab === 'performance' && (
+          <Card className="xl:col-span-2">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 className="font-bold text-slate-800">روند عملکرد مجری</h3>
+                <p className="mt-1 text-xs leading-6 text-slate-500">
+                  Snapshotهای ثبت‌شده، تغییر کیفیت و ریسک عملکرد را در طول زمان نشان می‌دهند.
+                </p>
+              </div>
+              <Badge color={Number(profile.riskScore) >= 50 ? 'red' : 'green'}>
+                ریسک فعلی: {Number(profile.riskScore).toFixed(0)}
+              </Badge>
+            </div>
+            {profile.performanceSnapshots.length === 0 ? (
+              <div className="mt-4 rounded-control bg-slate-50 p-4 text-sm text-slate-500">
+                هنوز Snapshot عملکردی ثبت نشده است. محاسبه دوره‌ای در گام بعدی فاز ۵ فعال می‌شود.
+              </div>
+            ) : (
+              <div className="mt-4 overflow-x-auto">
+                <table className="w-full min-w-[880px] text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-100 text-right text-xs text-slate-400">
+                      <th className="px-3 py-2 font-medium">دوره</th>
+                      <th className="px-3 py-2 font-medium">فعال / تکمیل</th>
+                      <th className="px-3 py-2 font-medium">به‌موقع</th>
+                      <th className="px-3 py-2 font-medium">QC pass</th>
+                      <th className="px-3 py-2 font-medium">امتیاز</th>
+                      <th className="px-3 py-2 font-medium">شکایت / تشکر</th>
+                      <th className="px-3 py-2 font-medium">ریسک</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {profile.performanceSnapshots.map((snapshot) => (
+                      <tr key={snapshot.id} className="border-b border-slate-50">
+                        <td className="px-3 py-3 text-slate-600">
+                          {new Date(snapshot.periodEnd).toLocaleDateString('fa-IR')}
+                        </td>
+                        <td className="px-3 py-3 text-slate-600">
+                          {snapshot.activeOrders} / {snapshot.completedOrders}
+                        </td>
+                        <td className="px-3 py-3 text-slate-600">
+                          {Number(snapshot.onTimeRate).toFixed(0)}٪
+                        </td>
+                        <td className="px-3 py-3 text-slate-600">
+                          {Number(snapshot.qcPassRate).toFixed(0)}٪
+                        </td>
+                        <td className="px-3 py-3 text-slate-600">
+                          {Number(snapshot.avgCustomerRating).toFixed(1)}
+                        </td>
+                        <td className="px-3 py-3 text-slate-600">
+                          {snapshot.complaintCount} / {snapshot.complimentCount}
+                        </td>
+                        <td className="px-3 py-3">
+                          <Badge color={Number(snapshot.riskScore) >= 50 ? 'red' : 'green'}>
+                            {Number(snapshot.riskScore).toFixed(0)}
+                          </Badge>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
+        )}
+
+        {activeTab === 'feedback' && (
+          <Card className="xl:col-span-2">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <FeedbackMetric
+                label="امتیازها"
+                value={profile.feedback.filter((item) => item.feedbackType === 'rating').length}
+                color="blue"
+              />
+              <FeedbackMetric
+                label="شکایت‌ها"
+                value={profile.feedback.filter((item) => item.feedbackType === 'complaint').length}
+                color="red"
+              />
+              <FeedbackMetric
+                label="تشکرها"
+                value={profile.feedback.filter((item) => item.feedbackType === 'compliment').length}
+                color="green"
+              />
+            </div>
+            <h3 className="mt-5 font-bold text-slate-800">امتیاز، شکایت و تشکر</h3>
+            {profile.feedback.length === 0 ? (
+              <p className="mt-3 text-sm text-slate-400">بازخوردی برای این مجری ثبت نشده است.</p>
+            ) : (
+              <ul className="mt-3 divide-y divide-slate-100">
+                {profile.feedback.map((item) => (
+                  <li key={item.id} className="py-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge
+                          color={
+                            item.feedbackType === 'complaint'
+                              ? 'red'
+                              : item.feedbackType === 'compliment'
+                                ? 'green'
+                                : 'blue'
+                          }
+                        >
+                          {FEEDBACK_LABELS[item.feedbackType] ?? item.feedbackType}
+                        </Badge>
+                        <span className="text-sm font-bold text-slate-700">{item.code}</span>
+                        {item.rating != null && (
+                          <span className="text-sm text-amber-600">{item.rating} از ۵</span>
+                        )}
+                      </div>
+                      <span className="text-xs text-slate-400">
+                        {new Date(item.createdAt).toLocaleString('fa-IR')}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm text-slate-600">
+                      سفارش {item.order.code} — {item.order.title}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-400">ثبت‌کننده: {item.customer.fullName}</p>
+                    {item.comment && <p className="mt-2 text-sm leading-7 text-slate-700">{item.comment}</p>}
+                    {item.resolutionNote && (
+                      <div className="mt-2 rounded-control bg-emerald-50 p-3 text-sm text-emerald-800">
+                        نتیجه رسیدگی: {item.resolutionNote}
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+        )}
+
+        {activeTab === 'history' && (
+          <Card className="xl:col-span-2">
+            <h3 className="font-bold text-slate-800">تاریخچه تغییرات داخلی</h3>
+            <p className="mt-1 text-xs leading-6 text-slate-500">
+              تصمیم‌های مدیریتی همراه ثبت‌کننده، زمان و داده قبل/بعد نگهداری می‌شوند.
+            </p>
+            {profile.history.length === 0 ? (
+              <p className="mt-4 text-sm text-slate-400">رویدادی ثبت نشده است.</p>
+            ) : (
+              <ol className="mt-4 space-y-3 border-r-2 border-slate-100 pr-5">
+                {profile.history.map((entry) => (
+                  <li key={entry.id} className="relative rounded-control border border-slate-100 p-4">
+                    <span className="absolute -right-[27px] top-5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500" />
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="font-bold text-slate-700">
+                        {HISTORY_ACTION_LABELS[entry.action] ?? entry.action}
+                      </p>
+                      <span className="text-xs text-slate-400">
+                        {new Date(entry.createdAt).toLocaleString('fa-IR')}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs text-slate-500">
+                      توسط {entry.actor?.fullName ?? entry.actorRole ?? 'سیستم'}
+                    </p>
+                    <details className="mt-3 text-xs text-slate-500">
+                      <summary className="cursor-pointer font-medium text-slate-600">مشاهده داده قبل و بعد</summary>
+                      <div className="mt-2 grid gap-2 lg:grid-cols-2" dir="ltr">
+                        <pre className="overflow-x-auto rounded-control bg-slate-50 p-3 text-left">{formatAuditPayload(entry.before)}</pre>
+                        <pre className="overflow-x-auto rounded-control bg-slate-50 p-3 text-left">{formatAuditPayload(entry.after)}</pre>
+                      </div>
+                    </details>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </Card>
+        )}
+
+        {activeTab === 'orders' && (
+          <Card className="xl:col-span-2">
           <h3 className="font-bold text-slate-800">سفارش‌های مرتبط</h3>
           {profile.assignments?.length ? (
             <ul className="mt-3 max-h-80 divide-y divide-slate-100 overflow-y-auto text-sm">
@@ -643,7 +915,8 @@ export default function AdminStaffDetailPage({
           ) : (
             <p className="mt-3 text-sm text-slate-400">سفارشی ثبت نشده است.</p>
           )}
-        </Card>
+          </Card>
+        )}
       </div>
 
       <ConfirmationModal
@@ -667,4 +940,32 @@ function Metric({ label, value }: { label: string; value: string }) {
       <p className="mt-1 text-2xl font-bold text-slate-900">{value}</p>
     </Card>
   );
+}
+
+function FeedbackMetric({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: number;
+  color: 'blue' | 'red' | 'green';
+}) {
+  return (
+    <div className="rounded-control border border-slate-100 p-4">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm text-slate-500">{label}</p>
+        <Badge color={color}>{value}</Badge>
+      </div>
+    </div>
+  );
+}
+
+function formatAuditPayload(value: unknown) {
+  if (value == null) return 'بدون داده';
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return 'نمایش داده ممکن نیست';
+  }
 }

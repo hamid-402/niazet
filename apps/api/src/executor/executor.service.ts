@@ -227,7 +227,43 @@ export class ExecutorService {
       },
     });
     if (!profile) throw new NotFoundException('پروفایل مجری یافت نشد.');
-    return profile;
+    const [feedback, history] = await Promise.all([
+      this.prisma.feedback.findMany({
+        where: { targetType: 'executor', targetInternalId: id },
+        select: {
+          id: true,
+          code: true,
+          rating: true,
+          satisfactionPercent: true,
+          feedbackType: true,
+          comment: true,
+          status: true,
+          resolutionNote: true,
+          resolvedAt: true,
+          createdAt: true,
+          order: { select: { id: true, code: true, title: true } },
+          customer: { select: { fullName: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+      }),
+      this.prisma.auditLog.findMany({
+        where: { entityType: 'executor_profile', entityId: id },
+        select: {
+          id: true,
+          action: true,
+          before: true,
+          after: true,
+          sensitivity: true,
+          actorRole: true,
+          createdAt: true,
+          actor: { select: { fullName: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+      }),
+    ]);
+    return { ...profile, feedback, history };
   }
 
   async setStatus(

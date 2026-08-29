@@ -72,9 +72,15 @@ if ($Action -eq 'start') {
   & (Join-Path $PSScriptRoot 'runtime.ps1') attach | Out-Null
 
   foreach ($Service in $Services) {
-    if (Get-TrackedProcess $Service) {
-      Write-Host "$($Service.Name) is already running."
-      continue
+    $TrackedProcess = Get-TrackedProcess $Service
+    if ($TrackedProcess) {
+      if (Test-Health $Service) {
+        Write-Host "$($Service.Name) is already running and healthy."
+        continue
+      }
+
+      Write-Host "$($Service.Name) is tracked but unhealthy; restarting it."
+      Stop-ProcessTree $TrackedProcess.Id
     }
 
     $StateFile = Get-StateFile $Service

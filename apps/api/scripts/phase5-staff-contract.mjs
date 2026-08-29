@@ -62,6 +62,13 @@ const detail = await json(
 assert(Array.isArray(detail.user.capabilities), 'Access capabilities are missing.');
 assert(Array.isArray(detail.attendanceRecords), 'Attendance records are missing.');
 assert(Array.isArray(detail.capacitySnapshots), 'Capacity history is missing.');
+assert(Array.isArray(detail.performanceSnapshots), 'Performance history is missing.');
+assert(Array.isArray(detail.feedback), 'Executor feedback history is missing.');
+assert(Array.isArray(detail.history), 'Staff audit history is missing.');
+assert(
+  detail.history.every((item) => item.action && item.createdAt),
+  'Staff history entries are malformed.',
+);
 
 const attendance = await json(
   await fetch(`${API_ORIGIN}/v1/admin/staff/${target.id}/attendance`, {
@@ -95,5 +102,12 @@ const detailPage = await readFile(
 );
 assert(detailPage.includes('ConfirmationModal'), 'Sensitive staff actions must use the standard confirmation modal.');
 assert(detailPage.includes('/attendance') && detailPage.includes('/access'), 'Staff attendance/access UI contracts are missing.');
+assert(
+  detailPage.includes('role="tablist"') &&
+    detailPage.includes("activeTab === 'performance'") &&
+    detailPage.includes("activeTab === 'feedback'") &&
+    detailPage.includes("activeTab === 'history'"),
+  'Tabbed staff performance, feedback and history UI contracts are missing.',
+);
 
-console.log('Phase 5 staff contract passed: team, skill, verification, attendance, capacity, access, required-note and scope isolation.');
+console.log('Phase 5 staff contract passed: team, skill, verification, attendance, capacity, access, profile tabs, feedback/history, required-note and scope isolation.');
