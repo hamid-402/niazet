@@ -3,6 +3,7 @@ export const JOB_NAMES = [
   'release_eligible_escrows',
   'escalate_overdue_tickets',
   'recalculate_staff_performance',
+  'detect_staff_risks',
   'recalculate_executor_scores',
   'send_outbox_notifications',
   'file_antivirus_scan',

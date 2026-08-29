@@ -195,6 +195,13 @@ export class UpdateStaffAccessDto {
   note!: string;
 }
 
+export class AcknowledgeStaffRiskDto {
+  @IsString()
+  @MinLength(3)
+  @MaxLength(500)
+  note!: string;
+}
+
 export class UpdateExecutionChecklistDto {
   @IsBoolean()
   completed!: boolean;

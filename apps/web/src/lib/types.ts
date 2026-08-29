@@ -324,6 +324,23 @@ export interface ExecutorSkillAssignment {
   skill: StaffSkill;
 }
 
+export interface StaffRiskAlert {
+  id: string;
+  riskType:
+    | 'over_capacity'
+    | 'burnout_risk'
+    | 'sla_risk'
+    | 'quality_regression';
+  severity: 'warning' | 'high' | 'critical';
+  status: 'active' | 'acknowledged' | 'cleared';
+  evidence: Record<string, unknown> | null;
+  detectedAt: string;
+  lastDetectedAt: string;
+  acknowledgedAt: string | null;
+  acknowledgementNote: string | null;
+  acknowledgedBy?: { fullName: string } | null;
+}
+
 export interface ExecutorProfile {
   id: string;
   publicHandlerCode: string;
@@ -348,6 +365,7 @@ export interface ExecutorProfile {
     capacityPercent: number;
     activeOrders: number;
   }[];
+  riskAlerts?: StaffRiskAlert[];
   user?: {
     id?: string;
     fullName: string;

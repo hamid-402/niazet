@@ -106,6 +106,11 @@ export class JobsService implements OnModuleInit {
       run: (now) => this.recalculateStaffPerformance(now),
     });
     this.runner.register({
+      name: 'detect_staff_risks',
+      intervalMs: HOUR,
+      run: (now) => this.detectStaffRisks(now),
+    });
+    this.runner.register({
       name: 'recalculate_executor_scores',
       intervalMs: 24 * HOUR,
       run: () => this.recalculateExecutorScores(),
@@ -282,6 +287,19 @@ export class JobsService implements OnModuleInit {
       data: { status: 'under_review' },
     });
     return { processed: result.count };
+  }
+
+  private async detectStaffRisks(now: Date): Promise<JobResult> {
+    const profiles = await this.prisma.executorProfile.findMany({
+      where: { status: { not: 'blocked' } },
+      select: { id: true },
+    });
+    return runPerformanceBatch(
+      profiles.map((profile) => profile.id),
+      now,
+      (profileId, detectionTime) =>
+        this.executor.refreshRiskAlerts(profileId, detectionTime),
+    );
   }
 
   private async scanPendingFiles(): Promise<JobResult> {

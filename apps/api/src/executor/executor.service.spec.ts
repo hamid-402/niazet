@@ -123,9 +123,28 @@ describe('ExecutorService staff operations', () => {
           capacityInput = input;
         }),
       },
+      staffRiskAlert: {
+        findMany: jest.fn().mockResolvedValue([]),
+        create: jest.fn().mockResolvedValue({
+          id: 'risk-1',
+          riskType: 'over_capacity',
+          severity: 'high',
+          status: 'active',
+        }),
+      },
+      user: { findMany: jest.fn().mockResolvedValue([]) },
       auditLog: { create: jest.fn() },
     };
     const prisma = {
+      executorProfile: {
+        findUnique: jest.fn().mockResolvedValue({
+          id: 'profile-1',
+          displayAlias: 'مجری تست',
+          capacityPercent: 100,
+        }),
+      },
+      orderAssignment: { findMany: jest.fn().mockResolvedValue([]) },
+      staffPerformanceSnapshot: { findMany: jest.fn().mockResolvedValue([]) },
       $transaction: jest.fn((callback: (client: typeof tx) => unknown) =>
         callback(tx),
       ),
@@ -245,6 +264,8 @@ describe('ExecutorService staff operations', () => {
     const tx = {
       executorProfile: { update: jest.fn() },
       staffPerformanceSnapshot: { upsert },
+      staffRiskAlert: { findMany: jest.fn().mockResolvedValue([]) },
+      user: { findMany: jest.fn().mockResolvedValue([]) },
     };
     const prisma = {
       executorProfile: {
@@ -253,6 +274,7 @@ describe('ExecutorService staff operations', () => {
       orderAssignment: { findMany: jest.fn().mockResolvedValue([]) },
       qcReview: { findMany: jest.fn().mockResolvedValue([]) },
       feedback: { findMany: jest.fn().mockResolvedValue([]) },
+      staffPerformanceSnapshot: { findMany: jest.fn().mockResolvedValue([]) },
       $transaction: jest.fn((callback: (client: typeof tx) => unknown) =>
         callback(tx),
       ),

@@ -69,6 +69,25 @@ enum AttendanceStatus {
   absent
 }
 
+enum StaffRiskType {
+  over_capacity
+  burnout_risk
+  sla_risk
+  quality_regression
+}
+
+enum StaffRiskSeverity {
+  warning
+  high
+  critical
+}
+
+enum StaffRiskStatus {
+  active
+  acknowledged
+  cleared
+}
+
 enum PricingModel {
   fixed
   formula
@@ -399,13 +418,14 @@ model User {
 
   statusChanges OrderStatusHistory[] @relation("StatusActor")
 
-  auditLogs               AuditLog[]              @relation("AuditActor")
-  notifications           NotificationLog[]
-  notificationPreference  NotificationPreference?
-  customerProfile         CustomerProfile?
-  privacyRequests         PrivacyRequest[]
-  signedUrlGrants         SignedUrlGrant[]
-  staffAttendanceRecorded StaffAttendanceRecord[] @relation("StaffAttendanceRecordedBy")
+  auditLogs                   AuditLog[]              @relation("AuditActor")
+  notifications               NotificationLog[]
+  notificationPreference      NotificationPreference?
+  customerProfile             CustomerProfile?
+  privacyRequests             PrivacyRequest[]
+  signedUrlGrants             SignedUrlGrant[]
+  staffAttendanceRecorded     StaffAttendanceRecord[] @relation("StaffAttendanceRecordedBy")
+  staffRiskAlertsAcknowledged StaffRiskAlert[]        @relation("StaffRiskAcknowledgedBy")
 
   systemSettingsUpdated SystemSetting[] @relation("SettingUpdatedBy")
 
@@ -576,6 +596,7 @@ model ExecutorProfile {
   capacitySnapshots    StaffCapacitySnapshot[]
   performanceSnapshots StaffPerformanceSnapshot[]
   attendanceRecords    StaffAttendanceRecord[]
+  riskAlerts           StaffRiskAlert[]
   assignments          OrderAssignment[]
   onboarding           ExecutorOnboarding?
   withdrawals          Withdrawal[]
@@ -646,6 +667,30 @@ model StaffAttendanceRecord {
   @@unique([executorProfileId, workDate])
   @@index([workDate, status])
   @@map("staff_attendance_records")
+}
+
+model StaffRiskAlert {
+  id                   String            @id @default(uuid())
+  executorProfileId    String            @map("executor_profile_id")
+  riskType             StaffRiskType     @map("risk_type")
+  severity             StaffRiskSeverity
+  status               StaffRiskStatus   @default(active)
+  evidence             Json?
+  detectedAt           DateTime          @default(now()) @map("detected_at")
+  lastDetectedAt       DateTime          @default(now()) @map("last_detected_at")
+  acknowledgedAt       DateTime?         @map("acknowledged_at")
+  acknowledgedByUserId String?           @map("acknowledged_by_user_id")
+  acknowledgementNote  String?           @map("acknowledgement_note")
+  clearedAt            DateTime?         @map("cleared_at")
+  createdAt            DateTime          @default(now()) @map("created_at")
+  updatedAt            DateTime          @updatedAt @map("updated_at")
+
+  executorProfile ExecutorProfile @relation(fields: [executorProfileId], references: [id], onDelete: Cascade)
+  acknowledgedBy  User?           @relation("StaffRiskAcknowledgedBy", fields: [acknowledgedByUserId], references: [id], onDelete: SetNull)
+
+  @@unique([executorProfileId, riskType])
+  @@index([status, severity, lastDetectedAt])
+  @@map("staff_risk_alerts")
 }
 
 // فاز بعد: جذب مجری بیرونی

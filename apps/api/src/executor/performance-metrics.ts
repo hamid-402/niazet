@@ -85,6 +85,21 @@ export function isAssignmentOnTime(
   return order.deliveredAt <= deadline;
 }
 
+export function assignmentDeadline(assignment: PerformanceAssignment) {
+  if (assignment.order.deliveredAt) return null;
+  const pendingMilestoneDeadlines = assignment.order.milestones
+    .filter((item) => item.dueAt && !item.deliveredAt)
+    .map((item) => item.dueAt as Date)
+    .sort((first, second) => first.getTime() - second.getTime());
+  if (pendingMilestoneDeadlines.length > 0) return pendingMilestoneDeadlines[0];
+
+  const slaHours =
+    snapshotSlaHours(assignment.order.packageSnapshot) ??
+    assignment.order.serviceLine.slaHours;
+  if (!slaHours || slaHours <= 0) return null;
+  return new Date(assignment.assignedAt.getTime() + slaHours * HOUR_MS);
+}
+
 export function calculateRiskScore(input: RiskInputs) {
   const components: { value: number; weight: number }[] = [];
   if (input.onTimeSamples > 0) {

@@ -403,6 +403,7 @@ export default function AdminStaffPage() {
                 <th className="px-4 py-3 font-medium">وضعیت</th>
                 <th className="px-4 py-3 font-medium">ظرفیت</th>
                 <th className="px-4 py-3 font-medium">عملکرد</th>
+                <th className="px-4 py-3 font-medium">هشدار</th>
               </tr>
             </thead>
             <tbody>
@@ -459,6 +460,23 @@ export default function AdminStaffPage() {
                     <p className="mt-1">
                       رضایت: {Number(item.customerRatingAvg).toFixed(1)}
                     </p>
+                  </td>
+                  <td className="px-4 py-3">
+                    {(item.riskAlerts?.length ?? 0) > 0 ? (
+                      <Badge
+                        color={
+                          item.riskAlerts?.some(
+                            (alert) => alert.severity === 'critical',
+                          )
+                            ? 'red'
+                            : 'yellow'
+                        }
+                      >
+                        {item.riskAlerts?.length} هشدار باز
+                      </Badge>
+                    ) : (
+                      <Badge color="green">بدون هشدار</Badge>
+                    )}
                   </td>
                 </tr>
               ))}

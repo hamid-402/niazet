@@ -20,6 +20,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
 import { buildPagination, PaginationDto } from '../common/dto/pagination.dto';
 import {
+  AcknowledgeStaffRiskDto,
   AttendanceQueryDto,
   CreateStaffDto,
   CreateSkillDto,
@@ -141,6 +142,23 @@ export class StaffAdminController {
     @Req() req: Request,
   ) {
     return this.executor.updateAccess(id, dto, user, req.ip);
+  }
+
+  @Patch(':id/alerts/:alertId/acknowledge')
+  acknowledgeAlert(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Param('alertId') alertId: string,
+    @Body() dto: AcknowledgeStaffRiskDto,
+    @Req() req: Request,
+  ) {
+    return this.executor.acknowledgeRiskAlert(
+      id,
+      alertId,
+      dto.note,
+      user,
+      req.ip,
+    );
   }
 }
 

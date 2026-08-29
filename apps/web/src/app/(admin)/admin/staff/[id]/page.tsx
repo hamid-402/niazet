@@ -17,10 +17,12 @@ import type {
   ExecutorProfile,
   StaffAttendanceRecord,
   StaffSkill,
+  StaffRiskAlert,
   StaffTeam,
 } from '@/lib/types';
 
 interface StaffDetail extends ExecutorProfile {
+  riskAlerts: StaffRiskAlert[];
   assignments: {
     id?: string;
     order: { code: string; title: string; status: string };
@@ -124,6 +126,25 @@ const FEEDBACK_LABELS: Record<string, string> = {
   compliment: 'تشکر',
 };
 
+const RISK_LABELS: Record<string, string> = {
+  over_capacity: 'ظرفیت تکمیل‌شده',
+  burnout_risk: 'فشار کاری پایدار',
+  sla_risk: 'ریسک SLA',
+  quality_regression: 'افت کیفیت',
+};
+
+const RISK_EVIDENCE_LABELS: Record<string, string> = {
+  capacityPercent: 'ظرفیت',
+  activeOrders: 'سفارش فعال',
+  overdueCount: 'سررسید گذشته',
+  dueSoonCount: 'سررسید تا ۲۴ ساعت',
+  deadlineCount: 'سفارش دارای deadline',
+  qcDrop: 'افت QC',
+  currentQcPassRate: 'QC فعلی',
+  previousQcPassRate: 'QC قبلی',
+  currentRiskScore: 'ریسک فعلی',
+};
+
 const HISTORY_ACTION_LABELS: Record<string, string> = {
   'staff.created': 'ایجاد پروفایل مجری',
   'staff.profile_changed': 'تغییر مشخصات و احراز',
@@ -132,6 +153,11 @@ const HISTORY_ACTION_LABELS: Record<string, string> = {
   'staff.skills_changed': 'تغییر مهارت‌ها',
   'staff.attendance_recorded': 'ثبت یا اصلاح حضور',
   'staff.access_changed': 'تغییر دسترسی حساب',
+  'staff.performance_recalculated': 'محاسبه دستی عملکرد',
+  'staff.risk_alert_activated': 'فعال‌شدن هشدار ریسک',
+  'staff.risk_alert_escalated': 'افزایش شدت هشدار ریسک',
+  'staff.risk_alert_acknowledged': 'تأیید مشاهده هشدار',
+  'staff.risk_alert_cleared': 'رفع خودکار هشدار ریسک',
 };
 
 export default function AdminStaffDetailPage({
@@ -761,6 +787,70 @@ export default function AdminStaffDetailPage({
                 </Button>
               </div>
             </div>
+            {profile.riskAlerts.length > 0 && (
+              <div className="mt-4 grid gap-3 lg:grid-cols-2">
+                {profile.riskAlerts.map((alert) => (
+                  <div
+                    key={alert.id}
+                    className={`rounded-control border p-4 ${
+                      alert.severity === 'critical'
+                        ? 'border-red-200 bg-red-50'
+                        : 'border-amber-200 bg-amber-50'
+                    }`}
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Badge color={alert.severity === 'critical' ? 'red' : 'yellow'}>
+                          {RISK_LABELS[alert.riskType] ?? alert.riskType}
+                        </Badge>
+                        <span className="text-xs text-slate-500">
+                          {alert.status === 'acknowledged' ? 'مشاهده‌شده' : 'نیازمند بررسی'}
+                        </span>
+                      </div>
+                      <span className="text-xs text-slate-400">
+                        {new Date(alert.lastDetectedAt).toLocaleString('fa-IR')}
+                      </span>
+                    </div>
+                    <dl className="mt-3 flex flex-wrap gap-2 text-xs text-slate-600">
+                      {Object.entries(alert.evidence ?? {}).map(([key, value]) => (
+                        <div key={key} className="rounded-full bg-white/80 px-2 py-1">
+                          <dt className="inline">{RISK_EVIDENCE_LABELS[key] ?? key}: </dt>
+                          <dd className="inline font-bold">{String(value ?? '—')}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                    {alert.status === 'active' ? (
+                      <Button
+                        className="mt-3"
+                        variant="secondary"
+                        onClick={() =>
+                          setPending({
+                            title: 'تأیید مشاهده هشدار',
+                            description:
+                              'هشدار تا زمان رفع شواهد فعال می‌ماند، اما مسئول بررسی و یادداشت تصمیم ثبت می‌شود.',
+                            impacts: [
+                              'هشدار حذف نمی‌شود و فقط به وضعیت مشاهده‌شده می‌رود.',
+                              'در صورت افزایش شدت، دوباره فعال و اعلان جدید ساخته می‌شود.',
+                            ],
+                            confirmLabel: 'ثبت مشاهده',
+                            path: `/admin/staff/${id}/alerts/${alert.id}/acknowledge`,
+                            body: {},
+                            success: 'مشاهده و یادداشت بررسی هشدار ثبت شد.',
+                          })
+                        }
+                      >
+                        ثبت مشاهده
+                      </Button>
+                    ) : (
+                      <p className="mt-3 text-xs text-slate-500">
+                        توسط {alert.acknowledgedBy?.fullName ?? 'مدیر عملیات'}؛{' '}
+                        {alert.acknowledgementNote}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
             {profile.performanceSnapshots.length === 0 ? (
               <div className="mt-4 rounded-control bg-slate-50 p-4 text-sm text-slate-500">
                 هنوز Snapshot عملکردی ثبت نشده است؛ Job روزانه یا دکمه «محاسبه اکنون» اولین Snapshot را می‌سازد.

@@ -4,13 +4,14 @@ import { outboxRetryDelayMs } from './outbox-worker.service';
 
 describe('phase 3 background infrastructure', () => {
   it('registers every required worker exactly once', () => {
-    expect(new Set(JOB_NAMES).size).toBe(9);
+    expect(new Set(JOB_NAMES).size).toBe(10);
     expect(JOB_NAMES).toEqual(
       expect.arrayContaining([
         'payment_verify_recheck',
         'release_eligible_escrows',
         'escalate_overdue_tickets',
         'recalculate_staff_performance',
+        'detect_staff_risks',
         'recalculate_executor_scores',
         'send_outbox_notifications',
         'file_antivirus_scan',

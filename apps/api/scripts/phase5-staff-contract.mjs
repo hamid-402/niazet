@@ -78,6 +78,7 @@ assert(Array.isArray(detail.user.capabilities), 'Access capabilities are missing
 assert(Array.isArray(detail.attendanceRecords), 'Attendance records are missing.');
 assert(Array.isArray(detail.capacitySnapshots), 'Capacity history is missing.');
 assert(Array.isArray(detail.performanceSnapshots), 'Performance history is missing.');
+assert(Array.isArray(detail.riskAlerts), 'Operational risk alerts are missing.');
 assert(
   detail.performanceSnapshots.some((item) => item.id === performance.id),
   'Daily performance snapshot was not persisted.',
@@ -109,6 +110,90 @@ for (const [path, body, label] of [
   assert(response.status === 400, `${label} mutation without note must fail.`);
 }
 
+const originalCapacity = target.capacityPercent;
+await json(
+  await fetch(`${API_ORIGIN}/v1/admin/staff/${target.id}/capacity`, {
+    method: 'PATCH',
+    headers,
+    body: JSON.stringify({
+      capacityPercent: 100,
+      note: 'آزمون قرارداد هشدار ظرفیت',
+    }),
+  }),
+);
+await json(
+  await fetch(
+    `${API_ORIGIN}/v1/admin/staff/${target.id}/performance/recalculate`,
+    { method: 'POST', headers },
+  ),
+);
+const riskyDetail = await json(
+  await fetch(`${API_ORIGIN}/v1/admin/staff/${target.id}`, { headers }),
+);
+const capacityAlert = riskyDetail.riskAlerts.find(
+  (item) => item.riskType === 'over_capacity',
+);
+assert(
+  capacityAlert?.status === 'active' && capacityAlert.evidence?.capacityPercent === 100,
+  'Over-capacity alert was not activated with evidence.',
+);
+const acknowledged = await json(
+  await fetch(
+    `${API_ORIGIN}/v1/admin/staff/${target.id}/alerts/${capacityAlert.id}/acknowledge`,
+    {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify({ note: 'بررسی هشدار در قرارداد زنده' }),
+    },
+  ),
+);
+assert(
+  acknowledged.status === 'acknowledged',
+  'Risk alert acknowledgement was not persisted.',
+);
+const safeCapacity = originalCapacity === 100 ? 50 : originalCapacity;
+await json(
+  await fetch(`${API_ORIGIN}/v1/admin/staff/${target.id}/capacity`, {
+    method: 'PATCH',
+    headers,
+    body: JSON.stringify({
+      capacityPercent: safeCapacity,
+      note: 'بازگردانی ظرفیت بعد از آزمون هشدار',
+    }),
+  }),
+);
+await json(
+  await fetch(
+    `${API_ORIGIN}/v1/admin/staff/${target.id}/performance/recalculate`,
+    { method: 'POST', headers },
+  ),
+);
+const clearedDetail = await json(
+  await fetch(`${API_ORIGIN}/v1/admin/staff/${target.id}`, { headers }),
+);
+assert(
+  !clearedDetail.riskAlerts.some((item) => item.riskType === 'over_capacity'),
+  'Resolved capacity evidence did not clear the alert.',
+);
+if (originalCapacity === 100) {
+  await json(
+    await fetch(`${API_ORIGIN}/v1/admin/staff/${target.id}/capacity`, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify({
+        capacityPercent: originalCapacity,
+        note: 'بازگردانی ظرفیت اولیه قرارداد',
+      }),
+    }),
+  );
+  await json(
+    await fetch(
+      `${API_ORIGIN}/v1/admin/staff/${target.id}/performance/recalculate`,
+      { method: 'POST', headers },
+    ),
+  );
+}
+
 const financeLogin = await login(finance);
 const forbidden = await fetch(`${API_ORIGIN}/v1/admin/staff`, {
   headers: { authorization: `Bearer ${financeLogin.accessToken}` },
@@ -129,6 +214,11 @@ const performanceJob = jobs.find(
 assert(
   performanceJob?.intervalMs === 24 * 60 * 60 * 1000,
   'Daily staff performance job is not registered.',
+);
+const riskJob = jobs.find((item) => item.name === 'detect_staff_risks');
+assert(
+  riskJob?.intervalMs === 60 * 60 * 1000,
+  'Hourly staff risk detection job is not registered.',
 );
 const jobResult = await json(
   await fetch(
@@ -161,5 +251,10 @@ assert(
     detailPage.includes('محاسبه اکنون'),
   'Manual performance recalculation UI contract is missing.',
 );
+assert(
+  detailPage.includes('/alerts/${alert.id}/acknowledge') &&
+    detailPage.includes('RISK_EVIDENCE_LABELS'),
+  'Risk evidence and acknowledgement UI contracts are missing.',
+);
 
-console.log('Phase 5 staff contract passed: team, skill, verification, attendance, capacity, access, profile tabs, feedback/history, daily performance snapshots/job, required-note and scope isolation.');
+console.log('Phase 5 staff contract passed: team, skill, verification, attendance, capacity, access, profile tabs, feedback/history, daily performance snapshots/job, risk activation/acknowledgement/auto-clear, required-note and scope isolation.');

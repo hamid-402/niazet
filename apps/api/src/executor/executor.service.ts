@@ -34,6 +34,20 @@ import {
   rollingPeriod,
   round2,
 } from './performance-metrics';
+import { detectStaffRisks, type StaffRiskSeverity } from './staff-risk';
+
+const RISK_LABELS = {
+  over_capacity: 'ظرفیت تکمیل شده',
+  burnout_risk: 'فشار کاری پایدار',
+  sla_risk: 'ریسک سررسید SLA',
+  quality_regression: 'افت معنادار کیفیت',
+} as const;
+
+const SEVERITY_RANK: Record<StaffRiskSeverity, number> = {
+  warning: 1,
+  high: 2,
+  critical: 3,
+};
 
 @Injectable()
 export class ExecutorService {
@@ -194,6 +208,10 @@ export class ExecutorService {
         user: { select: { fullName: true, phone: true, status: true } },
         team: true,
         skills: { include: { skill: true } },
+        riskAlerts: {
+          where: { status: { not: 'cleared' } },
+          orderBy: [{ severity: 'desc' }, { lastDetectedAt: 'desc' }],
+        },
         _count: { select: { assignments: true } },
       },
       orderBy: { createdAt: 'desc' },
@@ -229,6 +247,11 @@ export class ExecutorService {
           include: { recordedBy: { select: { fullName: true } } },
         },
         performanceSnapshots: { orderBy: { periodEnd: 'desc' }, take: 12 },
+        riskAlerts: {
+          where: { status: { not: 'cleared' } },
+          orderBy: [{ severity: 'desc' }, { lastDetectedAt: 'desc' }],
+          include: { acknowledgedBy: { select: { fullName: true } } },
+        },
         onboarding: true,
       },
     });
@@ -316,7 +339,7 @@ export class ExecutorService {
     actor: AuthenticatedUser,
     ipAddress?: string,
   ) {
-    return this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
       const before = await tx.executorProfile.findUnique({ where: { id } });
       if (!before) throw new NotFoundException('پروفایل مجری یافت نشد.');
       const autoManaged = ['active', 'over_capacity'].includes(before.status);
@@ -363,6 +386,8 @@ export class ExecutorService {
       });
       return result;
     });
+    await this.refreshRiskAlerts(id, new Date());
+    return result;
   }
 
   async updateProfile(
@@ -777,7 +802,7 @@ export class ExecutorService {
       compliments,
     });
 
-    return this.prisma.$transaction(async (tx) => {
+    const snapshot = await this.prisma.$transaction(async (tx) => {
       await tx.executorProfile.update({
         where: { id: executorProfileId },
         data: {
@@ -818,6 +843,229 @@ export class ExecutorService {
           complimentCount: compliments,
           riskScore,
         },
+      });
+    });
+    await this.refreshRiskAlerts(executorProfileId, now);
+    return snapshot;
+  }
+
+  async acknowledgeRiskAlert(
+    executorProfileId: string,
+    alertId: string,
+    note: string,
+    actor: AuthenticatedUser,
+    ipAddress?: string,
+  ) {
+    return this.prisma.$transaction(async (tx) => {
+      const alert = await tx.staffRiskAlert.findFirst({
+        where: { id: alertId, executorProfileId },
+      });
+      if (!alert) throw new NotFoundException('هشدار عملکرد یافت نشد.');
+      if (alert.status === 'cleared') {
+        throw new BadRequestException(
+          'این هشدار قبلاً به‌صورت خودکار رفع شده است.',
+        );
+      }
+      if (alert.status === 'acknowledged') return alert;
+      const updated = await tx.staffRiskAlert.update({
+        where: { id: alert.id },
+        data: {
+          status: 'acknowledged',
+          acknowledgedAt: new Date(),
+          acknowledgedByUserId: actor.id,
+          acknowledgementNote: note,
+        },
+      });
+      await tx.auditLog.create({
+        data: {
+          actorUserId: actor.id,
+          actorRole: actor.role,
+          action: 'staff.risk_alert_acknowledged',
+          entityType: 'executor_profile',
+          entityId: executorProfileId,
+          before: { alertId, status: alert.status },
+          after: {
+            alertId,
+            status: updated.status,
+            riskType: alert.riskType,
+            note,
+          },
+          sensitivity: AuditSensitivity.sensitive,
+          ipAddress,
+        },
+      });
+      return updated;
+    });
+  }
+
+  async refreshRiskAlerts(executorProfileId: string, now: Date) {
+    const [profile, activeAssignments, snapshots] = await Promise.all([
+      this.prisma.executorProfile.findUnique({
+        where: { id: executorProfileId },
+        select: { id: true, displayAlias: true, capacityPercent: true },
+      }),
+      this.prisma.orderAssignment.findMany({
+        where: {
+          executorProfileId,
+          unassignedAt: null,
+          order: {
+            status: { notIn: [OrderStatus.closed, OrderStatus.cancelled] },
+          },
+        },
+        include: {
+          order: {
+            include: {
+              serviceLine: { select: { slaHours: true } },
+              milestones: { select: { dueAt: true, deliveredAt: true } },
+            },
+          },
+        },
+      }),
+      this.prisma.staffPerformanceSnapshot.findMany({
+        where: { executorProfileId },
+        orderBy: { periodEnd: 'desc' },
+        take: 2,
+        select: { qcPassRate: true, riskScore: true },
+      }),
+    ]);
+    if (!profile) return [];
+
+    const signals = detectStaffRisks({
+      capacityPercent: profile.capacityPercent,
+      activeAssignments,
+      currentSnapshot: snapshots[0]
+        ? {
+            qcPassRate: Number(snapshots[0].qcPassRate),
+            riskScore: Number(snapshots[0].riskScore),
+          }
+        : null,
+      previousSnapshot: snapshots[1]
+        ? {
+            qcPassRate: Number(snapshots[1].qcPassRate),
+            riskScore: Number(snapshots[1].riskScore),
+          }
+        : null,
+      now,
+    });
+
+    return this.prisma.$transaction(async (tx) => {
+      const [existingAlerts, opsAdmins] = await Promise.all([
+        tx.staffRiskAlert.findMany({ where: { executorProfileId } }),
+        tx.user.findMany({
+          where: {
+            role: UserRole.admin,
+            status: 'active',
+            adminScope: { in: ['ops_admin', 'super_admin'] },
+          },
+          select: { id: true },
+        }),
+      ]);
+
+      for (const signal of signals) {
+        const existing = existingAlerts.find(
+          (alert) => alert.riskType === signal.riskType,
+        );
+        if (!signal.active) {
+          if (existing && existing.status !== 'cleared') {
+            await tx.staffRiskAlert.update({
+              where: { id: existing.id },
+              data: { status: 'cleared', clearedAt: now },
+            });
+            await tx.auditLog.create({
+              data: {
+                action: 'staff.risk_alert_cleared',
+                entityType: 'executor_profile',
+                entityId: executorProfileId,
+                before: { alertId: existing.id, status: existing.status },
+                after: {
+                  alertId: existing.id,
+                  riskType: signal.riskType,
+                  status: 'cleared',
+                },
+              },
+            });
+          }
+          continue;
+        }
+
+        const severityEscalated = Boolean(
+          existing &&
+          SEVERITY_RANK[signal.severity] > SEVERITY_RANK[existing.severity],
+        );
+        const newlyActivated = !existing || existing.status === 'cleared';
+        const shouldNotify = newlyActivated || severityEscalated;
+        const alert = existing
+          ? await tx.staffRiskAlert.update({
+              where: { id: existing.id },
+              data: {
+                severity: signal.severity,
+                status:
+                  newlyActivated || severityEscalated ? 'active' : undefined,
+                evidence: signal.evidence,
+                detectedAt: newlyActivated ? now : undefined,
+                lastDetectedAt: now,
+                clearedAt: null,
+                acknowledgedAt: severityEscalated ? null : undefined,
+                acknowledgedByUserId: severityEscalated ? null : undefined,
+                acknowledgementNote: severityEscalated ? null : undefined,
+              },
+            })
+          : await tx.staffRiskAlert.create({
+              data: {
+                executorProfileId,
+                riskType: signal.riskType,
+                severity: signal.severity,
+                evidence: signal.evidence,
+                detectedAt: now,
+                lastDetectedAt: now,
+              },
+            });
+
+        if (shouldNotify) {
+          await tx.auditLog.create({
+            data: {
+              action: severityEscalated
+                ? 'staff.risk_alert_escalated'
+                : 'staff.risk_alert_activated',
+              entityType: 'executor_profile',
+              entityId: executorProfileId,
+              before: existing
+                ? {
+                    alertId: existing.id,
+                    status: existing.status,
+                    severity: existing.severity,
+                  }
+                : undefined,
+              after: {
+                alertId: alert.id,
+                riskType: signal.riskType,
+                severity: signal.severity,
+                evidence: signal.evidence,
+              },
+              sensitivity:
+                signal.severity === 'critical'
+                  ? AuditSensitivity.critical
+                  : AuditSensitivity.sensitive,
+            },
+          });
+          if (opsAdmins.length > 0) {
+            await tx.notificationLog.createMany({
+              data: opsAdmins.map((admin) => ({
+                userId: admin.id,
+                channel: 'in_app',
+                eventType: `staff.risk.${signal.riskType}`,
+                title: `هشدار ${RISK_LABELS[signal.riskType]}`,
+                body: `${profile.displayAlias}: شواهد جدید در پروفایل عملیاتی ثبت شد.`,
+                sentAt: now,
+              })),
+            });
+          }
+        }
+      }
+
+      return tx.staffRiskAlert.findMany({
+        where: { executorProfileId, status: { not: 'cleared' } },
+        orderBy: [{ severity: 'desc' }, { lastDetectedAt: 'desc' }],
       });
     });
   }
