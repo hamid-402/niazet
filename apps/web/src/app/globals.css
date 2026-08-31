@@ -481,8 +481,34 @@ textarea:disabled,
   background: transparent;
 }
 
+/* Route-aware entry motion stays deliberately quiet: public pages gain a
+   small spatial cue, while operational workspaces only fade into place. */
+@keyframes route-enter-public {
+  from { opacity: 0.97; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes route-enter-workspace {
+  from { opacity: 0.985; }
+  to { opacity: 1; }
+}
+
+.route-transition--public {
+  animation: route-enter-public var(--duration-base) var(--ease-standard) both;
+}
+
+.route-transition--workspace {
+  animation: route-enter-workspace var(--duration-fast) var(--ease-standard) both;
+}
+
 /* Respect reduced-motion preference across the whole app */
 @media (prefers-reduced-motion: reduce) {
+  .route-transition {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
   *,
   *::before,
   *::after {

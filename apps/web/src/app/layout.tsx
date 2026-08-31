@@ -5,6 +5,7 @@ import { AuthProvider } from '@/lib/auth-context';
 import { ThemeProvider } from '@/components/theme-provider';
 import { DEFAULT_THEME, THEMES, THEME_STORAGE_KEY } from '@/lib/themes';
 import { NetworkStatus } from '@/components/network-status';
+import { RouteTransition } from '@/components/route-transition';
 
 const vazirmatn = Vazirmatn({
   variable: '--font-vazirmatn',
@@ -40,7 +41,7 @@ export default function RootLayout({
           رفتن به محتوای اصلی
         </a>
         <ThemeProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider><RouteTransition>{children}</RouteTransition></AuthProvider>
           <NetworkStatus />
         </ThemeProvider>
       </body>
