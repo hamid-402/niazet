@@ -90,13 +90,13 @@
   --color-fg: #152a4a;
   --color-fg-muted: #5b6b85;
   --color-fg-subtle: #637086;
-  --color-fg-on-accent: #152a4a;
+  --color-fg-on-accent: #ffffff;
   --color-fg-on-danger: #ffffff;
   --color-overlay: rgb(5 15 30 / 0.58);
 
-  --color-accent: #b9821c;
-  --color-accent-hover: #a8741a;
-  --color-accent-active: #8f6116;
+  --color-accent: #976716;
+  --color-accent-hover: #855812;
+  --color-accent-active: #70480e;
   --color-accent-subtle: #fff4d6;
   --color-accent-border: #e6c67d;
 
@@ -152,7 +152,7 @@
   --color-fg-muted: #a3b7d1;
   --color-fg-subtle: #82a0c2;
   --color-fg-on-accent: #152a4a;
-  --color-fg-on-danger: #ffffff;
+  --color-fg-on-danger: #152a4a;
   --color-overlay: rgb(2 8 20 / 0.72);
 
   --color-accent: #edbf5a;
@@ -456,7 +456,7 @@ textarea:disabled,
   font-size: var(--font-size-body-sm);
   font-weight: 700;
   transform: translateY(calc(-100% - var(--space-6)));
-  transition: transform var(--motion-duration-fast) var(--motion-easing-standard);
+  transition: transform var(--duration-fast) var(--ease-standard);
 }
 
 .skip-link:focus-visible {

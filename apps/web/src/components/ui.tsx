@@ -63,7 +63,7 @@ const BUTTON_VARIANTS: Record<string, string> = {
     'bg-accent text-fg-on-accent hover:bg-accent-hover active:bg-accent-active shadow-elevation-1',
   secondary:
     'bg-bg-subtle text-fg border border-border hover:border-border-strong hover:bg-surface-sunken',
-  danger: 'bg-danger text-fg-on-accent hover:opacity-90',
+  danger: 'bg-danger text-fg-on-danger hover:opacity-90',
   ghost: 'text-fg-muted hover:bg-bg-subtle hover:text-fg',
 };
 

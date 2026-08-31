@@ -200,7 +200,12 @@ export default function ExecutorOrderDetailPage({
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-bg-subtle">
                 <div
-                  className="h-full rounded-full bg-success-subtle0 transition-all"
+                  role="progressbar"
+                  aria-label="پیشرفت چک‌لیست"
+                  aria-valuemin={0}
+                  aria-valuemax={checklist.length}
+                  aria-valuenow={completedChecklist}
+                  className="h-full rounded-full bg-success transition-all"
                   style={{ width: `${(completedChecklist / checklist.length) * 100}%` }}
                 />
               </div>
