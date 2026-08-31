@@ -7,6 +7,7 @@ import { ServiceUseCases } from '@/components/service-use-cases';
 import { ServiceOutputSamples } from '@/components/service-output-samples';
 import { ServiceAssurance } from '@/components/service-assurance';
 import { PublicFaqAndFinalCta } from '@/components/public-faq-cta';
+import { GeometricSectionDivider } from '@/components/geometric-section-divider';
 
 const CATEGORIES = [
   'طراحی و توسعه سایت',
@@ -67,6 +68,8 @@ export default function HomePage() {
 
         <ManagedServiceFlow />
 
+        <GeometricSectionDivider />
+
         <section className="mx-auto w-full max-w-6xl px-4 pb-16 md:px-8">
         <h2 className="mb-4 text-center text-lg font-bold text-fg">
           دسته‌های خدمات
@@ -89,6 +92,8 @@ export default function HomePage() {
         <ServiceOutputSamples />
 
         <ServiceAssurance />
+
+        <GeometricSectionDivider flip />
 
         <ServiceProcessStepper />
 
