@@ -1,7 +1,29 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef, type ButtonHTMLAttributes, type ReactNode, type TableHTMLAttributes } from 'react';
+import { useEffect, useRef, type ButtonHTMLAttributes, type HTMLAttributes, type KeyboardEvent, type ReactNode, type TableHTMLAttributes } from 'react';
+
+export function TabList({ items, value, onChange, label, idPrefix, variant = 'underline' }: { items: ReadonlyArray<{ value: string; label: string }>; value: string; onChange: (value: string) => void; label: string; idPrefix: string; variant?: 'underline' | 'pill' }) {
+  const refs = useRef<Array<HTMLButtonElement | null>>([]);
+  function navigate(event: KeyboardEvent<HTMLButtonElement>, index: number) {
+    const rtl = document.documentElement.dir === 'rtl';
+    let next = index;
+    if (event.key === 'Home') next = 0;
+    else if (event.key === 'End') next = items.length - 1;
+    else if (event.key === 'ArrowRight') next = (index + (rtl ? -1 : 1) + items.length) % items.length;
+    else if (event.key === 'ArrowLeft') next = (index + (rtl ? 1 : -1) + items.length) % items.length;
+    else return;
+    event.preventDefault();
+    onChange(items[next].value);
+    refs.current[next]?.focus();
+  }
+  return <div role="tablist" aria-label={label} className={`mb-4 flex gap-1 overflow-x-auto ${variant === 'pill' ? 'rounded-card border border-border bg-surface p-2' : 'border-b border-border'}`}>
+    {items.map((item, index) => {
+      const active = item.value === value;
+      return <button key={item.value} ref={(node) => { refs.current[index] = node; }} type="button" role="tab" id={`${idPrefix}-tab-${item.value}`} aria-controls={`${idPrefix}-panel-${item.value}`} aria-selected={active} tabIndex={active ? 0 : -1} onKeyDown={(event) => navigate(event, index)} onClick={() => onChange(item.value)} className={`shrink-0 whitespace-nowrap px-4 py-2.5 text-sm font-bold transition-colors ${variant === 'pill' ? `rounded-control ${active ? 'bg-accent text-fg-on-accent' : 'text-fg-muted hover:bg-bg-subtle hover:text-fg'}` : `border-b-2 ${active ? 'border-accent text-accent' : 'border-transparent text-fg-muted hover:text-fg'}`}`}>{item.label}</button>;
+    })}
+  </div>;
+}
 
 export function ResponsiveTable({ children, className = '', ...props }: TableHTMLAttributes<HTMLTableElement>) {
   const tableRef = useRef<HTMLTableElement>(null);
@@ -21,13 +43,12 @@ export function ResponsiveTable({ children, className = '', ...props }: TableHTM
 export function Card({
   children,
   className = '',
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
+  ...props
+}: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={`rounded-card border border-border bg-surface p-5 shadow-elevation-1 transition-colors ${className}`}
+      {...props}
     >
       {children}
     </div>

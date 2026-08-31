@@ -11,6 +11,7 @@ import {
   ErrorBanner,
   PageLoading,
   SectionTitle,
+  TabList,
 } from "@/components/ui";
 import { formatDate, formatToman } from "@/lib/format";
 
@@ -199,18 +200,10 @@ export default function WalletPage() {
             </Card>
           )}
 
-          <div className="mb-5 overflow-x-auto border-b border-border" role="tablist" aria-label="بخش‌های مالی">
-            <div className="flex min-w-max gap-1">
-              {TABS.map((item) => (
-                <button key={item.id} type="button" role="tab" aria-selected={tab === item.id} onClick={() => setTab(item.id)} className={`border-b-2 px-4 py-3 text-sm font-bold transition-colors ${tab === item.id ? "border-accent text-accent" : "border-transparent text-fg-muted hover:text-fg"}`}>
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          <TabList idPrefix="finance" label="بخش‌های مالی" items={TABS.map((item) => ({ value: item.id, label: item.label }))} value={tab} onChange={(value) => setTab(value as FinanceTab)} />
 
           {tab === "overview" && (
-            <div className="grid gap-4 lg:grid-cols-2">
+            <div role="tabpanel" id="finance-panel-overview" aria-labelledby="finance-tab-overview" tabIndex={0} className="grid gap-4 lg:grid-cols-2">
               <Card>
                 <h3 className="mb-3 font-extrabold text-fg">آخرین پرداخت‌ها</h3>
                 {data.payments.length ? data.payments.slice(0, 5).map((payment) => (
@@ -233,7 +226,7 @@ export default function WalletPage() {
           )}
 
           {tab === "payments" && (
-            <Card>
+            <Card role="tabpanel" id="finance-panel-payments" aria-labelledby="finance-tab-payments" tabIndex={0}>
               <h3 className="mb-3 font-extrabold text-fg">تاریخچه پرداخت سفارش‌ها</h3>
               {data.payments.length ? (
                 <div className="space-y-3">
@@ -250,7 +243,7 @@ export default function WalletPage() {
           )}
 
           {tab === "escrow" && (
-            <Card>
+            <Card role="tabpanel" id="finance-panel-escrow" aria-labelledby="finance-tab-escrow" tabIndex={0}>
               <h3 className="mb-3 font-extrabold text-fg">وجوه حساب امانی</h3>
               {data.escrows.length ? (
                 <div className="space-y-4">
@@ -271,7 +264,7 @@ export default function WalletPage() {
           )}
 
           {tab === "refunds" && (
-            <Card>
+            <Card role="tabpanel" id="finance-panel-refunds" aria-labelledby="finance-tab-refunds" tabIndex={0}>
               <h3 className="mb-3 font-extrabold text-fg">سوابق بازپرداخت</h3>
               {data.refunds.length ? data.refunds.map((refund) => (
                 <div key={refund.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-border py-4 last:border-0"><div><Link href={`/orders/${refund.order.id}`} className="font-bold text-fg hover:text-accent">{refund.order.title}</Link><p className="mt-1 text-sm text-fg-muted">{refund.reason}</p><p className="mt-1 text-xs text-fg-subtle">{refund.order.code} · {formatDate(refund.createdAt)}</p></div><div className="text-left"><p className="font-extrabold text-info">{formatToman(refund.amount)}</p><StatusBadge status={refund.status} /></div></div>
@@ -280,7 +273,7 @@ export default function WalletPage() {
           )}
 
           {tab === "invoices" && (
-            <Card>
+            <Card role="tabpanel" id="finance-panel-invoices" aria-labelledby="finance-tab-invoices" tabIndex={0}>
               <h3 className="mb-3 font-extrabold text-fg">فاکتورهای صادرشده</h3>
               {data.invoices.length ? data.invoices.map((invoice) => (
                 <div key={invoice.id} className="grid gap-3 border-b border-border py-4 last:border-0 md:grid-cols-[1fr_auto_auto] md:items-center"><div><p className="font-bold text-fg">{invoice.invoiceNumber}</p><Link href={`/orders/${invoice.order.id}`} className="mt-1 block text-sm text-fg-muted hover:text-accent">{invoice.order.title} · {invoice.order.code}</Link><p className="mt-1 text-xs text-fg-subtle">صدور: {formatDate(invoice.issuedAt)}</p></div><p className="font-extrabold text-fg">{formatToman(invoice.amount)}</p><Button type="button" variant="secondary" disabled={downloadingInvoiceId === invoice.id} onClick={() => void downloadInvoice(invoice)}>{downloadingInvoiceId === invoice.id ? "در حال دریافت..." : "دانلود PDF"}</Button></div>
@@ -289,7 +282,7 @@ export default function WalletPage() {
           )}
 
           {tab === "wallet" && (
-            <Card>
+            <Card role="tabpanel" id="finance-panel-wallet" aria-labelledby="finance-tab-wallet" tabIndex={0}>
               <div className="mb-4 flex items-center justify-between"><h3 className="font-extrabold text-fg">گردش کیف پول</h3><p className="text-lg font-extrabold text-fg">{formatToman(data.wallet.balance)}</p></div>
               {data.wallet.transactions.length ? data.wallet.transactions.map((transaction) => (
                 <div key={transaction.id} className="grid grid-cols-[1fr_auto] gap-3 border-b border-border py-3 last:border-0"><div><p className="text-sm font-bold text-fg">{transaction.referenceType}</p><p className="mt-1 text-xs text-fg-subtle">{formatDate(transaction.createdAt)} · مانده پس از تراکنش: {formatToman(transaction.balanceAfter)}</p></div><p className={`font-extrabold ${transaction.direction === "credit" ? "text-success" : "text-danger"}`}>{transaction.direction === "credit" ? "+" : "−"}{formatToman(transaction.amount)}</p></div>

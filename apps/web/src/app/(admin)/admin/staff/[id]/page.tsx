@@ -12,6 +12,7 @@ import { ResponsiveTable,
   inputClass,
   PageLoading,
   SectionTitle,
+  TabList,
 } from '@/components/ui';
 import type {
   ExecutorProfile,
@@ -351,26 +352,9 @@ export default function AdminStaffDetailPage({
         <Metric label="ریسک عملکرد" value={Number(profile.riskScore).toFixed(0)} />
       </div>
 
-      <div
-        className="mb-4 flex gap-2 overflow-x-auto rounded-card border border-border bg-surface p-2"
-        role="tablist"
-        aria-label="بخش‌های پروفایل داخلی مجری"
-      >
-        {STAFF_TABS.map((tab) => (
-          <button
-            key={tab.value}
-            type="button"
-            role="tab"
-            aria-selected={activeTab === tab.value}
-            onClick={() => setActiveTab(tab.value)}
-            className={`shrink-0 rounded-control px-4 py-2 text-sm font-bold transition-colors ${activeTab === tab.value ? 'bg-accent text-fg-on-accent' : 'text-fg-muted hover:bg-bg-subtle hover:text-fg'}`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <TabList idPrefix="staff" label="بخش‌های پروفایل داخلی مجری" items={STAFF_TABS} value={activeTab} onChange={(value) => setActiveTab(value as StaffTab)} variant="pill" />
 
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div role="tabpanel" id={`staff-panel-${activeTab}`} aria-labelledby={`staff-tab-${activeTab}`} tabIndex={0} className="grid gap-4 xl:grid-cols-2">
         {activeTab === 'summary' && (
           <Card>
           <h3 className="font-bold text-fg">مشخصات همکاری و احراز</h3>

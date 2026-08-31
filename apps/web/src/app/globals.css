@@ -359,6 +359,8 @@
    ============================================================ */
 html {
   color-scheme: light dark;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 body {
@@ -368,6 +370,49 @@ body {
   transition:
     background-color var(--duration-base) var(--ease-standard),
     color var(--duration-base) var(--ease-standard);
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+main,
+section,
+article,
+aside,
+nav,
+header,
+footer,
+form,
+fieldset {
+  min-width: 0;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-inline-size: 100%;
+}
+
+input,
+select,
+textarea,
+button {
+  max-inline-size: 100%;
+}
+
+p,
+li,
+dd,
+td,
+th,
+a,
+code {
+  overflow-wrap: anywhere;
+}
+
+pre {
+  max-inline-size: 100%;
+  overflow-x: auto;
 }
 
 * {

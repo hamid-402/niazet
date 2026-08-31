@@ -11,6 +11,7 @@ import {
   inputClass,
   PageLoading,
   SectionTitle,
+  TabList,
 } from "@/components/ui";
 import { OrderStatusBadge } from "@/components/status-badge";
 import { SecureFileLink, SecureFileUpload } from "@/components/secure-file";
@@ -252,24 +253,10 @@ export default function CustomerOrderDetailPage({
         </div>
       </Card>
 
-      <div className="mb-4 flex gap-1 overflow-x-auto border-b border-border">
-        {TABS.map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`whitespace-nowrap px-3 py-2 text-sm font-medium ${
-              tab === t
-                ? "border-b-2 border-accent text-accent"
-                : "text-fg-subtle hover:text-fg-muted"
-            }`}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
+      <TabList idPrefix="order" label="بخش‌های سفارش" items={TABS.map((item) => ({ value: item, label: item }))} value={tab} onChange={(value) => setTab(value as (typeof TABS)[number])} />
 
       {tab === "خلاصه" && (
-        <Card>
+        <Card role="tabpanel" id="order-panel-خلاصه" aria-labelledby="order-tab-خلاصه" tabIndex={0}>
           <p className="text-sm leading-7 text-fg-muted">
             {order.briefDescription}
           </p>
@@ -289,13 +276,13 @@ export default function CustomerOrderDetailPage({
       )}
 
       {tab === "مراحل" && (
-        <Card>
+        <Card role="tabpanel" id="order-panel-مراحل" aria-labelledby="order-tab-مراحل" tabIndex={0}>
           <OrderTimeline order={order} />
         </Card>
       )}
 
       {tab === "گزارش‌ها" && (
-        <Card>
+        <Card role="tabpanel" id="order-panel-گزارش‌ها" aria-labelledby="order-tab-گزارش‌ها" tabIndex={0}>
           {order.reports && order.reports.length > 0 ? (
             <div className="space-y-3">
               {order.reports.map((r) => (
@@ -330,7 +317,7 @@ export default function CustomerOrderDetailPage({
       )}
 
       {tab === "فایل‌ها" && (
-        <Card>
+        <Card role="tabpanel" id="order-panel-فایل‌ها" aria-labelledby="order-tab-فایل‌ها" tabIndex={0}>
           <div className="mb-4">
             <SecureFileUpload
               orderId={id}
@@ -364,7 +351,7 @@ export default function CustomerOrderDetailPage({
       )}
 
       {tab === "پیام‌ها" && (
-        <Card>
+        <Card role="tabpanel" id="order-panel-پیام‌ها" aria-labelledby="order-tab-پیام‌ها" tabIndex={0}>
           <div className="mb-4 space-y-3">
             {order.messages && order.messages.length > 0 ? (
               order.messages.map((m) => (
@@ -431,7 +418,7 @@ export default function CustomerOrderDetailPage({
       )}
 
       {tab === "پرداخت‌ها" && (
-        <Card>
+        <Card role="tabpanel" id="order-panel-پرداخت‌ها" aria-labelledby="order-tab-پرداخت‌ها" tabIndex={0}>
           {order.payments && order.payments.length > 0 ? (
             <ul className="divide-y divide-border text-sm">
               {order.payments.map((p) => (
@@ -466,7 +453,7 @@ export default function CustomerOrderDetailPage({
       )}
 
       {tab === "تیکت‌ها" && (
-        <Card>
+        <Card role="tabpanel" id="order-panel-تیکت‌ها" aria-labelledby="order-tab-تیکت‌ها" tabIndex={0}>
           {order.tickets && order.tickets.length > 0 ? (
             <ul className="divide-y divide-border text-sm">
               {order.tickets.map((t) => (

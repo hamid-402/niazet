@@ -154,7 +154,7 @@
 - [x] منوی عمومی موبایل و Sidebar→Drawer در پنل‌ها
 - [x] تبدیل Tableهای عملیاتی به Card قابل اسکن در موبایل بدون حذف Actionها
 - [ ] رفع Overflow و آزمون خودکار عرض‌های موبایل، تبلت، لپ‌تاپ و دسکتاپ بزرگ
-- [ ] Tab/Tablist/Tabpanel، Drawer و Modal با Keyboard، ESC، Focus trap و Focus restore
+- [x] Tab/Tablist/Tabpanel، Drawer و Modal با Keyboard، ESC، Focus trap و Focus restore
 - [ ] نام دسترس‌پذیر Theme Switcher و تمام کنترل‌های icon-only
 - [ ] ترتیب Heading، Landmark، Label، Inline error، Focus Ring و Skip link
 - [ ] کنتراست WCAG AA، عدم اتکا به رنگ و پشتیبانی Reduced Motion
