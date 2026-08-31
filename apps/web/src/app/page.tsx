@@ -4,6 +4,7 @@ import { LinkButton } from '@/components/ui';
 import { ManagedServiceFlow } from '@/components/managed-service-flow';
 import { ServiceProcessStepper } from '@/components/service-process-stepper';
 import { ServiceUseCases } from '@/components/service-use-cases';
+import { ServiceOutputSamples } from '@/components/service-output-samples';
 
 const CATEGORIES = [
   'طراحی و توسعه سایت',
@@ -97,6 +98,8 @@ export default function HomePage() {
         </section>
 
         <ServiceUseCases />
+
+        <ServiceOutputSamples />
 
         <ServiceProcessStepper />
 
