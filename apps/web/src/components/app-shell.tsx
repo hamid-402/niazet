@@ -15,7 +15,7 @@ export interface NavItem {
 
 function MenuIcon() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" className="icon-md">
+    <svg viewBox="0 0 20 20" fill="none" className="icon-md" aria-hidden="true">
       <path
         stroke="currentColor"
         strokeWidth="1.6"

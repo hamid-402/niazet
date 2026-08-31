@@ -5,7 +5,7 @@ import { useTheme } from './theme-provider';
 
 function SunIcon() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4">
+    <svg viewBox="0 0 20 20" fill="none" className="icon-sm" aria-hidden="true">
       <circle cx="10" cy="10" r="3.5" stroke="currentColor" strokeWidth="1.5" />
       <path
         stroke="currentColor"
@@ -51,6 +51,8 @@ export function ThemeSwitcher({
         aria-label={`انتخاب پوسته؛ پوسته فعلی: ${activeMeta.label}`}
         aria-haspopup="listbox"
         aria-expanded={open}
+        aria-controls="theme-options"
+        title={`پوسته فعلی: ${activeMeta.label}`}
         onClick={() => setOpen((v) => !v)}
         className={`inline-flex items-center gap-2 rounded-control border border-border bg-surface text-fg-muted transition-colors hover:border-border-strong hover:text-fg ${
           variant === 'compact'
@@ -64,7 +66,9 @@ export function ThemeSwitcher({
 
       {open && (
         <ul
+          id="theme-options"
           role="listbox"
+          aria-label="پوسته‌های قابل انتخاب"
           className="absolute left-0 z-dropdown mt-2 w-56 origin-top-left rounded-card border border-border bg-surface-raised p-1.5 shadow-elevation-3"
         >
           {themes.map((t) => (
