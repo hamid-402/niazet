@@ -3,6 +3,7 @@ import { PublicNav } from '@/components/public-nav';
 import { LinkButton } from '@/components/ui';
 import { ManagedServiceFlow } from '@/components/managed-service-flow';
 import { ServiceProcessStepper } from '@/components/service-process-stepper';
+import { ServiceUseCases } from '@/components/service-use-cases';
 
 const CATEGORIES = [
   'طراحی و توسعه سایت',
@@ -94,6 +95,8 @@ export default function HomePage() {
           ))}
         </div>
         </section>
+
+        <ServiceUseCases />
 
         <ServiceProcessStepper />
 
