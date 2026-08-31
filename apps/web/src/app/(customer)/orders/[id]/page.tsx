@@ -560,7 +560,7 @@ function FeedbackForm({
   return (
     <div className="mt-5 space-y-4">
       <Card>
-        <SectionTitle subtitle="برای هر بازخورد یک کد پیگیری مستقل دریافت می‌کنید.">
+        <SectionTitle as="h2" subtitle="برای هر بازخورد یک کد پیگیری مستقل دریافت می‌کنید.">
           ثبت امتیاز، تشکر یا شکایت
         </SectionTitle>
         {lastCode && (

@@ -58,7 +58,7 @@ export default function StatusPage() {
 
   return <div className="min-h-screen bg-bg">
     <PublicNav />
-    <main className="mx-auto w-full max-w-4xl px-4 py-12 md:px-8">
+    <main id="main-content" className="mx-auto w-full max-w-4xl px-4 py-12 md:px-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div><h1 className="text-3xl font-extrabold text-fg">وضعیت سرویس‌های نیازت</h1><p className="mt-2 text-sm text-fg-muted">نمای عمومی سلامت سرویس‌ها؛ به‌روزرسانی خودکار هر ۶۰ ثانیه</p></div>
         <Button variant="secondary" disabled={refreshing} onClick={() => { setRefreshing(true); void load(); }}>{refreshing ? 'در حال بررسی...' : 'بررسی دوباره'}</Button>

@@ -20,7 +20,7 @@ export default async function ServicesPage() {
   return (
     <div className="flex flex-1 flex-col">
       <PublicNav />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 md:px-8">
+      <main id="main-content" className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 md:px-8">
         <h1 className="mb-6 text-2xl font-extrabold text-fg">خدمات</h1>
         {error && <ErrorBanner message="دریافت خدمات ممکن نشد؛ کمی بعد دوباره تلاش کنید." />}
         {!error && services.length === 0 && <EmptyState title="در حال حاضر خدمتی ثبت نشده است." />}

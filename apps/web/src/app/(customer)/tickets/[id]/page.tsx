@@ -56,7 +56,7 @@ export default function CustomerTicketDetailPage({
       </div>
 
       <Card>
-        <SectionTitle>گفتگو</SectionTitle>
+        <SectionTitle as="h2">گفتگو</SectionTitle>
         <div className="mb-4 space-y-3">
           {ticket.messages.map((m) => (
             <div key={m.id} className="rounded-card bg-bg-subtle p-3 text-sm">

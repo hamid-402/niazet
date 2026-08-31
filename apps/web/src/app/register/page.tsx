@@ -51,7 +51,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bg px-4">
+    <main id="main-content" className="flex min-h-screen items-center justify-center bg-bg px-4">
       <Card className="w-full max-w-sm">
         <h1 className="mb-1 text-xl font-extrabold text-fg">
           ثبت‌نام در نیازت با ما
@@ -136,6 +136,6 @@ export default function RegisterPage() {
           </Link>
         </p>
       </Card>
-    </div>
+    </main>
   );
 }

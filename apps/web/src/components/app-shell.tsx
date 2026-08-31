@@ -144,7 +144,7 @@ export function AppShell({
           </span>
           <NotificationCenter />
         </header>
-        <main className="page-container py-6 md:py-8">
+        <main id="main-content" className="page-container py-6 md:py-8">
           {children}
         </main>
       </div>

@@ -76,7 +76,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-bg px-4 py-10">
+    <main id="main-content" className="flex min-h-screen items-center justify-center bg-bg px-4 py-10">
       <Card className="w-full max-w-md">
         <h1 className="mb-1 text-heading-md font-extrabold leading-heading text-fg">
           بازیابی رمز عبور

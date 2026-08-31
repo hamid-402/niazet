@@ -121,7 +121,7 @@ export default function AdminOrderDetailPage({
       </Card>
 
       <Card className="mb-4">
-        <SectionTitle>اقدامات عملیاتی</SectionTitle>
+        <SectionTitle as="h2">اقدامات عملیاتی</SectionTitle>
 
         {order.status === "pending_triage" || order.status === "triaging" ? (
           <div className="mb-4 flex flex-wrap items-end gap-2">

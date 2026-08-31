@@ -35,6 +35,9 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: NO_FOUC_SCRIPT }} />
       </head>
       <body className="min-h-full flex flex-col bg-bg text-fg">
+        <a href="#main-content" className="skip-link">
+          رفتن به محتوای اصلی
+        </a>
         <ThemeProvider>
           <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>

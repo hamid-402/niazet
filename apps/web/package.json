@@ -13,7 +13,8 @@
     "phase6:overflow-contract": "node scripts/phase6-overflow-contract.mjs",
     "phase6:overflow-e2e": "node scripts/phase6-overflow-e2e.mjs",
     "phase6:keyboard-contract": "node scripts/phase6-keyboard-contract.mjs",
-    "phase6:icon-label-contract": "node scripts/phase6-icon-label-contract.mjs"
+    "phase6:icon-label-contract": "node scripts/phase6-icon-label-contract.mjs",
+    "phase6:structure-contract": "node scripts/phase6-structure-contract.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.42.2",

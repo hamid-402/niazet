@@ -173,6 +173,7 @@ export function ErrorBanner({ message }: { message: string }) {
   return (
     <div
       role="alert"
+      aria-live="assertive"
       className="rounded-control border border-danger-border bg-danger-subtle px-4 py-3 text-sm text-danger"
     >
       {message}
@@ -183,15 +184,17 @@ export function ErrorBanner({ message }: { message: string }) {
 export function SectionTitle({
   children,
   subtitle,
+  as: Heading = 'h1',
 }: {
   children: ReactNode;
   subtitle?: string;
+  as?: 'h1' | 'h2' | 'h3';
 }) {
   return (
     <div className="mb-4">
-      <h2 className="text-heading-lg font-bold leading-heading text-fg">
+      <Heading className="text-heading-lg font-bold leading-heading text-fg">
         {children}
-      </h2>
+      </Heading>
       {subtitle && <p className="mt-1 text-sm text-fg-muted">{subtitle}</p>}
     </div>
   );
@@ -201,16 +204,23 @@ export function Field({
   label,
   children,
   hint,
+  error,
 }: {
   label: string;
   children: ReactNode;
   hint?: string;
+  error?: string;
 }) {
   return (
     <label className="flex flex-col gap-1.5">
       <span className="text-sm font-medium text-fg-muted">{label}</span>
       {children}
       {hint && <span className="text-xs text-fg-subtle">{hint}</span>}
+      {error && (
+        <span role="alert" aria-live="polite" className="text-xs font-medium text-danger">
+          {error}
+        </span>
+      )}
     </label>
   );
 }

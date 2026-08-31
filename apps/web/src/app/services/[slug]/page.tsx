@@ -15,7 +15,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   return (
     <div className="flex flex-1 flex-col">
       <PublicNav />
-      <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10 md:px-8">
+      <main id="main-content" className="mx-auto w-full max-w-4xl flex-1 px-4 py-10 md:px-8">
         <p className="mb-1 text-xs font-medium text-fg-subtle">{service.category}</p>
         <h1 className="mb-3 text-2xl font-extrabold text-fg">{service.title}</h1>
         <p className="mb-6 text-fg-muted">{service.description}</p>

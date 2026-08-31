@@ -57,7 +57,8 @@ export default function HomePage() {
     <div className="flex flex-1 flex-col">
       <PublicNav />
 
-      <section className="mx-auto w-full max-w-6xl px-4 py-16 text-center md:px-8">
+      <main id="main-content">
+        <section className="mx-auto w-full max-w-6xl px-4 py-16 text-center md:px-8">
         <h1 className="text-3xl font-extrabold tracking-tight text-fg md:text-4xl">
           خدمات تخصصی، با اجرای مدیریت‌شده و پرداخت امن
         </h1>
@@ -71,9 +72,9 @@ export default function HomePage() {
             مشاهده خدمات
           </LinkButton>
         </div>
-      </section>
+        </section>
 
-      <section className="mx-auto w-full max-w-6xl px-4 pb-16 md:px-8">
+        <section className="mx-auto w-full max-w-6xl px-4 pb-16 md:px-8">
         <h2 className="mb-4 text-center text-lg font-bold text-fg">
           دسته‌های خدمات
         </h2>
@@ -88,9 +89,9 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
-      </section>
+        </section>
 
-      <section id="how-it-works" className="bg-surface py-16">
+        <section id="how-it-works" className="bg-surface py-16">
         <div className="mx-auto max-w-6xl px-4 md:px-8">
           <h2 className="mb-8 text-center text-lg font-bold text-fg">
             روند کار
@@ -110,9 +111,9 @@ export default function HomePage() {
             ))}
           </div>
         </div>
-      </section>
+        </section>
 
-      <section id="faq" className="mx-auto w-full max-w-3xl px-4 py-16 md:px-8">
+        <section id="faq" className="mx-auto w-full max-w-3xl px-4 py-16 md:px-8">
         <h2 className="mb-6 text-center text-lg font-bold text-fg">
           سوالات پرتکرار
         </h2>
@@ -129,7 +130,8 @@ export default function HomePage() {
             </details>
           ))}
         </div>
-      </section>
+        </section>
+      </main>
 
       <footer className="border-t border-border bg-surface py-6 text-center text-xs text-fg-subtle">
         © نیازت با ما — سامانه خدمات مدیریت‌شده
