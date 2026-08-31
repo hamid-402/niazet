@@ -21,17 +21,17 @@ export default async function ServicesPage() {
     <div className="flex flex-1 flex-col">
       <PublicNav />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 md:px-8">
-        <h1 className="mb-6 text-2xl font-extrabold text-slate-900">خدمات</h1>
+        <h1 className="mb-6 text-2xl font-extrabold text-fg">خدمات</h1>
         {error && <ErrorBanner message="دریافت خدمات ممکن نشد؛ کمی بعد دوباره تلاش کنید." />}
         {!error && services.length === 0 && <EmptyState title="در حال حاضر خدمتی ثبت نشده است." />}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {services.map((service) => (
             <Link key={service.id} href={`/services/${service.slug}`}>
-              <Card className="h-full transition hover:border-slate-400">
-                <p className="mb-1 text-xs font-medium text-slate-400">{service.category}</p>
-                <h2 className="mb-2 text-base font-bold text-slate-900">{service.title}</h2>
-                <p className="mb-4 line-clamp-2 text-sm text-slate-500">{service.description}</p>
-                <div className="flex items-center justify-between text-xs text-slate-400">
+              <Card className="h-full transition hover:border-border-strong">
+                <p className="mb-1 text-xs font-medium text-fg-subtle">{service.category}</p>
+                <h2 className="mb-2 text-base font-bold text-fg">{service.title}</h2>
+                <p className="mb-4 line-clamp-2 text-sm text-fg-muted">{service.description}</p>
+                <div className="flex items-center justify-between text-xs text-fg-subtle">
                   <span>{PRICING_LABEL[service.pricingModel]}</span>
                   <span>{service.basePrice ? formatToman(service.basePrice) : ''}</span>
                 </div>

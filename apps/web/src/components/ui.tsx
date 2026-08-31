@@ -20,7 +20,7 @@ export function Card({
 }
 
 const BUTTON_BASE =
-  'inline-flex items-center justify-center gap-2 rounded-control px-4 py-2 text-sm font-bold transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed';
+  'control-density inline-flex items-center justify-center gap-2 rounded-control text-body-sm font-bold transition-colors duration-150';
 
 const BUTTON_VARIANTS: Record<string, string> = {
   primary:
@@ -180,4 +180,4 @@ export function Field({
 }
 
 export const inputClass =
-  'w-full rounded-control border border-form-border bg-surface px-3 py-2 text-sm text-fg outline-none transition-colors placeholder:text-fg-subtle focus:border-accent';
+  'control-density w-full rounded-control border border-form-border bg-surface text-body-sm text-fg outline-none transition-colors placeholder:text-fg-subtle focus:border-accent';

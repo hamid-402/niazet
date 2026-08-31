@@ -83,8 +83,8 @@ export default function ExecutorOrderDetailPage({
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs text-slate-400">{order.code}</p>
-          <h1 className="text-xl font-extrabold text-slate-900">
+          <p className="text-xs text-fg-subtle">{order.code}</p>
+          <h1 className="text-xl font-extrabold text-fg">
             {order.title}
           </h1>
         </div>
@@ -94,16 +94,16 @@ export default function ExecutorOrderDetailPage({
       {error && <ErrorBanner message={error} />}
 
       {needsRework && (
-        <Card className="border-amber-200 bg-amber-50">
-          <h2 className="font-bold text-amber-900">اصلاحات درخواستی QC</h2>
-          <p className="mt-2 text-sm leading-7 text-amber-800">
+        <Card className="border-warning-border bg-warning-subtle">
+          <h2 className="font-bold text-warning">اصلاحات درخواستی QC</h2>
+          <p className="mt-2 text-sm leading-7 text-warning">
             {latestQc.comment || "خروجی را مطابق موارد ردشده اصلاح و دوباره ارسال کنید."}
           </p>
           {latestQc.items.length > 0 && (
             <ul className="mt-3 space-y-2 text-sm">
               {latestQc.items.map((item) => (
                 <li key={item.id} className="flex items-start gap-2">
-                  <span className={item.passed ? "text-emerald-600" : "text-rose-600"}>
+                  <span className={item.passed ? "text-success" : "text-danger"}>
                     {item.passed ? "✓" : "×"}
                   </span>
                   <span>
@@ -119,16 +119,16 @@ export default function ExecutorOrderDetailPage({
 
       <div className="grid gap-4 xl:grid-cols-2">
         <Card>
-          <h2 className="mb-3 font-bold text-slate-800">شرح و ورودی‌های کار</h2>
-          <p className="text-sm leading-7 text-slate-600">
+          <h2 className="mb-3 font-bold text-fg">شرح و ورودی‌های کار</h2>
+          <p className="text-sm leading-7 text-fg-muted">
             {order.briefDescription}
           </p>
           {formEntries.length > 0 && (
-            <dl className="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-100 px-3">
+            <dl className="mt-4 divide-y divide-border rounded-card border border-border px-3">
               {formEntries.map(([key, value]) => (
                 <div key={key} className="grid gap-1 py-2 text-sm sm:grid-cols-3">
-                  <dt className="font-medium text-slate-500">{key}</dt>
-                  <dd className="break-words text-slate-700 sm:col-span-2">
+                  <dt className="font-medium text-fg-muted">{key}</dt>
+                  <dd className="break-words text-fg sm:col-span-2">
                     {displayValue(value)}
                   </dd>
                 </div>
@@ -136,7 +136,7 @@ export default function ExecutorOrderDetailPage({
             </dl>
           )}
           <div className="mt-4">
-            <h3 className="mb-2 text-sm font-bold text-slate-700">فایل‌های ورودی امن</h3>
+            <h3 className="mb-2 text-sm font-bold text-fg">فایل‌های ورودی امن</h3>
             {inputFiles.length ? (
               <div className="space-y-2">
                 {inputFiles.map((file) => (
@@ -144,26 +144,26 @@ export default function ExecutorOrderDetailPage({
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-slate-400">فایل ورودی جداگانه‌ای ثبت نشده است.</p>
+              <p className="text-sm text-fg-subtle">فایل ورودی جداگانه‌ای ثبت نشده است.</p>
             )}
           </div>
         </Card>
 
         <Card>
           <div className="mb-3 flex items-center justify-between gap-3">
-            <h2 className="font-bold text-slate-800">معیار پذیرش و چک‌لیست اجرا</h2>
+            <h2 className="font-bold text-fg">معیار پذیرش و چک‌لیست اجرا</h2>
             {assignment?.acceptedAt && (
-              <span className="text-xs text-emerald-700">پذیرش ثبت شده</span>
+              <span className="text-xs text-success">پذیرش ثبت شده</span>
             )}
           </div>
           {order.acceptanceCriteria?.length ? (
-            <ul className="space-y-2 text-sm text-slate-600">
+            <ul className="space-y-2 text-sm text-fg-muted">
               {order.acceptanceCriteria.map((criterion) => {
                 const item = checklist.find(
                   (checklistItem) => checklistItem.label === criterion.description,
                 );
                 return (
-                  <li key={criterion.id} className="rounded-xl border border-slate-100 p-3">
+                  <li key={criterion.id} className="rounded-card border border-border p-3">
                     {item ? (
                       <label className="flex cursor-pointer items-start gap-3">
                         <input
@@ -190,17 +190,17 @@ export default function ExecutorOrderDetailPage({
               })}
             </ul>
           ) : (
-            <p className="text-sm text-slate-400">معیار جداگانه‌ای تعریف نشده است.</p>
+            <p className="text-sm text-fg-subtle">معیار جداگانه‌ای تعریف نشده است.</p>
           )}
           {assignment?.acceptedAt && checklist.length > 0 && (
             <div className="mt-4">
-              <div className="mb-1 flex justify-between text-xs text-slate-500">
+              <div className="mb-1 flex justify-between text-xs text-fg-muted">
                 <span>پیشرفت چک‌لیست</span>
                 <span>{completedChecklist} از {checklist.length}</span>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+              <div className="h-2 overflow-hidden rounded-full bg-bg-subtle">
                 <div
-                  className="h-full rounded-full bg-emerald-500 transition-all"
+                  className="h-full rounded-full bg-success-subtle0 transition-all"
                   style={{ width: `${(completedChecklist / checklist.length) * 100}%` }}
                 />
               </div>
@@ -210,10 +210,10 @@ export default function ExecutorOrderDetailPage({
       </div>
 
       <Card>
-        <h2 className="mb-3 font-bold text-slate-800">اقدام بعدی</h2>
+        <h2 className="mb-3 font-bold text-fg">اقدام بعدی</h2>
         {order.status === "assigned" && !assignment?.acceptedAt && (
           <div>
-            <p className="mb-3 text-sm leading-7 text-slate-600">
+            <p className="mb-3 text-sm leading-7 text-fg-muted">
               با پذیرش، تأیید می‌کنید شرح کار، ورودی‌ها و معیارهای تحویل را بررسی کرده‌اید.
             </p>
             <Button
@@ -245,7 +245,7 @@ export default function ExecutorOrderDetailPage({
         {order.status === "in_progress" && (
           <div className="grid gap-6 xl:grid-cols-2">
             <section className="space-y-3">
-              <h3 className="text-sm font-bold text-slate-700">گزارش پیشرفت</h3>
+              <h3 className="text-sm font-bold text-fg">گزارش پیشرفت</h3>
               <textarea
                 className={inputClass}
                 rows={3}
@@ -253,7 +253,7 @@ export default function ExecutorOrderDetailPage({
                 value={progressSummary}
                 onChange={(event) => setProgressSummary(event.target.value)}
               />
-              <label className="block text-xs text-slate-500">
+              <label className="block text-xs text-fg-muted">
                 درصد پیشرفت: {progressPercent}٪
                 <input
                   type="range"
@@ -273,7 +273,7 @@ export default function ExecutorOrderDetailPage({
                 onUploaded={setProgressFile}
               />
               {progressFile && (
-                <p className="text-xs text-emerald-700">
+                <p className="text-xs text-success">
                   فایل آماده است: {progressFile.originalName}
                 </p>
               )}
@@ -299,8 +299,8 @@ export default function ExecutorOrderDetailPage({
               </Button>
             </section>
 
-            <section className="space-y-3 border-t border-slate-100 pt-5 xl:border-r xl:border-t-0 xl:pr-6 xl:pt-0">
-              <h3 className="text-sm font-bold text-slate-700">
+            <section className="space-y-3 border-t border-border pt-5 xl:border-r xl:border-t-0 xl:pr-6 xl:pt-0">
+              <h3 className="text-sm font-bold text-fg">
                 {needsRework ? "ارسال نسخه اصلاح‌شده" : "تحویل خروجی برای QC"}
               </h3>
               <textarea
@@ -323,7 +323,7 @@ export default function ExecutorOrderDetailPage({
                 <SecureFileLink key={file.id} file={file} />
               ))}
               {!checklistReady && (
-                <p className="text-xs text-amber-700">
+                <p className="text-xs text-warning">
                   تحویل پس از تکمیل همه موارد چک‌لیست فعال می‌شود.
                 </p>
               )}
@@ -355,29 +355,29 @@ export default function ExecutorOrderDetailPage({
         )}
 
         {!["assigned", "in_progress"].includes(order.status) && (
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-fg-subtle">
             در این وضعیت اقدام اجرایی تازه‌ای از شما لازم نیست.
           </p>
         )}
       </Card>
 
       <Card>
-        <h2 className="mb-3 font-bold text-slate-800">گزارش‌های ثبت‌شده</h2>
+        <h2 className="mb-3 font-bold text-fg">گزارش‌های ثبت‌شده</h2>
         {order.reports?.length ? (
-          <ul className="divide-y divide-slate-100 text-sm">
+          <ul className="divide-y divide-border text-sm">
             {order.reports.map((report) => (
               <li key={report.id} className="py-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="font-medium text-slate-700">
+                  <p className="font-medium text-fg">
                     {report.reportType} · نسخه {report.version}
                   </p>
                   {report.progressPercent != null && (
-                    <span className="text-xs text-emerald-700">
+                    <span className="text-xs text-success">
                       پیشرفت {report.progressPercent}٪
                     </span>
                   )}
                 </div>
-                <p className="mt-1 text-slate-500">{report.summary}</p>
+                <p className="mt-1 text-fg-muted">{report.summary}</p>
                 {report.file && (
                   <div className="mt-2">
                     <SecureFileLink file={report.file} />
@@ -387,12 +387,12 @@ export default function ExecutorOrderDetailPage({
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-slate-400">گزارشی ثبت نشده است.</p>
+          <p className="text-sm text-fg-subtle">گزارشی ثبت نشده است.</p>
         )}
       </Card>
 
       <Card>
-        <h2 className="mb-3 font-bold text-slate-800">خط زمانی سفارش و مراحل</h2>
+        <h2 className="mb-3 font-bold text-fg">خط زمانی سفارش و مراحل</h2>
         <OrderTimeline order={order} showFinancials={false} />
       </Card>
     </div>

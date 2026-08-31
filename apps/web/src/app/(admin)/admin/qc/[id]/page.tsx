@@ -95,18 +95,18 @@ export default function AdminQcDetailPage({
       )}
 
       <Card className="mb-4">
-        <h3 className="mb-2 font-bold text-slate-800">شرح سفارش</h3>
-        <p className="text-sm text-slate-600">
+        <h3 className="mb-2 font-bold text-fg">شرح سفارش</h3>
+        <p className="text-sm text-fg-muted">
           {review.order.briefDescription}
         </p>
       </Card>
 
       <Card className="mb-4">
-        <h3 className="mb-2 font-bold text-slate-800">فایل‌های خروجی</h3>
+        <h3 className="mb-2 font-bold text-fg">فایل‌های خروجی</h3>
         {review.order.files.length === 0 ? (
-          <p className="text-sm text-slate-400">فایلی ثبت نشده است.</p>
+          <p className="text-sm text-fg-subtle">فایلی ثبت نشده است.</p>
         ) : (
-          <ul className="space-y-2 text-sm text-slate-600">
+          <ul className="space-y-2 text-sm text-fg-muted">
             {review.order.files.map((f) => (
               <li key={f.id}>
                 <SecureFileLink file={f} />
@@ -118,12 +118,12 @@ export default function AdminQcDetailPage({
 
       {checklistItems.length > 0 && (
         <Card className="mb-4">
-          <h3 className="mb-2 font-bold text-slate-800">چک‌لیست QC</h3>
+          <h3 className="mb-2 font-bold text-fg">چک‌لیست QC</h3>
           <div className="space-y-2">
             {checklistItems.map((item) => (
               <label
                 key={item.id}
-                className="flex items-center gap-2 text-sm text-slate-700"
+                className="flex items-center gap-2 text-sm text-fg"
               >
                 <input
                   type="checkbox"

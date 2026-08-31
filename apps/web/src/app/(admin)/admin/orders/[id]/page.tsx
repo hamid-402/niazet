@@ -73,8 +73,8 @@ export default function AdminOrderDetailPage({
     <div>
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <p className="text-xs text-slate-400">{order.code}</p>
-          <h1 className="text-xl font-extrabold text-slate-900">
+          <p className="text-xs text-fg-subtle">{order.code}</p>
+          <h1 className="text-xl font-extrabold text-fg">
             {order.title}
           </h1>
         </div>
@@ -89,33 +89,33 @@ export default function AdminOrderDetailPage({
 
       <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Card>
-          <p className="text-xs text-slate-400">مشتری</p>
-          <p className="mt-1 font-bold text-slate-800">
+          <p className="text-xs text-fg-subtle">مشتری</p>
+          <p className="mt-1 font-bold text-fg">
             {(order as unknown as { customer?: { fullName: string } }).customer
               ?.fullName ?? "—"}
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">مبلغ نهایی</p>
-          <p className="mt-1 font-bold text-slate-800">
+          <p className="text-xs text-fg-subtle">مبلغ نهایی</p>
+          <p className="mt-1 font-bold text-fg">
             {formatToman(order.finalPrice)}
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">فوریت</p>
-          <p className="mt-1 font-bold text-slate-800">{order.urgency}</p>
+          <p className="text-xs text-fg-subtle">فوریت</p>
+          <p className="mt-1 font-bold text-fg">{order.urgency}</p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">تاریخ ثبت</p>
-          <p className="mt-1 font-bold text-slate-800">
+          <p className="text-xs text-fg-subtle">تاریخ ثبت</p>
+          <p className="mt-1 font-bold text-fg">
             {formatDate(order.createdAt)}
           </p>
         </Card>
       </div>
 
       <Card className="mb-4">
-        <h3 className="mb-2 font-bold text-slate-800">شرح نیاز مشتری</h3>
-        <p className="text-sm leading-7 text-slate-600">
+        <h3 className="mb-2 font-bold text-fg">شرح نیاز مشتری</h3>
+        <p className="text-sm leading-7 text-fg-muted">
           {order.briefDescription}
         </p>
       </Card>
@@ -243,8 +243,8 @@ export default function AdminOrderDetailPage({
         )}
 
         {["assigned", "in_progress", "qc_rejected"].includes(order.status) && (
-          <div className="mb-4 flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-sm font-medium text-slate-700">
+          <div className="mb-4 flex flex-col gap-3 rounded-card border border-border bg-bg-subtle p-4">
+            <p className="text-sm font-medium text-fg">
               مسئول فعلی:{" "}
               {(() => {
                 const active = order.assignments?.find((a) => !a.unassignedAt);
@@ -253,7 +253,7 @@ export default function AdminOrderDetailPage({
                   : "نامشخص";
               })()}
             </p>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-fg-muted">
               اگر لازم است کار از این مجری گرفته شود و به مجری دیگری برای ادامه
               یا شروع مجدد سپرده شود، از این بخش استفاده کنید. گزارش‌ها و
               پیام‌های قبلی برای مجری جدید قابل مشاهده می‌ماند.
@@ -312,8 +312,8 @@ export default function AdminOrderDetailPage({
         )}
 
         {order.status === "disputed" && (
-          <div className="mb-4 flex flex-col gap-3 rounded-xl border border-red-100 bg-red-50 p-4">
-            <p className="text-sm font-medium text-red-700">
+          <div className="mb-4 flex flex-col gap-3 rounded-card border border-danger-border bg-danger-subtle p-4">
+            <p className="text-sm font-medium text-danger">
               این سفارش در وضعیت اختلاف (dispute) است.
             </p>
             <Field label="یادداشت تصمیم (اجباری)">
@@ -403,7 +403,7 @@ export default function AdminOrderDetailPage({
         )}
 
         {!["cancelled", "closed"].includes(order.status) && (
-          <div className="flex flex-wrap items-end gap-2 border-t border-slate-100 pt-4">
+          <div className="flex flex-wrap items-end gap-2 border-t border-border pt-4">
             <Field label="دلیل لغو">
               <input
                 className={inputClass}
@@ -430,7 +430,7 @@ export default function AdminOrderDetailPage({
       </Card>
 
       <Card className="mb-4">
-        <h3 className="mb-3 font-bold text-slate-800">
+        <h3 className="mb-3 font-bold text-fg">
           گزارش مدیریتی نسخه‌دار
         </h3>
         <textarea
@@ -477,14 +477,14 @@ export default function AdminOrderDetailPage({
           </Button>
         </div>
         {managementFile && (
-          <p className="mt-2 text-xs text-emerald-700">
+          <p className="mt-2 text-xs text-success">
             فایل آماده: {managementFile.originalName}
           </p>
         )}
       </Card>
 
       <Card>
-        <h3 className="mb-3 font-bold text-slate-800">
+        <h3 className="mb-3 font-bold text-fg">
           Timeline سفارش، مراحل و گزارش‌ها
         </h3>
         <OrderTimeline order={order} />

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "phase6:design-system-contract": "node scripts/phase6-design-system-contract.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.42.2",

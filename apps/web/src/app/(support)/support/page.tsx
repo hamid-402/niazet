@@ -33,13 +33,13 @@ export default function SupportDashboardPage() {
       <SectionTitle>داشبورد پشتیبانی</SectionTitle>
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {[
-          ["صف بدون مسئول", data.unassigned, "text-sky-700"],
-          ["تیکت‌های من", data.mine, "text-emerald-700"],
-          ["ریسک SLA تا یک ساعت", data.slaAtRisk, "text-amber-700"],
-          ["SLA عبورکرده", data.breached, "text-rose-700"],
+          ["صف بدون مسئول", data.unassigned, "text-info"],
+          ["تیکت‌های من", data.mine, "text-success"],
+          ["ریسک SLA تا یک ساعت", data.slaAtRisk, "text-warning"],
+          ["SLA عبورکرده", data.breached, "text-danger"],
         ].map(([label, value, color]) => (
           <Card key={String(label)}>
-            <p className="text-xs text-slate-500">{label}</p>
+            <p className="text-xs text-fg-muted">{label}</p>
             <p className={`mt-2 text-2xl font-extrabold ${color}`}>{value}</p>
           </Card>
         ))}
@@ -47,13 +47,13 @@ export default function SupportDashboardPage() {
 
       <Card>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-bold text-slate-800">اقدام‌های بعدی من</h2>
-          <Link href="/support/tickets?view=mine" className="text-sm text-emerald-700">
+          <h2 className="font-bold text-fg">اقدام‌های بعدی من</h2>
+          <Link href="/support/tickets?view=mine" className="text-sm text-success">
             همه تیکت‌های من
           </Link>
         </div>
         {data.nextTickets.length ? (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-border">
             {data.nextTickets.map((ticket) => (
               <Link
                 key={ticket.id}
@@ -61,15 +61,15 @@ export default function SupportDashboardPage() {
                 className="flex flex-wrap items-center justify-between gap-3 py-3"
               >
                 <div>
-                  <p className="font-medium text-slate-800">{ticket.subject}</p>
-                  <p className="text-xs text-slate-400">{ticket.code}</p>
+                  <p className="font-medium text-fg">{ticket.subject}</p>
+                  <p className="text-xs text-fg-subtle">{ticket.code}</p>
                 </div>
                 <TicketStatusBadge status={ticket.status} />
               </Link>
             ))}
           </div>
         ) : (
-          <p className="text-sm text-slate-400">تیکت فعالی به شما تخصیص ندارد.</p>
+          <p className="text-sm text-fg-subtle">تیکت فعالی به شما تخصیص ندارد.</p>
         )}
       </Card>
     </div>

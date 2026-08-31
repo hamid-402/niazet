@@ -335,7 +335,7 @@ export default function AdminStaffDetailPage({
       </div>
 
       {message && (
-        <div className="mb-4 rounded-control border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+        <div className="mb-4 rounded-control border border-success-border bg-success-subtle px-4 py-3 text-sm text-success">
           {message}
         </div>
       )}
@@ -373,8 +373,8 @@ export default function AdminStaffDetailPage({
       <div className="grid gap-4 xl:grid-cols-2">
         {activeTab === 'summary' && (
           <Card>
-          <h3 className="font-bold text-slate-800">مشخصات همکاری و احراز</h3>
-          <p className="mt-1 text-xs leading-6 text-slate-500">
+          <h3 className="font-bold text-fg">مشخصات همکاری و احراز</h3>
+          <p className="mt-1 text-xs leading-6 text-fg-muted">
             مجری تأییدنشده در تخصیص سفارش قابل انتخاب نیست.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -454,8 +454,8 @@ export default function AdminStaffDetailPage({
 
         {activeTab === 'capacity' && (
           <Card>
-          <h3 className="font-bold text-slate-800">وضعیت کاری و ظرفیت</h3>
-          <p className="mt-1 text-xs leading-6 text-slate-500">
+          <h3 className="font-bold text-fg">وضعیت کاری و ظرفیت</h3>
+          <p className="mt-1 text-xs leading-6 text-fg-muted">
             ظرفیت ۱۰۰٪ یا بیشتر، وضعیت را خودکار روی بیش‌ازظرفیت می‌گذارد.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -534,13 +534,13 @@ export default function AdminStaffDetailPage({
 
         {activeTab === 'skills' && (
           <Card className="xl:col-span-2">
-          <h3 className="font-bold text-slate-800">مهارت‌ها و سطح تسلط</h3>
-          <p className="mt-1 text-xs leading-6 text-slate-500">
+          <h3 className="font-bold text-fg">مهارت‌ها و سطح تسلط</h3>
+          <p className="mt-1 text-xs leading-6 text-fg-muted">
             سطح ۱ مقدماتی و سطح ۵ خبره است. تخصص با دسته خدمت در تخصیص کنترل می‌شود.
           </p>
           <div className="mt-4 max-h-72 space-y-2 overflow-y-auto">
             {allSkills.length === 0 && (
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-fg-subtle">
                 ابتدا از صفحه فهرست کارکنان مهارت تعریف کنید.
               </p>
             )}
@@ -549,9 +549,9 @@ export default function AdminStaffDetailPage({
               return (
                 <div
                   key={skill.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-control border border-slate-100 p-3"
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-control border border-border p-3"
                 >
-                  <label className="flex items-center gap-2 text-sm text-slate-700">
+                  <label className="flex items-center gap-2 text-sm text-fg">
                     <input
                       type="checkbox"
                       checked={selected}
@@ -623,8 +623,8 @@ export default function AdminStaffDetailPage({
 
         {activeTab === 'capacity' && (
           <Card>
-          <h3 className="font-bold text-slate-800">حضور روزانه</h3>
-          <p className="mt-1 text-xs leading-6 text-slate-500">
+          <h3 className="font-bold text-fg">حضور روزانه</h3>
+          <p className="mt-1 text-xs leading-6 text-fg-muted">
             برای هر روز فقط یک رکورد نگهداری می‌شود و ثبت دوباره همان روز را اصلاح می‌کند.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -685,19 +685,19 @@ export default function AdminStaffDetailPage({
               </Button>
             </div>
           </div>
-          <div className="mt-4 border-t border-slate-100 pt-3">
-            <h4 className="text-sm font-bold text-slate-700">۳۰ روز اخیر</h4>
+          <div className="mt-4 border-t border-border pt-3">
+            <h4 className="text-sm font-bold text-fg">۳۰ روز اخیر</h4>
             {attendance.length === 0 ? (
-              <p className="mt-2 text-sm text-slate-400">رکوردی ثبت نشده است.</p>
+              <p className="mt-2 text-sm text-fg-subtle">رکوردی ثبت نشده است.</p>
             ) : (
-              <ul className="mt-2 max-h-48 divide-y divide-slate-100 overflow-y-auto text-sm">
+              <ul className="mt-2 max-h-48 divide-y divide-border overflow-y-auto text-sm">
                 {attendance.map((record) => (
                   <li
                     key={record.id}
                     className="flex items-center justify-between gap-3 py-2"
                   >
                     <span>{new Date(record.workDate).toLocaleDateString('fa-IR')}</span>
-                    <span className="text-slate-500">
+                    <span className="text-fg-muted">
                       {ATTENDANCE_LABELS[record.status] ?? record.status}
                     </span>
                   </li>
@@ -710,8 +710,8 @@ export default function AdminStaffDetailPage({
 
         {activeTab === 'summary' && (
           <Card>
-          <h3 className="font-bold text-slate-800">دسترسی حساب</h3>
-          <p className="mt-1 text-xs leading-6 text-slate-500">
+          <h3 className="font-bold text-fg">دسترسی حساب</h3>
+          <p className="mt-1 text-xs leading-6 text-fg-muted">
             تغییر دسترسی همه نشست‌های فعال را باطل می‌کند تا سیاست جدید فوری اعمال شود.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -727,7 +727,7 @@ export default function AdminStaffDetailPage({
                 <option value="blocked">مسدود</option>
               </select>
             </Field>
-            <label className="flex items-center gap-3 rounded-control border border-slate-100 p-3 text-sm text-slate-700">
+            <label className="flex items-center gap-3 rounded-control border border-border p-3 text-sm text-fg">
               <input
                 type="checkbox"
                 checked={customerCapability}
@@ -736,7 +736,7 @@ export default function AdminStaffDetailPage({
               قابلیت استفاده هم‌زمان به‌عنوان مشتری
             </label>
           </div>
-          <div className="mt-3 rounded-control bg-slate-50 p-3 text-xs leading-6 text-slate-500">
+          <div className="mt-3 rounded-control bg-bg-subtle p-3 text-xs leading-6 text-fg-muted">
             دسترسی فعلی: حساب {profile.user?.status ?? 'نامشخص'}؛ قابلیت مشتری{' '}
             {hasCustomerCapability ? 'فعال' : 'غیرفعال'}.
           </div>
@@ -769,8 +769,8 @@ export default function AdminStaffDetailPage({
           <Card className="xl:col-span-2">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h3 className="font-bold text-slate-800">روند عملکرد مجری</h3>
-                <p className="mt-1 text-xs leading-6 text-slate-500">
+                <h3 className="font-bold text-fg">روند عملکرد مجری</h3>
+                <p className="mt-1 text-xs leading-6 text-fg-muted">
                   Snapshotهای ثبت‌شده، تغییر کیفیت و ریسک عملکرد را در طول زمان نشان می‌دهند.
                 </p>
               </div>
@@ -794,8 +794,8 @@ export default function AdminStaffDetailPage({
                     key={alert.id}
                     className={`rounded-control border p-4 ${
                       alert.severity === 'critical'
-                        ? 'border-red-200 bg-red-50'
-                        : 'border-amber-200 bg-amber-50'
+                        ? 'border-danger-border bg-danger-subtle'
+                        : 'border-warning-border bg-warning-subtle'
                     }`}
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
@@ -803,17 +803,17 @@ export default function AdminStaffDetailPage({
                         <Badge color={alert.severity === 'critical' ? 'red' : 'yellow'}>
                           {RISK_LABELS[alert.riskType] ?? alert.riskType}
                         </Badge>
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs text-fg-muted">
                           {alert.status === 'acknowledged' ? 'مشاهده‌شده' : 'نیازمند بررسی'}
                         </span>
                       </div>
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-fg-subtle">
                         {new Date(alert.lastDetectedAt).toLocaleString('fa-IR')}
                       </span>
                     </div>
-                    <dl className="mt-3 flex flex-wrap gap-2 text-xs text-slate-600">
+                    <dl className="mt-3 flex flex-wrap gap-2 text-xs text-fg-muted">
                       {Object.entries(alert.evidence ?? {}).map(([key, value]) => (
-                        <div key={key} className="rounded-full bg-white/80 px-2 py-1">
+                        <div key={key} className="rounded-pill bg-surface/80 px-2 py-1">
                           <dt className="inline">{RISK_EVIDENCE_LABELS[key] ?? key}: </dt>
                           <dd className="inline font-bold">{String(value ?? '—')}</dd>
                         </div>
@@ -842,7 +842,7 @@ export default function AdminStaffDetailPage({
                         ثبت مشاهده
                       </Button>
                     ) : (
-                      <p className="mt-3 text-xs text-slate-500">
+                      <p className="mt-3 text-xs text-fg-muted">
                         توسط {alert.acknowledgedBy?.fullName ?? 'مدیر عملیات'}؛{' '}
                         {alert.acknowledgementNote}
                       </p>
@@ -852,14 +852,14 @@ export default function AdminStaffDetailPage({
               </div>
             )}
             {profile.performanceSnapshots.length === 0 ? (
-              <div className="mt-4 rounded-control bg-slate-50 p-4 text-sm text-slate-500">
+              <div className="mt-4 rounded-control bg-bg-subtle p-4 text-sm text-fg-muted">
                 هنوز Snapshot عملکردی ثبت نشده است؛ Job روزانه یا دکمه «محاسبه اکنون» اولین Snapshot را می‌سازد.
               </div>
             ) : (
               <div className="mt-4 overflow-x-auto">
                 <table className="w-full min-w-[880px] text-sm">
                   <thead>
-                    <tr className="border-b border-slate-100 text-right text-xs text-slate-400">
+                    <tr className="border-b border-border text-right text-xs text-fg-subtle">
                       <th className="px-3 py-2 font-medium">دوره</th>
                       <th className="px-3 py-2 font-medium">فعال / تکمیل</th>
                       <th className="px-3 py-2 font-medium">به‌موقع</th>
@@ -871,23 +871,23 @@ export default function AdminStaffDetailPage({
                   </thead>
                   <tbody>
                     {profile.performanceSnapshots.map((snapshot) => (
-                      <tr key={snapshot.id} className="border-b border-slate-50">
-                        <td className="px-3 py-3 text-slate-600">
+                      <tr key={snapshot.id} className="border-b border-border">
+                        <td className="px-3 py-3 text-fg-muted">
                           {new Date(snapshot.periodEnd).toLocaleDateString('fa-IR')}
                         </td>
-                        <td className="px-3 py-3 text-slate-600">
+                        <td className="px-3 py-3 text-fg-muted">
                           {snapshot.activeOrders} / {snapshot.completedOrders}
                         </td>
-                        <td className="px-3 py-3 text-slate-600">
+                        <td className="px-3 py-3 text-fg-muted">
                           {Number(snapshot.onTimeRate).toFixed(0)}٪
                         </td>
-                        <td className="px-3 py-3 text-slate-600">
+                        <td className="px-3 py-3 text-fg-muted">
                           {Number(snapshot.qcPassRate).toFixed(0)}٪
                         </td>
-                        <td className="px-3 py-3 text-slate-600">
+                        <td className="px-3 py-3 text-fg-muted">
                           {Number(snapshot.avgCustomerRating).toFixed(1)}
                         </td>
-                        <td className="px-3 py-3 text-slate-600">
+                        <td className="px-3 py-3 text-fg-muted">
                           {snapshot.complaintCount} / {snapshot.complimentCount}
                         </td>
                         <td className="px-3 py-3">
@@ -923,11 +923,11 @@ export default function AdminStaffDetailPage({
                 color="green"
               />
             </div>
-            <h3 className="mt-5 font-bold text-slate-800">امتیاز، شکایت و تشکر</h3>
+            <h3 className="mt-5 font-bold text-fg">امتیاز، شکایت و تشکر</h3>
             {profile.feedback.length === 0 ? (
-              <p className="mt-3 text-sm text-slate-400">بازخوردی برای این مجری ثبت نشده است.</p>
+              <p className="mt-3 text-sm text-fg-subtle">بازخوردی برای این مجری ثبت نشده است.</p>
             ) : (
-              <ul className="mt-3 divide-y divide-slate-100">
+              <ul className="mt-3 divide-y divide-border">
                 {profile.feedback.map((item) => (
                   <li key={item.id} className="py-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
@@ -943,22 +943,22 @@ export default function AdminStaffDetailPage({
                         >
                           {FEEDBACK_LABELS[item.feedbackType] ?? item.feedbackType}
                         </Badge>
-                        <span className="text-sm font-bold text-slate-700">{item.code}</span>
+                        <span className="text-sm font-bold text-fg">{item.code}</span>
                         {item.rating != null && (
-                          <span className="text-sm text-amber-600">{item.rating} از ۵</span>
+                          <span className="text-sm text-warning">{item.rating} از ۵</span>
                         )}
                       </div>
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-fg-subtle">
                         {new Date(item.createdAt).toLocaleString('fa-IR')}
                       </span>
                     </div>
-                    <p className="mt-2 text-sm text-slate-600">
+                    <p className="mt-2 text-sm text-fg-muted">
                       سفارش {item.order.code} — {item.order.title}
                     </p>
-                    <p className="mt-1 text-xs text-slate-400">ثبت‌کننده: {item.customer.fullName}</p>
-                    {item.comment && <p className="mt-2 text-sm leading-7 text-slate-700">{item.comment}</p>}
+                    <p className="mt-1 text-xs text-fg-subtle">ثبت‌کننده: {item.customer.fullName}</p>
+                    {item.comment && <p className="mt-2 text-sm leading-7 text-fg">{item.comment}</p>}
                     {item.resolutionNote && (
-                      <div className="mt-2 rounded-control bg-emerald-50 p-3 text-sm text-emerald-800">
+                      <div className="mt-2 rounded-control bg-success-subtle p-3 text-sm text-success">
                         نتیجه رسیدگی: {item.resolutionNote}
                       </div>
                     )}
@@ -971,33 +971,33 @@ export default function AdminStaffDetailPage({
 
         {activeTab === 'history' && (
           <Card className="xl:col-span-2">
-            <h3 className="font-bold text-slate-800">تاریخچه تغییرات داخلی</h3>
-            <p className="mt-1 text-xs leading-6 text-slate-500">
+            <h3 className="font-bold text-fg">تاریخچه تغییرات داخلی</h3>
+            <p className="mt-1 text-xs leading-6 text-fg-muted">
               تصمیم‌های مدیریتی همراه ثبت‌کننده، زمان و داده قبل/بعد نگهداری می‌شوند.
             </p>
             {profile.history.length === 0 ? (
-              <p className="mt-4 text-sm text-slate-400">رویدادی ثبت نشده است.</p>
+              <p className="mt-4 text-sm text-fg-subtle">رویدادی ثبت نشده است.</p>
             ) : (
-              <ol className="mt-4 space-y-3 border-r-2 border-slate-100 pr-5">
+              <ol className="mt-4 space-y-3 border-r-2 border-border pr-5">
                 {profile.history.map((entry) => (
-                  <li key={entry.id} className="relative rounded-control border border-slate-100 p-4">
-                    <span className="absolute -right-[27px] top-5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500" />
+                  <li key={entry.id} className="relative rounded-control border border-border p-4">
+                    <span className="absolute -right-[27px] top-5 h-3 w-3 rounded-pill border-2 border-surface bg-success" />
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="font-bold text-slate-700">
+                      <p className="font-bold text-fg">
                         {HISTORY_ACTION_LABELS[entry.action] ?? entry.action}
                       </p>
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-fg-subtle">
                         {new Date(entry.createdAt).toLocaleString('fa-IR')}
                       </span>
                     </div>
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="mt-1 text-xs text-fg-muted">
                       توسط {entry.actor?.fullName ?? entry.actorRole ?? 'سیستم'}
                     </p>
-                    <details className="mt-3 text-xs text-slate-500">
-                      <summary className="cursor-pointer font-medium text-slate-600">مشاهده داده قبل و بعد</summary>
+                    <details className="mt-3 text-xs text-fg-muted">
+                      <summary className="cursor-pointer font-medium text-fg-muted">مشاهده داده قبل و بعد</summary>
                       <div className="mt-2 grid gap-2 lg:grid-cols-2" dir="ltr">
-                        <pre className="overflow-x-auto rounded-control bg-slate-50 p-3 text-left">{formatAuditPayload(entry.before)}</pre>
-                        <pre className="overflow-x-auto rounded-control bg-slate-50 p-3 text-left">{formatAuditPayload(entry.after)}</pre>
+                        <pre className="overflow-x-auto rounded-control bg-bg-subtle p-3 text-left">{formatAuditPayload(entry.before)}</pre>
+                        <pre className="overflow-x-auto rounded-control bg-bg-subtle p-3 text-left">{formatAuditPayload(entry.after)}</pre>
                       </div>
                     </details>
                   </li>
@@ -1009,9 +1009,9 @@ export default function AdminStaffDetailPage({
 
         {activeTab === 'orders' && (
           <Card className="xl:col-span-2">
-          <h3 className="font-bold text-slate-800">سفارش‌های مرتبط</h3>
+          <h3 className="font-bold text-fg">سفارش‌های مرتبط</h3>
           {profile.assignments?.length ? (
-            <ul className="mt-3 max-h-80 divide-y divide-slate-100 overflow-y-auto text-sm">
+            <ul className="mt-3 max-h-80 divide-y divide-border overflow-y-auto text-sm">
               {profile.assignments.map((assignment, index) => (
                 <li
                   key={assignment.id ?? index}
@@ -1019,18 +1019,18 @@ export default function AdminStaffDetailPage({
                 >
                   <span>
                     {assignment.order.title}
-                    <small className="mr-2 text-slate-400">
+                    <small className="mr-2 text-fg-subtle">
                       {assignment.order.code}
                     </small>
                   </span>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-fg-subtle">
                     {assignment.order.status}
                   </span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-3 text-sm text-slate-400">سفارشی ثبت نشده است.</p>
+            <p className="mt-3 text-sm text-fg-subtle">سفارشی ثبت نشده است.</p>
           )}
           </Card>
         )}
@@ -1053,8 +1053,8 @@ export default function AdminStaffDetailPage({
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <Card>
-      <p className="text-xs text-slate-400">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-slate-900">{value}</p>
+      <p className="text-xs text-fg-subtle">{label}</p>
+      <p className="mt-1 text-2xl font-bold text-fg">{value}</p>
     </Card>
   );
 }
@@ -1069,9 +1069,9 @@ function FeedbackMetric({
   color: 'blue' | 'red' | 'green';
 }) {
   return (
-    <div className="rounded-control border border-slate-100 p-4">
+    <div className="rounded-control border border-border p-4">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-sm text-slate-500">{label}</p>
+        <p className="text-sm text-fg-muted">{label}</p>
         <Badge color={color}>{value}</Badge>
       </div>
     </div>

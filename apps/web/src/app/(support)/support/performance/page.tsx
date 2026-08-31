@@ -28,19 +28,19 @@ export default function SupportPerformancePage() {
       <SectionTitle>عملکرد من</SectionTitle>
       <div className="grid gap-3 md:grid-cols-3">
         <Card>
-          <p className="text-xs text-slate-500">پاسخ‌های قابل مشاهده مشتری</p>
-          <p className="mt-2 text-2xl font-extrabold text-sky-700">{data.totalReplied}</p>
+          <p className="text-xs text-fg-muted">پاسخ‌های قابل مشاهده مشتری</p>
+          <p className="mt-2 text-2xl font-extrabold text-info">{data.totalReplied}</p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-500">تیکت حل یا بسته‌شده</p>
-          <p className="mt-2 text-2xl font-extrabold text-emerald-700">{data.resolved}</p>
+          <p className="text-xs text-fg-muted">تیکت حل یا بسته‌شده</p>
+          <p className="mt-2 text-2xl font-extrabold text-success">{data.resolved}</p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-500">عبور از SLA</p>
-          <p className="mt-2 text-2xl font-extrabold text-rose-700">{data.slaBreaches}</p>
+          <p className="text-xs text-fg-muted">عبور از SLA</p>
+          <p className="mt-2 text-2xl font-extrabold text-danger">{data.slaBreaches}</p>
         </Card>
       </div>
-      <Card className="text-sm leading-7 text-slate-600">
+      <Card className="text-sm leading-7 text-fg-muted">
         این شاخص‌ها فقط فعالیت حساب فعلی را نشان می‌دهند و یادداشت‌های داخلی در تعداد پاسخ‌های مشتری محاسبه نمی‌شوند.
       </Card>
     </div>

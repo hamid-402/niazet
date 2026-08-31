@@ -77,14 +77,14 @@ export default function AdminEscrowPage() {
           <Card key={e.id}>
             <div className="mb-2 flex items-center justify-between">
               <div>
-                <p className="font-medium text-slate-800">{e.order.title}</p>
-                <p className="text-xs text-slate-400">{e.order.code}</p>
+                <p className="font-medium text-fg">{e.order.title}</p>
+                <p className="text-xs text-fg-subtle">{e.order.code}</p>
               </div>
               <Badge color={e.status === 'held' ? 'yellow' : 'green'}>
                 {e.status}
               </Badge>
             </div>
-            <p className="mb-3 text-sm text-slate-600">
+            <p className="mb-3 text-sm text-fg-muted">
               مبلغ: {formatToman(e.amount)}
             </p>
             {(e.status === 'held' || e.status === 'partially_released') && (

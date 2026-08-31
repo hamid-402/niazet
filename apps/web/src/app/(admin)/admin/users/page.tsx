@@ -63,7 +63,7 @@ export default function AdminUsersPage() {
         <Card className="overflow-x-auto p-0">
           <table className="w-full min-w-[720px] text-sm">
             <thead>
-              <tr className="border-b border-slate-100 text-right text-xs text-slate-400">
+              <tr className="border-b border-border text-right text-xs text-fg-subtle">
                 <th className="px-4 py-3 font-medium">نام</th>
                 <th className="px-4 py-3 font-medium">موبایل</th>
                 <th className="px-4 py-3 font-medium">نقش</th>
@@ -76,19 +76,19 @@ export default function AdminUsersPage() {
               {users.map((u) => (
                 <tr
                   key={u.id}
-                  className="border-b border-slate-50 last:border-0"
+                  className="border-b border-border last:border-0"
                 >
-                  <td className="px-4 py-3 text-slate-700">{u.fullName}</td>
-                  <td className="px-4 py-3 text-slate-500" dir="ltr">
+                  <td className="px-4 py-3 text-fg">{u.fullName}</td>
+                  <td className="px-4 py-3 text-fg-muted" dir="ltr">
                     {u.phone}
                   </td>
-                  <td className="px-4 py-3 text-slate-500">{u.role}</td>
+                  <td className="px-4 py-3 text-fg-muted">{u.role}</td>
                   <td className="px-4 py-3">
                     <Badge color={u.status === 'active' ? 'green' : 'red'}>
                       {u.status}
                     </Badge>
                   </td>
-                  <td className="px-4 py-3 text-slate-400">
+                  <td className="px-4 py-3 text-fg-subtle">
                     {formatDate(u.createdAt)}
                   </td>
                   <td className="px-4 py-3">

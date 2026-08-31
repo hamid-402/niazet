@@ -53,7 +53,7 @@ export default function AdminPaymentsPage() {
         <Card className="overflow-x-auto p-0">
           <table className="w-full min-w-[720px] text-sm">
             <thead>
-              <tr className="border-b border-slate-100 text-right text-xs text-slate-400">
+              <tr className="border-b border-border text-right text-xs text-fg-subtle">
                 <th className="px-4 py-3 font-medium">سفارش</th>
                 <th className="px-4 py-3 font-medium">مشتری</th>
                 <th className="px-4 py-3 font-medium">مبلغ</th>
@@ -65,13 +65,13 @@ export default function AdminPaymentsPage() {
               {payments.map((p) => (
                 <tr
                   key={p.id}
-                  className="border-b border-slate-50 last:border-0"
+                  className="border-b border-border last:border-0"
                 >
-                  <td className="px-4 py-3 text-slate-700">{p.order.code}</td>
-                  <td className="px-4 py-3 text-slate-500">
+                  <td className="px-4 py-3 text-fg">{p.order.code}</td>
+                  <td className="px-4 py-3 text-fg-muted">
                     {p.customer.fullName}
                   </td>
-                  <td className="px-4 py-3 text-slate-700">
+                  <td className="px-4 py-3 text-fg">
                     {formatToman(p.amount)}
                   </td>
                   <td className="px-4 py-3">
@@ -79,7 +79,7 @@ export default function AdminPaymentsPage() {
                       {p.status}
                     </Badge>
                   </td>
-                  <td className="px-4 py-3 text-slate-400">
+                  <td className="px-4 py-3 text-fg-subtle">
                     {formatDate(p.createdAt)}
                   </td>
                 </tr>

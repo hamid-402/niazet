@@ -71,7 +71,7 @@ export default function AdminLedgerPage() {
         <Card className="overflow-x-auto p-0">
           <table className="w-full min-w-[720px] text-sm">
             <thead>
-              <tr className="border-b border-slate-100 text-right text-xs text-slate-400">
+              <tr className="border-b border-border text-right text-xs text-fg-subtle">
                 <th className="px-4 py-3 font-medium">بدهکار</th>
                 <th className="px-4 py-3 font-medium">بستانکار</th>
                 <th className="px-4 py-3 font-medium">مبلغ</th>
@@ -83,21 +83,21 @@ export default function AdminLedgerPage() {
               {entries.map((e) => (
                 <tr
                   key={e.id}
-                  className="border-b border-slate-50 last:border-0"
+                  className="border-b border-border last:border-0"
                 >
-                  <td className="px-4 py-3 text-slate-500">
+                  <td className="px-4 py-3 text-fg-muted">
                     {ACCOUNT_LABELS[e.debitAccount.accountType]}
                   </td>
-                  <td className="px-4 py-3 text-slate-500">
+                  <td className="px-4 py-3 text-fg-muted">
                     {ACCOUNT_LABELS[e.creditAccount.accountType]}
                   </td>
-                  <td className="px-4 py-3 text-slate-700">
+                  <td className="px-4 py-3 text-fg">
                     {formatToman(e.amount)}
                   </td>
-                  <td className="px-4 py-3 text-slate-500">
+                  <td className="px-4 py-3 text-fg-muted">
                     {e.referenceType}
                   </td>
-                  <td className="px-4 py-3 text-slate-400">
+                  <td className="px-4 py-3 text-fg-subtle">
                     {formatDate(e.createdAt)}
                   </td>
                 </tr>

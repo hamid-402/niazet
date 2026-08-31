@@ -47,8 +47,8 @@ export default function CustomerTicketDetailPage({
     <div className="mx-auto max-w-2xl">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <p className="text-xs text-slate-400">{ticket.code}</p>
-          <h1 className="text-xl font-extrabold text-slate-900">
+          <p className="text-xs text-fg-subtle">{ticket.code}</p>
+          <h1 className="text-xl font-extrabold text-fg">
             {ticket.subject}
           </h1>
         </div>
@@ -59,9 +59,9 @@ export default function CustomerTicketDetailPage({
         <SectionTitle>گفتگو</SectionTitle>
         <div className="mb-4 space-y-3">
           {ticket.messages.map((m) => (
-            <div key={m.id} className="rounded-xl bg-slate-50 p-3 text-sm">
-              <p className="text-slate-700">{m.body}</p>
-              <p className="mt-1 text-xs text-slate-400">
+            <div key={m.id} className="rounded-card bg-bg-subtle p-3 text-sm">
+              <p className="text-fg">{m.body}</p>
+              <p className="mt-1 text-xs text-fg-subtle">
                 {formatDate(m.createdAt)}
               </p>
               {m.attachment && (
@@ -117,7 +117,7 @@ export default function CustomerTicketDetailPage({
                 onUploaded={setAttachment}
               />
               {attachment && (
-                <p className="text-xs text-emerald-700">
+                <p className="text-xs text-success">
                   پیوست آماده ارسال: {attachment.originalName}
                 </p>
               )}

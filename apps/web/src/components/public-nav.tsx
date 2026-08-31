@@ -11,7 +11,7 @@ export function PublicNav() {
 
   return (
     <header className="sticky top-0 z-sticky border-b border-border bg-surface/90 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:px-8">
+      <div className="page-container flex items-center justify-between py-4">
         <Link href="/" className="text-lg font-extrabold text-fg">
           نیازت با ما
         </Link>

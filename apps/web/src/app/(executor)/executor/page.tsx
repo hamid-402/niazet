@@ -44,46 +44,46 @@ export default function ExecutorDashboardPage() {
 
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Card>
-          <p className="text-xs text-slate-400">کارهای فعال</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">
+          <p className="text-xs text-fg-subtle">کارهای فعال</p>
+          <p className="mt-1 text-2xl font-bold text-fg">
             {data.activeOrders}
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">نیازمند اصلاح (QC)</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">
+          <p className="text-xs text-fg-subtle">نیازمند اصلاح (QC)</p>
+          <p className="mt-1 text-2xl font-bold text-fg">
             {data.needsRework}
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">نرخ قبولی QC</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">
+          <p className="text-xs text-fg-subtle">نرخ قبولی QC</p>
+          <p className="mt-1 text-2xl font-bold text-fg">
             {Number(data.profile.qcPassRate).toFixed(0)}٪
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">تحویل به‌موقع</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">
+          <p className="text-xs text-fg-subtle">تحویل به‌موقع</p>
+          <p className="mt-1 text-2xl font-bold text-fg">
             {Number(data.profile.onTimeDeliveryRate).toFixed(0)}٪
           </p>
         </Card>
       </div>
 
       <Card>
-        <h3 className="mb-3 font-bold text-slate-800">کارهای در صف</h3>
+        <h3 className="mb-3 font-bold text-fg">کارهای در صف</h3>
         {data.dueSoon.length === 0 ? (
-          <p className="text-sm text-slate-400">کاری در صف نیست.</p>
+          <p className="text-sm text-fg-subtle">کاری در صف نیست.</p>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-border">
             {data.dueSoon.map((order) => (
               <Link
                 key={order.id}
                 href={`/executor/orders/${order.id}`}
-                className="flex items-center justify-between py-3 text-sm hover:bg-slate-50"
+                className="flex items-center justify-between py-3 text-sm hover:bg-bg-subtle"
               >
                 <div>
-                  <p className="font-medium text-slate-800">{order.title}</p>
-                  <p className="text-xs text-slate-400">{order.code}</p>
+                  <p className="font-medium text-fg">{order.title}</p>
+                  <p className="text-xs text-fg-subtle">{order.code}</p>
                 </div>
                 <OrderStatusBadge status={order.status} />
               </Link>

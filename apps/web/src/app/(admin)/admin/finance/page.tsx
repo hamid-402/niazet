@@ -35,50 +35,50 @@ export default function AdminFinanceDashboardPage() {
       <SectionTitle>داشبورد مالی</SectionTitle>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
         <Card>
-          <p className="text-xs text-slate-400">GMV این ماه</p>
-          <p className="mt-1 text-xl font-bold text-slate-900">
+          <p className="text-xs text-fg-subtle">GMV این ماه</p>
+          <p className="mt-1 text-xl font-bold text-fg">
             {formatToman(data.gmv)}
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">درآمد و کارمزد این ماه</p>
-          <p className="mt-1 text-xl font-bold text-slate-900">
+          <p className="text-xs text-fg-subtle">درآمد و کارمزد این ماه</p>
+          <p className="mt-1 text-xl font-bold text-fg">
             {formatToman(data.revenue)}
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">مانده Escrow</p>
-          <p className="mt-1 text-xl font-bold text-slate-900">
+          <p className="text-xs text-fg-subtle">مانده Escrow</p>
+          <p className="mt-1 text-xl font-bold text-fg">
             {formatToman(data.escrow.held)}
           </p>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-fg-subtle">
             {data.escrow.count.toLocaleString('fa-IR')} حساب امانی
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">بازپرداخت این ماه</p>
-          <p className="mt-1 text-xl font-bold text-slate-900">
+          <p className="text-xs text-fg-subtle">بازپرداخت این ماه</p>
+          <p className="mt-1 text-xl font-bold text-fg">
             {formatToman(data.refunds)}
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">برداشت در انتظار</p>
-          <p className="mt-1 text-xl font-bold text-slate-900">
+          <p className="text-xs text-fg-subtle">برداشت در انتظار</p>
+          <p className="mt-1 text-xl font-bold text-fg">
             {data.pendingWithdrawals.toLocaleString('fa-IR')}
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">پرداخت ناموفق</p>
-          <p className="mt-1 text-xl font-bold text-slate-900">
+          <p className="text-xs text-fg-subtle">پرداخت ناموفق</p>
+          <p className="mt-1 text-xl font-bold text-fg">
             {data.failedPayments.toLocaleString('fa-IR')}
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">تعهد کیف پول‌ها</p>
-          <p className="mt-1 text-xl font-bold text-slate-900">
+          <p className="text-xs text-fg-subtle">تعهد کیف پول‌ها</p>
+          <p className="mt-1 text-xl font-bold text-fg">
             {formatToman(data.walletLiability.balance)}
           </p>
-          <p className="text-xs text-slate-400">{data.walletLiability.count.toLocaleString('fa-IR')} کیف پول</p>
+          <p className="text-xs text-fg-subtle">{data.walletLiability.count.toLocaleString('fa-IR')} کیف پول</p>
         </Card>
       </div>
     </div>

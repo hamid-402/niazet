@@ -42,7 +42,7 @@ export default function CustomerTicketsPage() {
         <Card className="overflow-x-auto p-0">
           <table className="w-full min-w-[560px] text-sm">
             <thead>
-              <tr className="border-b border-slate-100 text-right text-xs text-slate-400">
+              <tr className="border-b border-border text-right text-xs text-fg-subtle">
                 <th className="px-4 py-3 font-medium">موضوع</th>
                 <th className="px-4 py-3 font-medium">دسته</th>
                 <th className="px-4 py-3 font-medium">وضعیت</th>
@@ -53,22 +53,22 @@ export default function CustomerTicketsPage() {
               {tickets.map((t) => (
                 <tr
                   key={t.id}
-                  className="border-b border-slate-50 last:border-0 hover:bg-slate-50"
+                  className="border-b border-border last:border-0 hover:bg-bg-subtle"
                 >
                   <td className="px-4 py-3">
                     <Link
                       href={`/tickets/${t.id}`}
-                      className="font-medium text-slate-800 hover:underline"
+                      className="font-medium text-fg hover:underline"
                     >
                       {t.subject}
                     </Link>
-                    <p className="text-xs text-slate-400">{t.code}</p>
+                    <p className="text-xs text-fg-subtle">{t.code}</p>
                   </td>
-                  <td className="px-4 py-3 text-slate-500">{t.category}</td>
+                  <td className="px-4 py-3 text-fg-muted">{t.category}</td>
                   <td className="px-4 py-3">
                     <TicketStatusBadge status={t.status} />
                   </td>
-                  <td className="px-4 py-3 text-slate-400">
+                  <td className="px-4 py-3 text-fg-subtle">
                     {formatDate(t.createdAt)}
                   </td>
                 </tr>

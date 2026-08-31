@@ -261,8 +261,8 @@ export default function AdminStaffPage() {
 
       <div className="mb-4 grid gap-4 lg:grid-cols-2">
         <Card>
-          <h3 className="font-bold text-slate-800">تعریف تیم</h3>
-          <p className="mt-1 text-xs text-slate-500">
+          <h3 className="font-bold text-fg">تعریف تیم</h3>
+          <p className="mt-1 text-xs text-fg-muted">
             {teams.length} تیم فعال در ساختار عملیات
           </p>
           <form onSubmit={createTeam} className="mt-3 grid gap-3 sm:grid-cols-3">
@@ -291,8 +291,8 @@ export default function AdminStaffPage() {
           </form>
         </Card>
         <Card>
-          <h3 className="font-bold text-slate-800">تعریف مهارت</h3>
-          <p className="mt-1 text-xs text-slate-500">
+          <h3 className="font-bold text-fg">تعریف مهارت</h3>
+          <p className="mt-1 text-xs text-fg-muted">
             {skills.length} مهارت قابل انتساب
           </p>
           <form onSubmit={createSkill} className="mt-3 grid gap-3 sm:grid-cols-3">
@@ -321,7 +321,7 @@ export default function AdminStaffPage() {
       </div>
 
       {message && (
-        <div className="mb-4 rounded-control border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+        <div className="mb-4 rounded-control border border-success-border bg-success-subtle px-4 py-3 text-sm text-success">
           {message}
         </div>
       )}
@@ -396,7 +396,7 @@ export default function AdminStaffPage() {
         <Card className="overflow-x-auto p-0">
           <table className="w-full min-w-[1080px] text-sm">
             <thead>
-              <tr className="border-b border-slate-100 text-right text-xs text-slate-400">
+              <tr className="border-b border-border text-right text-xs text-fg-subtle">
                 <th className="px-4 py-3 font-medium">کارمند / کد</th>
                 <th className="px-4 py-3 font-medium">نوع و احراز</th>
                 <th className="px-4 py-3 font-medium">تیم و مهارت</th>
@@ -410,31 +410,31 @@ export default function AdminStaffPage() {
               {filteredStaff.map((item) => (
                 <tr
                   key={item.id}
-                  className="border-b border-slate-50 last:border-0 hover:bg-slate-50"
+                  className="border-b border-border last:border-0 hover:bg-bg-subtle"
                 >
                   <td className="px-4 py-3">
                     <Link
                       href={`/admin/staff/${item.id}`}
-                      className="font-bold text-slate-800 hover:underline"
+                      className="font-bold text-fg hover:underline"
                     >
                       {item.user?.fullName ?? item.displayAlias}
                     </Link>
-                    <p className="mt-1 text-xs text-slate-400">
+                    <p className="mt-1 text-xs text-fg-subtle">
                       {item.displayAlias} · {item.publicHandlerCode}
                     </p>
                   </td>
                   <td className="px-4 py-3">
-                    <p className="text-slate-600">
+                    <p className="text-fg-muted">
                       {item.executorType === 'internal_staff' ? 'داخلی' : 'بیرونی'}
                     </p>
-                    <p className="mt-1 text-xs text-slate-400">
+                    <p className="mt-1 text-xs text-fg-subtle">
                       {VERIFICATION_LABELS[item.verificationStatus] ??
                         item.verificationStatus}
                     </p>
                   </td>
                   <td className="px-4 py-3">
-                    <p className="text-slate-600">{item.team?.name ?? 'بدون تیم'}</p>
-                    <p className="mt-1 max-w-56 truncate text-xs text-slate-400">
+                    <p className="text-fg-muted">{item.team?.name ?? 'بدون تیم'}</p>
+                    <p className="mt-1 max-w-56 truncate text-xs text-fg-subtle">
                       {item.skills?.map((entry) => entry.skill.name).join('، ') ||
                         'مهارتی ثبت نشده'}
                     </p>
@@ -445,17 +445,17 @@ export default function AdminStaffPage() {
                     </Badge>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="h-2 w-28 overflow-hidden rounded-full bg-slate-100">
+                    <div className="h-2 w-28 overflow-hidden rounded-full bg-bg-subtle">
                       <div
-                        className={`h-full ${item.capacityPercent >= 90 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                        className={`h-full ${item.capacityPercent >= 90 ? 'bg-warning-subtle0' : 'bg-success-subtle0'}`}
                         style={{ width: `${item.capacityPercent}%` }}
                       />
                     </div>
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="mt-1 text-xs text-fg-muted">
                       {item.capacityPercent}٪
                     </p>
                   </td>
-                  <td className="px-4 py-3 text-xs text-slate-500">
+                  <td className="px-4 py-3 text-xs text-fg-muted">
                     <p>QC: {Number(item.qcPassRate).toFixed(0)}٪</p>
                     <p className="mt-1">
                       رضایت: {Number(item.customerRatingAvg).toFixed(1)}

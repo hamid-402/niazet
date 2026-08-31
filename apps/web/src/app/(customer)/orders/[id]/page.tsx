@@ -79,8 +79,8 @@ export default function CustomerOrderDetailPage({
     <div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs text-slate-400">{order.code}</p>
-          <h1 className="text-xl font-extrabold text-slate-900">
+          <p className="text-xs text-fg-subtle">{order.code}</p>
+          <h1 className="text-xl font-extrabold text-fg">
             {order.title}
           </h1>
         </div>
@@ -95,28 +95,28 @@ export default function CustomerOrderDetailPage({
 
       <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Card>
-          <p className="text-xs text-slate-400">مبلغ سفارش</p>
-          <p className="mt-1 font-bold text-slate-800">
+          <p className="text-xs text-fg-subtle">مبلغ سفارش</p>
+          <p className="mt-1 font-bold text-fg">
             {formatToman(order.finalPrice)}
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">مسئول پیگیری</p>
-          <p className="mt-1 font-bold text-slate-800">
+          <p className="text-xs text-fg-subtle">مسئول پیگیری</p>
+          <p className="mt-1 font-bold text-fg">
             {handler
               ? `${handler.displayAlias} (${handler.publicHandlerCode})`
               : "—"}
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">اصلاحات</p>
-          <p className="mt-1 font-bold text-slate-800">
+          <p className="text-xs text-fg-subtle">اصلاحات</p>
+          <p className="mt-1 font-bold text-fg">
             {order.revisionsUsed} از {order.revisionsAllowed}
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">تاریخ ثبت</p>
-          <p className="mt-1 font-bold text-slate-800">
+          <p className="text-xs text-fg-subtle">تاریخ ثبت</p>
+          <p className="mt-1 font-bold text-fg">
             {formatDate(order.createdAt)}
           </p>
         </Card>
@@ -124,7 +124,7 @@ export default function CustomerOrderDetailPage({
 
       {/* اقدام‌های وابسته به وضعیت */}
       <Card className="mb-4">
-        <h3 className="mb-3 font-bold text-slate-800">اقدام بعدی</h3>
+        <h3 className="mb-3 font-bold text-fg">اقدام بعدی</h3>
         <p className="mb-3 text-sm leading-7 text-fg-muted">
           {customerNextAction(order.status)}
         </p>
@@ -181,7 +181,7 @@ export default function CustomerOrderDetailPage({
                 تایید تحویل
               </Button>
               <details className="w-full">
-                <summary className="cursor-pointer text-sm text-slate-600">
+                <summary className="cursor-pointer text-sm text-fg-muted">
                   درخواست اصلاح
                 </summary>
                 <div className="mt-2 flex gap-2">
@@ -245,22 +245,22 @@ export default function CustomerOrderDetailPage({
             "closed",
             "cancelled",
           ].includes(order.status) && (
-            <span className="text-sm text-slate-400">
+            <span className="text-sm text-fg-subtle">
               برای این وضعیت اقدامی نیاز نیست یا از طریق تیکت پیگیری کنید.
             </span>
           )}
         </div>
       </Card>
 
-      <div className="mb-4 flex gap-1 overflow-x-auto border-b border-slate-200">
+      <div className="mb-4 flex gap-1 overflow-x-auto border-b border-border">
         {TABS.map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`whitespace-nowrap px-3 py-2 text-sm font-medium ${
               tab === t
-                ? "border-b-2 border-slate-900 text-slate-900"
-                : "text-slate-400 hover:text-slate-600"
+                ? "border-b-2 border-accent text-accent"
+                : "text-fg-subtle hover:text-fg-muted"
             }`}
           >
             {t}
@@ -270,15 +270,15 @@ export default function CustomerOrderDetailPage({
 
       {tab === "خلاصه" && (
         <Card>
-          <p className="text-sm leading-7 text-slate-600">
+          <p className="text-sm leading-7 text-fg-muted">
             {order.briefDescription}
           </p>
           {order.acceptanceCriteria && order.acceptanceCriteria.length > 0 && (
             <div className="mt-4">
-              <h4 className="mb-2 text-sm font-bold text-slate-700">
+              <h4 className="mb-2 text-sm font-bold text-fg">
                 معیار پذیرش
               </h4>
-              <ul className="list-inside list-disc space-y-1 text-sm text-slate-600">
+              <ul className="list-inside list-disc space-y-1 text-sm text-fg-muted">
                 {order.acceptanceCriteria.map((c) => (
                   <li key={c.id}>{c.description}</li>
                 ))}
@@ -301,17 +301,17 @@ export default function CustomerOrderDetailPage({
               {order.reports.map((r) => (
                 <div
                   key={r.id}
-                  className="rounded-xl border border-slate-100 p-3"
+                  className="rounded-card border border-border p-3"
                 >
                   <div className="flex items-center justify-between">
                     <Badge color="blue">
                       {r.reportType} · نسخه {r.version}
                     </Badge>
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-fg-subtle">
                       {formatDate(r.createdAt)}
                     </span>
                   </div>
-                  <p className="mt-2 text-sm text-slate-600">{r.summary}</p>
+                  <p className="mt-2 text-sm text-fg-muted">{r.summary}</p>
                   {r.file && (
                     <div className="mt-2">
                       <SecureFileLink
@@ -324,7 +324,7 @@ export default function CustomerOrderDetailPage({
               ))}
             </div>
           ) : (
-            <p className="text-sm text-slate-400">هنوز گزارشی ثبت نشده است.</p>
+            <p className="text-sm text-fg-subtle">هنوز گزارشی ثبت نشده است.</p>
           )}
         </Card>
       )}
@@ -346,19 +346,19 @@ export default function CustomerOrderDetailPage({
             />
           </div>
           {order.files && order.files.length > 0 ? (
-            <ul className="divide-y divide-slate-100 text-sm">
+            <ul className="divide-y divide-border text-sm">
               {order.files.map((f) => (
                 <li
                   key={f.id}
                   className="flex items-center justify-between py-2"
                 >
                   <SecureFileLink file={f} />
-                  <span className="text-xs text-slate-400">{f.fileKind}</span>
+                  <span className="text-xs text-fg-subtle">{f.fileKind}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-slate-400">فایلی ثبت نشده است.</p>
+            <p className="text-sm text-fg-subtle">فایلی ثبت نشده است.</p>
           )}
         </Card>
       )}
@@ -368,8 +368,8 @@ export default function CustomerOrderDetailPage({
           <div className="mb-4 space-y-3">
             {order.messages && order.messages.length > 0 ? (
               order.messages.map((m) => (
-                <div key={m.id} className="rounded-xl bg-slate-50 p-3 text-sm">
-                  <p className="text-slate-700">{m.body}</p>
+                <div key={m.id} className="rounded-card bg-bg-subtle p-3 text-sm">
+                  <p className="text-fg">{m.body}</p>
                   {m.attachment && (
                     <div className="mt-2">
                       <SecureFileLink
@@ -378,13 +378,13 @@ export default function CustomerOrderDetailPage({
                       />
                     </div>
                   )}
-                  <p className="mt-1 text-xs text-slate-400">
+                  <p className="mt-1 text-xs text-fg-subtle">
                     {formatDate(m.createdAt)}
                   </p>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-slate-400">پیامی وجود ندارد.</p>
+              <p className="text-sm text-fg-subtle">پیامی وجود ندارد.</p>
             )}
           </div>
           <div className="flex flex-col gap-3">
@@ -433,7 +433,7 @@ export default function CustomerOrderDetailPage({
       {tab === "پرداخت‌ها" && (
         <Card>
           {order.payments && order.payments.length > 0 ? (
-            <ul className="divide-y divide-slate-100 text-sm">
+            <ul className="divide-y divide-border text-sm">
               {order.payments.map((p) => (
                 <li
                   key={p.id}
@@ -447,11 +447,11 @@ export default function CustomerOrderDetailPage({
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-slate-400">پرداختی ثبت نشده است.</p>
+            <p className="text-sm text-fg-subtle">پرداختی ثبت نشده است.</p>
           )}
           {order.escrowHolds && order.escrowHolds.length > 0 && (
-            <div className="mt-4 border-t border-slate-100 pt-3">
-              <h4 className="mb-2 text-sm font-bold text-slate-700">
+            <div className="mt-4 border-t border-border pt-3">
+              <h4 className="mb-2 text-sm font-bold text-fg">
                 وضعیت امانت (escrow)
               </h4>
               {order.escrowHolds.map((e) => (
@@ -468,7 +468,7 @@ export default function CustomerOrderDetailPage({
       {tab === "تیکت‌ها" && (
         <Card>
           {order.tickets && order.tickets.length > 0 ? (
-            <ul className="divide-y divide-slate-100 text-sm">
+            <ul className="divide-y divide-border text-sm">
               {order.tickets.map((t) => (
                 <li
                   key={t.id}
@@ -480,7 +480,7 @@ export default function CustomerOrderDetailPage({
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-slate-400">تیکتی ثبت نشده است.</p>
+            <p className="text-sm text-fg-subtle">تیکتی ثبت نشده است.</p>
           )}
         </Card>
       )}

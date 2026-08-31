@@ -148,7 +148,7 @@
 
 ## فاز ۶ — UX، موبایل و دسترس‌پذیری
 
-- [ ] Design System کامل: Color، Type، Spacing، Grid، Radius، Shadow، Icon، State، Breakpoint،
+- [x] Design System کامل: Color، Type، Spacing، Grid، Radius، Shadow، Icon، State، Breakpoint،
   Density و Z-index
 - [x] دو تم لاجورد و عسل روشن/تیره با Persistence و بدون FOUC
 - [ ] منوی عمومی موبایل و Sidebar→Drawer در پنل‌ها

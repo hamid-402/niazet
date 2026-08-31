@@ -148,7 +148,7 @@ function NewTicketForm() {
                   onUploaded={setAttachment}
                 />
                 {attachment && (
-                  <p className="mt-2 text-xs text-emerald-700">
+                  <p className="mt-2 text-xs text-success">
                     پیوست آماده است: {attachment.originalName}
                   </p>
                 )}

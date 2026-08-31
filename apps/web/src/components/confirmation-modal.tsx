@@ -86,8 +86,8 @@ export function ConfirmationModal({
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/55 p-4" onMouseDown={(event) => { if (event.target === event.currentTarget && !submitting) onCancel(); }}>
-      <div ref={dialogRef} role="alertdialog" aria-modal="true" aria-labelledby="confirmation-title" aria-describedby="confirmation-description" className="w-full max-w-lg rounded-card border border-border bg-surface p-5 shadow-2xl">
+    <div className="fixed inset-0 z-modal flex items-center justify-center bg-overlay p-4" onMouseDown={(event) => { if (event.target === event.currentTarget && !submitting) onCancel(); }}>
+      <div ref={dialogRef} role="alertdialog" aria-modal="true" aria-labelledby="confirmation-title" aria-describedby="confirmation-description" className="w-full max-w-lg rounded-modal border border-border bg-surface p-5 shadow-elevation-4">
         <h2 id="confirmation-title" className="text-lg font-extrabold text-fg">{title}</h2>
         <p id="confirmation-description" className="mt-2 text-sm leading-7 text-fg-muted">{description}</p>
         {impacts.length > 0 && <div className="mt-4 rounded-control border border-warning-border bg-warning-subtle p-3"><p className="text-sm font-bold text-warning">اثر این اقدام</p><ul className="mt-2 list-inside list-disc space-y-1 text-sm text-fg-muted">{impacts.map((impact) => <li key={impact}>{impact}</li>)}</ul></div>}

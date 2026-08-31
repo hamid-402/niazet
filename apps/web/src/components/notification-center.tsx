@@ -117,7 +117,7 @@ export function NotificationCenter() {
       >
         اعلان‌ها
         {unread > 0 && (
-          <span className="absolute -left-2 -top-2 min-w-5 rounded-pill bg-danger px-1.5 py-0.5 text-center text-[10px] font-bold text-white">
+          <span className="absolute -left-2 -top-2 min-w-5 rounded-pill bg-danger px-1.5 py-0.5 text-center text-[10px] font-bold text-fg-on-danger">
             {unread.toLocaleString("fa-IR")}
           </span>
         )}

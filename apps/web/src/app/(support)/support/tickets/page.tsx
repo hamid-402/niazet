@@ -10,12 +10,12 @@ import type { Ticket } from "@/lib/types";
 import { formatDate } from "@/lib/format";
 
 function slaState(dueAt: string | null) {
-  if (!dueAt) return { label: "بدون SLA", className: "text-slate-400" };
+  if (!dueAt) return { label: "بدون SLA", className: "text-fg-subtle" };
   const diff = new Date(dueAt).getTime() - Date.now();
-  if (diff <= 0) return { label: "عبور از SLA", className: "text-rose-700" };
+  if (diff <= 0) return { label: "عبور از SLA", className: "text-danger" };
   const hours = Math.ceil(diff / 3_600_000);
-  if (hours <= 1) return { label: "کمتر از یک ساعت", className: "text-amber-700" };
-  return { label: `${hours} ساعت مانده`, className: "text-emerald-700" };
+  if (hours <= 1) return { label: "کمتر از یک ساعت", className: "text-warning" };
+  return { label: `${hours} ساعت مانده`, className: "text-success" };
 }
 
 function SupportTicketsQueueContent() {
@@ -62,19 +62,19 @@ function SupportTicketsQueueContent() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <SectionTitle>{view === "mine" ? "تیکت‌های من" : "صف تیکت‌ها"}</SectionTitle>
-        <div className="flex rounded-xl border border-slate-200 p-1 text-sm">
-          <button className={`rounded-lg px-3 py-2 ${view === "queue" ? "bg-slate-900 text-white" : "text-slate-500"}`} onClick={() => router.replace("/support/tickets")}>کل صف</button>
-          <button className={`rounded-lg px-3 py-2 ${view === "mine" ? "bg-slate-900 text-white" : "text-slate-500"}`} onClick={() => router.replace("/support/tickets?view=mine")}>تیکت‌های من</button>
+        <div className="flex rounded-card border border-border p-1 text-sm">
+          <button className={`rounded-control px-3 py-2 ${view === "queue" ? "bg-accent text-fg-on-accent" : "text-fg-muted"}`} onClick={() => router.replace("/support/tickets")}>کل صف</button>
+          <button className={`rounded-control px-3 py-2 ${view === "mine" ? "bg-accent text-fg-on-accent" : "text-fg-muted"}`} onClick={() => router.replace("/support/tickets?view=mine")}>تیکت‌های من</button>
         </div>
       </div>
 
       <Card className="grid gap-3 md:grid-cols-2">
-        <label className="text-xs text-slate-500">وضعیت
+        <label className="text-xs text-fg-muted">وضعیت
           <select className={`${inputClass} mt-1`} value={status} onChange={(event) => setStatus(event.target.value)}>
             <option value="">همه وضعیت‌ها</option><option value="open">باز</option><option value="assigned">تخصیص‌یافته</option><option value="waiting_internal">منتظر اقدام داخلی</option><option value="waiting_customer">منتظر مشتری</option><option value="escalated">ارجاع ویژه</option><option value="resolved">حل‌شده</option><option value="closed">بسته‌شده</option>
           </select>
         </label>
-        <label className="text-xs text-slate-500">اولویت
+        <label className="text-xs text-fg-muted">اولویت
           <select className={`${inputClass} mt-1`} value={priority} onChange={(event) => setPriority(event.target.value)}>
             <option value="">همه اولویت‌ها</option><option value="low">کم</option><option value="normal">عادی</option><option value="high">زیاد</option><option value="urgent">فوری</option>
           </select>
@@ -88,13 +88,13 @@ function SupportTicketsQueueContent() {
       {tickets && tickets.length > 0 && (
         <Card className="overflow-x-auto p-0">
           <table className="w-full min-w-[880px] text-sm">
-            <thead><tr className="border-b border-slate-100 text-right text-xs text-slate-400"><th className="px-4 py-3 font-medium">موضوع</th><th className="px-4 py-3 font-medium">مشتری</th><th className="px-4 py-3 font-medium">اولویت</th><th className="px-4 py-3 font-medium">وضعیت</th><th className="px-4 py-3 font-medium">SLA</th><th className="px-4 py-3 font-medium">ایجاد</th><th className="px-4 py-3 font-medium">اقدام</th></tr></thead>
+            <thead><tr className="border-b border-border text-right text-xs text-fg-subtle"><th className="px-4 py-3 font-medium">موضوع</th><th className="px-4 py-3 font-medium">مشتری</th><th className="px-4 py-3 font-medium">اولویت</th><th className="px-4 py-3 font-medium">وضعیت</th><th className="px-4 py-3 font-medium">SLA</th><th className="px-4 py-3 font-medium">ایجاد</th><th className="px-4 py-3 font-medium">اقدام</th></tr></thead>
             <tbody>{tickets.map((ticket) => {
               const sla = slaState(ticket.slaDueAt);
-              return <tr key={ticket.id} className="border-b border-slate-50 last:border-0 hover:bg-slate-50">
-                <td className="px-4 py-3"><Link href={`/support/tickets/${ticket.id}`} className="font-medium text-slate-800 hover:underline">{ticket.subject}</Link><p className="text-xs text-slate-400">{ticket.code}</p></td>
-                <td className="px-4 py-3 text-slate-500">{ticket.customer?.fullName ?? "—"}</td><td className="px-4 py-3 text-slate-500">{ticket.priority}</td><td className="px-4 py-3"><TicketStatusBadge status={ticket.status} /></td><td className={`px-4 py-3 text-xs font-medium ${sla.className}`}>{sla.label}</td><td className="px-4 py-3 text-slate-400">{formatDate(ticket.createdAt)}</td>
-                <td className="px-4 py-3">{!ticket.assignedToUserId ? <Button variant="secondary" disabled={busyId === ticket.id} onClick={() => claim(ticket.id)}>برداشتن تیکت</Button> : <Link href={`/support/tickets/${ticket.id}`} className="text-emerald-700">مشاهده</Link>}</td>
+              return <tr key={ticket.id} className="border-b border-border last:border-0 hover:bg-bg-subtle">
+                <td className="px-4 py-3"><Link href={`/support/tickets/${ticket.id}`} className="font-medium text-fg hover:underline">{ticket.subject}</Link><p className="text-xs text-fg-subtle">{ticket.code}</p></td>
+                <td className="px-4 py-3 text-fg-muted">{ticket.customer?.fullName ?? "—"}</td><td className="px-4 py-3 text-fg-muted">{ticket.priority}</td><td className="px-4 py-3"><TicketStatusBadge status={ticket.status} /></td><td className={`px-4 py-3 text-xs font-medium ${sla.className}`}>{sla.label}</td><td className="px-4 py-3 text-fg-subtle">{formatDate(ticket.createdAt)}</td>
+                <td className="px-4 py-3">{!ticket.assignedToUserId ? <Button variant="secondary" disabled={busyId === ticket.id} onClick={() => claim(ticket.id)}>برداشتن تیکت</Button> : <Link href={`/support/tickets/${ticket.id}`} className="text-success">مشاهده</Link>}</td>
               </tr>;
             })}</tbody>
           </table>

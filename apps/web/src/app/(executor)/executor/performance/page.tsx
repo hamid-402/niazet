@@ -32,26 +32,26 @@ export default function ExecutorPerformancePage() {
       </SectionTitle>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Card>
-          <p className="text-xs text-slate-400">نرخ قبولی QC</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">
+          <p className="text-xs text-fg-subtle">نرخ قبولی QC</p>
+          <p className="mt-1 text-2xl font-bold text-fg">
             {Number(perf.qcPassRate).toFixed(0)}٪
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">تحویل به‌موقع</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">
+          <p className="text-xs text-fg-subtle">تحویل به‌موقع</p>
+          <p className="mt-1 text-2xl font-bold text-fg">
             {Number(perf.onTimeDeliveryRate).toFixed(0)}٪
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">میانگین امتیاز مشتری</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">
+          <p className="text-xs text-fg-subtle">میانگین امتیاز مشتری</p>
+          <p className="mt-1 text-2xl font-bold text-fg">
             {Number(perf.customerRatingAvg).toFixed(1)}
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-slate-400">تشکر / شکایت</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">
+          <p className="text-xs text-fg-subtle">تشکر / شکایت</p>
+          <p className="mt-1 text-2xl font-bold text-fg">
             {perf.complimentCount} / {perf.complaintCount}
           </p>
         </Card>

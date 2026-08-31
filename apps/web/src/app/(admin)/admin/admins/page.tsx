@@ -140,7 +140,7 @@ export default function AdminsPage() {
         <Card className="overflow-x-auto p-0">
           <table className="w-full min-w-[560px] text-sm">
             <thead>
-              <tr className="border-b border-slate-100 text-right text-xs text-slate-400">
+              <tr className="border-b border-border text-right text-xs text-fg-subtle">
                 <th className="px-4 py-3 font-medium">نام</th>
                 <th className="px-4 py-3 font-medium">موبایل</th>
                 <th className="px-4 py-3 font-medium">دسترسی</th>
@@ -152,10 +152,10 @@ export default function AdminsPage() {
               {admins.map((a) => (
                 <tr
                   key={a.id}
-                  className="border-b border-slate-50 last:border-0"
+                  className="border-b border-border last:border-0"
                 >
-                  <td className="px-4 py-3 text-slate-700">{a.fullName}</td>
-                  <td className="px-4 py-3 text-slate-500" dir="ltr">
+                  <td className="px-4 py-3 text-fg">{a.fullName}</td>
+                  <td className="px-4 py-3 text-fg-muted" dir="ltr">
                     {a.phone}
                   </td>
                   <td className="px-4 py-3">

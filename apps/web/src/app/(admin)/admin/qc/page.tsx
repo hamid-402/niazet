@@ -43,12 +43,12 @@ export default function AdminQcQueuePage() {
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         {items?.map((item) => (
           <Link key={item.id} href={`/admin/qc/${item.id}`}>
-            <Card className="transition hover:border-slate-400">
-              <p className="text-xs text-slate-400">
+            <Card className="transition hover:border-border-strong">
+              <p className="text-xs text-fg-subtle">
                 {item.order.serviceLine.title}
               </p>
-              <h3 className="font-bold text-slate-900">{item.order.title}</h3>
-              <p className="text-xs text-slate-400">{item.order.code}</p>
+              <h3 className="font-bold text-fg">{item.order.title}</h3>
+              <p className="text-xs text-fg-subtle">{item.order.code}</p>
             </Card>
           </Link>
         ))}

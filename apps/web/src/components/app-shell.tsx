@@ -14,7 +14,7 @@ export interface NavItem {
 
 function MenuIcon() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" className="h-5 w-5">
+    <svg viewBox="0 0 20 20" fill="none" className="icon-md">
       <path
         stroke="currentColor"
         strokeWidth="1.6"
@@ -27,7 +27,7 @@ function MenuIcon() {
 
 function CloseIcon() {
   return (
-    <svg viewBox="0 0 20 20" fill="none" className="h-5 w-5">
+    <svg viewBox="0 0 20 20" fill="none" className="icon-md">
       <path
         stroke="currentColor"
         strokeWidth="1.6"
@@ -121,7 +121,7 @@ export function AppShell({
       {mobileOpen && (
         <div className="fixed inset-0 z-overlay md:hidden">
           <div
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-overlay"
             onClick={() => setMobileOpen(false)}
             aria-hidden="true"
           />
@@ -176,7 +176,7 @@ export function AppShell({
           </span>
           <NotificationCenter />
         </header>
-        <main className="mx-auto max-w-6xl px-4 py-6 md:px-8 md:py-8">
+        <main className="page-container py-6 md:py-8">
           {children}
         </main>
       </div>
