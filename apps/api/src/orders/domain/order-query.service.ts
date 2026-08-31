@@ -2,6 +2,17 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { FileKind, MessageVisibility, OrderStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
+const EXECUTOR_FILE_SELECT = {
+  id: true,
+  orderId: true,
+  fileKind: true,
+  originalName: true,
+  mimeType: true,
+  sizeBytes: true,
+  scanStatus: true,
+  createdAt: true,
+} as const;
+
 @Injectable()
 export class OrderQueryService {
   constructor(private readonly prisma: PrismaService) {}
@@ -48,7 +59,16 @@ export class OrderQueryService {
           },
         },
       },
-      include: { serviceLine: { select: { title: true } } },
+      select: {
+        id: true,
+        code: true,
+        title: true,
+        status: true,
+        urgency: true,
+        createdAt: true,
+        updatedAt: true,
+        serviceLine: { select: { title: true } },
+      },
       orderBy: { createdAt: 'desc' },
       skip: params.skip,
       take: params.take,
@@ -67,8 +87,34 @@ export class OrderQueryService {
     if (!assignment) throw new NotFoundException('سفارش یافت نشد.');
     return this.prisma.order.findUnique({
       where: { id: orderId },
-      include: {
-        serviceLine: true,
+      select: {
+        id: true,
+        code: true,
+        title: true,
+        status: true,
+        urgency: true,
+        briefDescription: true,
+        formResponses: true,
+        confidentialityLevel: true,
+        revisionsAllowed: true,
+        revisionsUsed: true,
+        submittedAt: true,
+        assignedAt: true,
+        deliveredAt: true,
+        createdAt: true,
+        updatedAt: true,
+        serviceLine: {
+          select: {
+            id: true,
+            slug: true,
+            title: true,
+            category: true,
+            description: true,
+            deliverables: true,
+            slaHours: true,
+            revisionPolicy: true,
+          },
+        },
         files: {
           where: {
             scanStatus: 'clean',
@@ -82,23 +128,99 @@ export class OrderQueryService {
             ],
           },
           orderBy: { createdAt: 'asc' },
+          select: EXECUTOR_FILE_SELECT,
         },
-        messages: { orderBy: { createdAt: 'asc' } },
-        acceptanceCriteria: true,
-        statusHistory: { orderBy: { createdAt: 'asc' } },
-        milestones: { orderBy: { sequence: 'asc' } },
-        reports: { include: { file: true } },
+        messages: {
+          where: { visibility: MessageVisibility.customer_visible },
+          orderBy: { createdAt: 'asc' },
+          select: {
+            id: true,
+            messageType: true,
+            body: true,
+            visibility: true,
+            createdAt: true,
+            attachment: { select: EXECUTOR_FILE_SELECT },
+          },
+        },
+        acceptanceCriteria: {
+          select: { id: true, description: true, isMet: true },
+        },
+        statusHistory: {
+          orderBy: { createdAt: 'asc' },
+          select: {
+            id: true,
+            fromStatus: true,
+            toStatus: true,
+            source: true,
+            createdAt: true,
+          },
+        },
+        milestones: {
+          orderBy: { sequence: 'asc' },
+          select: {
+            id: true,
+            sequence: true,
+            title: true,
+            dueAt: true,
+            acceptanceCriteria: true,
+            deliveryStatus: true,
+            qcStatus: true,
+            deliveredAt: true,
+            approvedAt: true,
+            createdAt: true,
+          },
+        },
+        reports: {
+          where: { authorUserId: executorUserId },
+          orderBy: { createdAt: 'desc' },
+          select: {
+            id: true,
+            reportType: true,
+            version: true,
+            summary: true,
+            progressPercent: true,
+            visibleToCustomer: true,
+            status: true,
+            createdAt: true,
+            file: { select: EXECUTOR_FILE_SELECT },
+          },
+        },
         assignments: {
           where: { id: assignment.id },
-          include: {
-            executionChecklistItems: { orderBy: { createdAt: 'asc' } },
+          select: {
+            id: true,
+            assignmentRole: true,
+            assignedAt: true,
+            acceptedAt: true,
+            executionChecklistItems: {
+              orderBy: { createdAt: 'asc' },
+              select: {
+                id: true,
+                label: true,
+                isCompleted: true,
+                completedAt: true,
+                createdAt: true,
+              },
+            },
           },
         },
         qcReviews: {
           orderBy: { createdAt: 'desc' },
           take: 1,
-          include: {
-            items: { include: { checklistItem: true } },
+          select: {
+            id: true,
+            result: true,
+            comment: true,
+            reviewedAt: true,
+            createdAt: true,
+            items: {
+              select: {
+                id: true,
+                passed: true,
+                note: true,
+                checklistItem: { select: { label: true } },
+              },
+            },
           },
         },
       },

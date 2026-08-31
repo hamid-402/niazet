@@ -128,7 +128,7 @@ export interface OrderSummary {
   title: string;
   status: OrderStatus;
   urgency: string;
-  finalPrice: number | null;
+  finalPrice?: number | null;
   createdAt: string;
   serviceLine?: { title: string };
   publicHandlers?: PublicHandler[];
@@ -140,14 +140,14 @@ export interface OrderDetail extends OrderSummary {
   budgetHint?: number | null;
   formResponses?: unknown;
   version?: number;
-  customerId: string;
+  customerId?: string;
   revisionsAllowed: number;
   revisionsUsed: number;
   statusHistory?: {
     id: string;
     fromStatus: OrderStatus | null;
     toStatus: OrderStatus;
-    note: string | null;
+    note?: string | null;
     createdAt: string;
     source: string;
   }[];
@@ -155,10 +155,10 @@ export interface OrderDetail extends OrderSummary {
     id: string;
     sequence: number;
     title: string;
-    amount: number;
+    amount?: number;
     dueAt: string | null;
     acceptanceCriteria: string | null;
-    paymentStatus: string;
+    paymentStatus?: string;
     deliveryStatus: string;
     qcStatus: string;
     deliveredAt: string | null;

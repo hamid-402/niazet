@@ -52,6 +52,16 @@ export function isAllowedMimeType(mimeType: string) {
   return ALLOWED_MIME_TYPES.has(mimeType);
 }
 
+export function canAssignedExecutorReadFile(
+  fileKind: FileKind,
+  isCustomerVisibleAttachment: boolean,
+) {
+  return (
+    fileKind === FileKind.input ||
+    (fileKind === FileKind.message_attachment && isCustomerVisibleAttachment)
+  );
+}
+
 const MIME_EXTENSIONS: Record<string, string[]> = {
   'application/pdf': ['.pdf'],
   'application/zip': ['.zip'],
@@ -254,6 +264,13 @@ export class FilesService {
           include: {
             assignments: { include: { executorProfile: true } },
             reports: { select: { fileId: true, visibleToCustomer: true } },
+            messages: {
+              where: {
+                attachmentFileId: fileId,
+                visibility: 'customer_visible',
+              },
+              select: { id: true },
+            },
           },
         },
       },
@@ -272,6 +289,12 @@ export class FilesService {
     const isAssignedExecutor = file.order.assignments.some(
       (a) => a.unassignedAt === null && a.executorProfile.userId === user.id,
     );
+    const executorCanRead =
+      isAssignedExecutor &&
+      canAssignedExecutorReadFile(
+        file.fileKind,
+        file.order.messages.length > 0,
+      );
     const isOpsAdmin =
       user.role === UserRole.admin &&
       (user.adminScope === AdminScope.super_admin ||
@@ -289,7 +312,7 @@ export class FilesService {
     if (
       !isOwner &&
       !isCustomer &&
-      !isAssignedExecutor &&
+      !executorCanRead &&
       !isOpsAdmin &&
       !isFinanceInvoice &&
       !isRelatedSupport

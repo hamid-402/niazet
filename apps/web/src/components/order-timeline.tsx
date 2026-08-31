@@ -34,8 +34,10 @@ export function customerNextAction(status: OrderStatus) {
 
 export function OrderTimeline({
   order,
+  showFinancials = true,
 }: {
   order: Pick<OrderDetail, "statusHistory" | "milestones" | "reports">;
+  showFinancials?: boolean;
 }) {
   const events = [
     ...(order.statusHistory ?? []).map((item) => ({
@@ -112,8 +114,13 @@ export function OrderTimeline({
                 {event.title}
               </Badge>
               <p className="mt-1 text-xs text-fg-muted">
-                {formatToman(event.item.amount)} · پرداخت{" "}
-                {event.item.paymentStatus} · تحویل {event.item.deliveryStatus}
+                {showFinancials && event.item.amount != null
+                  ? `${formatToman(event.item.amount)} · `
+                  : ""}
+                {showFinancials && event.item.paymentStatus
+                  ? `پرداخت ${event.item.paymentStatus} · `
+                  : ""}
+                تحویل {event.item.deliveryStatus}
               </p>
             </>
           )}

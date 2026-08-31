@@ -393,7 +393,7 @@ export default function ExecutorOrderDetailPage({
 
       <Card>
         <h2 className="mb-3 font-bold text-slate-800">خط زمانی سفارش و مراحل</h2>
-        <OrderTimeline order={order} />
+        <OrderTimeline order={order} showFinancials={false} />
       </Card>
     </div>
   );

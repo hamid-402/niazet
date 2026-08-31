@@ -63,6 +63,17 @@ Job مستقل `detect_staff_risks` هر ساعت سیگنال‌ها را تا�
 
 هشدار در `staff_risk_alerts` با evidence، شدت، زمان تشخیص و وضعیت نگهداری می‌شود. مدیر عملیات می‌تواند با یادداشت آن را acknowledge کند؛ از بین رفتن شواهد هشدار را خودکار `cleared` می‌کند و تمام transitionها Audit می‌شوند.
 
+## مرز محرمانگی مجری
+
+تمام پاسخ‌های `/v1/executor` بر پایه allowlist صریح هستند:
+
+- لیست سفارش هیچ `customerId`، قیمت، بودجه، ریسک داخلی یا Snapshot تجاری برنمی‌گرداند.
+- جزئیات سفارش فقط شرح/فرم لازم اجرا، فایل ورودی امن، فایل‌های خود مجری، پیام customer-visible، معیار پذیرش، milestone بدون مبلغ و وضعیت مالی، گزارش‌های خود مجری و آخرین بازخورد QC را نشان می‌دهد.
+- پیام `internal_only`، گزارش مدیریتی، actor داخلی، اثر مالی تاریخچه و metadata ذخیره‌سازی فایل (`storageKey` و `checksum`) در projection مجری وجود ندارند.
+- مجری تخصیص‌یافته فقط فایل input یا attachment پیام customer-visible را می‌تواند دانلود کند؛ مالک فایل همچنان به فایل خروجی خودش دسترسی دارد و invoice/ticket attachment/فایل مجری دیگر مسدود است.
+- پروفایل و history عملکرد شخصی، شماره شبا، `userId` داخلی، risk score و جزئیات شکایت را افشا نمی‌کند.
+- دسترسی به سفارش تخصیص‌نیافته با 404 پاسخ داده می‌شود تا وجود رکورد نیز افشا نشود.
+
 ## داده حضور
 
 وضعیت‌های مجاز:
@@ -82,4 +93,5 @@ Job مستقل `detect_staff_risks` هر ساعت سیگنال‌ها را تا�
 ```powershell
 cd apps/api
 npm.cmd run phase5:staff-contract
+npm.cmd run phase5:executor-confidentiality-contract
 ```

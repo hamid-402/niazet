@@ -1205,7 +1205,28 @@ export class ExecutorService {
   async getOwnProfile(userId: string) {
     const profile = await this.prisma.executorProfile.findUnique({
       where: { userId },
-      include: { team: true, skills: { include: { skill: true } } },
+      select: {
+        id: true,
+        executorType: true,
+        verificationStatus: true,
+        publicHandlerCode: true,
+        displayAlias: true,
+        status: true,
+        capacityPercent: true,
+        qcPassRate: true,
+        onTimeDeliveryRate: true,
+        customerRatingAvg: true,
+        complaintCount: true,
+        complimentCount: true,
+        team: { select: { id: true, code: true, name: true } },
+        skills: {
+          select: {
+            id: true,
+            level: true,
+            skill: { select: { id: true, name: true, category: true } },
+          },
+        },
+      },
     });
     if (!profile) throw new NotFoundException('پروفایل مجری یافت نشد.');
     return profile;
@@ -1217,6 +1238,16 @@ export class ExecutorService {
       where: { executorProfileId: profile.id },
       orderBy: { periodEnd: 'desc' },
       take: 6,
+      select: {
+        id: true,
+        periodStart: true,
+        periodEnd: true,
+        completedOrders: true,
+        activeOrders: true,
+        onTimeRate: true,
+        qcPassRate: true,
+        avgCustomerRating: true,
+      },
     });
     return {
       qcPassRate: profile.qcPassRate,
@@ -1269,6 +1300,16 @@ export class ExecutorService {
           where: { authorUserId: userId },
           orderBy: { createdAt: 'desc' },
           take: 5,
+          select: {
+            id: true,
+            orderId: true,
+            reportType: true,
+            version: true,
+            summary: true,
+            progressPercent: true,
+            status: true,
+            createdAt: true,
+          },
         }),
       ]);
 
