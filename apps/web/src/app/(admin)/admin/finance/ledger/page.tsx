@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { apiFetch, downloadAuthenticated } from '@/lib/api';
-import {
+import { ResponsiveTable,
   Button,
   Card,
   EmptyState,
@@ -69,7 +69,7 @@ export default function AdminLedgerPage() {
 
       {entries && entries.length > 0 && (
         <Card className="overflow-x-auto p-0">
-          <table className="w-full min-w-[720px] text-sm">
+          <ResponsiveTable className="w-full min-w-[720px] text-sm">
             <thead>
               <tr className="border-b border-border text-right text-xs text-fg-subtle">
                 <th className="px-4 py-3 font-medium">بدهکار</th>
@@ -103,7 +103,7 @@ export default function AdminLedgerPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </ResponsiveTable>
         </Card>
       )}
     </div>

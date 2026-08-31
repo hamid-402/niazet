@@ -1,7 +1,22 @@
 'use client';
 
 import Link from 'next/link';
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { useEffect, useRef, type ButtonHTMLAttributes, type ReactNode, type TableHTMLAttributes } from 'react';
+
+export function ResponsiveTable({ children, className = '', ...props }: TableHTMLAttributes<HTMLTableElement>) {
+  const tableRef = useRef<HTMLTableElement>(null);
+  useEffect(() => {
+    const table = tableRef.current;
+    if (!table) return;
+    const labels = [...table.querySelectorAll('thead th')].map((cell) => cell.textContent?.trim() ?? '');
+    for (const row of table.querySelectorAll('tbody tr')) {
+      [...row.children].forEach((cell, index) => {
+        if (cell instanceof HTMLTableCellElement) cell.dataset.label = labels[index] ?? '';
+      });
+    }
+  }, [children]);
+  return <table ref={tableRef} className={`responsive-table ${className}`} {...props}>{children}</table>;
+}
 
 export function Card({
   children,

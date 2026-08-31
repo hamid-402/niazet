@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
-import {
+import { ResponsiveTable,
   Card,
   EmptyState,
   ErrorBanner,
@@ -40,7 +40,7 @@ export default function CustomerTicketsPage() {
 
       {tickets && tickets.length > 0 && (
         <Card className="overflow-x-auto p-0">
-          <table className="w-full min-w-[560px] text-sm">
+          <ResponsiveTable className="w-full min-w-[560px] text-sm">
             <thead>
               <tr className="border-b border-border text-right text-xs text-fg-subtle">
                 <th className="px-4 py-3 font-medium">موضوع</th>
@@ -74,7 +74,7 @@ export default function CustomerTicketsPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </ResponsiveTable>
         </Card>
       )}
     </div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { apiFetch, ApiError } from '@/lib/api';
-import {
+import { ResponsiveTable,
   Badge,
   Button,
   Card,
@@ -61,7 +61,7 @@ export default function AdminUsersPage() {
 
       {users && (
         <Card className="overflow-x-auto p-0">
-          <table className="w-full min-w-[720px] text-sm">
+          <ResponsiveTable className="w-full min-w-[720px] text-sm">
             <thead>
               <tr className="border-b border-border text-right text-xs text-fg-subtle">
                 <th className="px-4 py-3 font-medium">نام</th>
@@ -103,7 +103,7 @@ export default function AdminUsersPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </ResponsiveTable>
         </Card>
       )}
       {pending && (

@@ -3,7 +3,7 @@
 import { use, useEffect, useState } from 'react';
 import { ConfirmationModal } from '@/components/confirmation-modal';
 import { apiFetch } from '@/lib/api';
-import {
+import { ResponsiveTable,
   Badge,
   Button,
   Card,
@@ -857,7 +857,7 @@ export default function AdminStaffDetailPage({
               </div>
             ) : (
               <div className="mt-4 overflow-x-auto">
-                <table className="w-full min-w-[880px] text-sm">
+                <ResponsiveTable className="w-full min-w-[880px] text-sm">
                   <thead>
                     <tr className="border-b border-border text-right text-xs text-fg-subtle">
                       <th className="px-3 py-2 font-medium">دوره</th>
@@ -898,7 +898,7 @@ export default function AdminStaffDetailPage({
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                </ResponsiveTable>
               </div>
             )}
           </Card>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
-import {
+import { ResponsiveTable,
   Badge,
   Card,
   EmptyState,
@@ -51,7 +51,7 @@ export default function AdminPaymentsPage() {
 
       {payments && payments.length > 0 && (
         <Card className="overflow-x-auto p-0">
-          <table className="w-full min-w-[720px] text-sm">
+          <ResponsiveTable className="w-full min-w-[720px] text-sm">
             <thead>
               <tr className="border-b border-border text-right text-xs text-fg-subtle">
                 <th className="px-4 py-3 font-medium">سفارش</th>
@@ -85,7 +85,7 @@ export default function AdminPaymentsPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </ResponsiveTable>
         </Card>
       )}
     </div>

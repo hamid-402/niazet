@@ -152,7 +152,7 @@
   Density و Z-index
 - [x] دو تم لاجورد و عسل روشن/تیره با Persistence و بدون FOUC
 - [x] منوی عمومی موبایل و Sidebar→Drawer در پنل‌ها
-- [ ] تبدیل Tableهای عملیاتی به Card قابل اسکن در موبایل بدون حذف Actionها
+- [x] تبدیل Tableهای عملیاتی به Card قابل اسکن در موبایل بدون حذف Actionها
 - [ ] رفع Overflow و آزمون خودکار عرض‌های موبایل، تبلت، لپ‌تاپ و دسکتاپ بزرگ
 - [ ] Tab/Tablist/Tabpanel، Drawer و Modal با Keyboard، ESC، Focus trap و Focus restore
 - [ ] نام دسترس‌پذیر Theme Switcher و تمام کنترل‌های icon-only

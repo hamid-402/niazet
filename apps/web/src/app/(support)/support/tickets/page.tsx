@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiFetch, ApiError } from "@/lib/api";
-import { Button, Card, EmptyState, ErrorBanner, inputClass, PageLoading, SectionTitle } from "@/components/ui";
+import { ResponsiveTable, Button, Card, EmptyState, ErrorBanner, inputClass, PageLoading, SectionTitle } from "@/components/ui";
 import { TicketStatusBadge } from "@/components/status-badge";
 import type { Ticket } from "@/lib/types";
 import { formatDate } from "@/lib/format";
@@ -87,7 +87,7 @@ function SupportTicketsQueueContent() {
 
       {tickets && tickets.length > 0 && (
         <Card className="overflow-x-auto p-0">
-          <table className="w-full min-w-[880px] text-sm">
+          <ResponsiveTable className="w-full min-w-[880px] text-sm">
             <thead><tr className="border-b border-border text-right text-xs text-fg-subtle"><th className="px-4 py-3 font-medium">موضوع</th><th className="px-4 py-3 font-medium">مشتری</th><th className="px-4 py-3 font-medium">اولویت</th><th className="px-4 py-3 font-medium">وضعیت</th><th className="px-4 py-3 font-medium">SLA</th><th className="px-4 py-3 font-medium">ایجاد</th><th className="px-4 py-3 font-medium">اقدام</th></tr></thead>
             <tbody>{tickets.map((ticket) => {
               const sla = slaState(ticket.slaDueAt);
@@ -97,7 +97,7 @@ function SupportTicketsQueueContent() {
                 <td className="px-4 py-3">{!ticket.assignedToUserId ? <Button variant="secondary" disabled={busyId === ticket.id} onClick={() => claim(ticket.id)}>برداشتن تیکت</Button> : <Link href={`/support/tickets/${ticket.id}`} className="text-success">مشاهده</Link>}</td>
               </tr>;
             })}</tbody>
-          </table>
+          </ResponsiveTable>
         </Card>
       )}
     </div>

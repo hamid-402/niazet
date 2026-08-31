@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { apiFetch, ApiError } from '@/lib/api';
-import {
+import { ResponsiveTable,
   Badge,
   Button,
   Card,
@@ -394,7 +394,7 @@ export default function AdminStaffPage() {
       )}
       {staff && filteredStaff.length > 0 && (
         <Card className="overflow-x-auto p-0">
-          <table className="w-full min-w-[1080px] text-sm">
+          <ResponsiveTable className="w-full min-w-[1080px] text-sm">
             <thead>
               <tr className="border-b border-border text-right text-xs text-fg-subtle">
                 <th className="px-4 py-3 font-medium">کارمند / کد</th>
@@ -481,7 +481,7 @@ export default function AdminStaffPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </ResponsiveTable>
         </Card>
       )}
     </div>
