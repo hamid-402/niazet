@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, downloadAuthenticated } from '@/lib/api';
 import { formatToman } from '@/lib/format';
 import { Button, Card, ErrorBanner, Field, PageLoading, SectionTitle, inputClass } from '@/components/ui';
 
@@ -20,6 +20,7 @@ export default function FinanceReportPage() {
   const [data, setData] = useState<FinanceReport | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const load = useCallback(async () => {
@@ -37,9 +38,16 @@ export default function FinanceReportPage() {
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, []);
+  async function exportCsv() {
+    setExporting(true); setError('');
+    const query = new URLSearchParams(); if (from) query.set('from', from); if (to) query.set('to', to);
+    try { await downloadAuthenticated(`/admin/reports/finance/export?${query}`, `niazat-finance-${new Date().toISOString().slice(0, 10)}.csv`); }
+    catch (e) { setError(e instanceof Error ? e.message : 'دریافت خروجی ممکن نشد.'); }
+    finally { setExporting(false); }
+  }
 
   return <div>
-    <SectionTitle subtitle="فروش، درآمد، وجوه امانی و بازپرداخت؛ فقط برای حوزه مالی">گزارش یکپارچه مالی</SectionTitle>
+    <div className="mb-4 flex flex-wrap items-start justify-between gap-3"><SectionTitle subtitle="فروش، درآمد، وجوه امانی و بازپرداخت؛ فقط برای حوزه مالی">گزارش یکپارچه مالی</SectionTitle><Button variant="secondary" disabled={exporting || loading} onClick={() => void exportCsv()}>{exporting ? 'در حال تهیه...' : 'خروجی کنترل‌شده CSV'}</Button></div>
     <Card className="mb-4"><div className="grid items-end gap-3 md:grid-cols-[1fr_1fr_auto]">
       <Field label="از تاریخ"><input aria-label="از تاریخ گزارش مالی" type="date" className={inputClass} value={from} onChange={(e) => setFrom(e.target.value)} /></Field>
       <Field label="تا تاریخ"><input aria-label="تا تاریخ گزارش مالی" type="date" className={inputClass} value={to} onChange={(e) => setTo(e.target.value)} /></Field>

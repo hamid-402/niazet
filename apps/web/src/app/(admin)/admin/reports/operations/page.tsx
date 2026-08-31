@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, downloadAuthenticated } from '@/lib/api';
 import { Button, Card, ErrorBanner, Field, PageLoading, SectionTitle, inputClass } from '@/components/ui';
 
 interface OperationsReport {
@@ -27,6 +27,7 @@ export default function OperationsReportPage() {
   const [data, setData] = useState<OperationsReport | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const load = useCallback(async () => {
@@ -46,9 +47,16 @@ export default function OperationsReportPage() {
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, []);
+  async function exportCsv() {
+    setExporting(true); setError('');
+    const query = new URLSearchParams(); if (from) query.set('from', from); if (to) query.set('to', to);
+    try { await downloadAuthenticated(`/admin/reports/operations/export?${query}`, `niazat-operations-${new Date().toISOString().slice(0, 10)}.csv`); }
+    catch (e) { setError(e instanceof Error ? e.message : 'دریافت خروجی ممکن نشد.'); }
+    finally { setExporting(false); }
+  }
 
   return <div>
-    <SectionTitle subtitle="آمار غیرمالی سفارش، کیفیت، SLA و عملکرد کارکنان؛ پیش‌فرض ۳۰ روز اخیر">گزارش یکپارچه عملیات</SectionTitle>
+    <div className="mb-4 flex flex-wrap items-start justify-between gap-3"><SectionTitle subtitle="آمار غیرمالی سفارش، کیفیت، SLA و عملکرد کارکنان؛ پیش‌فرض ۳۰ روز اخیر">گزارش یکپارچه عملیات</SectionTitle><Button variant="secondary" disabled={exporting || loading} onClick={() => void exportCsv()}>{exporting ? 'در حال تهیه...' : 'خروجی کنترل‌شده CSV'}</Button></div>
     <Card className="mb-4"><div className="grid items-end gap-3 md:grid-cols-[1fr_1fr_auto]">
       <Field label="از تاریخ"><input aria-label="از تاریخ گزارش عملیات" type="date" className={inputClass} value={from} onChange={(e) => setFrom(e.target.value)} /></Field>
       <Field label="تا تاریخ"><input aria-label="تا تاریخ گزارش عملیات" type="date" className={inputClass} value={to} onChange={(e) => setTo(e.target.value)} /></Field>

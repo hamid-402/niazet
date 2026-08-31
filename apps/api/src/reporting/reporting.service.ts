@@ -14,6 +14,7 @@ import {
   percentage,
   resolveReportRange,
 } from './reporting-metrics';
+import { buildReportCsv, type ReportCsvRow } from './reporting-csv';
 
 const ACTIVE_ORDER_STATUSES: OrderStatus[] = [
   OrderStatus.assigned,
@@ -363,6 +364,255 @@ export class ReportingService {
         byStatus: statusCounts(refunds),
       },
       daily,
+    };
+  }
+
+  async operationsCsv(query: ReportQueryDto) {
+    const report = await this.operations(query);
+    const rows: ReportCsvRow[] = [
+      {
+        section: 'period',
+        entity: 'report',
+        metric: 'from_utc',
+        value: report.period.fromUtc,
+      },
+      {
+        section: 'period',
+        entity: 'report',
+        metric: 'to_exclusive_utc',
+        value: report.period.toExclusiveUtc,
+      },
+      {
+        section: 'orders',
+        entity: 'all',
+        metric: 'total',
+        value: report.orders.total,
+        unit: 'count',
+      },
+      ...Object.entries(report.orders.byStatus).map(([status, value]) => ({
+        section: 'orders',
+        entity: status,
+        metric: 'count',
+        value,
+        unit: 'count',
+      })),
+      ...Object.entries(report.funnel).map(([metric, value]) => ({
+        section: 'funnel',
+        entity: 'orders',
+        metric,
+        value,
+        unit: metric.endsWith('Rate') ? 'percent' : 'count',
+      })),
+      ...report.serviceSales.flatMap((service) => [
+        {
+          section: 'service_sales',
+          entity: service.title,
+          metric: 'orders',
+          value: service.orders,
+          unit: 'count',
+        },
+        {
+          section: 'service_sales',
+          entity: service.title,
+          metric: 'paid',
+          value: service.paid,
+          unit: 'count',
+        },
+        {
+          section: 'service_sales',
+          entity: service.title,
+          metric: 'closed',
+          value: service.closed,
+          unit: 'count',
+        },
+        {
+          section: 'service_sales',
+          entity: service.title,
+          metric: 'paid_rate',
+          value: service.paidRate,
+          unit: 'percent',
+        },
+      ]),
+      ...Object.entries(report.quality).map(([metric, value]) => ({
+        section: 'quality',
+        entity: 'qc',
+        metric,
+        value,
+        unit: metric.toLowerCase().includes('rate') ? 'percent' : 'count',
+      })),
+      ...Object.entries(report.sla).map(([metric, value]) => ({
+        section: 'sla',
+        entity: 'tickets',
+        metric,
+        value,
+        unit: metric.toLowerCase().includes('rate') ? 'percent' : 'count',
+      })),
+      ...Object.entries(report.satisfaction).map(([metric, value]) => ({
+        section: 'satisfaction',
+        entity: 'feedback',
+        metric,
+        value,
+        unit: metric.toLowerCase().includes('average') ? 'score' : 'count',
+      })),
+      ...Object.entries(report.delivery).map(([metric, value]) => ({
+        section: 'delivery',
+        entity: 'orders',
+        metric,
+        value,
+        unit: metric.toLowerCase().includes('hours') ? 'hours' : 'count',
+      })),
+      ...report.teams.flatMap((team) =>
+        Object.entries({
+          members: team.members,
+          activeOrders: team.activeOrders,
+          averageCapacity: team.averageCapacity,
+          onTimeRate: team.onTimeRate,
+          qcPassRate: team.qcPassRate,
+          customerRating: team.customerRating,
+        }).map(([metric, value]) => ({
+          section: 'teams',
+          entity: team.name,
+          metric,
+          value,
+          unit:
+            metric.toLowerCase().includes('rate') ||
+            metric.toLowerCase().includes('capacity')
+              ? 'percent'
+              : metric === 'customerRating'
+                ? 'score'
+                : 'count',
+        })),
+      ),
+      ...report.staff.flatMap((staff) =>
+        Object.entries({
+          team: staff.team?.name ?? 'unassigned',
+          status: staff.status,
+          capacityPercent: staff.capacityPercent,
+          activeOrders: staff.activeOrders,
+          onTimeRate: staff.onTimeRate,
+          qcPassRate: staff.qcPassRate,
+          customerRating: staff.customerRating,
+          complaintCount: staff.complaintCount,
+          complimentCount: staff.complimentCount,
+          openRiskAlerts: staff.openRiskAlerts,
+        }).map(([metric, value]) => ({
+          section: 'staff',
+          entity: staff.publicHandlerCode,
+          metric,
+          value,
+          unit:
+            typeof value === 'number'
+              ? metric.toLowerCase().includes('rate') ||
+                metric.toLowerCase().includes('percent')
+                ? 'percent'
+                : metric === 'customerRating'
+                  ? 'score'
+                  : 'count'
+              : 'text',
+        })),
+      ),
+    ];
+    return {
+      content: buildReportCsv(rows),
+      rowCount: rows.length,
+      period: report.period,
+    };
+  }
+
+  async financeCsv(query: ReportQueryDto) {
+    const report = await this.finance(query);
+    const rows: ReportCsvRow[] = [
+      {
+        section: 'period',
+        entity: 'report',
+        metric: 'from_utc',
+        value: report.period.fromUtc,
+      },
+      {
+        section: 'period',
+        entity: 'report',
+        metric: 'to_exclusive_utc',
+        value: report.period.toExclusiveUtc,
+      },
+      ...Object.entries(report.sales).map(([metric, value]) => ({
+        section: 'sales',
+        entity: 'payments',
+        metric,
+        value,
+        unit: ['gmv', 'averagePayment'].includes(metric) ? 'IRT' : 'count',
+      })),
+      ...Object.entries(report.income).map(([metric, value]) => ({
+        section: 'income',
+        entity: 'platform',
+        metric,
+        value,
+        unit: 'IRT',
+      })),
+      ...Object.entries({
+        periodInflow: report.escrow.periodInflow,
+        periodCount: report.escrow.periodCount,
+        currentHeld: report.escrow.currentHeld,
+        totalCount: report.escrow.totalCount,
+      }).map(([metric, value]) => ({
+        section: 'escrow',
+        entity: 'all',
+        metric,
+        value,
+        unit: metric.toLowerCase().includes('count') ? 'count' : 'IRT',
+      })),
+      ...Object.entries(report.escrow.byStatus).map(([status, value]) => ({
+        section: 'escrow',
+        entity: status,
+        metric: 'count',
+        value,
+        unit: 'count',
+      })),
+      ...Object.entries({
+        requestedAmount: report.refunds.requestedAmount,
+        processedAmount: report.refunds.processedAmount,
+        count: report.refunds.count,
+      }).map(([metric, value]) => ({
+        section: 'refunds',
+        entity: 'all',
+        metric,
+        value,
+        unit: metric === 'count' ? 'count' : 'IRT',
+      })),
+      ...Object.entries(report.refunds.byStatus).map(([status, value]) => ({
+        section: 'refunds',
+        entity: status,
+        metric: 'count',
+        value,
+        unit: 'count',
+      })),
+      ...report.daily.flatMap((day) => [
+        {
+          section: 'daily',
+          entity: day.date,
+          metric: 'gmv',
+          value: day.gmv,
+          unit: 'IRT',
+        },
+        {
+          section: 'daily',
+          entity: day.date,
+          metric: 'revenue',
+          value: day.revenue,
+          unit: 'IRT',
+        },
+        {
+          section: 'daily',
+          entity: day.date,
+          metric: 'refunds',
+          value: day.refunds,
+          unit: 'IRT',
+        },
+      ]),
+    ];
+    return {
+      content: buildReportCsv(rows),
+      rowCount: rows.length,
+      period: report.period,
     };
   }
 }
