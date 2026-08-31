@@ -18,7 +18,8 @@
     "phase6:contrast-motion-contract": "node scripts/phase6-contrast-motion-contract.mjs",
     "phase6:rtl-format-contract": "node scripts/phase6-rtl-format-contract.mjs",
     "phase6:states-contract": "node scripts/phase6-states-contract.mjs",
-    "phase6:list-controls-contract": "node scripts/phase6-list-controls-contract.mjs"
+    "phase6:list-controls-contract": "node scripts/phase6-list-controls-contract.mjs",
+    "phase6:auth-redirect-contract": "node scripts/phase6-auth-redirect-contract.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.42.2",

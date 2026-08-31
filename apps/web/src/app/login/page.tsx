@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth-context';
 import { Button, Card, ErrorBanner, Field, inputClass } from '@/components/ui';
 import { roleHomePath } from '@/lib/role-paths';
 import { PasswordInput } from '@/components/password-input';
+import { GuestOnly } from '@/components/guest-only';
 
 type LoginMode = 'password' | 'otp';
 
@@ -50,7 +51,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const user = await loginWithPassword(phone, password);
-      router.push(roleHomePath(user));
+      router.replace(roleHomePath(user));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'خطا در ورود');
     } finally {
@@ -79,7 +80,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const user = await loginWithOtp(phone, code, 'login');
-      router.push(roleHomePath(user));
+      router.replace(roleHomePath(user));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'کد تأیید نادرست است.');
     } finally {
@@ -88,7 +89,8 @@ export default function LoginPage() {
   }
 
   return (
-    <main id="main-content" className="flex min-h-screen items-center justify-center bg-bg px-4 py-8">
+    <GuestOnly>
+      <main id="main-content" className="flex min-h-screen items-center justify-center bg-bg px-4 py-8">
       <Card className="w-full max-w-md">
         <h1 className="mb-1 text-xl font-extrabold text-fg">ورود به نیازت با ما</h1>
         <p className="mb-5 text-sm text-fg-muted">با رمز عبور یا کد یکبار مصرف وارد شوید.</p>
@@ -148,6 +150,7 @@ export default function LoginPage() {
 
         <p className="mt-5 text-center text-sm text-fg-muted">حساب ندارید؟{' '}<Link href="/register" className="font-medium text-fg hover:underline">ثبت‌نام</Link></p>
       </Card>
-    </main>
+      </main>
+    </GuestOnly>
   );
 }

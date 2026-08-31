@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Button, Card, ErrorBanner, Field, inputClass } from '@/components/ui';
 import { apiFetch } from '@/lib/api';
 import { PasswordInput } from '@/components/password-input';
+import { GuestOnly } from '@/components/guest-only';
 
 type Step = 'request' | 'reset' | 'success';
 
@@ -76,7 +77,8 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <main id="main-content" className="flex min-h-screen items-center justify-center bg-bg px-4 py-10">
+    <GuestOnly>
+      <main id="main-content" className="flex min-h-screen items-center justify-center bg-bg px-4 py-10">
       <Card className="w-full max-w-md">
         <h1 className="mb-1 text-heading-md font-extrabold leading-heading text-fg">
           بازیابی رمز عبور
@@ -193,6 +195,7 @@ export default function ForgotPasswordPage() {
           </p>
         )}
       </Card>
-    </main>
+      </main>
+    </GuestOnly>
   );
 }

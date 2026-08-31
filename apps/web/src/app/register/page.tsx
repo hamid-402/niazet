@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth-context';
 import { Button, Card, ErrorBanner, Field, inputClass } from '@/components/ui';
 import { roleHomePath } from '@/lib/role-paths';
 import { PasswordInput } from '@/components/password-input';
+import { GuestOnly } from '@/components/guest-only';
 
 export default function RegisterPage() {
   const { register, loginWithOtp } = useAuth();
@@ -42,7 +43,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       const user = await loginWithOtp(phone, code, 'register');
-      router.push(roleHomePath(user));
+      router.replace(roleHomePath(user));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'کد تایید نادرست است.');
     } finally {
@@ -51,7 +52,8 @@ export default function RegisterPage() {
   }
 
   return (
-    <main id="main-content" className="flex min-h-screen items-center justify-center bg-bg px-4">
+    <GuestOnly>
+      <main id="main-content" className="flex min-h-screen items-center justify-center bg-bg px-4">
       <Card className="w-full max-w-sm">
         <h1 className="mb-1 text-xl font-extrabold text-fg">
           ثبت‌نام در نیازت با ما
@@ -136,6 +138,7 @@ export default function RegisterPage() {
           </Link>
         </p>
       </Card>
-    </main>
+      </main>
+    </GuestOnly>
   );
 }

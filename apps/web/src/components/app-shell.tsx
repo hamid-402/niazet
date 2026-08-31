@@ -75,7 +75,7 @@ export function AppShell({
 
   async function handleLogout() {
     await logout();
-    router.push("/login");
+    router.replace("/login");
   }
 
   return (
