@@ -12,6 +12,7 @@ const OPS_NAV = [
   { href: '/admin/qc', label: 'کنترل کیفیت QC' },
   { href: '/admin/staff', label: 'کارمندان و مجریان' },
   { href: '/admin/feedback', label: 'بازخورد و شکایت‌ها' },
+  { href: '/admin/reports/operations', label: 'گزارش عملیات' },
   { href: '/account/security', label: 'حساب و امنیت' },
 ];
 
@@ -23,6 +24,7 @@ const FINANCE_NAV = [
   { href: '/admin/finance/invoices', label: 'فاکتورها' },
   { href: '/admin/finance/withdrawals', label: 'برداشت‌ها' },
   { href: '/admin/finance/ledger', label: 'Ledger' },
+  { href: '/admin/reports/finance', label: 'گزارش مالی' },
   { href: '/account/security', label: 'حساب و امنیت' },
 ];
 

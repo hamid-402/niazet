@@ -22,6 +22,7 @@ import { validateEnvironment } from './config/validate-env';
 import { JobsModule } from './jobs/jobs.module';
 import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
 import { AccountModule } from './account/account.module';
+import { ReportingModule } from './reporting/reporting.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { AccountModule } from './account/account.module';
     FilesModule,
     JobsModule,
     AccountModule,
+    ReportingModule,
   ],
   controllers: [AppController],
   providers: [
