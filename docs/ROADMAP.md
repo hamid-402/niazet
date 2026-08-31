@@ -170,7 +170,7 @@
 - [x] دیاگرام کوچک CSS/SVG مسیر درخواست تا تحویل
 - [x] Stepper تعاملی مراحل انتخاب، بررسی، پرداخت، اجرا، QC و تحویل
 - [x] Use Caseهای واقعی برای کسب‌وکار، دانشگاه/پژوهش، محتوا، طراحی و امور سفارشی
-- [ ] Service catalog با Search/Filter، Package، خروجی، SLA، Acceptance و FAQ
+- [x] Service catalog با Search/Filter، Package، خروجی، SLA، Acceptance و FAQ
 - [ ] نمونه خروجی‌ها بدون ادعای ساختگی و با Privacy مناسب
 - [ ] Assurance درباره اجرای داخلی، Escrow، QC، محرمانگی و پشتیبانی
 - [ ] FAQ قابل دسترس و Final CTA متناسب با وضعیت Login

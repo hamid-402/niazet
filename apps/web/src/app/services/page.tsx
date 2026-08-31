@@ -1,17 +1,10 @@
-import Link from 'next/link';
 import { PublicNav } from '@/components/public-nav';
-import { Card, EmptyState, LinkButton, RetryState } from '@/components/ui';
-import { formatToman } from '@/lib/format';
+import { ServiceCatalog } from '@/components/service-catalog';
+import { EmptyState, LinkButton, RetryState } from '@/components/ui';
 import { publicApiFetch } from '@/lib/server-api';
 import type { ServiceLine } from '@/lib/types';
 
 export const revalidate = 300;
-
-const PRICING_LABEL: Record<string, string> = {
-  fixed: 'قیمت ثابت',
-  formula: 'قیمت فرمولی',
-  manual_quote: 'قیمت‌گذاری پس از بررسی',
-};
 
 export default async function ServicesPage() {
   let services: ServiceLine[] = [];
@@ -21,24 +14,14 @@ export default async function ServicesPage() {
     <div className="flex flex-1 flex-col">
       <PublicNav />
       <main id="main-content" className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 md:px-8">
-        <h1 className="mb-6 text-2xl font-extrabold text-fg">خدمات</h1>
+        <div className="mb-6 max-w-3xl">
+          <p className="text-sm font-bold text-accent">کاتالوگ خدمات مدیریت‌شده</p>
+          <h1 className="mt-1 text-2xl font-extrabold text-fg">خدمت مناسب را با خروجی روشن انتخاب کنید</h1>
+          <p className="mt-2 text-sm leading-7 text-fg-muted">در هر خدمت، پکیج‌ها، زمان هدف، خروجی قابل تحویل و معیار پذیرش را پیش از ثبت سفارش مقایسه کنید.</p>
+        </div>
         {error && <RetryState title="دریافت خدمات ممکن نشد" description="ارتباط با سرویس خدمات برقرار نشد." action={<LinkButton href="/services">تلاش مجدد</LinkButton>} />}
         {!error && services.length === 0 && <EmptyState title="در حال حاضر خدمتی ثبت نشده است." />}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {services.map((service) => (
-            <Link key={service.id} href={`/services/${service.slug}`}>
-              <Card className="h-full transition hover:border-border-strong">
-                <p className="mb-1 text-xs font-medium text-fg-subtle">{service.category}</p>
-                <h2 className="mb-2 text-base font-bold text-fg">{service.title}</h2>
-                <p className="mb-4 line-clamp-2 text-sm text-fg-muted">{service.description}</p>
-                <div className="flex items-center justify-between text-xs text-fg-subtle">
-                  <span>{PRICING_LABEL[service.pricingModel]}</span>
-                  <span>{service.basePrice ? formatToman(service.basePrice) : ''}</span>
-                </div>
-              </Card>
-            </Link>
-          ))}
-        </div>
+        {!error && services.length > 0 && <ServiceCatalog services={services} />}
       </main>
     </div>
   );

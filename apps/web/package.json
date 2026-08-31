@@ -24,7 +24,8 @@
     "phase7:hero-contract": "node scripts/phase7-hero-contract.mjs",
     "phase7:flow-diagram-contract": "node scripts/phase7-flow-diagram-contract.mjs",
     "phase7:stepper-contract": "node scripts/phase7-stepper-contract.mjs",
-    "phase7:use-cases-contract": "node scripts/phase7-use-cases-contract.mjs"
+    "phase7:use-cases-contract": "node scripts/phase7-use-cases-contract.mjs",
+    "phase7:service-catalog-contract": "node scripts/phase7-service-catalog-contract.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.42.2",
