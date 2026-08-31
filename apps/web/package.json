@@ -16,7 +16,8 @@
     "phase6:icon-label-contract": "node scripts/phase6-icon-label-contract.mjs",
     "phase6:structure-contract": "node scripts/phase6-structure-contract.mjs",
     "phase6:contrast-motion-contract": "node scripts/phase6-contrast-motion-contract.mjs",
-    "phase6:rtl-format-contract": "node scripts/phase6-rtl-format-contract.mjs"
+    "phase6:rtl-format-contract": "node scripts/phase6-rtl-format-contract.mjs",
+    "phase6:states-contract": "node scripts/phase6-states-contract.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.42.2",

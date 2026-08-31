@@ -135,6 +135,51 @@ export function Badge({
   );
 }
 
+function StatePanel({
+  title,
+  description,
+  action,
+  tone = 'neutral',
+  role = 'status',
+}: {
+  title: string;
+  description?: string;
+  action?: ReactNode;
+  tone?: 'neutral' | 'danger' | 'warning';
+  role?: 'status' | 'alert';
+}) {
+  const toneClass = tone === 'danger'
+    ? 'border-danger-border bg-danger-subtle'
+    : tone === 'warning'
+      ? 'border-warning-border bg-warning-subtle'
+      : 'border-border-strong bg-bg-subtle';
+  return (
+    <section role={role} aria-live={role === 'alert' ? 'assertive' : 'polite'} className={`flex min-h-48 flex-col items-center justify-center gap-2 rounded-card border border-dashed px-6 py-10 text-center ${toneClass}`}>
+      <h2 className="text-base font-bold text-fg">{title}</h2>
+      {description && <p className="max-w-md text-sm leading-6 text-fg-muted">{description}</p>}
+      {action && <div className="mt-3">{action}</div>}
+    </section>
+  );
+}
+
+export function Skeleton({ className = '' }: { className?: string }) {
+  return <span aria-hidden="true" className={`block animate-pulse rounded-control bg-bg-subtle ${className}`} />;
+}
+
+export function PageSkeleton() {
+  return (
+    <div role="status" aria-label="در حال آماده‌سازی صفحه" className="space-y-4 py-4">
+      <Skeleton className="h-8 w-48" />
+      <Skeleton className="h-24 w-full" />
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <Skeleton className="h-32" />
+        <Skeleton className="h-32" />
+        <Skeleton className="h-32" />
+      </div>
+    </div>
+  );
+}
+
 export function EmptyState({
   title,
   description,
@@ -144,15 +189,23 @@ export function EmptyState({
   description?: string;
   action?: ReactNode;
 }) {
-  return (
-    <div className="flex flex-col items-center justify-center gap-2 rounded-card border border-dashed border-border-strong bg-bg-subtle px-6 py-14 text-center">
-      <p className="text-base font-medium text-fg">{title}</p>
-      {description && (
-        <p className="max-w-sm text-sm text-fg-muted">{description}</p>
-      )}
-      {action && <div className="mt-3">{action}</div>}
-    </div>
-  );
+  return <StatePanel title={title} description={description} action={action} />;
+}
+
+export function ErrorState({ title = 'دریافت اطلاعات ممکن نشد', description, action }: { title?: string; description?: string; action?: ReactNode }) {
+  return <StatePanel role="alert" tone="danger" title={title} description={description} action={action} />;
+}
+
+export function PermissionState({ action }: { action?: ReactNode }) {
+  return <StatePanel tone="warning" title="اجازه دسترسی به این بخش را ندارید" description="با نقش فعلی نمی‌توانید این صفحه را مشاهده کنید. به میز کار خود برگردید یا با مدیر سامانه تماس بگیرید." action={action} />;
+}
+
+export function OfflineState({ action }: { action?: ReactNode }) {
+  return <StatePanel tone="warning" title="اتصال اینترنت برقرار نیست" description="پس از برقراری اتصال دوباره تلاش کنید. اطلاعات ذخیره‌نشده را تا آن زمان نگه دارید." action={action} />;
+}
+
+export function RetryState({ title, description, action }: { title?: string; description?: string; action: ReactNode }) {
+  return <ErrorState title={title} description={description ?? 'خطا می‌تواند موقتی باشد؛ دوباره تلاش کنید.'} action={action} />;
 }
 
 export function Spinner({ className = '' }: { className?: string }) {

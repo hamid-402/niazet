@@ -4,6 +4,7 @@ import './globals.css';
 import { AuthProvider } from '@/lib/auth-context';
 import { ThemeProvider } from '@/components/theme-provider';
 import { DEFAULT_THEME, THEMES, THEME_STORAGE_KEY } from '@/lib/themes';
+import { NetworkStatus } from '@/components/network-status';
 
 const vazirmatn = Vazirmatn({
   variable: '--font-vazirmatn',
@@ -40,6 +41,7 @@ export default function RootLayout({
         </a>
         <ThemeProvider>
           <AuthProvider>{children}</AuthProvider>
+          <NetworkStatus />
         </ThemeProvider>
       </body>
     </html>

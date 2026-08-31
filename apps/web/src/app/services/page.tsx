@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { PublicNav } from '@/components/public-nav';
-import { Card, EmptyState, ErrorBanner } from '@/components/ui';
+import { Card, EmptyState, LinkButton, RetryState } from '@/components/ui';
 import { formatToman } from '@/lib/format';
 import { publicApiFetch } from '@/lib/server-api';
 import type { ServiceLine } from '@/lib/types';
@@ -22,7 +22,7 @@ export default async function ServicesPage() {
       <PublicNav />
       <main id="main-content" className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 md:px-8">
         <h1 className="mb-6 text-2xl font-extrabold text-fg">خدمات</h1>
-        {error && <ErrorBanner message="دریافت خدمات ممکن نشد؛ کمی بعد دوباره تلاش کنید." />}
+        {error && <RetryState title="دریافت خدمات ممکن نشد" description="ارتباط با سرویس خدمات برقرار نشد." action={<LinkButton href="/services">تلاش مجدد</LinkButton>} />}
         {!error && services.length === 0 && <EmptyState title="در حال حاضر خدمتی ثبت نشده است." />}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {services.map((service) => (

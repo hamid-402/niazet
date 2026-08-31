@@ -4,7 +4,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import type { AdminScope, UserRole } from '@/lib/types';
-import { PageLoading } from './ui';
+import { LinkButton, PageSkeleton, PermissionState } from './ui';
+import { roleHomePath } from '@/lib/role-paths';
 
 export function RequireRole({
   roles,
@@ -17,6 +18,18 @@ export function RequireRole({
 }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const roleOk =
+    !!user &&
+    (roles.includes(user.role) ||
+      roles.some((role) =>
+        user.capabilities.includes(role as 'customer' | 'executor'),
+      ));
+  const scopeOk =
+    !!user &&
+    (!adminScopes ||
+      (user.adminScope && adminScopes.includes(user.adminScope)) ||
+      user.adminScope === 'super_admin');
+  const authorized = roleOk && scopeOk;
 
   useEffect(() => {
     if (loading) return;
@@ -24,21 +37,19 @@ export function RequireRole({
       router.replace('/login');
       return;
     }
-    const roleOk =
-      roles.includes(user.role) ||
-      roles.some((r) =>
-        user.capabilities.includes(r as 'customer' | 'executor'),
-      );
-    const scopeOk =
-      !adminScopes ||
-      (user.adminScope && adminScopes.includes(user.adminScope)) ||
-      user.adminScope === 'super_admin';
-    if (!roleOk || !scopeOk) {
-      router.replace('/');
+    if (!authorized) {
+      router.replace(roleHomePath(user));
     }
-  }, [user, loading, roles, adminScopes, router]);
+  }, [user, loading, authorized, router]);
 
-  if (loading || !user) return <PageLoading />;
+  if (loading || !user) return <PageSkeleton />;
+  if (!authorized) {
+    return (
+      <PermissionState
+        action={<LinkButton href={roleHomePath(user)}>بازگشت به میز کار</LinkButton>}
+      />
+    );
+  }
 
   return <>{children}</>;
 }
