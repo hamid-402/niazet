@@ -13,6 +13,21 @@ const CATEGORIES = [
   'خدمات سفارشی',
 ];
 
+const TRUST_SIGNALS = [
+  {
+    title: 'اجرای داخلی و احراز‌شده',
+    description: 'درخواست شما به تیم مشخص شرکت سپرده می‌شود؛ نه مجری ناشناس.',
+  },
+  {
+    title: 'پرداخت در حساب امانی',
+    description: 'مبلغ تا رسیدن سفارش به مرحله تحویل، مستقیم آزاد نمی‌شود.',
+  },
+  {
+    title: 'کنترل کیفیت پیش از تحویل',
+    description: 'خروجی پیش از ارائه به شما با معیارهای توافق‌شده بررسی می‌شود.',
+  },
+] as const;
+
 const STEPS = [
   {
     title: 'انتخاب خدمت',
@@ -25,7 +40,7 @@ const STEPS = [
   },
   {
     title: 'پرداخت امن',
-    desc: 'مبلغ در امانت (escrow) نگه‌داری می‌شود تا تحویل کامل شود.',
+    desc: 'مبلغ در حساب امانی نگه‌داری می‌شود تا تحویل کامل شود.',
   },
   {
     title: 'اجرای مدیریت‌شده',
@@ -44,11 +59,11 @@ const FAQS = [
   },
   {
     q: 'پول من چطور محافظت می‌شود؟',
-    a: 'مبلغ سفارش تا تایید تحویل شما در امانت (escrow) نگه‌داری می‌شود و مستقیم به کسی پرداخت نمی‌شود.',
+    a: 'مبلغ سفارش تا تأیید تحویل شما در حساب امانی نگه‌داری می‌شود و مستقیم به کسی پرداخت نمی‌شود.',
   },
   {
     q: 'اگر از خروجی راضی نبودم چه؟',
-    a: 'می‌توانید درخواست اصلاح ثبت کنید یا در صورت لزوم dispute باز کنید تا تیم پشتیبانی بررسی کند.',
+    a: 'می‌توانید درخواست اصلاح یا بررسی اختلاف ثبت کنید تا تیم پشتیبانی موضوع را پیگیری کند.',
   },
 ];
 
@@ -59,19 +74,28 @@ export default function HomePage() {
 
       <main id="main-content">
         <section className="mx-auto w-full max-w-6xl px-4 py-16 text-center md:px-8">
-        <h1 className="text-3xl font-extrabold tracking-tight text-fg md:text-4xl">
-          خدمات تخصصی، با اجرای مدیریت‌شده و پرداخت امن
-        </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-base text-fg-muted">
-          «نیازت با ما» سامانه‌ای است که در آن کار شما توسط تیم اجرای داخلی
-          شرکت، با کنترل کیفیت و گزارش مرحله‌ای، انجام می‌شود.
-        </p>
-        <div className="mt-8 flex items-center justify-center gap-3">
-          <LinkButton href="/services">شروع ثبت درخواست</LinkButton>
-          <LinkButton href="/services" variant="secondary">
-            مشاهده خدمات
-          </LinkButton>
-        </div>
+          <p className="mb-3 text-sm font-bold text-accent">سامانه خدمات مدیریت‌شده</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-fg md:text-4xl">
+            خدمات تخصصی، با اجرای مدیریت‌شده و پرداخت امن
+          </h1>
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-fg-muted">
+            درخواستتان را ثبت کنید؛ تیم داخلی نیازت مسیر اجرا، زمان و هزینه را شفاف
+            می‌کند و تا کنترل کیفیت و تحویل نهایی کنار شما می‌ماند.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <LinkButton href="/services">شروع ثبت درخواست</LinkButton>
+            <LinkButton href="/services" variant="secondary">
+              مشاهده خدمات و قیمت‌گذاری
+            </LinkButton>
+          </div>
+          <ul aria-label="دلایل اعتماد به نیازت" className="mx-auto mt-10 grid max-w-5xl gap-3 text-right md:grid-cols-3">
+            {TRUST_SIGNALS.map((signal) => (
+              <li key={signal.title} className="rounded-card border border-border bg-surface p-4 shadow-elevation-1">
+                <p className="font-bold text-fg"><span aria-hidden="true" className="ml-2 text-success">✓</span>{signal.title}</p>
+                <p className="mt-2 text-sm leading-6 text-fg-muted">{signal.description}</p>
+              </li>
+            ))}
+          </ul>
         </section>
 
         <section className="mx-auto w-full max-w-6xl px-4 pb-16 md:px-8">
