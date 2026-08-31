@@ -498,6 +498,27 @@ textarea:disabled,
   font-variant-numeric: tabular-nums;
 }
 
+/* Isolate mixed Persian/Latin fragments so codes, URLs and names cannot
+   reorder surrounding RTL punctuation. Logical properties remain direction-safe. */
+[dir='ltr'],
+[dir='auto'],
+bdi,
+.bidi-isolate {
+  unicode-bidi: isolate;
+}
+
+.break-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.truncate-safe {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @media (max-width: 47.999rem) {
   .responsive-table {
     display: block;

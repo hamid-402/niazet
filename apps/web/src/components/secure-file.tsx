@@ -4,16 +4,11 @@ import { useRef, useState } from "react";
 import { apiFetch, ApiError } from "@/lib/api";
 import { Button } from "@/components/ui";
 import type { OrderFile } from "@/lib/types";
+import { formatFileSize } from "@/lib/format";
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024;
 const ACCEPTED_TYPES =
   ".pdf,.zip,.doc,.docx,.xlsx,.pptx,.png,.jpg,.jpeg,.webp,.txt,.csv";
-
-export function formatFileSize(bytes: number) {
-  if (bytes < 1024) return `${bytes} بایت`;
-  if (bytes < 1024 * 1024) return `${Math.ceil(bytes / 1024)} کیلوبایت`;
-  return `${(bytes / (1024 * 1024)).toLocaleString("fa-IR", { maximumFractionDigits: 1 })} مگابایت`;
-}
 
 export function SecureFileUpload({
   orderId,

@@ -13,7 +13,7 @@ import {
   SectionTitle,
   TabList,
 } from "@/components/ui";
-import { formatDate, formatToman } from "@/lib/format";
+import { formatDate, formatNumber, formatToman } from "@/lib/format";
 
 type FinanceTab = "overview" | "payments" | "escrow" | "refunds" | "invoices" | "wallet";
 
@@ -182,7 +182,7 @@ export default function WalletPage() {
             </Card>
             <Card>
               <p className="text-xs text-fg-subtle">نیازمند پرداخت</p>
-              <p className="mt-2 text-lg font-extrabold text-warning">{data.summary.pendingPaymentCount.toLocaleString("fa-IR")}</p>
+              <p className="mt-2 text-lg font-extrabold text-warning">{formatNumber(data.summary.pendingPaymentCount)}</p>
             </Card>
           </div>
 

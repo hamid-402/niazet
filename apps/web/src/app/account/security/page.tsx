@@ -13,7 +13,7 @@ import {
 } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatNumber } from "@/lib/format";
 import { roleHomePath } from "@/lib/role-paths";
 
 interface ActiveSession {
@@ -136,7 +136,7 @@ function SecurityContent() {
             <div>
               <p className="font-bold text-fg">کنترل دسترسی حساب</p>
               <p className="mt-1 text-sm text-fg-muted">
-                {sessions.length.toLocaleString("fa-IR")} نشست فعال شناسایی شد.
+                {formatNumber(sessions.length)} نشست فعال شناسایی شد.
               </p>
             </div>
             <Button

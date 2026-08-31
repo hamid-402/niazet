@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { apiFetch, downloadAuthenticated } from '@/lib/api';
-import { formatToman } from '@/lib/format';
+import { formatDateOnly, formatNumber, formatToman } from '@/lib/format';
 import { ResponsiveTable, Button, Card, ErrorBanner, Field, PageLoading, SectionTitle, inputClass } from '@/components/ui';
 
 interface FinanceReport {
@@ -13,7 +13,7 @@ interface FinanceReport {
   refunds: { requestedAmount: number; processedAmount: number; count: number; byStatus: Record<string, number> };
   daily: Array<{ date: string; gmv: number; revenue: number; refunds: number }>;
 }
-const nf = (value: number) => value.toLocaleString('fa-IR', { maximumFractionDigits: 2 });
+const nf = (value: number) => formatNumber(value, { maximumFractionDigits: 2 });
 const metric = (label: string, value: string, detail?: string) => <Card key={label}><p className="text-xs text-fg-muted">{label}</p><p className="mt-1 text-xl font-bold text-fg">{value}</p>{detail && <p className="text-xs text-fg-muted">{detail}</p>}</Card>;
 
 export default function FinanceReportPage() {
@@ -55,7 +55,7 @@ export default function FinanceReportPage() {
     </div></Card>
     {error && <ErrorBanner message={error} />}
     {loading && !data ? <PageLoading /> : data && <>
-      <p className="mb-3 text-xs text-fg-muted">بازه {data.period.days.toLocaleString('fa-IR')} روزه · منطقه زمانی {data.period.timeZone}</p>
+      <p className="mb-3 text-xs text-fg-muted">بازه {formatNumber(data.period.days)} روزه · منطقه زمانی <bdi dir="ltr">{data.period.timeZone}</bdi></p>
       <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {metric('فروش ناخالص GMV', formatToman(data.sales.gmv), `${nf(data.sales.succeededPayments)} پرداخت موفق`)}
         {metric('درآمد و کارمزد', formatToman(data.income.revenue))}
@@ -70,7 +70,7 @@ export default function FinanceReportPage() {
         <Card><h3 className="mb-3 font-bold text-fg">وضعیت Escrow</h3><div className="grid grid-cols-2 gap-2 text-sm">{Object.entries(data.escrow.byStatus).map(([status,count]) => <div key={status} className="flex justify-between rounded-control bg-bg-subtle p-3"><span>{status}</span><b>{nf(count)}</b></div>)}</div></Card>
         <Card><h3 className="mb-3 font-bold text-fg">بازپرداخت‌ها</h3><p className="mb-3 text-sm">مبلغ درخواست‌شده: <b>{formatToman(data.refunds.requestedAmount)}</b></p><div className="grid grid-cols-2 gap-2 text-sm">{Object.entries(data.refunds.byStatus).map(([status,count]) => <div key={status} className="flex justify-between rounded-control bg-bg-subtle p-3"><span>{status}</span><b>{nf(count)}</b></div>)}</div></Card>
       </div>
-      <Card className="mt-4 overflow-x-auto"><h3 className="mb-3 font-bold text-fg">روند روزانه بر مبنای تهران</h3><ResponsiveTable className="w-full min-w-[650px] text-sm"><thead><tr className="text-right text-fg-muted"><th className="pb-2">تاریخ</th><th>GMV</th><th>درآمد</th><th>بازپرداخت</th></tr></thead><tbody>{data.daily.map((item) => <tr key={item.date} className="border-t border-border"><td className="py-2" dir="ltr">{item.date}</td><td>{formatToman(item.gmv)}</td><td>{formatToman(item.revenue)}</td><td>{formatToman(item.refunds)}</td></tr>)}</tbody></ResponsiveTable></Card>
+      <Card className="mt-4 overflow-x-auto"><h3 className="mb-3 font-bold text-fg">روند روزانه بر مبنای تهران</h3><ResponsiveTable className="w-full min-w-[650px] text-sm"><thead><tr className="text-right text-fg-muted"><th className="pb-2">تاریخ</th><th>GMV</th><th>درآمد</th><th>بازپرداخت</th></tr></thead><tbody>{data.daily.map((item) => <tr key={item.date} className="border-t border-border"><td className="py-2">{formatDateOnly(item.date)}</td><td>{formatToman(item.gmv)}</td><td>{formatToman(item.revenue)}</td><td>{formatToman(item.refunds)}</td></tr>)}</tbody></ResponsiveTable></Card>
     </>}
   </div>;
 }

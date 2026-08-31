@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { apiFetch, downloadAuthenticated } from '@/lib/api';
 import { ResponsiveTable, Button, Card, ErrorBanner, Field, PageLoading, SectionTitle, inputClass } from '@/components/ui';
+import { formatNumber, formatPercent } from '@/lib/format';
 
 interface OperationsReport {
   period: { fromUtc: string; toExclusiveUtc: string; timeZone: string; days: number };
@@ -17,8 +18,8 @@ interface OperationsReport {
   staff: Array<{ profileId: string; displayAlias: string; publicHandlerCode: string; team: { id: string; name: string } | null; status: string; capacityPercent: number; activeOrders: number; onTimeRate: number; qcPassRate: number; customerRating: number; complaintCount: number; complimentCount: number; openRiskAlerts: number }>;
 }
 
-const nf = (value: number) => value.toLocaleString('fa-IR', { maximumFractionDigits: 2 });
-const pct = (value: number) => `${nf(value)}٪`;
+const nf = (value: number) => formatNumber(value, { maximumFractionDigits: 2 });
+const pct = (value: number) => formatPercent(value);
 const metric = (label: string, value: string | number) => (
   <Card key={label}><p className="text-xs text-fg-muted">{label}</p><p className="mt-1 text-xl font-bold text-fg">{typeof value === 'number' ? nf(value) : value}</p></Card>
 );
@@ -64,7 +65,7 @@ export default function OperationsReportPage() {
     </div></Card>
     {error && <ErrorBanner message={error} />}
     {loading && !data ? <PageLoading /> : data && <>
-      <p className="mb-3 text-xs text-fg-muted">بازه {data.period.days.toLocaleString('fa-IR')} روزه · منطقه زمانی {data.period.timeZone}</p>
+      <p className="mb-3 text-xs text-fg-muted">بازه {formatNumber(data.period.days)} روزه · منطقه زمانی <bdi dir="ltr">{data.period.timeZone}</bdi></p>
       <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {metric('کل سفارش‌ها', data.orders.total)}{metric('تبدیل ثبت به پرداخت', pct(data.funnel.submittedToPaidRate))}{metric('تبدیل پرداخت به بستن', pct(data.funnel.paidToClosedRate))}{metric('میانه زمان تحویل', `${nf(data.delivery.medianHours)} ساعت`)}
         {metric('نرخ قبولی QC', pct(data.quality.passRate))}{metric('قبولی بار اول QC', pct(data.quality.firstPassRate))}{metric('نرخ نقض SLA', pct(data.sla.breachRate))}{metric('رضایت متوسط', pct(data.satisfaction.averagePercent))}

@@ -21,6 +21,7 @@ import type {
   StaffRiskAlert,
   StaffTeam,
 } from '@/lib/types';
+import { formatDate, formatDateOnly } from '@/lib/format';
 
 interface StaffDetail extends ExecutorProfile {
   riskAlerts: StaffRiskAlert[];
@@ -680,7 +681,7 @@ export default function AdminStaffDetailPage({
                     key={record.id}
                     className="flex items-center justify-between gap-3 py-2"
                   >
-                    <span>{new Date(record.workDate).toLocaleDateString('fa-IR')}</span>
+                    <span>{formatDateOnly(record.workDate)}</span>
                     <span className="text-fg-muted">
                       {ATTENDANCE_LABELS[record.status] ?? record.status}
                     </span>
@@ -792,7 +793,7 @@ export default function AdminStaffDetailPage({
                         </span>
                       </div>
                       <span className="text-xs text-fg-subtle">
-                        {new Date(alert.lastDetectedAt).toLocaleString('fa-IR')}
+                        {formatDate(alert.lastDetectedAt)}
                       </span>
                     </div>
                     <dl className="mt-3 flex flex-wrap gap-2 text-xs text-fg-muted">
@@ -857,7 +858,7 @@ export default function AdminStaffDetailPage({
                     {profile.performanceSnapshots.map((snapshot) => (
                       <tr key={snapshot.id} className="border-b border-border">
                         <td className="px-3 py-3 text-fg-muted">
-                          {new Date(snapshot.periodEnd).toLocaleDateString('fa-IR')}
+                          {formatDateOnly(snapshot.periodEnd)}
                         </td>
                         <td className="px-3 py-3 text-fg-muted">
                           {snapshot.activeOrders} / {snapshot.completedOrders}
@@ -933,7 +934,7 @@ export default function AdminStaffDetailPage({
                         )}
                       </div>
                       <span className="text-xs text-fg-subtle">
-                        {new Date(item.createdAt).toLocaleString('fa-IR')}
+                        {formatDate(item.createdAt)}
                       </span>
                     </div>
                     <p className="mt-2 text-sm text-fg-muted">
@@ -971,7 +972,7 @@ export default function AdminStaffDetailPage({
                         {HISTORY_ACTION_LABELS[entry.action] ?? entry.action}
                       </p>
                       <span className="text-xs text-fg-subtle">
-                        {new Date(entry.createdAt).toLocaleString('fa-IR')}
+                        {formatDate(entry.createdAt)}
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-fg-muted">

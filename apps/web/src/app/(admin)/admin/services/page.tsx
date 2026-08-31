@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { apiFetch, ApiError } from "@/lib/api";
 import { Button, Card, ErrorBanner, inputClass, PageLoading, SectionTitle } from "@/components/ui";
+import { formatToman } from "@/lib/format";
 
 type FormField = { id: string; label: string; fieldKey: string; fieldType: string; required: boolean };
 type QcTemplate = { id: string; name: string; items: { id: string; label: string }[] };
@@ -89,7 +90,7 @@ export default function AdminServicesPage() {
 
         <Card>
           <h3 className="mb-3 font-bold text-fg">بسته‌های خدمت</h3>
-          <div className="mb-3 flex flex-wrap gap-2">{selected.packages.map((item) => <span key={item.id} className="rounded-control bg-bg-subtle px-3 py-2 text-sm">{item.name}{item.price != null ? ` · ${item.price.toLocaleString("fa-IR")} تومان` : ""}</span>)}</div>
+          <div className="mb-3 flex flex-wrap gap-2">{selected.packages.map((item) => <span key={item.id} className="rounded-control bg-bg-subtle px-3 py-2 text-sm">{item.name}{item.price != null ? ` · ${formatToman(item.price)}` : ""}</span>)}</div>
           <div className="grid gap-2 sm:grid-cols-2"><input className={inputClass} placeholder="نام بسته" value={packageForm.name} onChange={(event) => setPackageForm({ ...packageForm, name: event.target.value })} /><input className={inputClass} type="number" placeholder="قیمت" value={packageForm.price} onChange={(event) => setPackageForm({ ...packageForm, price: event.target.value })} /></div>
           <Button className="mt-2" variant="secondary" disabled={busy || !packageForm.name} onClick={() => run(() => apiFetch(`/admin/services/${selected.id}/packages`, { method: "POST", body: { name: packageForm.name, price: packageForm.price ? Number(packageForm.price) : undefined } }), () => setPackageForm({ name: "", price: "" }))}>افزودن بسته</Button>
         </Card>

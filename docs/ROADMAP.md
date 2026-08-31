@@ -158,7 +158,7 @@
 - [x] نام دسترس‌پذیر Theme Switcher و تمام کنترل‌های icon-only
 - [x] ترتیب Heading، Landmark، Label، Inline error، Focus Ring و Skip link
 - [x] کنتراست WCAG AA، عدم اتکا به رنگ و پشتیبانی Reduced Motion
-- [ ] RTL کامل، محتوای ترکیبی فارسی/انگلیسی، Truncation، اعداد و تاریخ مطابق تنظیم کاربر
+- [x] RTL کامل، محتوای ترکیبی فارسی/انگلیسی، Truncation، اعداد و تاریخ مطابق تنظیم کاربر
 - [ ] Skeleton، Empty، Error، Permission، Offline و Retry state استاندارد
 - [ ] Breadcrumb، Search، Filter، Sort، Pagination و Action Menu مشترک
 - [ ] حذف Flash محتوای نقش اشتباه و Redirect قابل پیش‌بینی

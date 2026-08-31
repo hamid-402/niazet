@@ -434,7 +434,7 @@ export default function AdminStaffPage() {
                   </td>
                   <td className="px-4 py-3">
                     <p className="text-fg-muted">{item.team?.name ?? 'بدون تیم'}</p>
-                    <p className="mt-1 max-w-56 truncate text-xs text-fg-subtle">
+                    <p className="truncate-safe mt-1 max-w-56 text-xs text-fg-subtle">
                       {item.skills?.map((entry) => entry.skill.name).join('، ') ||
                         'مهارتی ثبت نشده'}
                     </p>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { Card, ErrorBanner, PageLoading, SectionTitle } from '@/components/ui';
-import { formatToman } from '@/lib/format';
+import { formatNumber, formatToman } from '@/lib/format';
 
 interface FinanceDashboard {
   period: { timeZone: string; startUtc: string };
@@ -52,7 +52,7 @@ export default function AdminFinanceDashboardPage() {
             {formatToman(data.escrow.held)}
           </p>
           <p className="text-xs text-fg-subtle">
-            {data.escrow.count.toLocaleString('fa-IR')} حساب امانی
+            {formatNumber(data.escrow.count)} حساب امانی
           </p>
         </Card>
         <Card>
@@ -64,13 +64,13 @@ export default function AdminFinanceDashboardPage() {
         <Card>
           <p className="text-xs text-fg-subtle">برداشت در انتظار</p>
           <p className="mt-1 text-xl font-bold text-fg">
-            {data.pendingWithdrawals.toLocaleString('fa-IR')}
+            {formatNumber(data.pendingWithdrawals)}
           </p>
         </Card>
         <Card>
           <p className="text-xs text-fg-subtle">پرداخت ناموفق</p>
           <p className="mt-1 text-xl font-bold text-fg">
-            {data.failedPayments.toLocaleString('fa-IR')}
+            {formatNumber(data.failedPayments)}
           </p>
         </Card>
         <Card>
@@ -78,7 +78,7 @@ export default function AdminFinanceDashboardPage() {
           <p className="mt-1 text-xl font-bold text-fg">
             {formatToman(data.walletLiability.balance)}
           </p>
-          <p className="text-xs text-fg-subtle">{data.walletLiability.count.toLocaleString('fa-IR')} کیف پول</p>
+          <p className="text-xs text-fg-subtle">{formatNumber(data.walletLiability.count)} کیف پول</p>
         </Card>
       </div>
     </div>

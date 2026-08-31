@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { apiFetch } from "@/lib/api";
-import { formatDate } from "@/lib/format";
-import { Button } from "@/components/ui";
+import { formatDate, formatNumber } from "@/lib/format";
+import { BidiText, Button } from "@/components/ui";
 
 interface NotificationItem {
   id: string;
@@ -118,7 +118,7 @@ export function NotificationCenter() {
         اعلان‌ها
         {unread > 0 && (
           <span className="absolute -left-2 -top-2 min-w-5 rounded-pill bg-danger px-1.5 py-0.5 text-center text-[10px] font-bold text-fg-on-danger">
-            {unread.toLocaleString("fa-IR")}
+            {formatNumber(unread)}
           </span>
         )}
       </button>
@@ -164,12 +164,12 @@ export function NotificationCenter() {
                   onClick={() => void markRead(item)}
                   className={`block w-full rounded-control border p-3 text-right ${item.readAt ? "border-border bg-surface" : "border-info-border bg-info-subtle"}`}
                 >
-                  <span className="block text-sm font-bold text-fg">
+                  <BidiText className="block break-anywhere text-sm font-bold text-fg">
                     {item.title}
-                  </span>
-                  <span className="mt-1 block text-xs leading-5 text-fg-muted">
+                  </BidiText>
+                  <BidiText className="mt-1 block break-anywhere text-xs leading-5 text-fg-muted">
                     {item.body}
-                  </span>
+                  </BidiText>
                   <time className="mt-1 block text-[11px] text-fg-subtle">
                     {formatDate(item.createdAt)}
                   </time>

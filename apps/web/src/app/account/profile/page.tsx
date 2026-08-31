@@ -16,7 +16,7 @@ import {
 } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatNumber } from "@/lib/format";
 
 type AccountType = "individual" | "company";
 
@@ -286,7 +286,7 @@ function ProfileContent() {
           </div>
           <div className="min-w-52">
             <div className="mb-2 flex justify-between text-xs text-fg-muted">
-              <span>{form.completionPercent.toLocaleString("fa-IR")}٪</span>
+              <span>{formatNumber(form.completionPercent)}٪</span>
               <span>وضعیت تکمیل</span>
             </div>
             <div className="h-2 overflow-hidden rounded-pill bg-bg-subtle">

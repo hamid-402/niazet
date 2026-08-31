@@ -40,6 +40,10 @@ export function ResponsiveTable({ children, className = '', ...props }: TableHTM
   return <table ref={tableRef} className={`responsive-table ${className}`} {...props}>{children}</table>;
 }
 
+export function BidiText({ children, className = '', ...props }: HTMLAttributes<HTMLElement>) {
+  return <bdi dir="auto" className={className} {...props}>{children}</bdi>;
+}
+
 export function Card({
   children,
   className = '',

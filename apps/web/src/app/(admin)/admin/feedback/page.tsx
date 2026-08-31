@@ -14,7 +14,7 @@ import {
   inputClass,
 } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatNumber } from "@/lib/format";
 
 interface FeedbackItem {
   id: string;
@@ -115,8 +115,8 @@ export default function AdminFeedbackPage() {
       {error && <div className="mb-4"><ErrorBanner message={error} /></div>}
 
       <div className="mb-5 grid gap-3 sm:grid-cols-2">
-        <Card><p className="text-xs text-fg-subtle">نیازمند پیگیری</p><p className="mt-1 text-2xl font-extrabold text-warning">{openCount.toLocaleString("fa-IR")}</p></Card>
-        <Card><p className="text-xs text-fg-subtle">شکایت در نتیجه فعلی</p><p className="mt-1 text-2xl font-extrabold text-danger">{complaintCount.toLocaleString("fa-IR")}</p></Card>
+        <Card><p className="text-xs text-fg-subtle">نیازمند پیگیری</p><p className="mt-1 text-2xl font-extrabold text-warning">{formatNumber(openCount)}</p></Card>
+        <Card><p className="text-xs text-fg-subtle">شکایت در نتیجه فعلی</p><p className="mt-1 text-2xl font-extrabold text-danger">{formatNumber(complaintCount)}</p></Card>
       </div>
 
       <Card className="mb-5">
@@ -146,7 +146,7 @@ export default function AdminFeedbackPage() {
                 </div>
                 <Badge color={item.status === "resolved" || item.status === "closed" ? "green" : item.status === "in_review" ? "yellow" : "blue"}>{STATUS_LABELS[item.status]}</Badge>
               </div>
-              {item.rating && <p className="mt-3 text-warning">{"★".repeat(item.rating)}<span className="text-fg-subtle">{"★".repeat(5 - item.rating)}</span> {item.satisfactionPercent != null && `· رضایت ${item.satisfactionPercent.toLocaleString("fa-IR")}٪`}</p>}
+              {item.rating && <p className="mt-3 text-warning" aria-label={`${formatNumber(item.rating)} از ۵ ستاره`}>{"★".repeat(item.rating)}<span className="text-fg-subtle" aria-hidden="true">{"★".repeat(5 - item.rating)}</span> {item.satisfactionPercent != null && `· رضایت ${formatNumber(item.satisfactionPercent)}٪`}</p>}
               {item.comment && <p className="mt-3 rounded-control bg-bg-subtle px-3 py-3 text-sm leading-7 text-fg-muted">{item.comment}</p>}
               {item.resolutionNote ? <p className="mt-3 rounded-control bg-success-subtle px-3 py-3 text-sm text-success">نتیجه: {item.resolutionNote}</p> : (
                 <div className="mt-4 grid gap-3 md:grid-cols-[1fr_auto] md:items-end">

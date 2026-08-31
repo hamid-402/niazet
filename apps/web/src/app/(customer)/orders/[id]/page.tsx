@@ -16,7 +16,7 @@ import {
 import { OrderStatusBadge } from "@/components/status-badge";
 import { SecureFileLink, SecureFileUpload } from "@/components/secure-file";
 import type { OrderDetail, OrderFile } from "@/lib/types";
-import { formatDate, formatToman } from "@/lib/format";
+import { formatDate, formatNumber, formatToman } from "@/lib/format";
 import { customerNextAction, OrderTimeline } from "@/components/order-timeline";
 
 const TABS = [
@@ -589,14 +589,14 @@ function FeedbackForm({
               </select>
             </Field>
           )}
-          <Field label={`امتیاز: ${rating.toLocaleString("fa-IR")} از ۵`}>
+          <Field label={`امتیاز: ${formatNumber(rating)} از ۵`}>
             <div className="flex gap-1" role="radiogroup" aria-label="امتیاز ستاره‌ای">
               {[1, 2, 3, 4, 5].map((value) => (
                 <button key={value} type="button" role="radio" aria-checked={rating === value} aria-label={`${value} ستاره`} onClick={() => setRating(value)} className={`rounded-control px-3 py-2 text-xl ${value <= rating ? "bg-warning-subtle text-warning" : "bg-bg-subtle text-fg-subtle"}`}>★</button>
               ))}
             </div>
           </Field>
-          <Field label={`رضایت کلی: ${satisfactionPercent.toLocaleString("fa-IR")}٪`}>
+          <Field label={`رضایت کلی: ${formatNumber(satisfactionPercent)}٪`}>
             <input type="range" min={0} max={100} step={5} value={satisfactionPercent} onChange={(event) => setSatisfactionPercent(Number(event.target.value))} className="w-full accent-accent" />
           </Field>
           <div className="md:col-span-2">
@@ -650,7 +650,7 @@ function FeedbackForm({
                   <div><p className="font-bold text-fg">{feedbackLabels[item.feedbackType]} درباره {targetLabels[item.targetType]}</p><p className="mt-1 text-xs text-fg-subtle">{formatDate(item.createdAt)} · کد <b dir="ltr">{item.code}</b></p></div>
                   <Badge color={item.status === "resolved" || item.status === "closed" ? "green" : item.status === "in_review" ? "yellow" : "blue"}>{statusLabels[item.status]}</Badge>
                 </div>
-                {item.rating && <p className="mt-2 text-sm text-warning">{"★".repeat(item.rating)}<span className="text-fg-subtle">{"★".repeat(5 - item.rating)}</span></p>}
+                {item.rating && <p className="mt-2 text-sm text-warning" aria-label={`${formatNumber(item.rating)} از ۵ ستاره`}>{"★".repeat(item.rating)}<span className="text-fg-subtle" aria-hidden="true">{"★".repeat(5 - item.rating)}</span></p>}
                 {item.comment && <p className="mt-2 text-sm leading-7 text-fg-muted">{item.comment}</p>}
                 {item.resolutionNote && <p className="mt-3 rounded-control bg-success-subtle px-3 py-2 text-sm text-success">نتیجه رسیدگی: {item.resolutionNote}</p>}
               </div>
