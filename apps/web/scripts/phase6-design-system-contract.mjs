@@ -13,6 +13,7 @@ async function files(path) {
 const globals = await readFile(new URL('src/app/globals.css', ROOT), 'utf8');
 const ui = await readFile(new URL('src/components/ui.tsx', ROOT), 'utf8');
 const shell = await readFile(new URL('src/components/app-shell.tsx', ROOT), 'utf8');
+const drawer = await readFile(new URL('src/components/mobile-drawer.tsx', ROOT), 'utf8');
 const required = [
   '--color-accent', '--color-overlay', '--text-body', '--text-heading-lg',
   '--layout-content-max', '--layout-grid-gap', '--radius-card',
@@ -23,7 +24,7 @@ const required = [
 ];
 for (const token of required) assert(globals.includes(token), `Design token is missing: ${token}`);
 assert(ui.includes('control-density'), 'Shared controls do not consume density tokens.');
-assert(shell.includes('page-container') && shell.includes('z-overlay'), 'App shell does not consume layout/z-index tokens.');
+assert(shell.includes('page-container') && drawer.includes('z-overlay') && drawer.includes('z-modal'), 'Shell/drawer do not consume layout/z-index tokens.');
 
 const tsxFiles = (await files(SRC)).filter((path) => path.endsWith('.tsx'));
 const palettePattern = /(?:bg|text|border|divide)-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|fuchsia|pink|rose)-\d+(?:\/\d+)?/;

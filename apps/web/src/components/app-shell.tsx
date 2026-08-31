@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { ThemeSwitcher } from "./theme-switcher";
 import { NotificationCenter } from "./notification-center";
+import { MobileDrawer } from "./mobile-drawer";
 
 export interface NavItem {
   href: string;
@@ -20,19 +21,6 @@ function MenuIcon() {
         strokeWidth="1.6"
         strokeLinecap="round"
         d="M3 5.5h14M3 10h14M3 14.5h14"
-      />
-    </svg>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" className="icon-md">
-      <path
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        d="M5 5l10 10M15 5 5 15"
       />
     </svg>
   );
@@ -83,6 +71,7 @@ export function AppShell({
   const router = useRouter();
   const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const closeMobile = useCallback(() => setMobileOpen(false), []);
 
   async function handleLogout() {
     await logout();
@@ -118,48 +107,27 @@ export function AppShell({
       </aside>
 
       {/* Mobile off-canvas nav */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-overlay md:hidden">
-          <div
-            className="absolute inset-0 bg-overlay"
-            onClick={() => setMobileOpen(false)}
-            aria-hidden="true"
-          />
-          <aside className="absolute inset-y-0 right-0 flex w-72 flex-col bg-surface p-5 shadow-elevation-4">
-            <div className="mb-6 flex items-center justify-between">
-              <span className="text-lg font-extrabold text-fg">
-                نیازت با ما
-              </span>
-              <button
-                onClick={() => setMobileOpen(false)}
-                aria-label="بستن منو"
-                className="rounded-control p-1.5 text-fg-muted hover:bg-bg-subtle"
-              >
-                <CloseIcon />
-              </button>
-            </div>
-            <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-fg-subtle">
-              {title}
-            </p>
-            <NavLinks
-              navItems={navItems}
-              onNavigate={() => setMobileOpen(false)}
-            />
-            <div className="mt-6 border-t border-border pt-4">
-              <div className="mb-3">
-                <ThemeSwitcher />
-              </div>
-              <p className="text-sm font-medium text-fg">{user?.fullName}</p>
-              <button
-                onClick={handleLogout}
-                className="mt-3 text-xs font-medium text-danger hover:underline"
-              >
-                خروج از حساب
-              </button>
-            </div>
-          </aside>
-        </div>
-      )}
+      <MobileDrawer open={mobileOpen} onClose={closeMobile} title="نیازت با ما">
+           <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-fg-subtle">
+             {title}
+           </p>
+           <NavLinks
+             navItems={navItems}
+              onNavigate={closeMobile}
+           />
+           <div className="mt-6 border-t border-border pt-4">
+             <div className="mb-3">
+               <ThemeSwitcher />
+             </div>
+             <p className="text-sm font-medium text-fg">{user?.fullName}</p>
+             <button
+               onClick={handleLogout}
+               className="mt-3 text-xs font-medium text-danger hover:underline"
+             >
+               خروج از حساب
+             </button>
+           </div>
+      </MobileDrawer>
 
       <div className="flex-1">
         <header className="sticky top-0 z-sticky flex items-center justify-between border-b border-border bg-surface/90 px-4 py-3 backdrop-blur md:px-8">
