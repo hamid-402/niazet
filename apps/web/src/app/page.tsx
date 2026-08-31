@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { PublicNav } from '@/components/public-nav';
 import { LinkButton } from '@/components/ui';
 import { ManagedServiceFlow } from '@/components/managed-service-flow';
+import { ServiceProcessStepper } from '@/components/service-process-stepper';
 
 const CATEGORIES = [
   'طراحی و توسعه سایت',
@@ -28,30 +29,6 @@ const TRUST_SIGNALS = [
     description: 'خروجی پیش از ارائه به شما با معیارهای توافق‌شده بررسی می‌شود.',
   },
 ] as const;
-
-const STEPS = [
-  {
-    title: 'انتخاب خدمت',
-    desc: 'خدمت موردنیازتان را از فهرست خدمات انتخاب کنید.',
-  },
-  { title: 'ثبت درخواست', desc: 'فرم کوتاه را تکمیل و نیاز خود را شرح دهید.' },
-  {
-    title: 'بررسی و قیمت‌گذاری',
-    desc: 'کارشناسان ما درخواست را بررسی و قیمت نهایی را اعلام می‌کنند.',
-  },
-  {
-    title: 'پرداخت امن',
-    desc: 'مبلغ در حساب امانی نگه‌داری می‌شود تا تحویل کامل شود.',
-  },
-  {
-    title: 'اجرای مدیریت‌شده',
-    desc: 'تیم اجرا با گزارش مرحله‌ای کار را پیش می‌برد.',
-  },
-  {
-    title: 'کنترل کیفیت و تحویل',
-    desc: 'پیش از تحویل به شما، خروجی از کنترل کیفیت عبور می‌کند.',
-  },
-];
 
 const FAQS = [
   {
@@ -118,27 +95,7 @@ export default function HomePage() {
         </div>
         </section>
 
-        <section id="how-it-works" className="bg-surface py-16">
-        <div className="mx-auto max-w-6xl px-4 md:px-8">
-          <h2 className="mb-8 text-center text-lg font-bold text-fg">
-            روند کار
-          </h2>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            {STEPS.map((step, i) => (
-              <div
-                key={step.title}
-                className="rounded-card border border-border bg-bg p-5"
-              >
-                <span className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent text-sm font-bold text-fg-on-accent">
-                  {i + 1}
-                </span>
-                <h3 className="mt-2 font-bold text-fg">{step.title}</h3>
-                <p className="mt-1 text-sm text-fg-muted">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-        </section>
+        <ServiceProcessStepper />
 
         <section id="faq" className="mx-auto w-full max-w-3xl px-4 py-16 md:px-8">
         <h2 className="mb-6 text-center text-lg font-bold text-fg">
