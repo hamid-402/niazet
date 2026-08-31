@@ -6,6 +6,7 @@ import { ServiceProcessStepper } from '@/components/service-process-stepper';
 import { ServiceUseCases } from '@/components/service-use-cases';
 import { ServiceOutputSamples } from '@/components/service-output-samples';
 import { ServiceAssurance } from '@/components/service-assurance';
+import { PublicFaqAndFinalCta } from '@/components/public-faq-cta';
 
 const CATEGORIES = [
   'طراحی و توسعه سایت',
@@ -32,21 +33,6 @@ const TRUST_SIGNALS = [
     description: 'خروجی پیش از ارائه به شما با معیارهای توافق‌شده بررسی می‌شود.',
   },
 ] as const;
-
-const FAQS = [
-  {
-    q: 'چه کسی کار من را انجام می‌دهد؟',
-    a: 'در فاز فعلی، تمام کارها توسط تیم اجرای داخلی شرکت انجام می‌شود؛ نه فریلنسرهای آزاد و بدون احراز.',
-  },
-  {
-    q: 'پول من چطور محافظت می‌شود؟',
-    a: 'مبلغ سفارش تا تأیید تحویل شما در حساب امانی نگه‌داری می‌شود و مستقیم به کسی پرداخت نمی‌شود.',
-  },
-  {
-    q: 'اگر از خروجی راضی نبودم چه؟',
-    a: 'می‌توانید درخواست اصلاح یا بررسی اختلاف ثبت کنید تا تیم پشتیبانی موضوع را پیگیری کند.',
-  },
-];
 
 export default function HomePage() {
   return (
@@ -106,24 +92,7 @@ export default function HomePage() {
 
         <ServiceProcessStepper />
 
-        <section id="faq" className="mx-auto w-full max-w-3xl px-4 py-16 md:px-8">
-        <h2 className="mb-6 text-center text-lg font-bold text-fg">
-          سوالات پرتکرار
-        </h2>
-        <div className="flex flex-col gap-3">
-          {FAQS.map((item) => (
-            <details
-              key={item.q}
-              className="rounded-card border border-border bg-surface p-4"
-            >
-              <summary className="cursor-pointer font-medium text-fg">
-                {item.q}
-              </summary>
-              <p className="mt-2 text-sm text-fg-muted">{item.a}</p>
-            </details>
-          ))}
-        </div>
-        </section>
+        <PublicFaqAndFinalCta />
       </main>
 
       <footer className="border-t border-border bg-surface py-6 text-center text-xs text-fg-subtle">

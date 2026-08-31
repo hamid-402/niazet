@@ -173,7 +173,7 @@
 - [x] Service catalog با Search/Filter، Package، خروجی، SLA، Acceptance و FAQ
 - [x] نمونه خروجی‌ها بدون ادعای ساختگی و با Privacy مناسب
 - [x] Assurance درباره اجرای داخلی، Escrow، QC، محرمانگی و پشتیبانی
-- [ ] FAQ قابل دسترس و Final CTA متناسب با وضعیت Login
+- [x] FAQ قابل دسترس و Final CTA متناسب با وضعیت Login
 - [ ] تنوع محدود ریتم صفحه و جداکننده‌های هندسی با پالت فعلی
 - [ ] Motion محدود و Route-aware با رعایت Reduced Motion
 - [ ] SEO فنی، Metadata، Sitemap، Robots، Structured Data و صفحات خطای عمومی
