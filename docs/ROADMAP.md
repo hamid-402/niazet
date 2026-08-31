@@ -160,7 +160,7 @@
 - [x] کنتراست WCAG AA، عدم اتکا به رنگ و پشتیبانی Reduced Motion
 - [x] RTL کامل، محتوای ترکیبی فارسی/انگلیسی، Truncation، اعداد و تاریخ مطابق تنظیم کاربر
 - [x] Skeleton، Empty، Error، Permission، Offline و Retry state استاندارد
-- [ ] Breadcrumb، Search، Filter، Sort، Pagination و Action Menu مشترک
+- [x] Breadcrumb، Search، Filter، Sort، Pagination و Action Menu مشترک
 - [ ] حذف Flash محتوای نقش اشتباه و Redirect قابل پیش‌بینی
 - [ ] بازنویسی Microcopy برای زبان ساده، حرفه‌ای و اقدام‌محور
 
