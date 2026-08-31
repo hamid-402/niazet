@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { Card, ErrorBanner, PageLoading, SectionTitle } from '@/components/ui';
 import { formatNumber, formatToman } from '@/lib/format';
+import { PRODUCT_TERMS } from '@/lib/product-copy';
 
 interface FinanceDashboard {
   period: { timeZone: string; startUtc: string };
@@ -35,7 +36,7 @@ export default function AdminFinanceDashboardPage() {
       <SectionTitle>داشبورد مالی</SectionTitle>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
         <Card>
-          <p className="text-xs text-fg-subtle">GMV این ماه</p>
+          <p className="text-xs text-fg-subtle">{PRODUCT_TERMS.grossOrderValue} در این ماه</p>
           <p className="mt-1 text-xl font-bold text-fg">
             {formatToman(data.gmv)}
           </p>
@@ -47,7 +48,7 @@ export default function AdminFinanceDashboardPage() {
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-fg-subtle">مانده Escrow</p>
+          <p className="text-xs text-fg-subtle">مانده {PRODUCT_TERMS.escrow}</p>
           <p className="mt-1 text-xl font-bold text-fg">
             {formatToman(data.escrow.held)}
           </p>

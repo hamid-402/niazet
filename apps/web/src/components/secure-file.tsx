@@ -84,7 +84,7 @@ export function SecureFileUpload({
         {uploading ? "در حال بررسی و آپلود…" : label}
       </Button>
       <p className="mt-1 text-xs text-fg-muted">
-        PDF، Office، ZIP، تصویر، TXT یا CSV؛ حداکثر ۲۵ مگابایت
+        قالب‌های مجاز: PDF، فایل‌های آفیس، ZIP، تصویر، TXT و CSV؛ حداکثر ۲۵ مگابایت
       </p>
       {error && (
         <p role="alert" className="mt-1 text-xs text-danger">

@@ -162,7 +162,7 @@
 - [x] Skeleton، Empty، Error، Permission، Offline و Retry state استاندارد
 - [x] Breadcrumb، Search، Filter، Sort، Pagination و Action Menu مشترک
 - [x] حذف Flash محتوای نقش اشتباه و Redirect قابل پیش‌بینی
-- [ ] بازنویسی Microcopy برای زبان ساده، حرفه‌ای و اقدام‌محور
+- [x] بازنویسی Microcopy برای زبان ساده، حرفه‌ای و اقدام‌محور
 
 ## فاز ۷ — هویت بصری و صفحات عمومی
 

@@ -113,7 +113,7 @@ export default function AdminUsersPage() {
           description={`${pending.fullName} — ${pending.phone}`}
           impacts={pending.status === 'blocked'
             ? ['کاربر دوباره امکان ورود و استفاده از حساب را خواهد داشت.']
-            : ['همه Sessionهای فعال کاربر باطل می‌شوند.', 'ورود و استفاده از حساب تا فعال‌سازی مجدد متوقف می‌شود.']}
+            : ['دسترسی همه دستگاه‌های فعال کاربر فوراً قطع می‌شود.', 'ورود و استفاده از حساب تا فعال‌سازی مجدد متوقف می‌شود.']}
           confirmLabel={pending.status === 'blocked' ? 'فعال‌سازی کاربر' : 'مسدودکردن کاربر'}
           tone={pending.status === 'blocked' ? 'primary' : 'danger'}
           onCancel={() => setPending(null)}

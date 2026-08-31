@@ -12,6 +12,7 @@ import {
   SectionTitle,
 } from '@/components/ui';
 import { formatToman } from '@/lib/format';
+import { PRODUCT_TERMS } from '@/lib/product-copy';
 import { ConfirmationModal } from '@/components/confirmation-modal';
 
 interface Escrow {
@@ -65,7 +66,7 @@ export default function AdminEscrowPage() {
 
   return (
     <div>
-      <SectionTitle>Escrow</SectionTitle>
+      <SectionTitle subtitle="مبلغ سفارش تا زمان آزادسازی یا بازپرداخت، امن نگه‌داری می‌شود.">{PRODUCT_TERMS.escrow}</SectionTitle>
       {error && <ErrorBanner message={error} />}
       {!items && !error && <PageLoading />}
       {items && items.length === 0 && (
@@ -110,11 +111,11 @@ export default function AdminEscrowPage() {
       {pending && (
         <ConfirmationModal
           open
-          title={pending.action === 'release' ? 'تأیید آزادسازی Escrow' : 'تأیید بازپرداخت Escrow'}
+          title={pending.action === 'release' ? 'تأیید آزادسازی حساب امانی' : 'تأیید بازپرداخت حساب امانی'}
           description={`سفارش ${pending.item.order.code} — ${pending.item.order.title}`}
           impacts={pending.action === 'release'
-            ? [`انتقال ${formatToman(pending.item.amount)} از حساب امانی`, 'ثبت سند Ledger و Audit غیرقابل‌ویرایش']
-            : [`بازگشت ${formatToman(pending.item.amount)} به کیف پول مشتری`, 'ثبت Refund و سند Ledger غیرقابل‌ویرایش']}
+            ? [`انتقال ${formatToman(pending.item.amount)} از حساب امانی`, 'ثبت همیشگی سند مالی و رویداد تصمیم']
+            : [`بازگشت ${formatToman(pending.item.amount)} به کیف پول مشتری`, 'ثبت همیشگی بازپرداخت و سند مالی']}
           confirmLabel={pending.action === 'release' ? 'آزادسازی مبلغ' : 'ثبت بازپرداخت'}
           tone={pending.action === 'release' ? 'primary' : 'danger'}
           onCancel={() => setPending(null)}

@@ -19,16 +19,16 @@ export default function AiControlsPage() {
     try {
       await apiFetch('/admin/settings', { method: 'PUT', body: { key: item.key, value: !item.value } });
       apply(await apiFetch<Setting[]>('/admin/settings', { dedupe: false }));
-    } catch (err) { setError(err instanceof ApiError ? err.message : 'کنترل AI ذخیره نشد.'); }
+    } catch (err) { setError(err instanceof ApiError ? err.message : 'ذخیره تنظیم هوش مصنوعی ممکن نشد؛ دوباره تلاش کنید.'); }
     finally { setBusy(''); }
   }
 
   if (!items) return error ? <ErrorBanner message={error} /> : <PageLoading />;
   const masterEnabled = items.find((item) => item.key === 'ai.enabled')?.value === true;
   return <div>
-    <SectionTitle subtitle="این کنترل‌ها مجوز استفاده را تعیین می‌کنند؛ هیچ تصمیم یا ارسال خودکاری بدون پیاده‌سازی موتور و تأیید انسانی انجام نمی‌شود.">کنترل‌های AI</SectionTitle>
+    <SectionTitle subtitle="هیچ تصمیم مالی، حقوقی یا نهایی بدون تأیید انسان اجرا نمی‌شود.">کنترل‌های هوش مصنوعی</SectionTitle>
     {error && <ErrorBanner message={error} />}
-    <Card className={`mb-3 ${masterEnabled ? 'border-warning-border' : 'border-success-border'}`}><div className="flex items-center justify-between gap-3"><div><p className="font-bold text-fg">وضعیت سراسری</p><p className="mt-1 text-sm text-fg-muted">Kill switch بر همه قابلیت‌های AI اولویت دارد.</p></div><Badge color={masterEnabled ? 'yellow' : 'green'}>{masterEnabled ? 'فعال' : 'خاموش و امن'}</Badge></div></Card>
+    <Card className={`mb-3 ${masterEnabled ? 'border-warning-border' : 'border-success-border'}`}><div className="flex items-center justify-between gap-3"><div><p className="font-bold text-fg">وضعیت سراسری</p><p className="mt-1 text-sm text-fg-muted">توقف اضطراری، همه قابلیت‌های هوش مصنوعی را یکجا غیرفعال می‌کند.</p></div><Badge color={masterEnabled ? 'yellow' : 'green'}>{masterEnabled ? 'قابلیت‌ها فعال‌اند' : 'همه قابلیت‌ها متوقف‌اند'}</Badge></div></Card>
     <div className="space-y-3">{items.map((item) => {
       const enabled = item.value === true;
       const locked = item.key === 'ai.human_approval_required';

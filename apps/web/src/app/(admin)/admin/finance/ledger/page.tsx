@@ -11,6 +11,7 @@ import { ResponsiveTable,
   SectionTitle,
 } from '@/components/ui';
 import { formatDate, formatToman } from '@/lib/format';
+import { PRODUCT_TERMS } from '@/lib/product-copy';
 
 interface LedgerEntry {
   id: string;
@@ -49,7 +50,7 @@ export default function AdminLedgerPage() {
         `niazat-ledger-${new Date().toISOString().slice(0, 10)}.csv`,
       );
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'خروجی Ledger دریافت نشد.');
+      setError(err instanceof Error ? err.message : 'دریافت دفتر ثبت مالی ممکن نشد؛ دوباره تلاش کنید.');
     } finally {
       setExporting(false);
     }
@@ -58,7 +59,7 @@ export default function AdminLedgerPage() {
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <SectionTitle subtitle="فقط نمایش؛ بدون امکان ویرایش مستقیم">Ledger</SectionTitle>
+        <SectionTitle subtitle="این سوابق فقط خواندنی‌اند و برای اصلاح، سند جبرانی ثبت می‌شود.">{PRODUCT_TERMS.ledger}</SectionTitle>
         <Button variant="secondary" disabled={exporting} onClick={() => void exportCsv()}>{exporting ? 'در حال تهیه...' : 'خروجی CSV'}</Button>
       </div>
       {error && <ErrorBanner message={error} />}

@@ -50,13 +50,13 @@ export default function ExecutorDashboardPage() {
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-fg-subtle">نیازمند اصلاح (QC)</p>
+          <p className="text-xs text-fg-subtle">نیازمند اصلاح پس از کنترل کیفیت</p>
           <p className="mt-1 text-2xl font-bold text-fg">
             {data.needsRework}
           </p>
         </Card>
         <Card>
-          <p className="text-xs text-fg-subtle">نرخ قبولی QC</p>
+          <p className="text-xs text-fg-subtle">نرخ تأیید کنترل کیفیت</p>
           <p className="mt-1 text-2xl font-bold text-fg">
             {Number(data.profile.qcPassRate).toFixed(0)}٪
           </p>

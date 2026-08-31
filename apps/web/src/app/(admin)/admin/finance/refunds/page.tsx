@@ -34,7 +34,7 @@ export default function AdminRefundsPage() {
 
   return <div>
     <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-      <SectionTitle subtitle="سوابق بازگشت وجه از Escrow به کیف پول مشتری">بازپرداخت‌ها</SectionTitle>
+      <SectionTitle subtitle="سوابق بازگشت وجه از حساب امانی به کیف پول مشتری">بازپرداخت‌ها</SectionTitle>
       <select className={`${inputClass} w-48`} value={status} onChange={(event) => setStatus(event.target.value)}>
         <option value="">همه وضعیت‌ها</option>
         {Object.entries(STATUS_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
