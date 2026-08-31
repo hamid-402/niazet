@@ -21,7 +21,8 @@
     "phase6:list-controls-contract": "node scripts/phase6-list-controls-contract.mjs",
     "phase6:auth-redirect-contract": "node scripts/phase6-auth-redirect-contract.mjs",
     "phase6:microcopy-contract": "node scripts/phase6-microcopy-contract.mjs",
-    "phase7:hero-contract": "node scripts/phase7-hero-contract.mjs"
+    "phase7:hero-contract": "node scripts/phase7-hero-contract.mjs",
+    "phase7:flow-diagram-contract": "node scripts/phase7-flow-diagram-contract.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.42.2",

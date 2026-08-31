@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { PublicNav } from '@/components/public-nav';
 import { LinkButton } from '@/components/ui';
+import { ManagedServiceFlow } from '@/components/managed-service-flow';
 
 const CATEGORIES = [
   'طراحی و توسعه سایت',
@@ -97,6 +98,8 @@ export default function HomePage() {
             ))}
           </ul>
         </section>
+
+        <ManagedServiceFlow />
 
         <section className="mx-auto w-full max-w-6xl px-4 pb-16 md:px-8">
         <h2 className="mb-4 text-center text-lg font-bold text-fg">
