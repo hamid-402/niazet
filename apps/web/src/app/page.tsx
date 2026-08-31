@@ -5,6 +5,7 @@ import { ManagedServiceFlow } from '@/components/managed-service-flow';
 import { ServiceProcessStepper } from '@/components/service-process-stepper';
 import { ServiceUseCases } from '@/components/service-use-cases';
 import { ServiceOutputSamples } from '@/components/service-output-samples';
+import { ServiceAssurance } from '@/components/service-assurance';
 
 const CATEGORIES = [
   'طراحی و توسعه سایت',
@@ -100,6 +101,8 @@ export default function HomePage() {
         <ServiceUseCases />
 
         <ServiceOutputSamples />
+
+        <ServiceAssurance />
 
         <ServiceProcessStepper />
 

@@ -172,7 +172,7 @@
 - [x] Use Caseهای واقعی برای کسب‌وکار، دانشگاه/پژوهش، محتوا، طراحی و امور سفارشی
 - [x] Service catalog با Search/Filter، Package، خروجی، SLA، Acceptance و FAQ
 - [x] نمونه خروجی‌ها بدون ادعای ساختگی و با Privacy مناسب
-- [ ] Assurance درباره اجرای داخلی، Escrow، QC، محرمانگی و پشتیبانی
+- [x] Assurance درباره اجرای داخلی، Escrow، QC، محرمانگی و پشتیبانی
 - [ ] FAQ قابل دسترس و Final CTA متناسب با وضعیت Login
 - [ ] تنوع محدود ریتم صفحه و جداکننده‌های هندسی با پالت فعلی
 - [ ] Motion محدود و Route-aware با رعایت Reduced Motion
