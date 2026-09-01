@@ -35,6 +35,8 @@
     "phase5:reporting-contract": "node scripts/phase5-reporting-contract.mjs",
     "phase5:reporting-export-contract": "node scripts/phase5-reporting-export-contract.mjs",
     "phase8:unit-coverage-contract": "node scripts/phase8-unit-coverage-contract.mjs",
+    "phase8:postgres-contract": "node scripts/phase8-postgres-contract.mjs",
+    "test:integration:postgres": "node scripts/phase8-postgres-integration.mjs",
     "prisma:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {

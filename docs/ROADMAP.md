@@ -181,7 +181,7 @@
 ## فاز ۸ — Production، کیفیت و عملیات
 
 - [x] Unit test برای تمام Policyها، State transitionها، محاسبات مالی و Ownership
-- [ ] Integration test با PostgreSQL واقعی برای Transaction، Constraint و Migration
+- [x] Integration test با PostgreSQL واقعی برای Transaction، Constraint و Migration
 - [ ] E2E ماتریس تمام نقش‌ها و جریان کامل سفارش، پرداخت، QC، تحویل، تیکت و فایل
 - [ ] تست Accessibility، Responsive، Keyboard و Visual regression دو تم
 - [ ] CI برای Format-check، Lint، Typecheck، Unit، Integration، E2E، Migration و Build
