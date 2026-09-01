@@ -30,7 +30,8 @@
     "phase7:assurance-contract": "node scripts/phase7-assurance-contract.mjs",
     "phase7:faq-cta-contract": "node scripts/phase7-faq-cta-contract.mjs",
     "phase7:visual-rhythm-contract": "node scripts/phase7-visual-rhythm-contract.mjs",
-    "phase7:route-motion-contract": "node scripts/phase7-route-motion-contract.mjs"
+    "phase7:route-motion-contract": "node scripts/phase7-route-motion-contract.mjs",
+    "phase7:seo-contract": "node scripts/phase7-seo-contract.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.23.0",

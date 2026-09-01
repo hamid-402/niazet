@@ -8,6 +8,7 @@ import { ServiceOutputSamples } from '@/components/service-output-samples';
 import { ServiceAssurance } from '@/components/service-assurance';
 import { PublicFaqAndFinalCta } from '@/components/public-faq-cta';
 import { GeometricSectionDivider } from '@/components/geometric-section-divider';
+import { PublicStructuredData } from '@/components/public-structured-data';
 
 const CATEGORIES = [
   'طراحی و توسعه سایت',
@@ -38,6 +39,7 @@ const TRUST_SIGNALS = [
 export default function HomePage() {
   return (
     <div className="flex flex-1 flex-col">
+      <PublicStructuredData />
       <PublicNav />
 
       <main id="main-content">

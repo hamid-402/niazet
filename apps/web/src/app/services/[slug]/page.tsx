@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { PublicNav } from '@/components/public-nav';
 import { ServiceOrderCta } from '@/components/service-order-cta';
@@ -8,7 +9,24 @@ import type { ServiceLine } from '@/lib/types';
 
 export const revalidate = 300;
 
-export default async function ServiceDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+type ServicePageProps = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: ServicePageProps): Promise<Metadata> {
+  const { slug } = await params;
+  try {
+    const service = await publicApiFetch<ServiceLine>(`/services/${encodeURIComponent(slug)}`);
+    return {
+      title: service.title,
+      description: service.description,
+      alternates: { canonical: `/services/${service.slug}` },
+      openGraph: { title: service.title, description: service.description, type: 'website', url: `/services/${service.slug}` },
+    };
+  } catch {
+    return { title: 'خدمت پیدا نشد', robots: { index: false, follow: false } };
+  }
+}
+
+export default async function ServiceDetailPage({ params }: ServicePageProps) {
   const { slug } = await params;
   let service: ServiceLine;
   try { service = await publicApiFetch<ServiceLine>(`/services/${encodeURIComponent(slug)}`); } catch { notFound(); }

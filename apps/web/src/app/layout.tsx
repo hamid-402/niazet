@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { DEFAULT_THEME, THEMES, THEME_STORAGE_KEY } from '@/lib/themes';
 import { NetworkStatus } from '@/components/network-status';
 import { RouteTransition } from '@/components/route-transition';
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/lib/site';
 
 const vazirmatn = Vazirmatn({
   variable: '--font-vazirmatn',
@@ -13,8 +14,32 @@ const vazirmatn = Vazirmatn({
 });
 
 export const metadata: Metadata = {
-  title: 'نیازت با ما',
-  description: 'سامانه خدمات مدیریت‌شده «نیازت با ما»',
+  metadataBase: SITE_URL,
+  title: {
+    default: `${SITE_NAME} | خدمات تخصصی مدیریت‌شده`,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    locale: 'fa_IR',
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} | خدمات تخصصی مدیریت‌شده`,
+    description: SITE_DESCRIPTION,
+    url: '/',
+  },
+  twitter: {
+    card: 'summary',
+    title: `${SITE_NAME} | خدمات تخصصی مدیریت‌شده`,
+    description: SITE_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
+  },
 };
 
 // Runs before hydration/paint to apply the persisted theme and prevent a

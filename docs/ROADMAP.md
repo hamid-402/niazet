@@ -176,7 +176,7 @@
 - [x] FAQ قابل دسترس و Final CTA متناسب با وضعیت Login
 - [x] تنوع محدود ریتم صفحه و جداکننده‌های هندسی با پالت فعلی
 - [x] Motion محدود و Route-aware با رعایت Reduced Motion
-- [ ] SEO فنی، Metadata، Sitemap، Robots، Structured Data و صفحات خطای عمومی
+- [x] SEO فنی، Metadata، Sitemap، Robots، Structured Data و صفحات خطای عمومی
 
 ## فاز ۸ — Production، کیفیت و عملیات
 

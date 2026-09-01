@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { PublicNav } from '@/components/public-nav';
 import { ServiceCatalog } from '@/components/service-catalog';
 import { EmptyState, LinkButton, RetryState } from '@/components/ui';
@@ -5,6 +6,12 @@ import { publicApiFetch } from '@/lib/server-api';
 import type { ServiceLine } from '@/lib/types';
 
 export const revalidate = 300;
+export const metadata: Metadata = {
+  title: 'کاتالوگ خدمات',
+  description: 'جست‌وجو و مقایسه خدمات مدیریت‌شده نیازت بر اساس پکیج، خروجی، زمان هدف و معیار پذیرش',
+  alternates: { canonical: '/services' },
+  openGraph: { title: 'کاتالوگ خدمات مدیریت‌شده', description: 'خدمات را با خروجی، SLA و شرایط شفاف مقایسه کنید.', url: '/services' },
+};
 
 export default async function ServicesPage() {
   let services: ServiceLine[] = [];
