@@ -8,6 +8,8 @@ Workflow اصلی در `.github/workflows/ci.yml` روی هر Push و Pull Reque
 
 `permissions: contents: read` حداقل دسترسی لازم را اعمال می‌کند، اجرای قدیمی همان branch با `concurrency` لغو می‌شود و هر job محدودیت زمانی دارد. Secretهای داخل workflow فقط مقادیر ثابت محیط test هستند و هیچ credential محیط واقعی یا فایل `.env` وارد Git نمی‌شود.
 
+Jobهای بدون PostgreSQL نیز یک `DATABASE_URL` صرفاً نحوی دارند و پیش از lint/typecheck، `prisma generate` را صریح اجرا می‌کنند؛ این URL برای اتصال استفاده نمی‌شود و فقط بارگذاری `prisma.config.ts` و تولید typeهای Client را در محیط تمیز Linux پایدار می‌کند.
+
 معادل بررسی‌های اصلی روی لوکال:
 
 ```powershell
@@ -21,4 +23,3 @@ npm.cmd run phase8:ui-quality-contract --prefix apps/web
 ```
 
 تست‌های PostgreSQL و E2E دیتابیس‌های تصادفی خودشان را می‌سازند و در `finally` پاک می‌کنند؛ workflow به دیتابیس توسعه یا production متصل نمی‌شود.
-
