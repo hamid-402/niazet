@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { formatDate, formatNumber } from "@/lib/format";
 import { BidiText, Button } from "@/components/ui";
@@ -28,6 +28,8 @@ export function NotificationCenter() {
   );
   const [error, setError] = useState("");
   const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelId = `notification-center-${useId().replaceAll(":", "")}`;
 
   const load = useCallback(async () => {
     try {
@@ -64,9 +66,19 @@ export function NotificationCenter() {
     function close(event: MouseEvent) {
       if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
     }
+    function closeWithKeyboard(event: KeyboardEvent) {
+      if (event.key !== "Escape" || !open) return;
+      event.preventDefault();
+      setOpen(false);
+      window.requestAnimationFrame(() => triggerRef.current?.focus());
+    }
     document.addEventListener("mousedown", close);
-    return () => document.removeEventListener("mousedown", close);
-  }, []);
+    document.addEventListener("keydown", closeWithKeyboard);
+    return () => {
+      document.removeEventListener("mousedown", close);
+      document.removeEventListener("keydown", closeWithKeyboard);
+    };
+  }, [open]);
 
   const unread = items.filter((item) => !item.readAt).length;
 
@@ -109,9 +121,12 @@ export function NotificationCenter() {
   return (
     <div ref={rootRef} className="relative">
       <button
+        ref={triggerRef}
         type="button"
         aria-label={`اعلان‌ها${unread ? `، ${unread} خوانده‌نشده` : ""}`}
         aria-expanded={open}
+        aria-controls={panelId}
+        aria-haspopup="dialog"
         onClick={() => setOpen((value) => !value)}
         className="relative rounded-control border border-border bg-surface px-3 py-2 text-sm text-fg hover:bg-bg-subtle"
       >
@@ -124,6 +139,8 @@ export function NotificationCenter() {
       </button>
       {open && (
         <section
+          id={panelId}
+          role="dialog"
           className="absolute left-0 z-overlay mt-2 w-[min(24rem,calc(100vw-2rem))] rounded-card border border-border bg-surface p-4 shadow-elevation-4"
           aria-label="مرکز اعلان‌ها"
         >

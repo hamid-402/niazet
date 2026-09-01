@@ -31,7 +31,9 @@
     "phase7:faq-cta-contract": "node scripts/phase7-faq-cta-contract.mjs",
     "phase7:visual-rhythm-contract": "node scripts/phase7-visual-rhythm-contract.mjs",
     "phase7:route-motion-contract": "node scripts/phase7-route-motion-contract.mjs",
-    "phase7:seo-contract": "node scripts/phase7-seo-contract.mjs"
+    "phase7:seo-contract": "node scripts/phase7-seo-contract.mjs",
+    "phase8:ui-quality-contract": "node scripts/phase8-ui-quality-contract.mjs",
+    "phase8:visual-matrix": "node scripts/phase8-visual-regression-matrix.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.23.0",

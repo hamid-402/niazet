@@ -184,6 +184,7 @@
 - [x] Integration test با PostgreSQL واقعی برای Transaction، Constraint و Migration
 - [x] E2E ماتریس تمام نقش‌ها و جریان کامل سفارش، پرداخت، QC، تحویل، تیکت و فایل
 - [ ] تست Accessibility، Responsive، Keyboard و Visual regression دو تم
+  - قراردادهای استاتیک، اصلاح تعاملات کیبورد و ماتریس ۱۴۴ تصویری آماده است؛ ثبت baseline و مقایسه runtime پس از رفع اتصال مرورگر داخلی باقی مانده است.
 - [ ] CI برای Format-check، Lint، Typecheck، Unit، Integration، E2E، Migration و Build
 - [ ] Docker Production چندمرحله‌ای، non-root و `prisma migrate deploy`
 - [ ] Structured logging، Redaction، Correlation ID، Metrics، Trace و Alert

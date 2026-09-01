@@ -50,12 +50,12 @@ export function PublicNav() {
         </div>
         <div className="flex items-center gap-2 md:hidden">
           <ThemeSwitcher variant="compact" />
-          <button type="button" aria-label="باز کردن منوی سایت" aria-expanded={mobileOpen} onClick={() => setMobileOpen(true)} className="rounded-control p-2 text-fg-muted hover:bg-bg-subtle">
+          <button type="button" aria-label="باز کردن منوی سایت" aria-expanded={mobileOpen} aria-controls="public-mobile-drawer" onClick={() => setMobileOpen(true)} className="rounded-control p-2 text-fg-muted hover:bg-bg-subtle">
             <svg viewBox="0 0 20 20" fill="none" className="icon-md" aria-hidden="true"><path stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" d="M3 5.5h14M3 10h14M3 14.5h14" /></svg>
           </button>
         </div>
       </div>
-      <MobileDrawer open={mobileOpen} onClose={closeMobile} title="منوی سایت">
+      <MobileDrawer id="public-mobile-drawer" open={mobileOpen} onClose={closeMobile} title="منوی سایت">
         <nav className="flex flex-col gap-1" aria-label="ناوبری عمومی موبایل">
           {publicLinks.map((item) => <Link key={item.href} href={item.href} onClick={closeMobile} className="rounded-control px-3 py-3 text-sm font-medium text-fg-muted hover:bg-bg-subtle hover:text-fg">{item.label}</Link>)}
         </nav>

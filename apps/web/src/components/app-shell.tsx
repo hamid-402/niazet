@@ -107,7 +107,7 @@ export function AppShell({
       </aside>
 
       {/* Mobile off-canvas nav */}
-      <MobileDrawer open={mobileOpen} onClose={closeMobile} title="نیازت با ما">
+      <MobileDrawer id="workspace-mobile-drawer" open={mobileOpen} onClose={closeMobile} title="نیازت با ما">
            <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-fg-subtle">
              {title}
            </p>
@@ -134,6 +134,8 @@ export function AppShell({
           <button
             onClick={() => setMobileOpen(true)}
             aria-label="باز کردن منو"
+            aria-expanded={mobileOpen}
+            aria-controls="workspace-mobile-drawer"
             className="rounded-control p-1.5 text-fg-muted hover:bg-bg-subtle md:hidden"
           >
             <MenuIcon />

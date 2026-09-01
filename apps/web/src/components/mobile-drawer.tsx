@@ -6,11 +6,13 @@ export function MobileDrawer({
   open,
   onClose,
   title,
+  id,
   children,
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
+  id: string;
   children: ReactNode;
 }) {
   const panelRef = useRef<HTMLElement>(null);
@@ -64,14 +66,15 @@ export function MobileDrawer({
         onClick={onClose}
       />
       <aside
+        id={id}
         ref={panelRef}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="mobile-drawer-title"
+        aria-labelledby={`${id}-title`}
         className="absolute inset-y-0 right-0 z-modal flex w-[min(20rem,88vw)] flex-col overflow-y-auto border-l border-border bg-surface p-5 shadow-elevation-4"
       >
         <div className="mb-6 flex items-center justify-between gap-3">
-          <h2 id="mobile-drawer-title" className="font-extrabold text-fg">
+          <h2 id={`${id}-title`} className="font-extrabold text-fg">
             {title}
           </h2>
           <button
