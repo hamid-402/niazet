@@ -1,12 +1,45 @@
 import { OrderStatus, OrderStatusSource } from '@prisma/client';
 import {
   FINAL_ORDER_STATUSES,
+  ORDER_TRANSITIONS,
+  ORDER_TRANSITION_SOURCES,
   isCancellable,
   isTransitionAllowed,
   isTransitionAllowedForSource,
 } from './order-state-machine';
 
 describe('order-state-machine', () => {
+  it('defines every enum status and exactly mirrors every allowed transition', () => {
+    const statuses = Object.values(OrderStatus);
+    expect(Object.keys(ORDER_TRANSITIONS).sort()).toEqual([...statuses].sort());
+    for (const from of statuses) {
+      for (const to of statuses) {
+        expect(isTransitionAllowed(from, to)).toBe(ORDER_TRANSITIONS[from].includes(to));
+      }
+    }
+  });
+
+  it('assigns at least one actor source to every transition and no source to a forbidden transition', () => {
+    const statuses = Object.values(OrderStatus);
+    const sources = Object.values(OrderStatusSource);
+    for (const from of statuses) {
+      for (const to of statuses) {
+        const allowedSources = ORDER_TRANSITION_SOURCES[from]?.[to] ?? [];
+        expect(allowedSources.length > 0).toBe(ORDER_TRANSITIONS[from].includes(to));
+        for (const source of sources) {
+          expect(isTransitionAllowedForSource(from, to, source)).toBe(allowedSources.includes(source));
+        }
+      }
+    }
+  });
+
+  it('keeps final states absorbing with no transition sources', () => {
+    for (const status of FINAL_ORDER_STATUSES) {
+      expect(ORDER_TRANSITIONS[status]).toEqual([]);
+      expect(ORDER_TRANSITION_SOURCES[status]).toBeUndefined();
+    }
+  });
+
   it('allows the documented happy path in order', () => {
     const happyPath: OrderStatus[] = [
       OrderStatus.draft,

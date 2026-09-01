@@ -2,6 +2,28 @@ import { Injectable } from '@nestjs/common';
 import { PaymentStatus, RefundStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { WalletService } from './wallet.service';
+import { calculateEscrowBalance } from './escrow.service';
+
+export function calculateCustomerFinanceTotals(input: {
+  payments: ReadonlyArray<{ amount: number; status: PaymentStatus }>;
+  escrows: ReadonlyArray<{ amount: number; releasedAmount: number; refundedAmount: number }>;
+  refunds: ReadonlyArray<{ amount: number; status: RefundStatus }>;
+  pendingPaymentCount: number;
+}) {
+  return {
+    totalPaid: input.payments
+      .filter((payment) => payment.status === PaymentStatus.succeeded)
+      .reduce((sum, payment) => sum + payment.amount, 0),
+    totalHeld: input.escrows.reduce(
+      (sum, escrow) => sum + calculateEscrowBalance(escrow).remaining,
+      0,
+    ),
+    totalRefunded: input.refunds
+      .filter((refund) => refund.status === RefundStatus.processed)
+      .reduce((sum, refund) => sum + refund.amount, 0),
+    pendingPaymentCount: input.pendingPaymentCount,
+  };
+}
 
 @Injectable()
 export class CustomerFinanceOverviewService {
@@ -89,32 +111,23 @@ export class CustomerFinanceOverviewService {
         }),
       ]);
 
-    const totalPaid = payments
-      .filter((payment) => payment.status === PaymentStatus.succeeded)
-      .reduce((sum, payment) => sum + payment.amount, 0);
-    const totalHeld = escrows.reduce(
-      (sum, escrow) =>
-        sum + escrow.amount - escrow.releasedAmount - escrow.refundedAmount,
-      0,
-    );
-    const totalRefunded = refunds
-      .filter((refund) => refund.status === RefundStatus.processed)
-      .reduce((sum, refund) => sum + refund.amount, 0);
+    const totals = calculateCustomerFinanceTotals({
+      payments,
+      escrows,
+      refunds,
+      pendingPaymentCount: ordersNeedingPayment.length,
+    });
 
     return {
       summary: {
         walletBalance: wallet.balance,
-        totalPaid,
-        totalHeld,
-        totalRefunded,
-        pendingPaymentCount: ordersNeedingPayment.length,
+        ...totals,
       },
       wallet,
       payments,
       escrows: escrows.map((escrow) => ({
         ...escrow,
-        remainingAmount:
-          escrow.amount - escrow.releasedAmount - escrow.refundedAmount,
+        remainingAmount: calculateEscrowBalance(escrow).remaining,
       })),
       refunds,
       invoices,

@@ -55,6 +55,24 @@ export function escrowStatusAfterDistribution(balance: {
   return EscrowStatus.held;
 }
 
+export function calculateEscrowReleaseDistribution(
+  amount: number,
+  commissionRate: number,
+) {
+  if (amount <= 0) {
+    throw new BadRequestException('مبلغ آزادسازی باید مثبت باشد.');
+  }
+  if (commissionRate < 0 || commissionRate > 1) {
+    throw new BadRequestException('نرخ کارمزد مالی باید بین صفر و یک باشد.');
+  }
+  const commissionAmount = Math.round(amount * commissionRate);
+  const executorAmount = amount - commissionAmount;
+  if (executorAmount <= 0) {
+    throw new BadRequestException('مبلغ خالص مجری باید مثبت باشد.');
+  }
+  return { executorAmount, commissionAmount };
+}
+
 interface ReleaseParams {
   orderId: string;
   milestoneId?: string;
@@ -151,11 +169,8 @@ export class EscrowService {
     }
 
     const commissionRate = await this.getCommissionRate(tx);
-    const commissionAmount = Math.round(amount * commissionRate);
-    const executorAmount = amount - commissionAmount;
-    if (executorAmount <= 0) {
-      throw new BadRequestException('مبلغ خالص مجری باید مثبت باشد.');
-    }
+    const { executorAmount, commissionAmount } =
+      calculateEscrowReleaseDistribution(amount, commissionRate);
 
     const nextBalance = {
       released: balance.released + amount,

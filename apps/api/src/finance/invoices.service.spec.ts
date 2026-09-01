@@ -1,6 +1,17 @@
-import { buildInvoicePdf } from './invoices.service';
+import { NotFoundException } from '@nestjs/common';
+import { buildInvoicePdf, InvoicesService } from './invoices.service';
 
 describe('invoice PDF', () => {
+  it('queries a customer invoice by both invoice id and owner id', async () => {
+    const findFirst = jest.fn().mockResolvedValue(null);
+    const service = new InvoicesService({ invoice: { findFirst } } as never);
+    await expect(service.pdfForCustomer('customer-1', 'invoice-1')).rejects.toThrow(NotFoundException);
+    expect(findFirst).toHaveBeenCalledWith({
+      where: { id: 'invoice-1', customerId: 'customer-1' },
+      include: { order: { select: { code: true } } },
+    });
+  });
+
   it('creates a valid single-page PDF payload', () => {
     const pdf = buildInvoicePdf({
       invoiceNumber: 'INV-1',

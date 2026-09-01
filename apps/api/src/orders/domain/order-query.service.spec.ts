@@ -2,6 +2,26 @@ import { NotFoundException } from '@nestjs/common';
 import { OrderQueryService } from './order-query.service';
 
 describe('OrderQueryService executor confidentiality', () => {
+  it('returns not-found when a customer asks for another customer order', async () => {
+    const prisma = {
+      order: { findUnique: jest.fn().mockResolvedValue({ id: 'order-1', customerId: 'customer-2' }) },
+    };
+    const service = new OrderQueryService(prisma as never);
+    await expect(service.findOneForCustomer('customer-1', 'order-1')).rejects.toThrow(NotFoundException);
+  });
+
+  it('scopes customer and executor lists to their ownership relation', async () => {
+    const findMany = jest.fn().mockResolvedValue([]);
+    const prisma = { order: { findMany } };
+    const service = new OrderQueryService(prisma as never);
+    await service.listForCustomer('customer-1', { status: 'paid', skip: 0, take: 20 });
+    expect(findMany.mock.calls[0][0].where).toMatchObject({ customerId: 'customer-1', status: 'paid' });
+    await service.listForExecutor('executor-1', { skip: 0, take: 20 });
+    expect(findMany.mock.calls[1][0].where).toEqual({
+      assignments: { some: { unassignedAt: null, executorProfile: { userId: 'executor-1' } } },
+    });
+  });
+
   it('uses an allowlisted projection without financial or storage fields', async () => {
     type FieldProjection = { select: Record<string, boolean> };
     type ExecutorQuery = {
