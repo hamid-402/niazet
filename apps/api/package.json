@@ -37,6 +37,8 @@
     "phase8:unit-coverage-contract": "node scripts/phase8-unit-coverage-contract.mjs",
     "phase8:postgres-contract": "node scripts/phase8-postgres-contract.mjs",
     "test:integration:postgres": "node scripts/phase8-postgres-integration.mjs",
+    "phase8:role-workflow-contract": "node scripts/phase8-role-workflow-contract.mjs",
+    "test:e2e:roles": "node scripts/phase8-role-workflow-e2e.mjs",
     "prisma:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
