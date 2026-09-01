@@ -6,7 +6,11 @@ import { calculateEscrowBalance } from './escrow.service';
 
 export function calculateCustomerFinanceTotals(input: {
   payments: ReadonlyArray<{ amount: number; status: PaymentStatus }>;
-  escrows: ReadonlyArray<{ amount: number; releasedAmount: number; refundedAmount: number }>;
+  escrows: ReadonlyArray<{
+    amount: number;
+    releasedAmount: number;
+    refundedAmount: number;
+  }>;
   refunds: ReadonlyArray<{ amount: number; status: RefundStatus }>;
   pendingPaymentCount: number;
 }) {

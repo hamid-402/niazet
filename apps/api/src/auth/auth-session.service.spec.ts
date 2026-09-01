@@ -4,8 +4,10 @@ import { AuthSessionService } from './auth-session.service';
 import { AuthTokenService } from './auth-token.service';
 
 describe('AuthSessionService session management', () => {
-  const findMany =
-    jest.fn<() => Promise<Array<{ id: string; createdAt: Date }>>>();
+  const findMany = jest.fn<
+    Promise<Array<{ id: string; createdAt: Date }>>,
+    []
+  >();
   let lastUpdateInput: unknown;
   const updateMany = jest.fn((input: unknown) => {
     lastUpdateInput = input;

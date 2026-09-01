@@ -1,0 +1,154 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Format, lint, typecheck and unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            apps/api/package-lock.json
+            apps/web/package-lock.json
+      - name: Install API dependencies
+        run: npm ci
+        working-directory: apps/api
+      - name: Install Web dependencies
+        run: npm ci
+        working-directory: apps/web
+      - name: Format check
+        run: node scripts/format-check.mjs
+      - name: API lint
+        run: npm run lint:check
+        working-directory: apps/api
+      - name: Web lint
+        run: npm run lint
+        working-directory: apps/web
+      - name: API typecheck
+        run: npm run typecheck
+        working-directory: apps/api
+      - name: Web typecheck
+        run: npm run typecheck
+        working-directory: apps/web
+      - name: API unit tests
+        run: npm test -- --runInBand
+        working-directory: apps/api
+      - name: Critical unit coverage contract
+        run: npm run phase8:unit-coverage-contract
+        working-directory: apps/api
+      - name: Static UI quality contracts
+        run: npm run phase8:ui-quality-contract
+        working-directory: apps/web
+      - name: Two-theme visual matrix contract
+        run: npm run phase8:visual-matrix
+        working-directory: apps/web
+
+  postgres:
+    name: Migration, PostgreSQL integration and role E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: niazat_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d niazat_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/niazat_ci?schema=public
+      JWT_ACCESS_SECRET: ci-access-secret-0123456789abcdef0123456789abcdef
+      DOWNLOAD_TOKEN_SECRET: ci-download-secret-abcdef0123456789abcdef0123456789
+      APP_PORT: 3101
+      APP_URL: http://127.0.0.1:3101
+      WEB_URL: http://127.0.0.1:3002
+      REFRESH_TOKEN_TTL_DAYS: 30
+      OTP_TTL_SECONDS: 120
+      BACKGROUND_JOBS_ENABLED: false
+      PAYMENT_GATEWAY_DRIVER: mock
+      SMS_DRIVER: mock
+      EMAIL_DRIVER: mock
+      FILE_SCAN_DRIVER: mock
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/api/package-lock.json
+      - name: Install API dependencies
+        run: npm ci
+        working-directory: apps/api
+      - name: Build API for isolated E2E
+        run: npm run build
+        working-directory: apps/api
+      - name: Deploy migrations to CI database
+        run: node node_modules/prisma/build/index.js migrate deploy --schema prisma/schema.prisma
+        working-directory: apps/api
+      - name: Verify migration state
+        run: node node_modules/prisma/build/index.js migrate status --schema prisma/schema.prisma
+        working-directory: apps/api
+      - name: PostgreSQL safety contract
+        run: npm run phase8:postgres-contract
+        working-directory: apps/api
+      - name: PostgreSQL integration
+        run: npm run test:integration:postgres
+        working-directory: apps/api
+      - name: Complete role and workflow E2E
+        run: npm run test:e2e:roles
+        working-directory: apps/api
+
+  build:
+    name: Production builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [quality, postgres]
+    env:
+      NEXT_PUBLIC_API_URL: http://127.0.0.1:3001/v1
+      API_INTERNAL_URL: http://127.0.0.1:3001/v1
+      NEXT_PUBLIC_API_BASE_PATH: /api/backend
+      NEXT_PUBLIC_SITE_URL: https://example.invalid
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            apps/api/package-lock.json
+            apps/web/package-lock.json
+      - name: Install API dependencies
+        run: npm ci
+        working-directory: apps/api
+      - name: Install Web dependencies
+        run: npm ci
+        working-directory: apps/web
+      - name: Build API
+        run: npm run build
+        working-directory: apps/api
+      - name: Build Web
+        run: npm run build
+        working-directory: apps/web
+

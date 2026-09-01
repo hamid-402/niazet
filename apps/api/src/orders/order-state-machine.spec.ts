@@ -14,7 +14,9 @@ describe('order-state-machine', () => {
     expect(Object.keys(ORDER_TRANSITIONS).sort()).toEqual([...statuses].sort());
     for (const from of statuses) {
       for (const to of statuses) {
-        expect(isTransitionAllowed(from, to)).toBe(ORDER_TRANSITIONS[from].includes(to));
+        expect(isTransitionAllowed(from, to)).toBe(
+          ORDER_TRANSITIONS[from].includes(to),
+        );
       }
     }
   });
@@ -25,9 +27,13 @@ describe('order-state-machine', () => {
     for (const from of statuses) {
       for (const to of statuses) {
         const allowedSources = ORDER_TRANSITION_SOURCES[from]?.[to] ?? [];
-        expect(allowedSources.length > 0).toBe(ORDER_TRANSITIONS[from].includes(to));
+        expect(allowedSources.length > 0).toBe(
+          ORDER_TRANSITIONS[from].includes(to),
+        );
         for (const source of sources) {
-          expect(isTransitionAllowedForSource(from, to, source)).toBe(allowedSources.includes(source));
+          expect(isTransitionAllowedForSource(from, to, source)).toBe(
+            allowedSources.includes(source),
+          );
         }
       }
     }

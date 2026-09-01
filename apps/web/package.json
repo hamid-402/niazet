@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
     "phase6:design-system-contract": "node scripts/phase6-design-system-contract.mjs",
     "phase6:mobile-navigation-contract": "node scripts/phase6-mobile-navigation-contract.mjs",
     "phase6:responsive-table-contract": "node scripts/phase6-responsive-table-contract.mjs",

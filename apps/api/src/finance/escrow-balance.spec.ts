@@ -40,14 +40,28 @@ describe('escrow balance invariants', () => {
     [1_000, 0.2, 800, 200],
     [101, 0.25, 76, 25],
     [10_000, 0.333, 6_670, 3_330],
-  ])('splits amount=%i at rate=%f into executor=%i commission=%i', (amount, rate, executorAmount, commissionAmount) => {
-    expect(calculateEscrowReleaseDistribution(amount, rate)).toEqual({ executorAmount, commissionAmount });
-  });
+  ])(
+    'splits amount=%i at rate=%f into executor=%i commission=%i',
+    (amount, rate, executorAmount, commissionAmount) => {
+      expect(calculateEscrowReleaseDistribution(amount, rate)).toEqual({
+        executorAmount,
+        commissionAmount,
+      });
+    },
+  );
 
-  it.each([[0, 0.2], [-1, 0.2], [100, -0.01], [100, 1.01], [100, 1]])(
+  it.each([
+    [0, 0.2],
+    [-1, 0.2],
+    [100, -0.01],
+    [100, 1.01],
+    [100, 1],
+  ])(
     'rejects unsafe release distribution amount=%f rate=%f',
     (amount, rate) => {
-      expect(() => calculateEscrowReleaseDistribution(amount, rate)).toThrow(BadRequestException);
+      expect(() => calculateEscrowReleaseDistribution(amount, rate)).toThrow(
+        BadRequestException,
+      );
     },
   );
 

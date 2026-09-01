@@ -41,35 +41,60 @@ describe('access policy matrix', () => {
     const scopeReflector = {
       getAllAndOverride: jest.fn().mockReturnValue([AdminScope.ops_admin]),
     } as unknown as Reflector;
-    expect(() => new RolesGuard(roleReflector).canActivate(contextFor())).toThrow(ForbiddenException);
-    expect(() => new AdminScopeGuard(scopeReflector).canActivate(contextFor())).toThrow(ForbiddenException);
+    expect(() =>
+      new RolesGuard(roleReflector).canActivate(contextFor()),
+    ).toThrow(ForbiddenException);
+    expect(() =>
+      new AdminScopeGuard(scopeReflector).canActivate(contextFor()),
+    ).toThrow(ForbiddenException);
   });
 
   it.each(
     Object.values(UserRole).flatMap((actual) =>
-      Object.values(UserRole).map((required) => [actual, required, actual === required] as const),
+      Object.values(UserRole).map(
+        (required) => [actual, required, actual === required] as const,
+      ),
     ),
-  )('applies direct-role policy actual=%s required=%s expected=%s', (actual, required, expected) => {
-    const reflector = {
-      getAllAndOverride: jest.fn().mockReturnValue([required]),
-    } as unknown as Reflector;
-    const invoke = () => new RolesGuard(reflector).canActivate(contextFor({ ...baseUser, role: actual, capabilities: [] }));
-    if (expected) expect(invoke()).toBe(true);
-    else expect(invoke).toThrow(ForbiddenException);
-  });
+  )(
+    'applies direct-role policy actual=%s required=%s expected=%s',
+    (actual, required, expected) => {
+      const reflector = {
+        getAllAndOverride: jest.fn().mockReturnValue([required]),
+      } as unknown as Reflector;
+      const invoke = () =>
+        new RolesGuard(reflector).canActivate(
+          contextFor({ ...baseUser, role: actual, capabilities: [] }),
+        );
+      if (expected) expect(invoke()).toBe(true);
+      else expect(invoke).toThrow(ForbiddenException);
+    },
+  );
 
   it.each(
     Object.values(AdminScope).flatMap((actual) =>
-      Object.values(AdminScope).map((required) => [actual, required, actual === AdminScope.super_admin || actual === required] as const),
+      Object.values(AdminScope).map(
+        (required) =>
+          [
+            actual,
+            required,
+            actual === AdminScope.super_admin || actual === required,
+          ] as const,
+      ),
     ),
-  )('applies admin-scope policy actual=%s required=%s expected=%s', (actual, required, expected) => {
-    const reflector = {
-      getAllAndOverride: jest.fn().mockReturnValue([required]),
-    } as unknown as Reflector;
-    const invoke = () => new AdminScopeGuard(reflector).canActivate(contextFor({ ...baseUser, role: UserRole.admin, adminScope: actual }));
-    if (expected) expect(invoke()).toBe(true);
-    else expect(invoke).toThrow(ForbiddenException);
-  });
+  )(
+    'applies admin-scope policy actual=%s required=%s expected=%s',
+    (actual, required, expected) => {
+      const reflector = {
+        getAllAndOverride: jest.fn().mockReturnValue([required]),
+      } as unknown as Reflector;
+      const invoke = () =>
+        new AdminScopeGuard(reflector).canActivate(
+          contextFor({ ...baseUser, role: UserRole.admin, adminScope: actual }),
+        );
+      if (expected) expect(invoke()).toBe(true);
+      else expect(invoke).toThrow(ForbiddenException);
+    },
+  );
 
   it.each([
     UserRole.customer,

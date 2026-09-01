@@ -3,12 +3,21 @@ import { canAssignedExecutorReadFile } from './files.service';
 
 describe('assigned executor file confidentiality', () => {
   it.each(
-    Object.values(FileKind).flatMap((fileKind) => [false, true].map((visible) => [fileKind, visible] as const)),
-  )('exhaustively applies file policy kind=%s customerVisible=%s', (fileKind, customerVisible) => {
-    const alwaysAllowed = new Set<FileKind>([FileKind.input]);
-    const expected = alwaysAllowed.has(fileKind) || (fileKind === FileKind.message_attachment && customerVisible);
-    expect(canAssignedExecutorReadFile(fileKind, customerVisible)).toBe(expected);
-  });
+    Object.values(FileKind).flatMap((fileKind) =>
+      [false, true].map((visible) => [fileKind, visible] as const),
+    ),
+  )(
+    'exhaustively applies file policy kind=%s customerVisible=%s',
+    (fileKind, customerVisible) => {
+      const alwaysAllowed = new Set<FileKind>([FileKind.input]);
+      const expected =
+        alwaysAllowed.has(fileKind) ||
+        (fileKind === FileKind.message_attachment && customerVisible);
+      expect(canAssignedExecutorReadFile(fileKind, customerVisible)).toBe(
+        expected,
+      );
+    },
+  );
 
   it('allows work inputs and customer-visible message attachments', () => {
     expect(canAssignedExecutorReadFile(FileKind.input, false)).toBe(true);
