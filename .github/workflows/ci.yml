@@ -160,3 +160,16 @@ jobs:
       - name: Build Web
         run: npm run build
         working-directory: apps/web
+      - name: Docker production contract
+        run: node scripts/phase8-docker-contract.mjs
+      - name: Build API production image
+        run: docker build --tag niazat-api:ci apps/api
+      - name: Build Web production image
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL="$NEXT_PUBLIC_API_URL" \
+            --build-arg API_INTERNAL_URL="$API_INTERNAL_URL" \
+            --build-arg NEXT_PUBLIC_API_BASE_PATH="$NEXT_PUBLIC_API_BASE_PATH" \
+            --build-arg NEXT_PUBLIC_SITE_URL="$NEXT_PUBLIC_SITE_URL" \
+            --tag niazat-web:ci \
+            apps/web

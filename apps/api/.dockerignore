@@ -1,0 +1,12 @@
+node_modules
+dist
+coverage
+storage
+.env
+.env.*
+*.log
+.git
+.gitignore
+test
+scripts/*.mjs
+!scripts/production-start.mjs
