@@ -505,6 +505,8 @@ model Session {
 
   @@index([familyId])
   @@index([userId, revokedAt])
+  @@index([expiresAt])
+  @@index([revokedAt])
   @@map("sessions")
 }
 
@@ -535,6 +537,8 @@ model OtpCode {
 
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
+  @@index([expiresAt])
+  @@index([consumedAt])
   @@map("otp_codes")
 }
 
@@ -1445,6 +1449,8 @@ model OutboxEvent {
   notifications NotificationLog[]
 
   @@index([status, availableAt])
+  @@index([status, sentAt])
+  @@index([status, deadLetteredAt])
   @@map("outbox_events")
 }
 
@@ -1473,6 +1479,7 @@ model BackgroundJobRun {
 
   @@unique([jobName, runKey])
   @@index([status, startedAt])
+  @@index([completedAt])
   @@map("background_job_runs")
 }
 
@@ -1490,6 +1497,8 @@ model SignedUrlGrant {
   user User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([expiresAt, revokedAt])
+  @@index([usedAt])
+  @@index([revokedAt])
   @@map("signed_url_grants")
 }
 

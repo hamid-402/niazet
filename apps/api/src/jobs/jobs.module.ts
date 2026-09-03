@@ -8,6 +8,7 @@ import { JobRunnerService } from './job-runner.service';
 import { JobsAdminController } from './jobs.admin.controller';
 import { JobsService } from './jobs.service';
 import { OutboxWorkerService } from './outbox-worker.service';
+import { DataCleanupService } from './data-cleanup.service';
 
 @Module({
   imports: [
@@ -18,7 +19,12 @@ import { OutboxWorkerService } from './outbox-worker.service';
     OrdersModule,
   ],
   controllers: [JobsAdminController],
-  providers: [JobRunnerService, OutboxWorkerService, JobsService],
+  providers: [
+    JobRunnerService,
+    OutboxWorkerService,
+    DataCleanupService,
+    JobsService,
+  ],
   exports: [JobRunnerService, OutboxWorkerService],
 })
 export class JobsModule {}

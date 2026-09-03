@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuditSensitivity, FileScanStatus, Prisma } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
@@ -15,7 +10,6 @@ import {
 } from './file-cleanup-storage';
 
 const FILE_CLEANUP_LOCK_ID = 731_942_017;
-const DEFAULT_INTERVAL_MINUTES = 60;
 const DEFAULT_ORPHAN_GRACE_MINUTES = 60;
 const DEFAULT_REJECTED_RETENTION_HOURS = 24;
 
@@ -25,51 +19,13 @@ function positiveInteger(value: string | undefined, fallback: number) {
 }
 
 @Injectable()
-export class FileCleanupService implements OnModuleInit, OnModuleDestroy {
-  private readonly logger = new Logger(FileCleanupService.name);
-  private interval?: NodeJS.Timeout;
-  private initialRun?: NodeJS.Timeout;
+export class FileCleanupService {
   private running = false;
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
   ) {}
-
-  onModuleInit() {
-    if (
-      this.config.get<string>('NODE_ENV') === 'test' ||
-      this.config.get<string>('FILE_CLEANUP_ENABLED') === 'false'
-    ) {
-      return;
-    }
-
-    const intervalMinutes = positiveInteger(
-      this.config.get<string>('FILE_CLEANUP_INTERVAL_MINUTES'),
-      DEFAULT_INTERVAL_MINUTES,
-    );
-    this.initialRun = setTimeout(() => void this.runScheduled(), 30_000);
-    this.initialRun.unref();
-    this.interval = setInterval(
-      () => void this.runScheduled(),
-      intervalMinutes * 60_000,
-    );
-    this.interval.unref();
-  }
-
-  onModuleDestroy() {
-    if (this.initialRun) clearTimeout(this.initialRun);
-    if (this.interval) clearInterval(this.interval);
-  }
-
-  private async runScheduled() {
-    try {
-      await this.cleanup();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown error';
-      this.logger.error(`File cleanup failed: ${message}`);
-    }
-  }
 
   async cleanup(now = new Date()) {
     if (this.running) return { skipped: 'already_running' as const };

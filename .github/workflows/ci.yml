@@ -105,6 +105,7 @@ jobs:
       BACKUP_ENCRYPTION_KEY: YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWE=
       BACKUP_KEY_ID: ci-backup-key-v1
       BACKUP_TEST_CONFIRM: niazat_backup_restore_test
+      CLEANUP_TEST_CONFIRM: niazat_cleanup_test
       BACKUP_TEST_ADMIN_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
       RESTORE_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/niazat_ci_restore_test
       RESTORE_CONFIRM_DATABASE: niazat_ci_restore_test
@@ -135,6 +136,9 @@ jobs:
         working-directory: apps/api
       - name: Complete role and workflow E2E
         run: npm run test:e2e:roles
+        working-directory: apps/api
+      - name: Bounded retention cleanup on PostgreSQL
+        run: npm run phase8:cleanup-integration
         working-directory: apps/api
       - name: Encrypted backup and restore lifecycle
         run: npm run phase8:backup-restore
@@ -179,6 +183,9 @@ jobs:
         run: node scripts/phase8-docker-contract.mjs
       - name: Encrypted backup contract
         run: npm run phase8:backup-contract
+        working-directory: apps/api
+      - name: Bounded retention cleanup contract
+        run: npm run phase8:cleanup-contract
         working-directory: apps/api
       - name: Build API production image
         run: docker build --tag niazat-api:ci apps/api

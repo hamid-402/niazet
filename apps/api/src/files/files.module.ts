@@ -15,6 +15,6 @@ import { AntivirusService } from './antivirus.service';
   ],
   controllers: [FilesController],
   providers: [FilesService, FileCleanupService, AntivirusService],
-  exports: [FilesService, AntivirusService],
+  exports: [FilesService, FileCleanupService, AntivirusService],
 })
 export class FilesModule {}

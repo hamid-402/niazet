@@ -8,6 +8,8 @@ export const JOB_NAMES = [
   'send_outbox_notifications',
   'file_antivirus_scan',
   'expire_signed_urls',
+  'cleanup_expired_records',
+  'cleanup_storage_files',
   'generate_periodic_reports',
 ] as const;
 

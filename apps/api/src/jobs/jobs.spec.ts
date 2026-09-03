@@ -4,7 +4,7 @@ import { outboxRetryDelayMs } from './outbox-worker.service';
 
 describe('phase 3 background infrastructure', () => {
   it('registers every required worker exactly once', () => {
-    expect(new Set(JOB_NAMES).size).toBe(10);
+    expect(new Set(JOB_NAMES).size).toBe(12);
     expect(JOB_NAMES).toEqual(
       expect.arrayContaining([
         'payment_verify_recheck',
@@ -16,6 +16,8 @@ describe('phase 3 background infrastructure', () => {
         'send_outbox_notifications',
         'file_antivirus_scan',
         'expire_signed_urls',
+        'cleanup_expired_records',
+        'cleanup_storage_files',
         'generate_periodic_reports',
       ]),
     );

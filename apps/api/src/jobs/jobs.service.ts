@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import { ExecutorService } from '../executor/executor.service';
 import { runPerformanceBatch } from '../executor/performance-metrics';
 import { AntivirusService } from '../files/antivirus.service';
+import { FileCleanupService } from '../files/file-cleanup.service';
 import { QUARANTINE_ROOT, UPLOAD_ROOT } from '../files/files.service';
 import { FinanceReportingService } from '../finance/finance-reporting.service';
 import { PaymentsService } from '../finance/payments.service';
@@ -18,6 +19,7 @@ import type { JobName, JobResult } from './job.types';
 import { OutboxWorkerService } from './outbox-worker.service';
 import { SmsService } from '../notifications/sms.service';
 import { EmailService } from '../notifications/email.service';
+import { DataCleanupService } from './data-cleanup.service';
 
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
@@ -33,6 +35,8 @@ export class JobsService implements OnModuleInit {
     private readonly tickets: TicketsService,
     private readonly executor: ExecutorService,
     private readonly antivirus: AntivirusService,
+    private readonly fileCleanup: FileCleanupService,
+    private readonly dataCleanup: DataCleanupService,
     private readonly reporting: FinanceReportingService,
     private readonly orders: OrdersService,
     private readonly sms: SmsService,
@@ -136,6 +140,18 @@ export class JobsService implements OnModuleInit {
       name: 'expire_signed_urls',
       intervalMs: 5 * MINUTE,
       run: (now) => this.expireSignedUrls(now),
+    });
+    this.runner.register({
+      name: 'cleanup_expired_records',
+      intervalMs:
+        this.intervalMinutes('DATA_CLEANUP_INTERVAL_MINUTES', 360) * MINUTE,
+      run: (now) => this.dataCleanup.cleanup(now),
+    });
+    this.runner.register({
+      name: 'cleanup_storage_files',
+      intervalMs:
+        this.intervalMinutes('FILE_CLEANUP_INTERVAL_MINUTES', 60) * MINUTE,
+      run: (now) => this.cleanupStorageFiles(now),
     });
     this.runner.register({
       name: 'generate_periodic_reports',
@@ -341,6 +357,30 @@ export class JobsService implements OnModuleInit {
       data: { revokedAt: now },
     });
     return { processed: result.count };
+  }
+
+  private async cleanupStorageFiles(now: Date): Promise<JobResult> {
+    if (this.config.get<string>('FILE_CLEANUP_ENABLED') === 'false') {
+      return { processed: 0, skipped: 1, details: { reason: 'disabled' } };
+    }
+    const result = await this.fileCleanup.cleanup(now);
+    if ('skipped' in result) {
+      return { processed: 0, skipped: 1, details: { reason: result.skipped } };
+    }
+    return {
+      processed:
+        result.rejectedRecordsPurged +
+        result.rejectedPhysicalFiles +
+        result.orphanPhysicalFiles,
+      details: result,
+    };
+  }
+
+  private intervalMinutes(name: string, fallback: number) {
+    const value = Number(this.config.get<string>(name));
+    return Number.isInteger(value) && value > 0 && value <= 10_080
+      ? value
+      : fallback;
   }
 
   private async generatePeriodicReports(now: Date): Promise<JobResult> {
