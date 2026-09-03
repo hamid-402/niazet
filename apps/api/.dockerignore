@@ -10,3 +10,7 @@ storage
 test
 scripts/*.mjs
 !scripts/production-start.mjs
+!scripts/backup-format.mjs
+!scripts/backup-create.mjs
+!scripts/backup-restore.mjs
+!scripts/backup-retention.mjs

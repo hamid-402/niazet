@@ -102,6 +102,12 @@ jobs:
       SMS_DRIVER: mock
       EMAIL_DRIVER: mock
       FILE_SCAN_DRIVER: mock
+      BACKUP_ENCRYPTION_KEY: YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWE=
+      BACKUP_KEY_ID: ci-backup-key-v1
+      BACKUP_TEST_CONFIRM: niazat_backup_restore_test
+      BACKUP_TEST_ADMIN_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+      RESTORE_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/niazat_ci_restore_test
+      RESTORE_CONFIRM_DATABASE: niazat_ci_restore_test
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -129,6 +135,9 @@ jobs:
         working-directory: apps/api
       - name: Complete role and workflow E2E
         run: npm run test:e2e:roles
+        working-directory: apps/api
+      - name: Encrypted backup and restore lifecycle
+        run: npm run phase8:backup-restore
         working-directory: apps/api
 
   build:
@@ -168,6 +177,9 @@ jobs:
         working-directory: apps/web
       - name: Docker production contract
         run: node scripts/phase8-docker-contract.mjs
+      - name: Encrypted backup contract
+        run: npm run phase8:backup-contract
+        working-directory: apps/api
       - name: Build API production image
         run: docker build --tag niazat-api:ci apps/api
       - name: Build Web production image
@@ -180,3 +192,5 @@ jobs:
             --tag niazat-web:ci \
             --file apps/web/Dockerfile \
             .
+      - name: Build backup operations image
+        run: docker build --file apps/api/Dockerfile.backup --tag niazat-backup:ci apps/api

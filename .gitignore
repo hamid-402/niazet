@@ -6,6 +6,8 @@ build/
 .env
 .env.local
 .env.production
+.env.backup
+backups/
 .DS_Store
 coverage/
 .turbo/

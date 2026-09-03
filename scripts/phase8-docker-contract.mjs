@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 const root = resolve(import.meta.dirname, '..');
 const read = (path) => readFileSync(resolve(root, path), 'utf8');
 const api = read('apps/api/Dockerfile');
+const backup = read('apps/api/Dockerfile.backup');
 const web = read('apps/web/Dockerfile');
 const start = read('apps/api/scripts/production-start.mjs');
 const compose = read('docker-compose.production.yml');
@@ -23,6 +24,11 @@ assert.match(api, /npm ci/, 'API dependencies must be installed reproducibly.');
 assert.match(api, /prisma[^\n]+generate/, 'API build must generate Prisma Client.');
 assert.match(api, /npm prune --omit=dev/, 'API runtime dependencies must omit dev dependencies.');
 assert.match(api, /storage\/uploads storage\/quarantine/, 'API writable storage paths must exist.');
+assert.match(backup, /postgresql-client/, 'Backup image must include PostgreSQL client tools.');
+assert.match(backup, /USER node/, 'Backup image must run as a non-root user.');
+assert.doesNotMatch(backup, /COPY\s+\.\s+\./, 'Backup image must use explicit COPY boundaries.');
+assert.match(backup, /backup-create\.mjs/, 'Backup image must use the encrypted backup entrypoint.');
+assert.doesNotMatch(backup, /(PASSWORD|SECRET|TOKEN|ENCRYPTION_KEY)=/i, 'Backup image must not embed secrets.');
 assert.match(start, /migrate', 'deploy'/, 'API startup must deploy migrations.');
 assert.ok(
   start.indexOf("migrate', 'deploy'") < start.indexOf("['dist/main.js']"),

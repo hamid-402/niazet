@@ -42,6 +42,11 @@
     "phase8:role-workflow-contract": "node scripts/phase8-role-workflow-contract.mjs",
     "phase8:observability-contract": "node scripts/phase8-observability-contract.mjs",
     "phase8:readiness-contract": "node scripts/phase8-readiness-contract.mjs",
+    "phase8:backup-contract": "node scripts/phase8-backup-contract.mjs",
+    "phase8:backup-restore": "node scripts/phase8-backup-restore-integration.mjs",
+    "backup:create": "node scripts/backup-create.mjs",
+    "backup:restore": "node scripts/backup-restore.mjs",
+    "backup:retention": "node scripts/backup-retention.mjs",
     "test:e2e:roles": "node scripts/phase8-role-workflow-e2e.mjs",
     "prisma:seed": "tsx prisma/seed.ts"
   },
