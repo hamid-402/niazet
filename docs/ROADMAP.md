@@ -190,7 +190,8 @@
   - imageهای مستقل API و Web، filesystem فقط‌خواندنی، volume محدود Storage، Healthcheck و ساخت واقعی هر دو image در CI پیاده‌سازی و تأیید شد.
 - [x] Structured logging، Redaction، Correlation ID، Metrics، Trace و Alert
   - logger سراسری JSON با حذف secret/PII، context ناهمگام correlation و W3C trace، metrics سازگار با Prometheus و token مستقل، telemetry درخواست/job و alertهای نرخ 5xx/کندی با cooldown در runtime و CI تأیید شد.
-- [ ] Health/Readiness برای DB، Storage، Queue، SMS، Email و Payment
+- [x] Health/Readiness برای DB، Storage، Queue، SMS، Email و Payment
+  - liveness مستقل، readiness عمومی ۲۰۰/۵۰۳، جزئیات محدود به ادمین، probe واقعی DB/Storage/Outbox، fail-closed برای adapterهای جعلی، metric و alert وابستگی و healthcheck مبتنی بر `/ready` در Docker/CI تکمیل شد.
 - [ ] Backup رمزنگاری‌شده، Restore test، Retention و Disaster recovery runbook
 - [ ] Cleanup دوره‌ای Session، OTP، Idempotency، Outbox، فایل orphan و Signed URL
 - [ ] Dependency advisory، SBOM، Secret rotation و بررسی License
