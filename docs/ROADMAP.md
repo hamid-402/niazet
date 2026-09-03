@@ -186,7 +186,8 @@
 - [ ] تست Accessibility، Responsive، Keyboard و Visual regression دو تم
   - قراردادهای استاتیک، اصلاح تعاملات کیبورد و ماتریس ۱۴۴ تصویری آماده است؛ ثبت baseline و مقایسه runtime پس از رفع اتصال مرورگر داخلی باقی مانده است.
 - [x] CI برای Format-check، Lint، Typecheck، Unit، Integration، E2E، Migration و Build
-- [ ] Docker Production چندمرحله‌ای، non-root و `prisma migrate deploy`
+- [x] Docker Production چندمرحله‌ای، non-root و `prisma migrate deploy`
+  - imageهای مستقل API و Web، filesystem فقط‌خواندنی، volume محدود Storage، Healthcheck و ساخت واقعی هر دو image در CI پیاده‌سازی و تأیید شد.
 - [ ] Structured logging، Redaction، Correlation ID، Metrics، Trace و Alert
 - [ ] Health/Readiness برای DB، Storage، Queue، SMS، Email و Payment
 - [ ] Backup رمزنگاری‌شده، Restore test، Retention و Disaster recovery runbook
