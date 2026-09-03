@@ -188,7 +188,8 @@
 - [x] CI برای Format-check، Lint، Typecheck، Unit، Integration، E2E، Migration و Build
 - [x] Docker Production چندمرحله‌ای، non-root و `prisma migrate deploy`
   - imageهای مستقل API و Web، filesystem فقط‌خواندنی، volume محدود Storage، Healthcheck و ساخت واقعی هر دو image در CI پیاده‌سازی و تأیید شد.
-- [ ] Structured logging، Redaction، Correlation ID، Metrics، Trace و Alert
+- [x] Structured logging، Redaction، Correlation ID، Metrics، Trace و Alert
+  - logger سراسری JSON با حذف secret/PII، context ناهمگام correlation و W3C trace، metrics سازگار با Prometheus و token مستقل، telemetry درخواست/job و alertهای نرخ 5xx/کندی با cooldown در runtime و CI تأیید شد.
 - [ ] Health/Readiness برای DB، Storage، Queue، SMS، Email و Payment
 - [ ] Backup رمزنگاری‌شده، Restore test، Retention و Disaster recovery runbook
 - [ ] Cleanup دوره‌ای Session، OTP، Idempotency، Outbox، فایل orphan و Signed URL
