@@ -62,6 +62,11 @@ assert.ok(
 assert.match(restore, /--single-transaction/, 'Restore must be transactional.');
 assert.match(
   restore,
+  /'--dbname',\s*database/,
+  'pg_restore must receive the non-secret target database name.',
+);
+assert.match(
+  restore,
   /RESTORE_CONFIRM_DATABASE/,
   'Restore requires exact target confirmation.',
 );

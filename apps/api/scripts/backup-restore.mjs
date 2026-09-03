@@ -50,6 +50,8 @@ export async function restoreBackup(options = {}) {
   const restore = spawn(
     options.pgRestoreCommand ?? process.env.PG_RESTORE_COMMAND ?? 'pg_restore',
     [
+      '--dbname',
+      database,
       '--clean',
       '--if-exists',
       '--no-owner',
