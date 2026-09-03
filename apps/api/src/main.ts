@@ -3,9 +3,11 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
+import { StructuredLogger } from './observability/structured-logger.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  app.useLogger(app.get(StructuredLogger));
 
   app.use(helmet());
   app.enableCors({
@@ -16,8 +18,9 @@ async function bootstrap() {
       'Content-Type',
       'Idempotency-Key',
       'X-Correlation-Id',
+      'traceparent',
     ],
-    exposedHeaders: ['X-Correlation-Id'],
+    exposedHeaders: ['X-Correlation-Id', 'traceparent'],
   });
   app.useGlobalPipes(
     new ValidationPipe({
@@ -44,6 +47,6 @@ async function bootstrap() {
   const port = Number(process.env.APP_PORT ?? 3001);
   await app.listen(port);
 
-  console.log(`API running on http://localhost:${port}`);
+  app.get(StructuredLogger).event('info', 'application.started', { port });
 }
 void bootstrap();

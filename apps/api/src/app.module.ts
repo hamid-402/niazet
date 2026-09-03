@@ -23,6 +23,8 @@ import { JobsModule } from './jobs/jobs.module';
 import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
 import { AccountModule } from './account/account.module';
 import { ReportingModule } from './reporting/reporting.module';
+import { ObservabilityModule } from './observability/observability.module';
+import { RequestTelemetryMiddleware } from './observability/request-telemetry.middleware';
 
 @Module({
   imports: [
@@ -47,6 +49,7 @@ import { ReportingModule } from './reporting/reporting.module';
     JobsModule,
     AccountModule,
     ReportingModule,
+    ObservabilityModule,
   ],
   controllers: [AppController],
   providers: [
@@ -57,6 +60,8 @@ import { ReportingModule } from './reporting/reporting.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+    consumer
+      .apply(CorrelationIdMiddleware, RequestTelemetryMiddleware)
+      .forRoutes('*');
   }
 }

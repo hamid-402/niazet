@@ -13,6 +13,12 @@ export interface AppEnvironment extends Record<string, unknown> {
   REFRESH_TOKEN_TTL_DAYS: number;
   OTP_TTL_SECONDS: number;
   BACKGROUND_JOBS_ENABLED: boolean;
+  OBSERVABILITY_TOKEN?: string;
+  ALERT_WINDOW_SECONDS: number;
+  ALERT_MIN_REQUESTS: number;
+  ALERT_HTTP_5XX_RATE: number;
+  ALERT_SLOW_REQUEST_MS: number;
+  ALERT_COOLDOWN_SECONDS: number;
 }
 
 function integer(
@@ -34,6 +40,14 @@ function requireValue(config: Record<string, unknown>, key: string) {
   return value;
 }
 
+function rate(config: Record<string, unknown>, key: string, fallback: number) {
+  const value = Number(config[key] ?? fallback);
+  if (!Number.isFinite(value) || value <= 0 || value > 1) {
+    throw new Error(`${key} must be greater than zero and at most one.`);
+  }
+  return value;
+}
+
 export function validateEnvironment(
   config: Record<string, unknown>,
 ): AppEnvironment {
@@ -47,19 +61,24 @@ export function validateEnvironment(
 
   if (nodeEnv === 'production') {
     const downloadSecret = requireValue(config, 'DOWNLOAD_TOKEN_SECRET');
+    const observabilityToken = requireValue(config, 'OBSERVABILITY_TOKEN');
     if (
       accessSecret.length < 32 ||
       downloadSecret.length < 32 ||
+      observabilityToken.length < 32 ||
       UNSAFE_SECRET_VALUES.has(accessSecret) ||
-      UNSAFE_SECRET_VALUES.has(downloadSecret)
+      UNSAFE_SECRET_VALUES.has(downloadSecret) ||
+      UNSAFE_SECRET_VALUES.has(observabilityToken)
     ) {
       throw new Error(
-        'Production secrets must be unique random values of at least 32 characters.',
+        'Production secrets and observability token must be random values of at least 32 characters.',
       );
     }
-    if (accessSecret === downloadSecret) {
+    if (
+      new Set([accessSecret, downloadSecret, observabilityToken]).size !== 3
+    ) {
       throw new Error(
-        'JWT_ACCESS_SECRET and DOWNLOAD_TOKEN_SECRET must be different.',
+        'JWT_ACCESS_SECRET, DOWNLOAD_TOKEN_SECRET and OBSERVABILITY_TOKEN must be different.',
       );
     }
     for (const driver of [
@@ -95,5 +114,10 @@ export function validateEnvironment(
     REFRESH_TOKEN_TTL_DAYS: integer(config, 'REFRESH_TOKEN_TTL_DAYS', 30),
     OTP_TTL_SECONDS: integer(config, 'OTP_TTL_SECONDS', 120),
     BACKGROUND_JOBS_ENABLED: config.BACKGROUND_JOBS_ENABLED !== 'false',
+    ALERT_WINDOW_SECONDS: integer(config, 'ALERT_WINDOW_SECONDS', 300),
+    ALERT_MIN_REQUESTS: integer(config, 'ALERT_MIN_REQUESTS', 20),
+    ALERT_HTTP_5XX_RATE: rate(config, 'ALERT_HTTP_5XX_RATE', 0.1),
+    ALERT_SLOW_REQUEST_MS: integer(config, 'ALERT_SLOW_REQUEST_MS', 5_000),
+    ALERT_COOLDOWN_SECONDS: integer(config, 'ALERT_COOLDOWN_SECONDS', 300),
   };
 }

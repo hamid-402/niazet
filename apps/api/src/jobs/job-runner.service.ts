@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import type { JobDefinition, JobName, JobResult } from './job.types';
+import { MetricsRegistry } from '../observability/metrics-registry.service';
 
 export function createJobRunKey(name: JobName, now: Date, intervalMs: number) {
   return `${name}:${Math.floor(now.getTime() / intervalMs)}`;
@@ -17,6 +18,7 @@ export class JobRunnerService implements OnModuleDestroy {
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
+    private readonly metrics: MetricsRegistry,
   ) {}
 
   register(definition: JobDefinition) {
@@ -64,6 +66,7 @@ export class JobRunnerService implements OnModuleDestroy {
             completedAt: new Date(),
           },
         });
+        this.metrics.jobCompleted(name, 'succeeded');
         return result;
       } catch (error) {
         await this.prisma.backgroundJobRun.update({
@@ -74,6 +77,7 @@ export class JobRunnerService implements OnModuleDestroy {
             completedAt: new Date(),
           },
         });
+        this.metrics.jobCompleted(name, 'failed');
         throw error;
       }
     } catch (error) {
@@ -81,6 +85,7 @@ export class JobRunnerService implements OnModuleDestroy {
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2002'
       ) {
+        this.metrics.jobCompleted(name, 'skipped');
         return { processed: 0, skipped: 1, details: { reason: 'already_run' } };
       }
       throw error;

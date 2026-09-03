@@ -56,6 +56,9 @@ jobs:
       - name: Critical unit coverage contract
         run: npm run phase8:unit-coverage-contract
         working-directory: apps/api
+      - name: Observability contract
+        run: npm run phase8:observability-contract
+        working-directory: apps/api
       - name: Static UI quality contracts
         run: npm run phase8:ui-quality-contract
         working-directory: apps/web

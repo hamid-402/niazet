@@ -4,14 +4,14 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
-  Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import type { ApiErrorEnvelope } from '../http/api-contract';
+import { StructuredLogger } from '../../observability/structured-logger.service';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-  private readonly logger = new Logger('ExceptionFilter');
+  constructor(private readonly logger: StructuredLogger) {}
 
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -28,9 +28,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       : { message: 'خطای غیرمنتظره سرور رخ داد.' };
 
     if (!isHttpException) {
-      this.logger.error(
-        exception instanceof Error ? exception.stack : exception,
-      );
+      this.logger.error(exception, 'ExceptionFilter');
     }
 
     const normalized =

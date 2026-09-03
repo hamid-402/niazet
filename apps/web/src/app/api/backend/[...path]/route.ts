@@ -4,8 +4,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const INTERNAL_API_URL = process.env.API_INTERNAL_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/v1';
-const REQUEST_HEADERS = ['authorization', 'content-type', 'cookie', 'idempotency-key', 'x-correlation-id'];
-const RESPONSE_HEADERS = ['content-type', 'content-disposition', 'x-correlation-id', 'set-cookie'];
+const REQUEST_HEADERS = ['authorization', 'content-type', 'cookie', 'idempotency-key', 'x-correlation-id', 'traceparent'];
+const RESPONSE_HEADERS = ['content-type', 'content-disposition', 'x-correlation-id', 'traceparent', 'set-cookie'];
 
 async function proxy(request: NextRequest, context: { params: Promise<{ path: string[] }> }) {
   const { path } = await context.params;
