@@ -194,7 +194,8 @@
   - liveness مستقل، readiness عمومی ۲۰۰/۵۰۳، جزئیات محدود به ادمین، probe واقعی DB/Storage/Outbox، fail-closed برای adapterهای جعلی، metric و alert وابستگی و healthcheck مبتنی بر `/ready` در Docker/CI تکمیل شد.
 - [x] Backup رمزنگاری‌شده، Restore test، Retention و Disaster recovery runbook
   - archive سفارشی PostgreSQL با AES-256-GCM و AAD، checksum، key ID، ساخت atomic، Restore تراکنشی و تأیید دقیق مقصد، Retention امن با dry-run، ایمیج مستقل non-root و Runbook دارای RPO/RTO و Failback تکمیل شد؛ CI چرخه واقعی backup/restore، تطبیق داده و جدول، tamper rejection و ساخت image را تأیید کرد.
-- [ ] Cleanup دوره‌ای Session، OTP، Idempotency، Outbox، فایل orphan و Signed URL
+- [x] Cleanup دوره‌ای Session، OTP، Idempotency، Outbox، فایل orphan و Signed URL
+  - دو job یکپارچه و قفل‌شده با batch محدود، retention مستقل، Audit/Metrics، indexهای دیتابیس و اجرای دستی محدود به super admin اضافه شد؛ Outbox قابل‌اقدام و داده سالم حفظ می‌شوند و migration، تست PostgreSQL واقعی، unit/typecheck/build و هر دو اجرای CI موفق بودند.
 - [ ] Dependency advisory، SBOM، Secret rotation و بررسی License
 - [ ] Load/Stress test برای Auth، Order list، File، Payment و Workerها
 - [ ] انتخاب و اتصال درگاه پرداخت، SMS/OTP، Email، Antivirus و Storage واقعی
