@@ -25,6 +25,47 @@ export function encryptionKey(value = process.env.BACKUP_ENCRYPTION_KEY) {
   return key;
 }
 
+export function postgresEnvironment(databaseUrl) {
+  const url = new URL(databaseUrl);
+  if (!['postgres:', 'postgresql:'].includes(url.protocol)) {
+    throw new Error('PostgreSQL URL protocol is invalid.');
+  }
+  const database = decodeURIComponent(url.pathname.replace(/^\//, ''));
+  if (!url.hostname || !database) {
+    throw new Error('PostgreSQL URL must include a host and database name.');
+  }
+  const env = { ...process.env };
+  for (const name of [
+    'PGHOST',
+    'PGPORT',
+    'PGUSER',
+    'PGPASSWORD',
+    'PGDATABASE',
+    'PGSSLMODE',
+    'PGSSLROOTCERT',
+    'PGSSLCERT',
+    'PGSSLKEY',
+  ]) {
+    delete env[name];
+  }
+  env.PGHOST = url.hostname.replace(/^\[|\]$/g, '');
+  env.PGPORT = url.port || '5432';
+  env.PGDATABASE = database;
+  if (url.username) env.PGUSER = decodeURIComponent(url.username);
+  if (url.password) env.PGPASSWORD = decodeURIComponent(url.password);
+  const sslParameters = {
+    sslmode: 'PGSSLMODE',
+    sslrootcert: 'PGSSLROOTCERT',
+    sslcert: 'PGSSLCERT',
+    sslkey: 'PGSSLKEY',
+  };
+  for (const [parameter, name] of Object.entries(sslParameters)) {
+    const value = url.searchParams.get(parameter);
+    if (value) env[name] = value;
+  }
+  return env;
+}
+
 export function encodeHeader(header) {
   const json = Buffer.from(JSON.stringify(header), 'utf8');
   if (json.length > MAX_HEADER_BYTES)

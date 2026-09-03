@@ -9,6 +9,7 @@ import {
   AUTH_TAG_BYTES,
   encodeHeader,
   encryptionKey,
+  postgresEnvironment,
   sha256File,
 } from './backup-format.mjs';
 
@@ -76,7 +77,7 @@ export async function createBackup(options = {}) {
     options.pgDumpCommand ?? process.env.PG_DUMP_COMMAND ?? 'pg_dump',
     ['--format=custom', '--compress=9', '--no-owner', '--no-acl'],
     {
-      env: { ...process.env, PGDATABASE: databaseUrl },
+      env: postgresEnvironment(databaseUrl),
       stdio: ['ignore', 'pipe', 'inherit'],
       windowsHide: true,
     },

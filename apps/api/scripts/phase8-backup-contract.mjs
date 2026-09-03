@@ -20,8 +20,18 @@ assert.match(
 );
 assert.match(
   create,
-  /PGDATABASE: databaseUrl/,
-  'Database credentials must stay out of command arguments.',
+  /postgresEnvironment\(databaseUrl\)/,
+  'Database credentials must stay in the child environment.',
+);
+assert.doesNotMatch(
+  create,
+  /spawn\([\s\S]*?\[[^\]]*\bdatabaseUrl\b/,
+  'Backup database credentials must stay out of command arguments.',
+);
+assert.doesNotMatch(
+  restore,
+  /spawn\([\s\S]*?\[[^\]]*\bdatabaseUrl\b/,
+  'Restore database credentials must stay out of command arguments.',
 );
 assert.match(create, /\.partial/, 'Backup creation must be atomic.');
 assert.match(

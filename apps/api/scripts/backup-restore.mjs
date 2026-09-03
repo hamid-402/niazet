@@ -5,6 +5,7 @@ import { pipeline } from 'node:stream/promises';
 import {
   decryptedStream,
   encryptionKey,
+  postgresEnvironment,
   readBackupMetadata,
   verifyBackupFile,
 } from './backup-format.mjs';
@@ -57,7 +58,7 @@ export async function restoreBackup(options = {}) {
       '--single-transaction',
     ],
     {
-      env: { ...process.env, PGDATABASE: databaseUrl },
+      env: postgresEnvironment(databaseUrl),
       stdio: ['pipe', 'inherit', 'inherit'],
       windowsHide: true,
     },

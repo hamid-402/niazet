@@ -17,6 +17,7 @@ import { restoreBackup } from './backup-restore.mjs';
 import { enforceRetention } from './backup-retention.mjs';
 import {
   encryptionKey,
+  postgresEnvironment,
   sha256File,
   verifyBackupFile,
 } from './backup-format.mjs';
@@ -44,7 +45,7 @@ if (sourceUrl === targetUrl)
 
 function run(command, args, databaseUrl, input) {
   const child = spawn(command, args, {
-    env: { ...process.env, PGDATABASE: databaseUrl },
+    env: postgresEnvironment(databaseUrl),
     stdio: ['pipe', 'pipe', 'inherit'],
     windowsHide: true,
   });
