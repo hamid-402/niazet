@@ -41,6 +41,7 @@
     "test:integration:postgres": "node scripts/phase8-postgres-integration.mjs",
     "phase8:role-workflow-contract": "node scripts/phase8-role-workflow-contract.mjs",
     "phase8:observability-contract": "node scripts/phase8-observability-contract.mjs",
+    "phase8:readiness-contract": "node scripts/phase8-readiness-contract.mjs",
     "test:e2e:roles": "node scripts/phase8-role-workflow-e2e.mjs",
     "prisma:seed": "tsx prisma/seed.ts"
   },

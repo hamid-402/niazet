@@ -19,6 +19,11 @@ export interface AppEnvironment extends Record<string, unknown> {
   ALERT_HTTP_5XX_RATE: number;
   ALERT_SLOW_REQUEST_MS: number;
   ALERT_COOLDOWN_SECONDS: number;
+  READINESS_TIMEOUT_MS: number;
+  READINESS_CACHE_TTL_MS: number;
+  QUEUE_MAX_PENDING: number;
+  QUEUE_MAX_AGE_SECONDS: number;
+  QUEUE_MAX_DEAD_LETTERS_24H: number;
 }
 
 function integer(
@@ -119,5 +124,14 @@ export function validateEnvironment(
     ALERT_HTTP_5XX_RATE: rate(config, 'ALERT_HTTP_5XX_RATE', 0.1),
     ALERT_SLOW_REQUEST_MS: integer(config, 'ALERT_SLOW_REQUEST_MS', 5_000),
     ALERT_COOLDOWN_SECONDS: integer(config, 'ALERT_COOLDOWN_SECONDS', 300),
+    READINESS_TIMEOUT_MS: integer(config, 'READINESS_TIMEOUT_MS', 3_000),
+    READINESS_CACHE_TTL_MS: integer(config, 'READINESS_CACHE_TTL_MS', 5_000),
+    QUEUE_MAX_PENDING: integer(config, 'QUEUE_MAX_PENDING', 1_000),
+    QUEUE_MAX_AGE_SECONDS: integer(config, 'QUEUE_MAX_AGE_SECONDS', 900),
+    QUEUE_MAX_DEAD_LETTERS_24H: integer(
+      config,
+      'QUEUE_MAX_DEAD_LETTERS_24H',
+      10,
+    ),
   };
 }

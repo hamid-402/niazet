@@ -37,6 +37,7 @@ import { CustomerFinanceOverviewService } from './customer-finance-overview.serv
     WithdrawalsService,
     IdempotencyService,
     FinanceReportingService,
+    MockPaymentGateway,
   ],
 })
 export class FinanceModule {}

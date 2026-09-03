@@ -36,6 +36,7 @@ export class MetricsRegistry {
   private readonly durations = new Map<string, Histogram>();
   private readonly jobs = new Map<string, number>();
   private readonly alerts = new Map<string, number>();
+  private readonly dependencies = new Map<string, number>();
 
   requestStarted() {
     this.activeRequests += 1;
@@ -81,6 +82,10 @@ export class MetricsRegistry {
   alertTriggered(type: string, severity: string) {
     const key = JSON.stringify([type, severity]);
     this.alerts.set(key, (this.alerts.get(key) ?? 0) + 1);
+  }
+
+  setDependencyStatus(name: string, ready: boolean) {
+    this.dependencies.set(name, ready ? 1 : 0);
   }
 
   render() {
@@ -129,6 +134,15 @@ export class MetricsRegistry {
     for (const [key, value] of this.alerts) {
       const [type, severity] = JSON.parse(key) as [string, string];
       lines.push(`niazat_alerts_total${labels({ type, severity })} ${value}`);
+    }
+    lines.push(
+      '# HELP niazat_dependency_ready Whether a critical dependency is ready.',
+      '# TYPE niazat_dependency_ready gauge',
+    );
+    for (const [name, value] of this.dependencies) {
+      lines.push(
+        `niazat_dependency_ready${labels({ dependency: name })} ${value}`,
+      );
     }
     const memory = process.memoryUsage();
     lines.push(

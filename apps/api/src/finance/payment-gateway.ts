@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 /**
  * Abstract payment gateway adapter (docs/ROADMAP.md §۲ — سوال ۲).
@@ -23,6 +24,12 @@ export interface PaymentGatewayAdapter {
 @Injectable()
 export class MockPaymentGateway implements PaymentGatewayAdapter {
   private readonly logger = new Logger('MockPaymentGateway');
+  private readonly configuredDriver: string;
+
+  constructor(config: ConfigService) {
+    this.configuredDriver =
+      config.get<string>('PAYMENT_GATEWAY_DRIVER') ?? 'mock';
+  }
 
   createPaymentRequest(input: {
     amount: number;
@@ -44,5 +51,24 @@ export class MockPaymentGateway implements PaymentGatewayAdapter {
       `[MOCK GATEWAY] verify ${input.gatewayRef} amount=${input.amount}`,
     );
     return Promise.resolve({ verified: true });
+  }
+
+  readiness() {
+    const activeAdapter = 'mock';
+    return {
+      status:
+        this.configuredDriver === activeAdapter
+          ? ('ready' as const)
+          : ('not_ready' as const),
+      reason:
+        this.configuredDriver === activeAdapter
+          ? undefined
+          : 'configured_driver_is_not_implemented',
+      details: {
+        configuredDriver: this.configuredDriver,
+        activeAdapter,
+        mode: 'mock',
+      },
+    };
   }
 }

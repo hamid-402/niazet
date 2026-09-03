@@ -16,9 +16,9 @@ export class MockSmsProvider implements SmsProvider {
   private readonly logger = new Logger('MockSmsProvider');
 
   send(phone: string, message: string, idempotencyKey?: string): Promise<void> {
-    this.logger.log(
-      `[MOCK SMS] ${idempotencyKey ?? 'direct'} -> ${phone}: ${message}`,
-    );
+    void phone;
+    void message;
+    this.logger.log({ event: 'mock.sms.sent', idempotencyKey });
     return Promise.resolve();
   }
 }
@@ -26,6 +26,7 @@ export class MockSmsProvider implements SmsProvider {
 @Injectable()
 export class SmsService {
   private readonly driver: SmsProvider;
+  private readonly configuredDriver: string;
 
   constructor(
     private readonly config: ConfigService,
@@ -33,10 +34,29 @@ export class SmsService {
   ) {
     // Only "mock" is implemented in this phase; future drivers register here.
     this.driver = this.mockProvider;
-    void this.config.get('SMS_DRIVER');
+    this.configuredDriver = this.config.get<string>('SMS_DRIVER') ?? 'mock';
   }
 
   send(phone: string, message: string, idempotencyKey?: string): Promise<void> {
     return this.driver.send(phone, message, idempotencyKey);
+  }
+
+  readiness() {
+    const activeAdapter = 'mock';
+    return {
+      status:
+        this.configuredDriver === activeAdapter
+          ? ('ready' as const)
+          : ('not_ready' as const),
+      reason:
+        this.configuredDriver === activeAdapter
+          ? undefined
+          : 'configured_driver_is_not_implemented',
+      details: {
+        configuredDriver: this.configuredDriver,
+        activeAdapter,
+        mode: 'mock',
+      },
+    };
   }
 }

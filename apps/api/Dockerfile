@@ -31,5 +31,5 @@ COPY --chown=node:node scripts/production-start.mjs ./scripts/production-start.m
 USER node
 EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD ["node", "-e", "fetch(`http://127.0.0.1:${process.env.APP_PORT || 3001}/health`).then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+  CMD ["node", "-e", "fetch(`http://127.0.0.1:${process.env.APP_PORT || 3001}/ready`).then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
 CMD ["node", "scripts/production-start.mjs"]

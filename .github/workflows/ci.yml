@@ -59,6 +59,9 @@ jobs:
       - name: Observability contract
         run: npm run phase8:observability-contract
         working-directory: apps/api
+      - name: Deep readiness contract
+        run: npm run phase8:readiness-contract
+        working-directory: apps/api
       - name: Static UI quality contracts
         run: npm run phase8:ui-quality-contract
         working-directory: apps/web

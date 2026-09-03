@@ -48,6 +48,15 @@ export class ObservabilityAlertService {
       this.trigger('slow_http_request', 'warning', { durationMs, route });
   }
 
+  recordDependency(name: string, ready: boolean, reason?: string) {
+    if (!ready) {
+      this.trigger(`dependency_not_ready_${name}`, 'critical', {
+        dependency: name,
+        reason: reason ?? 'unknown',
+      });
+    }
+  }
+
   private trigger(
     type: string,
     severity: 'critical' | 'warning',
