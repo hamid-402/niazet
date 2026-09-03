@@ -30,10 +30,13 @@ assert.ok(
 );
 assert.match(nextConfig, /output: "standalone"/, 'Next must produce a standalone server.');
 assert.match(web, /\.next\/standalone/, 'Web runtime must copy standalone output only.');
+assert.match(web, /COPY packages\/contracts/, 'Web build must include the shared API contract.');
+assert.match(web, /apps\/web\/server\.js/, 'Web runtime must start the monorepo standalone entrypoint.');
 for (const safeguard of ['read_only: true', 'cap_drop:', 'no-new-privileges:true', 'condition: service_healthy']) {
   assert.ok(compose.includes(safeguard), `Compose safeguard missing: ${safeguard}`);
 }
 assert.match(compose, /niazat_storage:\/app\/storage/, 'Persistent API storage volume is required.');
+assert.match(compose, /context: \.\s*\n\s*dockerfile: apps\/web\/Dockerfile/, 'Web must build from the repository context.');
 assert.match(compose, /env_file:\s*\n\s*- \.env\.production/, 'Runtime secrets must come from an ignored env file.');
 assert.doesNotMatch(compose, /(PASSWORD|SECRET|TOKEN):\s*[^$\s]/i, 'Compose must not embed credentials.');
 assert.ok(envExample.includes('REPLACE_'), 'Production env example must use placeholders.');

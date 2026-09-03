@@ -1,4 +1,9 @@
-FROM node:24-bookworm-slim AS dependencies
+FROM node:24-bookworm-slim AS base
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y ca-certificates openssl \
+    && rm -rf /var/lib/apt/lists/*
+
+FROM base AS dependencies
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
@@ -12,14 +17,11 @@ COPY src ./src
 RUN npm run build
 RUN npm prune --omit=dev
 
-FROM node:24-bookworm-slim AS runtime
+FROM base AS runtime
 ENV NODE_ENV=production \
     APP_PORT=3001
 WORKDIR /app
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y ca-certificates openssl \
-    && rm -rf /var/lib/apt/lists/* \
-    && mkdir -p storage/uploads storage/quarantine \
+RUN mkdir -p storage/uploads storage/quarantine \
     && chown -R node:node /app
 COPY --from=build --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/dist ./dist

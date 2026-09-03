@@ -1,0 +1,12 @@
+.git
+_runtime
+**/node_modules
+**/.next
+**/.env
+**/.env.*
+**/*.log
+apps/api
+docs
+playwright-report
+test-results
+screenshots

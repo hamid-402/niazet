@@ -48,7 +48,7 @@ startup API فقط migrationهای forward و ثبت‌شده Prisma را با `
 ```powershell
 node scripts/phase8-docker-contract.mjs
 docker build -t niazat-api:verify apps/api
-docker build -t niazat-web:verify apps/web
+docker build -f apps/web/Dockerfile -t niazat-web:verify .
 ```
 
 CI همین قرارداد و ساخت هر دو image را روی Linux اجرا می‌کند؛ بنابراین ناسازگاری Dockerfile یا

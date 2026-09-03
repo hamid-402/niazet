@@ -36,8 +36,8 @@ services:
 
   web:
     build:
-      context: ./apps/web
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/web/Dockerfile
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:?Set NEXT_PUBLIC_API_URL in the Compose env file}
         API_INTERNAL_URL: http://api:3001/v1
@@ -59,7 +59,7 @@ services:
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid,size=64m
-      - /app/.next/cache:rw,noexec,nosuid,size=128m
+      - /app/apps/web/.next/cache:rw,noexec,nosuid,size=128m
     cap_drop:
       - ALL
     security_opt:
