@@ -196,7 +196,8 @@
   - archive سفارشی PostgreSQL با AES-256-GCM و AAD، checksum، key ID، ساخت atomic، Restore تراکنشی و تأیید دقیق مقصد، Retention امن با dry-run، ایمیج مستقل non-root و Runbook دارای RPO/RTO و Failback تکمیل شد؛ CI چرخه واقعی backup/restore، تطبیق داده و جدول، tamper rejection و ساخت image را تأیید کرد.
 - [x] Cleanup دوره‌ای Session، OTP، Idempotency، Outbox، فایل orphan و Signed URL
   - دو job یکپارچه و قفل‌شده با batch محدود، retention مستقل، Audit/Metrics، indexهای دیتابیس و اجرای دستی محدود به super admin اضافه شد؛ Outbox قابل‌اقدام و داده سالم حفظ می‌شوند و migration، تست PostgreSQL واقعی، unit/typecheck/build و هر دو اجرای CI موفق بودند.
-- [ ] Dependency advisory، SBOM، Secret rotation و بررسی License
+- [x] Dependency advisory، SBOM، Secret rotation و بررسی License
+  - audit مستقل production و development، overrideهای امن، integrity lockfile، policy مجوز، اسکن secretهای tracked، دو SBOM استاندارد CycloneDX و artifact سی‌روزه CI اضافه شد؛ Runbook چرخش عادی و اضطراری secretها ثبت شد و هر دو اجرای push/PR موفق بودند.
 - [ ] Load/Stress test برای Auth، Order list، File، Payment و Workerها
 - [ ] انتخاب و اتصال درگاه پرداخت، SMS/OTP، Email، Antivirus و Storage واقعی
 - [ ] مستند Deployment، عملیات روزانه، Incident response و Rollback migration
