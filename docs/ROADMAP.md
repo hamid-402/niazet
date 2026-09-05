@@ -198,7 +198,8 @@
   - دو job یکپارچه و قفل‌شده با batch محدود، retention مستقل، Audit/Metrics، indexهای دیتابیس و اجرای دستی محدود به super admin اضافه شد؛ Outbox قابل‌اقدام و داده سالم حفظ می‌شوند و migration، تست PostgreSQL واقعی، unit/typecheck/build و هر دو اجرای CI موفق بودند.
 - [x] Dependency advisory، SBOM، Secret rotation و بررسی License
   - audit مستقل production و development، overrideهای امن، integrity lockfile، policy مجوز، اسکن secretهای tracked، دو SBOM استاندارد CycloneDX و artifact سی‌روزه CI اضافه شد؛ Runbook چرخش عادی و اضطراری secretها ثبت شد و هر دو اجرای push/PR موفق بودند.
-- [ ] Load/Stress test برای Auth، Order list، File، Payment و Workerها
+- [x] Load/Stress test برای Auth، Order list، File، Payment و Workerها
+  - runner ایزوله PostgreSQL و HTTP واقعی با پروفایل‌های Smoke و Stress، بودجه p95/RPS، کنترل 5xx، فشار Signed URL، Idempotency پرداخت و قفل اجرای Worker اضافه شد؛ Smoke با ۲۱۸ و Stress با ۱۷۰۲ درخواست محلی و Smoke در هر دو اجرای CI موفق بود.
 - [ ] انتخاب و اتصال درگاه پرداخت، SMS/OTP، Email، Antivirus و Storage واقعی
 - [ ] مستند Deployment، عملیات روزانه، Incident response و Rollback migration
 
