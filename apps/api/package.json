@@ -5,6 +5,10 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "overrides": {
+    "deepmerge-ts": "8.0.2",
+    "qs": "6.16.0"
+  },
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -60,7 +64,7 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/serve-static": "^5.0.5",
-    "@nestjs/swagger": "^11.4.5",
+    "@nestjs/swagger": "11.4.7",
     "@prisma/client": "^6.19.3",
     "@types/multer": "^2.2.0",
     "bcrypt": "^6.0.0",

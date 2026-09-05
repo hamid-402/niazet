@@ -144,11 +144,47 @@ jobs:
         run: npm run phase8:backup-restore
         working-directory: apps/api
 
+  supply_chain:
+    name: Advisory, licenses, secrets and SBOM
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            apps/api/package-lock.json
+            apps/web/package-lock.json
+      - name: Install API dependencies
+        run: npm ci
+        working-directory: apps/api
+      - name: Install Web dependencies
+        run: npm ci
+        working-directory: apps/web
+      - name: Production dependency advisory gate
+        run: |
+          npm --prefix apps/api audit --omit=dev --audit-level=high
+          npm --prefix apps/web audit --omit=dev --audit-level=high
+      - name: Critical development advisory gate
+        run: |
+          npm --prefix apps/api audit --audit-level=critical
+          npm --prefix apps/web audit --audit-level=critical
+      - name: Lockfile, license, tracked-secret policy and CycloneDX SBOMs
+        run: node scripts/phase8-supply-chain.mjs --output .artifacts/supply-chain
+      - uses: actions/upload-artifact@v4
+        with:
+          name: supply-chain-reports
+          path: .artifacts/supply-chain
+          if-no-files-found: error
+          retention-days: 30
+
   build:
     name: Production builds
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: [quality, postgres]
+    needs: [quality, postgres, supply_chain]
     env:
       DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/niazat_build?schema=public
       NEXT_PUBLIC_API_URL: http://127.0.0.1:3001/v1

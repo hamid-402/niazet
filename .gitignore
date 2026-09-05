@@ -8,6 +8,7 @@ build/
 .env.production
 .env.backup
 backups/
+.artifacts/
 .DS_Store
 coverage/
 .turbo/
