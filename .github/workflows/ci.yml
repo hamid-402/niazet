@@ -1,0 +1,248 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Format, lint, typecheck and unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/niazat_typecheck?schema=public
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            apps/api/package-lock.json
+            apps/web/package-lock.json
+      - name: Install API dependencies
+        run: npm ci
+        working-directory: apps/api
+      - name: Generate Prisma Client
+        run: node node_modules/prisma/build/index.js generate --schema prisma/schema.prisma
+        working-directory: apps/api
+      - name: Install Web dependencies
+        run: npm ci
+        working-directory: apps/web
+      - name: Format check
+        run: node scripts/format-check.mjs
+      - name: API lint
+        run: npm run lint:check
+        working-directory: apps/api
+      - name: Web lint
+        run: npm run lint
+        working-directory: apps/web
+      - name: API typecheck
+        run: npm run typecheck
+        working-directory: apps/api
+      - name: Web typecheck
+        run: npm run typecheck
+        working-directory: apps/web
+      - name: API unit tests
+        run: npm test -- --runInBand
+        working-directory: apps/api
+      - name: Critical unit coverage contract
+        run: npm run phase8:unit-coverage-contract
+        working-directory: apps/api
+      - name: Observability contract
+        run: npm run phase8:observability-contract
+        working-directory: apps/api
+      - name: Deep readiness contract
+        run: npm run phase8:readiness-contract
+        working-directory: apps/api
+      - name: Static UI quality contracts
+        run: npm run phase8:ui-quality-contract
+        working-directory: apps/web
+      - name: Two-theme visual matrix contract
+        run: npm run phase8:visual-matrix
+        working-directory: apps/web
+
+  postgres:
+    name: Migration, PostgreSQL integration and role E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: niazat_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d niazat_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/niazat_ci?schema=public
+      JWT_ACCESS_SECRET: ci-access-secret-0123456789abcdef0123456789abcdef
+      DOWNLOAD_TOKEN_SECRET: ci-download-secret-abcdef0123456789abcdef0123456789
+      APP_PORT: 3101
+      APP_URL: http://127.0.0.1:3101
+      WEB_URL: http://127.0.0.1:3002
+      REFRESH_TOKEN_TTL_DAYS: 30
+      OTP_TTL_SECONDS: 120
+      BACKGROUND_JOBS_ENABLED: false
+      PAYMENT_GATEWAY_DRIVER: mock
+      SMS_DRIVER: mock
+      EMAIL_DRIVER: mock
+      FILE_SCAN_DRIVER: mock
+      BACKUP_ENCRYPTION_KEY: YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWE=
+      BACKUP_KEY_ID: ci-backup-key-v1
+      BACKUP_TEST_CONFIRM: niazat_backup_restore_test
+      CLEANUP_TEST_CONFIRM: niazat_cleanup_test
+      BACKUP_TEST_ADMIN_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+      RESTORE_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/niazat_ci_restore_test
+      RESTORE_CONFIRM_DATABASE: niazat_ci_restore_test
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/api/package-lock.json
+      - name: Install API dependencies
+        run: npm ci
+        working-directory: apps/api
+      - name: Build API for isolated E2E
+        run: npm run build
+        working-directory: apps/api
+      - name: Deploy migrations to CI database
+        run: node node_modules/prisma/build/index.js migrate deploy --schema prisma/schema.prisma
+        working-directory: apps/api
+      - name: Verify migration state
+        run: node node_modules/prisma/build/index.js migrate status --schema prisma/schema.prisma
+        working-directory: apps/api
+      - name: PostgreSQL safety contract
+        run: npm run phase8:postgres-contract
+        working-directory: apps/api
+      - name: PostgreSQL integration
+        run: npm run test:integration:postgres
+        working-directory: apps/api
+      - name: Complete role and workflow E2E
+        run: npm run test:e2e:roles
+        working-directory: apps/api
+      - name: Isolated load and concurrency smoke
+        run: npm run phase8:load-smoke -- --output=../../.artifacts/performance/load-smoke.json
+        working-directory: apps/api
+      - uses: actions/upload-artifact@v4
+        with:
+          name: load-smoke-report
+          path: .artifacts/performance/load-smoke.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Bounded retention cleanup on PostgreSQL
+        run: npm run phase8:cleanup-integration
+        working-directory: apps/api
+      - name: Encrypted backup and restore lifecycle
+        run: npm run phase8:backup-restore
+        working-directory: apps/api
+
+  supply_chain:
+    name: Advisory, licenses, secrets and SBOM
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            apps/api/package-lock.json
+            apps/web/package-lock.json
+      - name: Install API dependencies
+        run: npm ci
+        working-directory: apps/api
+      - name: Install Web dependencies
+        run: npm ci
+        working-directory: apps/web
+      - name: Production dependency advisory gate
+        run: |
+          npm --prefix apps/api audit --omit=dev --audit-level=high
+          npm --prefix apps/web audit --omit=dev --audit-level=high
+      - name: Critical development advisory gate
+        run: |
+          npm --prefix apps/api audit --audit-level=critical
+          npm --prefix apps/web audit --audit-level=critical
+      - name: Lockfile, license, tracked-secret policy and CycloneDX SBOMs
+        run: node scripts/phase8-supply-chain.mjs --output .artifacts/supply-chain
+      - uses: actions/upload-artifact@v4
+        with:
+          name: supply-chain-reports
+          path: .artifacts/supply-chain
+          if-no-files-found: error
+          retention-days: 30
+
+  build:
+    name: Production builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [quality, postgres, supply_chain]
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/niazat_build?schema=public
+      NEXT_PUBLIC_API_URL: http://127.0.0.1:3001/v1
+      API_INTERNAL_URL: http://127.0.0.1:3001/v1
+      NEXT_PUBLIC_API_BASE_PATH: /api/backend
+      NEXT_PUBLIC_SITE_URL: https://example.invalid
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            apps/api/package-lock.json
+            apps/web/package-lock.json
+      - name: Install API dependencies
+        run: npm ci
+        working-directory: apps/api
+      - name: Generate Prisma Client
+        run: node node_modules/prisma/build/index.js generate --schema prisma/schema.prisma
+        working-directory: apps/api
+      - name: Install Web dependencies
+        run: npm ci
+        working-directory: apps/web
+      - name: Build API
+        run: npm run build
+        working-directory: apps/api
+      - name: Build Web
+        run: npm run build
+        working-directory: apps/web
+      - name: Docker production contract
+        run: node scripts/phase8-docker-contract.mjs
+      - name: Encrypted backup contract
+        run: npm run phase8:backup-contract
+        working-directory: apps/api
+      - name: Bounded retention cleanup contract
+        run: npm run phase8:cleanup-contract
+        working-directory: apps/api
+      - name: Build API production image
+        run: docker build --tag niazat-api:ci apps/api
+      - name: Build Web production image
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL="$NEXT_PUBLIC_API_URL" \
+            --build-arg API_INTERNAL_URL="$API_INTERNAL_URL" \
+            --build-arg NEXT_PUBLIC_API_BASE_PATH="$NEXT_PUBLIC_API_BASE_PATH" \
+            --build-arg NEXT_PUBLIC_SITE_URL="$NEXT_PUBLIC_SITE_URL" \
+            --tag niazat-web:ci \
+            --file apps/web/Dockerfile \
+            .
+      - name: Build backup operations image
+        run: docker build --file apps/api/Dockerfile.backup --tag niazat-backup:ci apps/api
