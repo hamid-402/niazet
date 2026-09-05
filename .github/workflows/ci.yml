@@ -137,6 +137,15 @@ jobs:
       - name: Complete role and workflow E2E
         run: npm run test:e2e:roles
         working-directory: apps/api
+      - name: Isolated load and concurrency smoke
+        run: npm run phase8:load-smoke -- --output=../../.artifacts/performance/load-smoke.json
+        working-directory: apps/api
+      - uses: actions/upload-artifact@v4
+        with:
+          name: load-smoke-report
+          path: .artifacts/performance/load-smoke.json
+          if-no-files-found: error
+          retention-days: 30
       - name: Bounded retention cleanup on PostgreSQL
         run: npm run phase8:cleanup-integration
         working-directory: apps/api

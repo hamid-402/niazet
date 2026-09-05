@@ -50,6 +50,8 @@
     "phase8:backup-restore": "node scripts/phase8-backup-restore-integration.mjs",
     "phase8:cleanup-contract": "node scripts/phase8-cleanup-contract.mjs",
     "phase8:cleanup-integration": "tsx scripts/phase8-cleanup-integration.ts",
+    "phase8:load-smoke": "node scripts/phase8-load-stress.mjs --profile=smoke",
+    "phase8:load-stress": "node scripts/phase8-load-stress.mjs --profile=stress",
     "backup:create": "node scripts/backup-create.mjs",
     "backup:restore": "node scripts/backup-restore.mjs",
     "backup:retention": "node scripts/backup-retention.mjs",
