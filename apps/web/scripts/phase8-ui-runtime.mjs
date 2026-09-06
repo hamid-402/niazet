@@ -450,4 +450,13 @@ try {
   await control.$disconnect();
 }
 
-if (testError) throw testError;
+if (testError) {
+  if (process.env.GITHUB_ACTIONS === 'true') {
+    const annotation = report.failure
+      .replaceAll('%', '%25')
+      .replaceAll('\r', '%0D')
+      .replaceAll('\n', '%0A');
+    console.error(`::error title=Phase 8 runtime UI::${annotation}`);
+  }
+  throw testError;
+}
