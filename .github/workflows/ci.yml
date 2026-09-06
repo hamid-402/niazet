@@ -242,9 +242,6 @@ jobs:
       - name: Install Web dependencies
         run: npm ci
         working-directory: apps/web
-      - name: Build Web
-        run: npm run build
-        working-directory: apps/web
       - name: Install Chromium and Linux dependencies
         run: npm exec playwright -- install --with-deps chromium
         working-directory: apps/web

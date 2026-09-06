@@ -77,6 +77,18 @@ function runPrisma(args, label, environment, redactions) {
   }
 }
 
+function buildWeb(environment) {
+  const result = spawnSync(process.execPath, [nextCli, 'build'], {
+    cwd: webRoot,
+    env: environment,
+    encoding: 'utf8',
+    windowsHide: true,
+  });
+  if (result.status !== 0) {
+    throw new Error(`Isolated Web build failed.\n${`${result.stdout ?? ''}\n${result.stderr ?? ''}`.slice(-8_000)}`);
+  }
+}
+
 async function waitForUrl(url, processRef, output) {
   const deadline = Date.now() + 45_000;
   while (Date.now() < deadline) {
@@ -264,7 +276,6 @@ async function verifyKeyboardFlows(pages, webOrigin) {
 
 validateVisualMatrix();
 assert.ok(existsSync(apiEntry), 'Build apps/api before runtime UI tests.');
-assert.ok(existsSync(resolve(webRoot, '.next/BUILD_ID')), 'Build apps/web before runtime UI tests.');
 mkdirSync(artifactRoot, { recursive: true });
 
 const fileEnvironment = readEnvironmentFile();
@@ -326,16 +337,18 @@ try {
   apiProcess.stderr.on('data', captureApi);
   await waitForUrl(`${apiOrigin}/health`, apiProcess, () => apiOutput);
 
+  const webEnvironment = {
+    ...process.env,
+    NODE_ENV: 'production',
+    API_INTERNAL_URL: `${apiOrigin}/v1`,
+    NEXT_PUBLIC_API_URL: `${apiOrigin}/v1`,
+    NEXT_PUBLIC_API_BASE_PATH: '/api/backend',
+    NEXT_PUBLIC_SITE_URL: webOrigin,
+  };
+  buildWeb(webEnvironment);
   webProcess = spawn(process.execPath, [nextCli, 'start', '--hostname', '127.0.0.1', '--port', String(webPort)], {
     cwd: webRoot,
-    env: {
-      ...process.env,
-      NODE_ENV: 'production',
-      API_INTERNAL_URL: `${apiOrigin}/v1`,
-      NEXT_PUBLIC_API_URL: `${apiOrigin}/v1`,
-      NEXT_PUBLIC_API_BASE_PATH: '/api/backend',
-      NEXT_PUBLIC_SITE_URL: webOrigin,
-    },
+    env: webEnvironment,
     windowsHide: true,
     stdio: ['ignore', 'pipe', 'pipe'],
   });
