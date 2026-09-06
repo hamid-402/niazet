@@ -220,7 +220,7 @@ jobs:
       API_INTERNAL_URL: http://127.0.0.1:3001/v1
       NEXT_PUBLIC_API_BASE_PATH: /api/backend
       NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3002
-      PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/playwright
+      PLAYWRIGHT_BROWSERS_PATH: /tmp/playwright
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
