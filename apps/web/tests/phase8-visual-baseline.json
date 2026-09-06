@@ -1,0 +1,6627 @@
+{
+  "schemaVersion": 1,
+  "snapshots": [
+    {
+      "key": "public-home__mobile-320__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 11064,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 68,
+          "width": 320,
+          "height": 10932
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 68
+        },
+        "nav": null,
+        "footer": {
+          "x": 0,
+          "y": 11000,
+          "width": 320,
+          "height": 64
+        }
+      },
+      "counts": {
+        "headings": 24,
+        "links": 17,
+        "controls": 10,
+        "landmarks": 3
+      },
+      "headings": [
+        "H1:خدمات تخصصی، با اجرای مدیریت‌شده و پرداخت امن",
+        "H2:مسیر درخواست تا تحویل",
+        "H3:ثبت درخواست",
+        "H3:بررسی",
+        "H3:پرداخت امن",
+        "H3:اجرا",
+        "H3:کنترل کیفیت",
+        "H3:تحویل",
+        "H2:دسته‌های خدمات",
+        "H2:نیازت در عمل چه مسئله‌هایی را حل می‌کند؟",
+        "H3:کسب‌وکار",
+        "H3:دانشگاه و پژوهش",
+        "H3:محتوا",
+        "H3:طراحی",
+        "H3:امور سفارشی",
+        "H2:نمونه ساختار خروجی‌ها",
+        "H3:گزارش تحلیل بازار",
+        "H3:تقویم محتوای ماهانه",
+        "H3:بسته تحویل صفحه فرود",
+        "H3:مقایسه تأمین‌کنندگان",
+        "H2:تعهدهای محصول چگونه اجرا می‌شوند؟",
+        "H3:اجرای داخلی و پاسخ‌گو",
+        "H3:پرداخت در حساب امانی سامانه",
+        "H3:کنترل کیفیت قابل سنجش"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-home__mobile-320__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 11064,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 68,
+          "width": 320,
+          "height": 10932
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 68
+        },
+        "nav": null,
+        "footer": {
+          "x": 0,
+          "y": 11000,
+          "width": 320,
+          "height": 64
+        }
+      },
+      "counts": {
+        "headings": 24,
+        "links": 17,
+        "controls": 10,
+        "landmarks": 3
+      },
+      "headings": [
+        "H1:خدمات تخصصی، با اجرای مدیریت‌شده و پرداخت امن",
+        "H2:مسیر درخواست تا تحویل",
+        "H3:ثبت درخواست",
+        "H3:بررسی",
+        "H3:پرداخت امن",
+        "H3:اجرا",
+        "H3:کنترل کیفیت",
+        "H3:تحویل",
+        "H2:دسته‌های خدمات",
+        "H2:نیازت در عمل چه مسئله‌هایی را حل می‌کند؟",
+        "H3:کسب‌وکار",
+        "H3:دانشگاه و پژوهش",
+        "H3:محتوا",
+        "H3:طراحی",
+        "H3:امور سفارشی",
+        "H2:نمونه ساختار خروجی‌ها",
+        "H3:گزارش تحلیل بازار",
+        "H3:تقویم محتوای ماهانه",
+        "H3:بسته تحویل صفحه فرود",
+        "H3:مقایسه تأمین‌کنندگان",
+        "H2:تعهدهای محصول چگونه اجرا می‌شوند؟",
+        "H3:اجرای داخلی و پاسخ‌گو",
+        "H3:پرداخت در حساب امانی سامانه",
+        "H3:کنترل کیفیت قابل سنجش"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-home__tablet-768__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 6968,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 76,
+          "width": 768,
+          "height": 6824
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 76
+        },
+        "nav": {
+          "x": 280,
+          "y": 28,
+          "width": 324,
+          "height": 20
+        },
+        "footer": {
+          "x": 0,
+          "y": 6900,
+          "width": 768,
+          "height": 64
+        }
+      },
+      "counts": {
+        "headings": 24,
+        "links": 23,
+        "controls": 9,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:خدمات تخصصی، با اجرای مدیریت‌شده و پرداخت امن",
+        "H2:مسیر درخواست تا تحویل",
+        "H3:ثبت درخواست",
+        "H3:بررسی",
+        "H3:پرداخت امن",
+        "H3:اجرا",
+        "H3:کنترل کیفیت",
+        "H3:تحویل",
+        "H2:دسته‌های خدمات",
+        "H2:نیازت در عمل چه مسئله‌هایی را حل می‌کند؟",
+        "H3:کسب‌وکار",
+        "H3:دانشگاه و پژوهش",
+        "H3:محتوا",
+        "H3:طراحی",
+        "H3:امور سفارشی",
+        "H2:نمونه ساختار خروجی‌ها",
+        "H3:گزارش تحلیل بازار",
+        "H3:تقویم محتوای ماهانه",
+        "H3:بسته تحویل صفحه فرود",
+        "H3:مقایسه تأمین‌کنندگان",
+        "H2:تعهدهای محصول چگونه اجرا می‌شوند؟",
+        "H3:اجرای داخلی و پاسخ‌گو",
+        "H3:پرداخت در حساب امانی سامانه",
+        "H3:کنترل کیفیت قابل سنجش"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-home__tablet-768__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 6968,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 76,
+          "width": 768,
+          "height": 6824
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 76
+        },
+        "nav": {
+          "x": 280,
+          "y": 28,
+          "width": 324,
+          "height": 20
+        },
+        "footer": {
+          "x": 0,
+          "y": 6900,
+          "width": 768,
+          "height": 64
+        }
+      },
+      "counts": {
+        "headings": 24,
+        "links": 23,
+        "controls": 9,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:خدمات تخصصی، با اجرای مدیریت‌شده و پرداخت امن",
+        "H2:مسیر درخواست تا تحویل",
+        "H3:ثبت درخواست",
+        "H3:بررسی",
+        "H3:پرداخت امن",
+        "H3:اجرا",
+        "H3:کنترل کیفیت",
+        "H3:تحویل",
+        "H2:دسته‌های خدمات",
+        "H2:نیازت در عمل چه مسئله‌هایی را حل می‌کند؟",
+        "H3:کسب‌وکار",
+        "H3:دانشگاه و پژوهش",
+        "H3:محتوا",
+        "H3:طراحی",
+        "H3:امور سفارشی",
+        "H2:نمونه ساختار خروجی‌ها",
+        "H3:گزارش تحلیل بازار",
+        "H3:تقویم محتوای ماهانه",
+        "H3:بسته تحویل صفحه فرود",
+        "H3:مقایسه تأمین‌کنندگان",
+        "H2:تعهدهای محصول چگونه اجرا می‌شوند؟",
+        "H3:اجرای داخلی و پاسخ‌گو",
+        "H3:پرداخت در حساب امانی سامانه",
+        "H3:کنترل کیفیت قابل سنجش"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-home__laptop-1280__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 5664,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 76,
+          "width": 1280,
+          "height": 5520
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 76
+        },
+        "nav": {
+          "x": 536,
+          "y": 28,
+          "width": 324,
+          "height": 20
+        },
+        "footer": {
+          "x": 0,
+          "y": 5596,
+          "width": 1280,
+          "height": 64
+        }
+      },
+      "counts": {
+        "headings": 24,
+        "links": 23,
+        "controls": 9,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:خدمات تخصصی، با اجرای مدیریت‌شده و پرداخت امن",
+        "H2:مسیر درخواست تا تحویل",
+        "H3:ثبت درخواست",
+        "H3:بررسی",
+        "H3:پرداخت امن",
+        "H3:اجرا",
+        "H3:کنترل کیفیت",
+        "H3:تحویل",
+        "H2:دسته‌های خدمات",
+        "H2:نیازت در عمل چه مسئله‌هایی را حل می‌کند؟",
+        "H3:کسب‌وکار",
+        "H3:دانشگاه و پژوهش",
+        "H3:محتوا",
+        "H3:طراحی",
+        "H3:امور سفارشی",
+        "H2:نمونه ساختار خروجی‌ها",
+        "H3:گزارش تحلیل بازار",
+        "H3:تقویم محتوای ماهانه",
+        "H3:بسته تحویل صفحه فرود",
+        "H3:مقایسه تأمین‌کنندگان",
+        "H2:تعهدهای محصول چگونه اجرا می‌شوند؟",
+        "H3:اجرای داخلی و پاسخ‌گو",
+        "H3:پرداخت در حساب امانی سامانه",
+        "H3:کنترل کیفیت قابل سنجش"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-home__laptop-1280__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 5664,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 76,
+          "width": 1280,
+          "height": 5520
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 76
+        },
+        "nav": {
+          "x": 536,
+          "y": 28,
+          "width": 324,
+          "height": 20
+        },
+        "footer": {
+          "x": 0,
+          "y": 5596,
+          "width": 1280,
+          "height": 64
+        }
+      },
+      "counts": {
+        "headings": 24,
+        "links": 23,
+        "controls": 9,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:خدمات تخصصی، با اجرای مدیریت‌شده و پرداخت امن",
+        "H2:مسیر درخواست تا تحویل",
+        "H3:ثبت درخواست",
+        "H3:بررسی",
+        "H3:پرداخت امن",
+        "H3:اجرا",
+        "H3:کنترل کیفیت",
+        "H3:تحویل",
+        "H2:دسته‌های خدمات",
+        "H2:نیازت در عمل چه مسئله‌هایی را حل می‌کند؟",
+        "H3:کسب‌وکار",
+        "H3:دانشگاه و پژوهش",
+        "H3:محتوا",
+        "H3:طراحی",
+        "H3:امور سفارشی",
+        "H2:نمونه ساختار خروجی‌ها",
+        "H3:گزارش تحلیل بازار",
+        "H3:تقویم محتوای ماهانه",
+        "H3:بسته تحویل صفحه فرود",
+        "H3:مقایسه تأمین‌کنندگان",
+        "H2:تعهدهای محصول چگونه اجرا می‌شوند؟",
+        "H3:اجرای داخلی و پاسخ‌گو",
+        "H3:پرداخت در حساب امانی سامانه",
+        "H3:کنترل کیفیت قابل سنجش"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-home__desktop-1920__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 5664,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 76,
+          "width": 1920,
+          "height": 5520
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 76
+        },
+        "nav": {
+          "x": 856,
+          "y": 28,
+          "width": 324,
+          "height": 20
+        },
+        "footer": {
+          "x": 0,
+          "y": 5596,
+          "width": 1920,
+          "height": 64
+        }
+      },
+      "counts": {
+        "headings": 24,
+        "links": 23,
+        "controls": 9,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:خدمات تخصصی، با اجرای مدیریت‌شده و پرداخت امن",
+        "H2:مسیر درخواست تا تحویل",
+        "H3:ثبت درخواست",
+        "H3:بررسی",
+        "H3:پرداخت امن",
+        "H3:اجرا",
+        "H3:کنترل کیفیت",
+        "H3:تحویل",
+        "H2:دسته‌های خدمات",
+        "H2:نیازت در عمل چه مسئله‌هایی را حل می‌کند؟",
+        "H3:کسب‌وکار",
+        "H3:دانشگاه و پژوهش",
+        "H3:محتوا",
+        "H3:طراحی",
+        "H3:امور سفارشی",
+        "H2:نمونه ساختار خروجی‌ها",
+        "H3:گزارش تحلیل بازار",
+        "H3:تقویم محتوای ماهانه",
+        "H3:بسته تحویل صفحه فرود",
+        "H3:مقایسه تأمین‌کنندگان",
+        "H2:تعهدهای محصول چگونه اجرا می‌شوند؟",
+        "H3:اجرای داخلی و پاسخ‌گو",
+        "H3:پرداخت در حساب امانی سامانه",
+        "H3:کنترل کیفیت قابل سنجش"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-home__desktop-1920__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 5664,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 76,
+          "width": 1920,
+          "height": 5520
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 76
+        },
+        "nav": {
+          "x": 856,
+          "y": 28,
+          "width": 324,
+          "height": 20
+        },
+        "footer": {
+          "x": 0,
+          "y": 5596,
+          "width": 1920,
+          "height": 64
+        }
+      },
+      "counts": {
+        "headings": 24,
+        "links": 23,
+        "controls": 9,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:خدمات تخصصی، با اجرای مدیریت‌شده و پرداخت امن",
+        "H2:مسیر درخواست تا تحویل",
+        "H3:ثبت درخواست",
+        "H3:بررسی",
+        "H3:پرداخت امن",
+        "H3:اجرا",
+        "H3:کنترل کیفیت",
+        "H3:تحویل",
+        "H2:دسته‌های خدمات",
+        "H2:نیازت در عمل چه مسئله‌هایی را حل می‌کند؟",
+        "H3:کسب‌وکار",
+        "H3:دانشگاه و پژوهش",
+        "H3:محتوا",
+        "H3:طراحی",
+        "H3:امور سفارشی",
+        "H2:نمونه ساختار خروجی‌ها",
+        "H3:گزارش تحلیل بازار",
+        "H3:تقویم محتوای ماهانه",
+        "H3:بسته تحویل صفحه فرود",
+        "H3:مقایسه تأمین‌کنندگان",
+        "H2:تعهدهای محصول چگونه اجرا می‌شوند؟",
+        "H3:اجرای داخلی و پاسخ‌گو",
+        "H3:پرداخت در حساب امانی سامانه",
+        "H3:کنترل کیفیت قابل سنجش"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-services__mobile-320__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "کاتالوگ خدمات | نیازت با ما",
+      "bodyHeight": 1696,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 68,
+          "width": 320,
+          "height": 1632
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 68
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 4,
+        "links": 5,
+        "controls": 6,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:خدمت مناسب را با خروجی روشن انتخاب کنید",
+        "H2:تحقیق و تحلیل بازار",
+        "H2:طراحی و توسعه سایت",
+        "H2:محتوا و سئو"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-services__mobile-320__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "کاتالوگ خدمات | نیازت با ما",
+      "bodyHeight": 1696,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 68,
+          "width": 320,
+          "height": 1632
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 68
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 4,
+        "links": 5,
+        "controls": 6,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:خدمت مناسب را با خروجی روشن انتخاب کنید",
+        "H2:تحقیق و تحلیل بازار",
+        "H2:طراحی و توسعه سایت",
+        "H2:محتوا و سئو"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-services__tablet-768__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "کاتالوگ خدمات | نیازت با ما",
+      "bodyHeight": 1088,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 76,
+          "width": 768,
+          "height": 1012
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 76
+        },
+        "nav": {
+          "x": 280,
+          "y": 28,
+          "width": 324,
+          "height": 20
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 4,
+        "links": 11,
+        "controls": 5,
+        "landmarks": 3
+      },
+      "headings": [
+        "H1:خدمت مناسب را با خروجی روشن انتخاب کنید",
+        "H2:تحقیق و تحلیل بازار",
+        "H2:طراحی و توسعه سایت",
+        "H2:محتوا و سئو"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-services__tablet-768__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "کاتالوگ خدمات | نیازت با ما",
+      "bodyHeight": 1088,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 76,
+          "width": 768,
+          "height": 1012
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 76
+        },
+        "nav": {
+          "x": 280,
+          "y": 28,
+          "width": 324,
+          "height": 20
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 4,
+        "links": 11,
+        "controls": 5,
+        "landmarks": 3
+      },
+      "headings": [
+        "H1:خدمت مناسب را با خروجی روشن انتخاب کنید",
+        "H2:تحقیق و تحلیل بازار",
+        "H2:طراحی و توسعه سایت",
+        "H2:محتوا و سئو"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-services__laptop-1280__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "کاتالوگ خدمات | نیازت با ما",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 64,
+          "y": 76,
+          "width": 1152,
+          "height": 724
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 76
+        },
+        "nav": {
+          "x": 536,
+          "y": 28,
+          "width": 324,
+          "height": 20
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 4,
+        "links": 11,
+        "controls": 5,
+        "landmarks": 3
+      },
+      "headings": [
+        "H1:خدمت مناسب را با خروجی روشن انتخاب کنید",
+        "H2:تحقیق و تحلیل بازار",
+        "H2:طراحی و توسعه سایت",
+        "H2:محتوا و سئو"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-services__laptop-1280__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "کاتالوگ خدمات | نیازت با ما",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 64,
+          "y": 76,
+          "width": 1152,
+          "height": 724
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 76
+        },
+        "nav": {
+          "x": 536,
+          "y": 28,
+          "width": 324,
+          "height": 20
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 4,
+        "links": 11,
+        "controls": 5,
+        "landmarks": 3
+      },
+      "headings": [
+        "H1:خدمت مناسب را با خروجی روشن انتخاب کنید",
+        "H2:تحقیق و تحلیل بازار",
+        "H2:طراحی و توسعه سایت",
+        "H2:محتوا و سئو"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-services__desktop-1920__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "کاتالوگ خدمات | نیازت با ما",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 384,
+          "y": 76,
+          "width": 1152,
+          "height": 1004
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 76
+        },
+        "nav": {
+          "x": 856,
+          "y": 28,
+          "width": 324,
+          "height": 20
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 4,
+        "links": 11,
+        "controls": 5,
+        "landmarks": 3
+      },
+      "headings": [
+        "H1:خدمت مناسب را با خروجی روشن انتخاب کنید",
+        "H2:تحقیق و تحلیل بازار",
+        "H2:طراحی و توسعه سایت",
+        "H2:محتوا و سئو"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-services__desktop-1920__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "کاتالوگ خدمات | نیازت با ما",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 384,
+          "y": 76,
+          "width": 1152,
+          "height": 1004
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 76
+        },
+        "nav": {
+          "x": 856,
+          "y": 28,
+          "width": 324,
+          "height": 20
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 4,
+        "links": 11,
+        "controls": 5,
+        "landmarks": 3
+      },
+      "headings": [
+        "H1:خدمت مناسب را با خروجی روشن انتخاب کنید",
+        "H2:تحقیق و تحلیل بازار",
+        "H2:طراحی و توسعه سایت",
+        "H2:محتوا و سئو"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-status__mobile-320__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "وضعیت سرویس‌ها | نیازت با ما",
+      "bodyHeight": 1416,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 68,
+          "width": 320,
+          "height": 1348
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 68
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 3,
+        "links": 2,
+        "controls": 3,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:وضعیت سرویس‌های نیازت",
+        "H2:اجزای سرویس",
+        "H2:رخدادهای جاری"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-status__mobile-320__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "وضعیت سرویس‌ها | نیازت با ما",
+      "bodyHeight": 1416,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 68,
+          "width": 320,
+          "height": 1348
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 68
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 3,
+        "links": 2,
+        "controls": 3,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:وضعیت سرویس‌های نیازت",
+        "H2:اجزای سرویس",
+        "H2:رخدادهای جاری"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-status__tablet-768__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "وضعیت سرویس‌ها | نیازت با ما",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 76,
+          "width": 768,
+          "height": 900
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 76
+        },
+        "nav": {
+          "x": 280,
+          "y": 28,
+          "width": 324,
+          "height": 20
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 3,
+        "links": 8,
+        "controls": 2,
+        "landmarks": 3
+      },
+      "headings": [
+        "H1:وضعیت سرویس‌های نیازت",
+        "H2:اجزای سرویس",
+        "H2:رخدادهای جاری"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-status__tablet-768__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "وضعیت سرویس‌ها | نیازت با ما",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 76,
+          "width": 768,
+          "height": 900
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 76
+        },
+        "nav": {
+          "x": 280,
+          "y": 28,
+          "width": 324,
+          "height": 20
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 3,
+        "links": 8,
+        "controls": 2,
+        "landmarks": 3
+      },
+      "headings": [
+        "H1:وضعیت سرویس‌های نیازت",
+        "H2:اجزای سرویس",
+        "H2:رخدادهای جاری"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-status__laptop-1280__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "وضعیت سرویس‌ها | نیازت با ما",
+      "bodyHeight": 976,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 192,
+          "y": 76,
+          "width": 896,
+          "height": 900
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 76
+        },
+        "nav": {
+          "x": 536,
+          "y": 28,
+          "width": 324,
+          "height": 20
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 3,
+        "links": 8,
+        "controls": 2,
+        "landmarks": 3
+      },
+      "headings": [
+        "H1:وضعیت سرویس‌های نیازت",
+        "H2:اجزای سرویس",
+        "H2:رخدادهای جاری"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-status__laptop-1280__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "وضعیت سرویس‌ها | نیازت با ما",
+      "bodyHeight": 976,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 192,
+          "y": 76,
+          "width": 896,
+          "height": 900
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 76
+        },
+        "nav": {
+          "x": 536,
+          "y": 28,
+          "width": 324,
+          "height": 20
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 3,
+        "links": 8,
+        "controls": 2,
+        "landmarks": 3
+      },
+      "headings": [
+        "H1:وضعیت سرویس‌های نیازت",
+        "H2:اجزای سرویس",
+        "H2:رخدادهای جاری"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-status__desktop-1920__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "وضعیت سرویس‌ها | نیازت با ما",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 512,
+          "y": 76,
+          "width": 896,
+          "height": 900
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 76
+        },
+        "nav": {
+          "x": 856,
+          "y": 28,
+          "width": 324,
+          "height": 20
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 3,
+        "links": 8,
+        "controls": 2,
+        "landmarks": 3
+      },
+      "headings": [
+        "H1:وضعیت سرویس‌های نیازت",
+        "H2:اجزای سرویس",
+        "H2:رخدادهای جاری"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "public-status__desktop-1920__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "وضعیت سرویس‌ها | نیازت با ما",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 512,
+          "y": 76,
+          "width": 896,
+          "height": 900
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 76
+        },
+        "nav": {
+          "x": 856,
+          "y": 28,
+          "width": 324,
+          "height": 20
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 3,
+        "links": 8,
+        "controls": 2,
+        "landmarks": 3
+      },
+      "headings": [
+        "H1:وضعیت سرویس‌های نیازت",
+        "H2:اجزای سرویس",
+        "H2:رخدادهای جاری"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "auth-login__mobile-320__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "ورود | نیازت با ما",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 740
+        },
+        "header": null,
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 1,
+        "links": 3,
+        "controls": 6,
+        "landmarks": 1
+      },
+      "headings": [
+        "H1:ورود به نیازت با ما"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "auth-login__mobile-320__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "ورود | نیازت با ما",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 740
+        },
+        "header": null,
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 1,
+        "links": 3,
+        "controls": 6,
+        "landmarks": 1
+      },
+      "headings": [
+        "H1:ورود به نیازت با ما"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "auth-login__tablet-768__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "ورود | نیازت با ما",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 1024
+        },
+        "header": null,
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 1,
+        "links": 3,
+        "controls": 6,
+        "landmarks": 1
+      },
+      "headings": [
+        "H1:ورود به نیازت با ما"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "auth-login__tablet-768__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "ورود | نیازت با ما",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 1024
+        },
+        "header": null,
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 1,
+        "links": 3,
+        "controls": 6,
+        "landmarks": 1
+      },
+      "headings": [
+        "H1:ورود به نیازت با ما"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "auth-login__laptop-1280__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "ورود | نیازت با ما",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 800
+        },
+        "header": null,
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 1,
+        "links": 3,
+        "controls": 6,
+        "landmarks": 1
+      },
+      "headings": [
+        "H1:ورود به نیازت با ما"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "auth-login__laptop-1280__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "ورود | نیازت با ما",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 800
+        },
+        "header": null,
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 1,
+        "links": 3,
+        "controls": 6,
+        "landmarks": 1
+      },
+      "headings": [
+        "H1:ورود به نیازت با ما"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "auth-login__desktop-1920__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "ورود | نیازت با ما",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "header": null,
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 1,
+        "links": 3,
+        "controls": 6,
+        "landmarks": 1
+      },
+      "headings": [
+        "H1:ورود به نیازت با ما"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "auth-login__desktop-1920__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "ورود | نیازت با ما",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "header": null,
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 1,
+        "links": 3,
+        "controls": 6,
+        "landmarks": 1
+      },
+      "headings": [
+        "H1:ورود به نیازت با ما"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-dashboard__mobile-320__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 612
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 3,
+        "controls": 2,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:میز کار",
+        "H2:هنوز سفارشی ثبت نکرده‌اید"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-dashboard__mobile-320__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 612
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 3,
+        "controls": 2,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:میز کار",
+        "H2:هنوز سفارشی ثبت نکرده‌اید"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-dashboard__tablet-768__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 524
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 11,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:میز کار",
+        "H2:هنوز سفارشی ثبت نکرده‌اید"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-dashboard__tablet-768__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 524
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 11,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:میز کار",
+        "H2:هنوز سفارشی ثبت نکرده‌اید"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-dashboard__laptop-1280__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 464
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 11,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:میز کار",
+        "H2:هنوز سفارشی ثبت نکرده‌اید"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-dashboard__laptop-1280__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 464
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 11,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:میز کار",
+        "H2:هنوز سفارشی ثبت نکرده‌اید"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-dashboard__desktop-1920__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 464
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 11,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:میز کار",
+        "H2:هنوز سفارشی ثبت نکرده‌اید"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-dashboard__desktop-1920__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 464
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 11,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:میز کار",
+        "H2:هنوز سفارشی ثبت نکرده‌اید"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-new-order__mobile-320__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1368,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 1304
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 1,
+        "controls": 10,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:ثبت درخواست جدید",
+        "H2:فایل‌های ورودی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-new-order__mobile-320__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1368,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 1304
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 1,
+        "controls": 10,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:ثبت درخواست جدید",
+        "H2:فایل‌های ورودی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-new-order__tablet-768__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1136,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 1072
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 828
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 9,
+        "controls": 11,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:ثبت درخواست جدید",
+        "H2:فایل‌های ورودی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-new-order__tablet-768__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1136,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 1072
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 828
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 9,
+        "controls": 11,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:ثبت درخواست جدید",
+        "H2:فایل‌های ورودی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-new-order__laptop-1280__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1096,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 1036
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 792
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 9,
+        "controls": 11,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:ثبت درخواست جدید",
+        "H2:فایل‌های ورودی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-new-order__laptop-1280__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1096,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 1036
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 792
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 9,
+        "controls": 11,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:ثبت درخواست جدید",
+        "H2:فایل‌های ورودی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-new-order__desktop-1920__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1096,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 1036
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 792
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 9,
+        "controls": 11,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:ثبت درخواست جدید",
+        "H2:فایل‌های ورودی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-new-order__desktop-1920__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1096,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 1036
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 792
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 9,
+        "controls": 11,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:ثبت درخواست جدید",
+        "H2:فایل‌های ورودی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-orders__mobile-320__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 296
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 2,
+        "controls": 2,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:سفارش‌های من",
+        "H2:سفارشی ثبت نکرده‌اید"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-orders__mobile-320__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 296
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 2,
+        "controls": 2,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:سفارش‌های من",
+        "H2:سفارشی ثبت نکرده‌اید"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-orders__tablet-768__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 312
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 10,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:سفارش‌های من",
+        "H2:سفارشی ثبت نکرده‌اید"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-orders__tablet-768__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 312
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 10,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:سفارش‌های من",
+        "H2:سفارشی ثبت نکرده‌اید"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-orders__laptop-1280__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 312
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 10,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:سفارش‌های من",
+        "H2:سفارشی ثبت نکرده‌اید"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-orders__laptop-1280__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 312
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 10,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:سفارش‌های من",
+        "H2:سفارشی ثبت نکرده‌اید"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-orders__desktop-1920__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 312
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 10,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:سفارش‌های من",
+        "H2:سفارشی ثبت نکرده‌اید"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-orders__desktop-1920__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 312
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 10,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:سفارش‌های من",
+        "H2:سفارشی ثبت نکرده‌اید"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-wallet__mobile-320__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1088,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": -288,
+          "y": 64,
+          "width": 608,
+          "height": 1028
+        },
+        "header": {
+          "x": -288,
+          "y": 0,
+          "width": 608,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 4,
+        "links": 1,
+        "controls": 8,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:امور مالی من",
+        "H3:آخرین پرداخت‌ها",
+        "H2:پرداختی ثبت نشده است.",
+        "H3:منطق حساب امانی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-wallet__mobile-320__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1088,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": -288,
+          "y": 64,
+          "width": 608,
+          "height": 1028
+        },
+        "header": {
+          "x": -288,
+          "y": 0,
+          "width": 608,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 4,
+        "links": 1,
+        "controls": 8,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:امور مالی من",
+        "H3:آخرین پرداخت‌ها",
+        "H2:پرداختی ثبت نشده است.",
+        "H3:منطق حساب امانی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-wallet__tablet-768__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1104,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": -112,
+          "y": 64,
+          "width": 624,
+          "height": 1044
+        },
+        "header": {
+          "x": -112,
+          "y": 0,
+          "width": 624,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 800
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 4,
+        "links": 9,
+        "controls": 9,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:امور مالی من",
+        "H3:آخرین پرداخت‌ها",
+        "H2:پرداختی ثبت نشده است.",
+        "H3:منطق حساب امانی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-wallet__tablet-768__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1104,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": -112,
+          "y": 64,
+          "width": 624,
+          "height": 1044
+        },
+        "header": {
+          "x": -112,
+          "y": 0,
+          "width": 624,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 800
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 4,
+        "links": 9,
+        "controls": 9,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:امور مالی من",
+        "H3:آخرین پرداخت‌ها",
+        "H2:پرداختی ثبت نشده است.",
+        "H3:منطق حساب امانی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-wallet__laptop-1280__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 588
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 4,
+        "links": 9,
+        "controls": 9,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:امور مالی من",
+        "H3:آخرین پرداخت‌ها",
+        "H2:پرداختی ثبت نشده است.",
+        "H3:منطق حساب امانی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-wallet__laptop-1280__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 588
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 4,
+        "links": 9,
+        "controls": 9,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:امور مالی من",
+        "H3:آخرین پرداخت‌ها",
+        "H2:پرداختی ثبت نشده است.",
+        "H3:منطق حساب امانی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-wallet__desktop-1920__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 588
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 4,
+        "links": 9,
+        "controls": 9,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:امور مالی من",
+        "H3:آخرین پرداخت‌ها",
+        "H2:پرداختی ثبت نشده است.",
+        "H3:منطق حساب امانی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "customer-wallet__desktop-1920__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 588
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 4,
+        "links": 9,
+        "controls": 9,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:امور مالی من",
+        "H3:آخرین پرداخت‌ها",
+        "H2:پرداختی ثبت نشده است.",
+        "H3:منطق حساب امانی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-dashboard__mobile-320__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 316
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 1,
+        "controls": 2,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:داشبورد عملیات",
+        "H3:سفارش‌ها بر اساس وضعیت"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-dashboard__mobile-320__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 316
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 1,
+        "controls": 2,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:داشبورد عملیات",
+        "H3:سفارش‌ها بر اساس وضعیت"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-dashboard__tablet-768__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 348
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 10,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:داشبورد عملیات",
+        "H3:سفارش‌ها بر اساس وضعیت"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-dashboard__tablet-768__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 348
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 10,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:داشبورد عملیات",
+        "H3:سفارش‌ها بر اساس وضعیت"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-dashboard__laptop-1280__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 316
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 10,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:داشبورد عملیات",
+        "H3:سفارش‌ها بر اساس وضعیت"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-dashboard__laptop-1280__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 316
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 10,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:داشبورد عملیات",
+        "H3:سفارش‌ها بر اساس وضعیت"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-dashboard__desktop-1920__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 316
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 10,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:داشبورد عملیات",
+        "H3:سفارش‌ها بر اساس وضعیت"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-dashboard__desktop-1920__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 316
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 10,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:داشبورد عملیات",
+        "H3:سفارش‌ها بر اساس وضعیت"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-orders__mobile-320__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 588
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 2,
+        "controls": 5,
+        "landmarks": 3
+      },
+      "headings": [
+        "H1:مدیریت سفارش‌ها",
+        "H2:سفارشی یافت نشد."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-orders__mobile-320__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 588
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 2,
+        "controls": 5,
+        "landmarks": 3
+      },
+      "headings": [
+        "H1:مدیریت سفارش‌ها",
+        "H2:سفارشی یافت نشد."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-orders__tablet-768__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 456
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 11,
+        "controls": 6,
+        "landmarks": 5
+      },
+      "headings": [
+        "H1:مدیریت سفارش‌ها",
+        "H2:سفارشی یافت نشد."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-orders__tablet-768__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 456
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 11,
+        "controls": 6,
+        "landmarks": 5
+      },
+      "headings": [
+        "H1:مدیریت سفارش‌ها",
+        "H2:سفارشی یافت نشد."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-orders__laptop-1280__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 456
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 11,
+        "controls": 6,
+        "landmarks": 5
+      },
+      "headings": [
+        "H1:مدیریت سفارش‌ها",
+        "H2:سفارشی یافت نشد."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-orders__laptop-1280__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 456
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 11,
+        "controls": 6,
+        "landmarks": 5
+      },
+      "headings": [
+        "H1:مدیریت سفارش‌ها",
+        "H2:سفارشی یافت نشد."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-orders__desktop-1920__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 456
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 11,
+        "controls": 6,
+        "landmarks": 5
+      },
+      "headings": [
+        "H1:مدیریت سفارش‌ها",
+        "H2:سفارشی یافت نشد."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-orders__desktop-1920__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 456
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 11,
+        "controls": 6,
+        "landmarks": 5
+      },
+      "headings": [
+        "H1:مدیریت سفارش‌ها",
+        "H2:سفارشی یافت نشد."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-qc__mobile-320__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 340
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 1,
+        "controls": 2,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:صف کنترل کیفیت (QC)",
+        "H2:خروجی‌ای در صف QC نیست."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-qc__mobile-320__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 340
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 1,
+        "controls": 2,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:صف کنترل کیفیت (QC)",
+        "H2:خروجی‌ای در صف QC نیست."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-qc__tablet-768__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 312
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 10,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:صف کنترل کیفیت (QC)",
+        "H2:خروجی‌ای در صف QC نیست."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-qc__tablet-768__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 312
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 10,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:صف کنترل کیفیت (QC)",
+        "H2:خروجی‌ای در صف QC نیست."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-qc__laptop-1280__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 312
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 10,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:صف کنترل کیفیت (QC)",
+        "H2:خروجی‌ای در صف QC نیست."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-qc__laptop-1280__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 312
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 10,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:صف کنترل کیفیت (QC)",
+        "H2:خروجی‌ای در صف QC نیست."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-qc__desktop-1920__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 312
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 10,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:صف کنترل کیفیت (QC)",
+        "H2:خروجی‌ای در صف QC نیست."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-qc__desktop-1920__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 312
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 10,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:صف کنترل کیفیت (QC)",
+        "H2:خروجی‌ای در صف QC نیست."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-staff__mobile-320__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 2360,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 2296
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 3,
+        "links": 3,
+        "controls": 13,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:کارمندان و مجریان",
+        "H3:تعریف تیم",
+        "H3:تعریف مهارت"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-staff__mobile-320__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 2360,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 2296
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 3,
+        "links": 3,
+        "controls": 13,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:کارمندان و مجریان",
+        "H3:تعریف تیم",
+        "H3:تعریف مهارت"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-staff__tablet-768__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": -640,
+          "y": 64,
+          "width": 1152,
+          "height": 864
+        },
+        "header": {
+          "x": -640,
+          "y": 0,
+          "width": 1152,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 3,
+        "links": 12,
+        "controls": 14,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:کارمندان و مجریان",
+        "H3:تعریف تیم",
+        "H3:تعریف مهارت"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-staff__tablet-768__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": -640,
+          "y": 64,
+          "width": 1152,
+          "height": 864
+        },
+        "header": {
+          "x": -640,
+          "y": 0,
+          "width": 1152,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 3,
+        "links": 12,
+        "controls": 14,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:کارمندان و مجریان",
+        "H3:تعریف تیم",
+        "H3:تعریف مهارت"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-staff__laptop-1280__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": -128,
+          "y": 64,
+          "width": 1152,
+          "height": 684
+        },
+        "header": {
+          "x": -128,
+          "y": 0,
+          "width": 1152,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 3,
+        "links": 12,
+        "controls": 14,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:کارمندان و مجریان",
+        "H3:تعریف تیم",
+        "H3:تعریف مهارت"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-staff__laptop-1280__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": -128,
+          "y": 64,
+          "width": 1152,
+          "height": 684
+        },
+        "header": {
+          "x": -128,
+          "y": 0,
+          "width": 1152,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 3,
+        "links": 12,
+        "controls": 14,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:کارمندان و مجریان",
+        "H3:تعریف تیم",
+        "H3:تعریف مهارت"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-staff__desktop-1920__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 684
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 3,
+        "links": 12,
+        "controls": 14,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:کارمندان و مجریان",
+        "H3:تعریف تیم",
+        "H3:تعریف مهارت"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "ops-staff__desktop-1920__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 684
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 3,
+        "links": 12,
+        "controls": 14,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:کارمندان و مجریان",
+        "H3:تعریف تیم",
+        "H3:تعریف مهارت"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "finance-dashboard__mobile-320__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 580
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 1,
+        "links": 1,
+        "controls": 2,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:داشبورد مالی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "finance-dashboard__mobile-320__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 580
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 1,
+        "links": 1,
+        "controls": 2,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:داشبورد مالی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "finance-dashboard__tablet-768__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 464
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 1,
+        "links": 11,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:داشبورد مالی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "finance-dashboard__tablet-768__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 464
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 1,
+        "links": 11,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:داشبورد مالی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "finance-dashboard__laptop-1280__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 448
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 1,
+        "links": 11,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:داشبورد مالی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "finance-dashboard__laptop-1280__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 448
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 1,
+        "links": 11,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:داشبورد مالی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "finance-dashboard__desktop-1920__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 448
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 1,
+        "links": 11,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:داشبورد مالی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "finance-dashboard__desktop-1920__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 448
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 1,
+        "links": 11,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:داشبورد مالی"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "finance-ledger__mobile-320__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 412
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 1,
+        "controls": 3,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:دفتر ثبت مالی",
+        "H2:تراکنشی ثبت نشده است."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "finance-ledger__mobile-320__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 412
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 1,
+        "controls": 3,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:دفتر ثبت مالی",
+        "H2:تراکنشی ثبت نشده است."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "finance-ledger__tablet-768__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 408
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 11,
+        "controls": 4,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:دفتر ثبت مالی",
+        "H2:تراکنشی ثبت نشده است."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "finance-ledger__tablet-768__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 408
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 11,
+        "controls": 4,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:دفتر ثبت مالی",
+        "H2:تراکنشی ثبت نشده است."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "finance-ledger__laptop-1280__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 352
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 11,
+        "controls": 4,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:دفتر ثبت مالی",
+        "H2:تراکنشی ثبت نشده است."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "finance-ledger__laptop-1280__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 352
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 11,
+        "controls": 4,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:دفتر ثبت مالی",
+        "H2:تراکنشی ثبت نشده است."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "finance-ledger__desktop-1920__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 352
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 11,
+        "controls": 4,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:دفتر ثبت مالی",
+        "H2:تراکنشی ثبت نشده است."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "finance-ledger__desktop-1920__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 352
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 11,
+        "controls": 4,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:دفتر ثبت مالی",
+        "H2:تراکنشی ثبت نشده است."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "executor-dashboard__mobile-320__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 484
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 1,
+        "controls": 2,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:کارهای من",
+        "H3:کارهای در صف"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "executor-dashboard__mobile-320__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 484
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 1,
+        "controls": 2,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:کارهای من",
+        "H3:کارهای در صف"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "executor-dashboard__tablet-768__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 392
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 6,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:کارهای من",
+        "H3:کارهای در صف"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "executor-dashboard__tablet-768__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 392
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 6,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:کارهای من",
+        "H3:کارهای در صف"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "executor-dashboard__laptop-1280__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 360
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 6,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:کارهای من",
+        "H3:کارهای در صف"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "executor-dashboard__laptop-1280__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 360
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 6,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:کارهای من",
+        "H3:کارهای در صف"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "executor-dashboard__desktop-1920__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 360
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 6,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:کارهای من",
+        "H3:کارهای در صف"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "executor-dashboard__desktop-1920__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 360
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 6,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:کارهای من",
+        "H3:کارهای در صف"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "executor-orders__mobile-320__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 296
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 1,
+        "controls": 2,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:سفارش‌های ارجاع‌شده",
+        "H2:کاری به شما ارجاع نشده است."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "executor-orders__mobile-320__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 296
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 1,
+        "controls": 2,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:سفارش‌های ارجاع‌شده",
+        "H2:کاری به شما ارجاع نشده است."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "executor-orders__tablet-768__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 312
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 6,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:سفارش‌های ارجاع‌شده",
+        "H2:کاری به شما ارجاع نشده است."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "executor-orders__tablet-768__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 312
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 6,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:سفارش‌های ارجاع‌شده",
+        "H2:کاری به شما ارجاع نشده است."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "executor-orders__laptop-1280__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 312
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 6,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:سفارش‌های ارجاع‌شده",
+        "H2:کاری به شما ارجاع نشده است."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "executor-orders__laptop-1280__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 312
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 6,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:سفارش‌های ارجاع‌شده",
+        "H2:کاری به شما ارجاع نشده است."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "executor-orders__desktop-1920__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 312
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 6,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:سفارش‌های ارجاع‌شده",
+        "H2:کاری به شما ارجاع نشده است."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "executor-orders__desktop-1920__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 312
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 6,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:سفارش‌های ارجاع‌شده",
+        "H2:کاری به شما ارجاع نشده است."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "support-dashboard__mobile-320__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 648
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 2,
+        "controls": 2,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:داشبورد پشتیبانی",
+        "H2:اقدام‌های بعدی من"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "support-dashboard__mobile-320__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 648
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 2,
+        "controls": 2,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:داشبورد پشتیبانی",
+        "H2:اقدام‌های بعدی من"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "support-dashboard__tablet-768__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 444
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 8,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:داشبورد پشتیبانی",
+        "H2:اقدام‌های بعدی من"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "support-dashboard__tablet-768__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 444
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 8,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:داشبورد پشتیبانی",
+        "H2:اقدام‌های بعدی من"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "support-dashboard__laptop-1280__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 332
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 8,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:داشبورد پشتیبانی",
+        "H2:اقدام‌های بعدی من"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "support-dashboard__laptop-1280__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 332
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 8,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:داشبورد پشتیبانی",
+        "H2:اقدام‌های بعدی من"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "support-dashboard__desktop-1920__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 332
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 8,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:داشبورد پشتیبانی",
+        "H2:اقدام‌های بعدی من"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "support-dashboard__desktop-1920__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 332
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 8,
+        "controls": 3,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:داشبورد پشتیبانی",
+        "H2:اقدام‌های بعدی من"
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "support-tickets__mobile-320__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 564
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 1,
+        "controls": 6,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:صف تیکت‌ها",
+        "H2:تیکتی با این فیلتر یافت نشد."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "support-tickets__mobile-320__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 744,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 564
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "nav": null,
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 1,
+        "controls": 6,
+        "landmarks": 2
+      },
+      "headings": [
+        "H1:صف تیکت‌ها",
+        "H2:تیکتی با این فیلتر یافت نشد."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "support-tickets__tablet-768__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 448
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 7,
+        "controls": 7,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:صف تیکت‌ها",
+        "H2:تیکتی با این فیلتر یافت نشد."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "support-tickets__tablet-768__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1024,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 512,
+          "height": 448
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 64
+        },
+        "nav": {
+          "x": 532,
+          "y": 112,
+          "width": 216,
+          "height": 720
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 7,
+        "controls": 7,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:صف تیکت‌ها",
+        "H2:تیکتی با این فیلتر یافت نشد."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "support-tickets__laptop-1280__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 448
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 7,
+        "controls": 7,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:صف تیکت‌ها",
+        "H2:تیکتی با این فیلتر یافت نشد."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "support-tickets__laptop-1280__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 800,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 1024,
+          "height": 448
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 64
+        },
+        "nav": {
+          "x": 1044,
+          "y": 112,
+          "width": 216,
+          "height": 496
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 7,
+        "controls": 7,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:صف تیکت‌ها",
+        "H2:تیکتی با این فیلتر یافت نشد."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "support-tickets__desktop-1920__simple-light",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-light",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(242, 245, 250)",
+        "foreground": "rgb(21, 42, 74)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 448
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 7,
+        "controls": 7,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:صف تیکت‌ها",
+        "H2:تیکتی با این فیلتر یافت نشد."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    },
+    {
+      "key": "support-tickets__desktop-1920__simple-dark",
+      "lang": "fa",
+      "dir": "rtl",
+      "theme": "simple-dark",
+      "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
+      "bodyHeight": 1080,
+      "overflowX": 0,
+      "colors": {
+        "background": "rgb(16, 37, 68)",
+        "foreground": "rgb(244, 248, 252)"
+      },
+      "rects": {
+        "main": {
+          "x": 256,
+          "y": 64,
+          "width": 1152,
+          "height": 448
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1664,
+          "height": 64
+        },
+        "nav": {
+          "x": 1684,
+          "y": 112,
+          "width": 216,
+          "height": 776
+        },
+        "footer": null
+      },
+      "counts": {
+        "headings": 2,
+        "links": 7,
+        "controls": 7,
+        "landmarks": 4
+      },
+      "headings": [
+        "H1:صف تیکت‌ها",
+        "H2:تیکتی با این فیلتر یافت نشد."
+      ],
+      "duplicateIds": [],
+      "undersizedControls": []
+    }
+  ]
+}

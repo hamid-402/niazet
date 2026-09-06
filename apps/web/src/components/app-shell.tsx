@@ -99,7 +99,7 @@ export function AppShell({
           </p>
           <button
             onClick={handleLogout}
-            className="mt-3 text-xs font-medium text-danger hover:underline"
+            className="mt-3 inline-flex min-h-9 items-center rounded-control px-2 text-xs font-medium text-danger hover:underline"
           >
             خروج از حساب
           </button>
@@ -122,7 +122,7 @@ export function AppShell({
              <p className="text-sm font-medium text-fg">{user?.fullName}</p>
              <button
                onClick={handleLogout}
-               className="mt-3 text-xs font-medium text-danger hover:underline"
+               className="mt-3 inline-flex min-h-9 items-center rounded-control px-2 text-xs font-medium text-danger hover:underline"
              >
                خروج از حساب
              </button>

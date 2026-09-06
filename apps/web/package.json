@@ -34,7 +34,9 @@
     "phase7:route-motion-contract": "node scripts/phase7-route-motion-contract.mjs",
     "phase7:seo-contract": "node scripts/phase7-seo-contract.mjs",
     "phase8:ui-quality-contract": "node scripts/phase8-ui-quality-contract.mjs",
-    "phase8:visual-matrix": "node scripts/phase8-visual-regression-matrix.mjs"
+    "phase8:visual-matrix": "node scripts/phase8-visual-regression-matrix.mjs",
+    "phase8:ui-runtime": "node scripts/phase8-ui-runtime.mjs",
+    "phase8:ui-baseline": "node scripts/phase8-ui-runtime.mjs --update-baseline"
   },
   "dependencies": {
     "lucide-react": "^1.23.0",
@@ -43,6 +45,7 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

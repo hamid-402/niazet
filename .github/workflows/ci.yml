@@ -189,11 +189,81 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+  ui_runtime:
+    name: Runtime accessibility, keyboard and visual regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: niazat_ui_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d niazat_ui_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/niazat_ui_ci?schema=public
+      JWT_ACCESS_SECRET: ci-access-secret-0123456789abcdef0123456789abcdef
+      DOWNLOAD_TOKEN_SECRET: ci-download-secret-abcdef0123456789abcdef0123456789
+      BACKGROUND_JOBS_ENABLED: false
+      PAYMENT_GATEWAY_DRIVER: mock
+      SMS_DRIVER: mock
+      EMAIL_DRIVER: mock
+      FILE_SCAN_DRIVER: mock
+      NEXT_PUBLIC_API_URL: http://127.0.0.1:3001/v1
+      API_INTERNAL_URL: http://127.0.0.1:3001/v1
+      NEXT_PUBLIC_API_BASE_PATH: /api/backend
+      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3002
+      PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/playwright
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            apps/api/package-lock.json
+            apps/web/package-lock.json
+      - name: Install API dependencies
+        run: npm ci
+        working-directory: apps/api
+      - name: Generate Prisma Client
+        run: node node_modules/prisma/build/index.js generate --schema prisma/schema.prisma
+        working-directory: apps/api
+      - name: Build API
+        run: npm run build
+        working-directory: apps/api
+      - name: Install Web dependencies
+        run: npm ci
+        working-directory: apps/web
+      - name: Build Web
+        run: npm run build
+        working-directory: apps/web
+      - name: Install Chromium and Linux dependencies
+        run: npm exec playwright -- install --with-deps chromium
+        working-directory: apps/web
+      - name: Run runtime UI quality matrix
+        run: npm run phase8:ui-runtime
+        working-directory: apps/web
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-runtime-report
+          path: .artifacts/ui-runtime
+          if-no-files-found: warn
+          retention-days: 14
+
   build:
     name: Production builds
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: [quality, postgres, supply_chain]
+    needs: [quality, postgres, supply_chain, ui_runtime]
     env:
       DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/niazat_build?schema=public
       NEXT_PUBLIC_API_URL: http://127.0.0.1:3001/v1

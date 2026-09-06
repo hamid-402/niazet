@@ -89,12 +89,12 @@
 
   --color-fg: #152a4a;
   --color-fg-muted: #5b6b85;
-  --color-fg-subtle: #637086;
+  --color-fg-subtle: #606b81;
   --color-fg-on-accent: #ffffff;
   --color-fg-on-danger: #ffffff;
   --color-overlay: rgb(5 15 30 / 0.58);
 
-  --color-accent: #976716;
+  --color-accent: #895c12;
   --color-accent-hover: #855812;
   --color-accent-active: #70480e;
   --color-accent-subtle: #fff4d6;
