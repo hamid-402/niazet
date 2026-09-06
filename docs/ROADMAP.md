@@ -153,7 +153,8 @@
 - [x] دو تم لاجورد و عسل روشن/تیره با Persistence و بدون FOUC
 - [x] منوی عمومی موبایل و Sidebar→Drawer در پنل‌ها
 - [x] تبدیل Tableهای عملیاتی به Card قابل اسکن در موبایل بدون حذف Actionها
-- [ ] رفع Overflow و آزمون خودکار عرض‌های موبایل، تبلت، لپ‌تاپ و دسکتاپ بزرگ
+- [x] رفع Overflow و آزمون خودکار عرض‌های موبایل، تبلت، لپ‌تاپ و دسکتاپ بزرگ
+  - ماتریس runtime روی ۱۸ مسیر، چهار عرض ۳۲۰، ۷۶۸، ۱۲۸۰ و ۱۹۲۰ و هر دو تم، overflow افقی و حداقل اندازه کنترل‌ها را در مرورگر واقعی کنترل می‌کند.
 - [x] Tab/Tablist/Tabpanel، Drawer و Modal با Keyboard، ESC، Focus trap و Focus restore
 - [x] نام دسترس‌پذیر Theme Switcher و تمام کنترل‌های icon-only
 - [x] ترتیب Heading، Landmark، Label، Inline error، Focus Ring و Skip link
@@ -183,8 +184,8 @@
 - [x] Unit test برای تمام Policyها، State transitionها، محاسبات مالی و Ownership
 - [x] Integration test با PostgreSQL واقعی برای Transaction، Constraint و Migration
 - [x] E2E ماتریس تمام نقش‌ها و جریان کامل سفارش، پرداخت، QC، تحویل، تیکت و فایل
-- [ ] تست Accessibility، Responsive، Keyboard و Visual regression دو تم
-  - قراردادهای استاتیک، اصلاح تعاملات کیبورد و ماتریس ۱۴۴ تصویری آماده است؛ ثبت baseline و مقایسه runtime پس از رفع اتصال مرورگر داخلی باقی مانده است.
+- [x] تست Accessibility، Responsive، Keyboard و Visual regression دو تم
+  - runner ایزوله PostgreSQL/API/Web با ورود واقعی پنج نقش، ۱۴۴ screenshot و اسکن Axe، baseline فشرده، آزمون overflow/هدف لمسی و جریان‌های Skip Link، Theme Listbox و Drawer اضافه شد؛ build صفحات prerender در برابر seed ایزوله انجام می‌شود و هر دو اجرای push/PR روی Linux و Chromium موفق بودند.
 - [x] CI برای Format-check، Lint، Typecheck، Unit، Integration، E2E، Migration و Build
 - [x] Docker Production چندمرحله‌ای، non-root و `prisma migrate deploy`
   - imageهای مستقل API و Web، filesystem فقط‌خواندنی، volume محدود Storage، Healthcheck و ساخت واقعی هر دو image در CI پیاده‌سازی و تأیید شد.
