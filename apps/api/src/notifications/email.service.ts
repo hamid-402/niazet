@@ -1,5 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadGatewayException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { SmtpProvider } from './live-providers';
 
 export interface EmailProvider {
   send(
@@ -28,16 +29,42 @@ export class EmailService {
   private readonly driver: EmailProvider;
   private readonly configuredDriver: string;
 
-  constructor(config: ConfigService, mockProvider: MockEmailProvider) {
-    this.driver = mockProvider;
+  constructor(
+    private readonly config: ConfigService,
+    mockProvider: MockEmailProvider,
+  ) {
     this.configuredDriver = config.get<string>('EMAIL_DRIVER') ?? 'mock';
+    this.driver =
+      this.configuredDriver === 'smtp'
+        ? new SmtpProvider(config)
+        : mockProvider;
   }
 
   send(to: string, subject: string, body: string, idempotencyKey: string) {
+    if (this.readiness().status !== 'ready')
+      throw new BadGatewayException('سرویس ایمیل تنظیم نشده است.');
     return this.driver.send(to, subject, body, idempotencyKey);
   }
 
   readiness() {
+    if (this.configuredDriver === 'smtp') {
+      const ready = [
+        'SMTP_HOST',
+        'SMTP_USER',
+        'SMTP_PASSWORD',
+        'SMTP_FROM',
+      ].every((key) => Boolean(this.config.get(key)));
+      return {
+        status: ready ? ('ready' as const) : ('not_ready' as const),
+        reason: ready ? undefined : 'provider_configuration_missing',
+        details: {
+          configuredDriver: 'smtp',
+          activeAdapter: 'smtp',
+          mode: 'live',
+          verification: 'configuration_only',
+        },
+      };
+    }
     const activeAdapter = 'mock';
     return {
       status:
@@ -52,6 +79,7 @@ export class EmailService {
         configuredDriver: this.configuredDriver,
         activeAdapter,
         mode: 'mock',
+        verification: 'simulated',
       },
     };
   }

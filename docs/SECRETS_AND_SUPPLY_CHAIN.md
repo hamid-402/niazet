@@ -6,6 +6,24 @@ CI برای API و Web، `npm audit --omit=dev --audit-level=high` را اجرا
 
 برای هر run، اسکریپت policy مستقیماً از lockfileهای قطعی دو SBOM با فرمت CycloneDX و inventory مجوزها می‌سازد و آن‌ها را در artifact به نام `supply-chain-reports` ذخیره می‌کند. LGPL مربوط به binaryهای جداگانه libvips و MPL مربوط به ابزارهای `axe-core` و `lightningcss` است؛ توزیع production باید notice و متن مجوزهای لازم را همراه خود نگه دارد. استثناهای فاقد metadata lockfile فقط با نام و نسخه دقیق در `dependency-license-exceptions.json` پذیرفته می‌شوند.
 
+## تأیید محدود Nodemailer — ۲۰۲۶-۰۹-۰۷
+
+مالک پروژه پس از بررسی ریسک، مجوز `MIT-0` را فقط برای `nodemailer@10.0.0` تأیید کرد.
+این تطبیق دقیق در `scripts/dependency-license-policy.mjs` ثبت شده و تست مثبت/منفی آن
+در CI اجرا می‌شود. `MIT-0` به فهرست عمومی اضافه نشده؛ بسته دیگر یا نسخه بعدی Nodemailer
+با این مجوز نیازمند بازبینی مستقل است. نسخه مستقیم در manifest و lockfile ثابت شده است.
+مجوزهای گزارش SBOM همچنان مقدار واقعی `MIT-0` را حفظ می‌کنند و به MIT تغییر نام نمی‌یابند.
+این تأیید به معنی فعال‌سازی SMTP، ارسال ایمیل یا نادیده‌گرفتن audit امنیتی نیست.
+مراجع: [مجوز Nodemailer](https://nodemailer.com/license) و
+[متن MIT-0](https://spdx.org/licenses/MIT-0.html).
+
+بررسی محلی همین روز: هر شش تست سیاست محدود و کنترل مجوز/lockfile برای ۱۳۰۲ بسته موفق بود.
+audit وابستگی‌های production هر دو برنامه صفر هشدار داشت. audit کامل API چهار و Web سه
+هشدار High مربوط به ابزارهای توسعه گزارش کرد؛ Critical وجود نداشت. این هشدارها به دلیل
+سیاست فعلی CI (توقف High/Critical در production و Critical در development) مانع این
+انتشار نیستند، اما باید با به‌روزرسانی کنترل‌شده و تکرار تست‌ها رفع شوند؛ پذیرش مجوز
+Nodemailer معافیت امنیتی برای آن‌ها ایجاد نمی‌کند.
+
 ## موجودی Secret و دوره چرخش
 
 | Secret | دوره عادی | اثر چرخش |

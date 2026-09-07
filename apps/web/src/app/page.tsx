@@ -43,10 +43,10 @@ export default function HomePage() {
       <PublicNav />
 
       <main id="main-content">
-        <section className="mx-auto w-full max-w-6xl px-4 py-16 text-center md:px-8">
-          <p className="mb-3 text-sm font-bold text-accent">سامانه خدمات مدیریت‌شده</p>
+        <section className="editorial-hero mx-auto w-full max-w-6xl px-4 py-16 text-center md:px-8">
+          <p className="hero-eyebrow mb-5 text-sm font-bold text-accent">سامانه خدمات مدیریت‌شده</p>
           <h1 className="text-3xl font-extrabold tracking-tight text-fg md:text-4xl">
-            خدمات تخصصی، با اجرای مدیریت‌شده و پرداخت امن
+            خدمات تخصصی، با اجرای مدیریت‌شده و <span>پرداخت امن</span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-fg-muted">
             درخواستتان را ثبت کنید؛ تیم داخلی نیازت مسیر اجرا، زمان و هزینه را شفاف
@@ -58,7 +58,7 @@ export default function HomePage() {
               مشاهده خدمات و قیمت‌گذاری
             </LinkButton>
           </div>
-          <ul aria-label="دلایل اعتماد به نیازت" className="mx-auto mt-10 grid max-w-5xl gap-3 text-right md:grid-cols-3">
+          <ul aria-label="دلایل اعتماد به نیازت" className="hero-trust mx-auto mt-10 grid max-w-5xl gap-3 text-right md:grid-cols-3">
             {TRUST_SIGNALS.map((signal) => (
               <li key={signal.title} className="rounded-card border border-border bg-surface p-4 shadow-elevation-1">
                 <p className="font-bold text-fg"><span aria-hidden="true" className="ml-2 text-success">✓</span>{signal.title}</p>
@@ -76,7 +76,7 @@ export default function HomePage() {
         <h2 className="mb-4 text-center text-lg font-bold text-fg">
           دسته‌های خدمات
         </h2>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div className="service-collection grid grid-cols-2 gap-3 md:grid-cols-4">
           {CATEGORIES.map((cat) => (
             <Link
               key={cat}

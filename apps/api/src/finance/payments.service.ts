@@ -14,7 +14,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { IdempotencyService } from './idempotency.service';
 import { LedgerService } from './ledger.service';
-import { MockPaymentGateway } from './payment-gateway';
+import { PaymentGatewayService } from './zarinpal.gateway';
 
 interface InitiatePaymentParams {
   orderId: string;
@@ -29,7 +29,7 @@ export class PaymentsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly ledger: LedgerService,
-    private readonly gateway: MockPaymentGateway,
+    private readonly gateway: PaymentGatewayService,
     private readonly idempotency: IdempotencyService,
   ) {}
 
@@ -69,7 +69,7 @@ export class PaymentsService {
             customerId: params.customerId,
             milestoneId: params.milestoneId,
             amount: params.amount,
-            gateway: 'mock',
+            gateway: this.gateway.name,
             status: PaymentStatus.pending,
             idempotencyKey: requestKey,
           },
@@ -77,7 +77,7 @@ export class PaymentsService {
         const gatewayRequest = await this.gateway.createPaymentRequest({
           amount: params.amount,
           orderId: params.orderId,
-          callbackUrl: `/v1/customer/orders/${params.orderId}/payments/${payment.id}/callback`,
+          callbackUrl: this.gateway.callbackUrl(params.orderId, payment.id),
         });
         const updated = await tx.payment.update({
           where: { id: payment.id },
@@ -153,6 +153,11 @@ export class PaymentsService {
       throw new BadRequestException('این پرداخت دیگر قابل تأیید نیست.');
     }
 
+    if (payment.gateway !== this.gateway.name) {
+      throw new BadRequestException(
+        'درگاه این پرداخت با تنظیمات جاری سازگار نیست؛ پشتیبانی باید بررسی کند.',
+      );
+    }
     const verification = await this.gateway.verifyPayment({
       gatewayRef: payment.gatewayRef,
       amount: payment.amount,

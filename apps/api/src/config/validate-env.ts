@@ -1,3 +1,5 @@
+import { validateProviderEnvironment } from './provider-environment';
+
 const UNSAFE_SECRET_VALUES = new Set([
   'change-me',
   'secret',
@@ -110,6 +112,7 @@ export function validateEnvironment(
     }
   }
 
+  validateProviderEnvironment(config);
   return {
     ...config,
     NODE_ENV: nodeEnv,

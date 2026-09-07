@@ -27,6 +27,6 @@ for (const path of pages) {
     assert(source.includes("from '@/components/ui'") || source.includes('from "@/components/ui"'), `ResponsiveTable import missing in ${path}`);
   }
 }
-assert(pageCount === 14, `Expected 14 table pages, found ${pageCount}.`);
-assert(tableCount === 16, `Expected 16 responsive tables, found ${tableCount}.`);
-console.log('Phase 6 responsive-table contract passed: 16 tables across 14 pages become labeled mobile cards without altering cell actions.');
+assert(pageCount === 15, `Expected 15 table pages, found ${pageCount}.`);
+assert(tableCount === 17, `Expected 17 responsive tables, found ${tableCount}.`);
+console.log('Phase 6 responsive-table contract passed: 17 tables across 15 pages become labeled mobile cards without altering cell actions.');

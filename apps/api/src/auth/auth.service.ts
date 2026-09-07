@@ -124,7 +124,7 @@ export class AuthService {
       },
     });
 
-    await this.sms.send(dto.phone, `کد تایید نیازت با ما: ${code}`);
+    await this.sms.sendOtp(dto.phone, code);
 
     const isMockDriver = (this.config.get('SMS_DRIVER') ?? 'mock') === 'mock';
 
@@ -132,7 +132,9 @@ export class AuthService {
       message: 'کد تایید ارسال شد.',
       expiresInSeconds: ttlSeconds,
       // در محیط توسعه (درایور mock پیامک)، کد برای راحتی تست در پاسخ برگردانده می‌شود.
-      ...(isMockDriver ? { devOtp: code } : {}),
+      ...(isMockDriver && this.config.get('NODE_ENV') === 'development'
+        ? { devOtp: code }
+        : {}),
     };
   }
 

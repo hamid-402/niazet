@@ -14,6 +14,7 @@ const OPS_NAV = [
   { href: '/admin/staff', label: 'کارمندان و مجریان' },
   { href: '/admin/feedback', label: 'بازخورد و شکایت‌ها' },
   { href: '/admin/reports/operations', label: 'گزارش عملیات' },
+  { href: '/admin/reports/bi', label: 'تحلیل کسب‌وکار' },
   { href: '/account/security', label: 'حساب و امنیت' },
 ];
 
@@ -26,6 +27,7 @@ const FINANCE_NAV = [
   { href: '/admin/finance/withdrawals', label: 'برداشت‌ها' },
   { href: '/admin/finance/ledger', label: PRODUCT_TERMS.ledger },
   { href: '/admin/reports/finance', label: 'گزارش مالی' },
+  { href: '/admin/reports/bi', label: 'تحلیل کسب‌وکار' },
   { href: '/account/security', label: 'حساب و امنیت' },
 ];
 
@@ -56,7 +58,7 @@ function AdminShell({ children }: { children: ReactNode }) {
     nav = FINANCE_NAV;
     title = 'پنل ادمین مالی';
   } else if (user?.adminScope === 'super_admin') {
-    nav = [...OPS_NAV, ...FINANCE_NAV, ...SUPER_NAV];
+    nav = [...new Map([...OPS_NAV, ...FINANCE_NAV, ...SUPER_NAV].map(item => [item.href, item])).values()];
     title = 'پنل ادمین کل';
   }
 

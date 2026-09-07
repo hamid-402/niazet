@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { apiFetch, ApiError } from "@/lib/api";
 import {
   Badge,
@@ -35,6 +36,8 @@ export default function CustomerOrderDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const searchParams = useSearchParams();
+  const returnedPaymentId = searchParams.get('paymentId');
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [error, setError] = useState("");
   const [tab, setTab] = useState<(typeof TABS)[number]>("خلاصه");
@@ -149,12 +152,20 @@ export default function CustomerOrderDetailPage({
               disabled={busy}
               onClick={() =>
                 runAction(async () => {
-                  const pay = await apiFetch<{ payment: { id: string } }>(
+                  const pay = await apiFetch<{ payment: { id: string; gateway: string }; redirectUrl: string }>(
                     `/customer/orders/${id}/pay`,
                     {
                       method: "POST",
                     },
                   );
+                  if (pay.payment.gateway !== 'mock') {
+                    const redirect = new URL(pay.redirectUrl);
+                    if (redirect.protocol !== 'https:' || redirect.hostname !== 'www.zarinpal.com' || !redirect.pathname.startsWith('/pg/StartPay/')) {
+                      throw new Error('نشانی درگاه معتبر نیست.');
+                    }
+                    window.location.assign(redirect.href);
+                    return;
+                  }
                   await apiFetch(
                     `/customer/orders/${id}/payments/${pay.payment.id}/verify`,
                     {
@@ -164,8 +175,13 @@ export default function CustomerOrderDetailPage({
                 })
               }
             >
-              پرداخت (شبیه‌سازی درگاه)
+              پرداخت امن سفارش
             </Button>
+          )}
+          {returnedPaymentId && order.status === 'pending_payment' && (
+            <Button variant="secondary" disabled={busy} onClick={() => runAction(() => apiFetch(
+              `/customer/orders/${id}/payments/${encodeURIComponent(returnedPaymentId)}/verify`, { method: 'POST' },
+            ))}>بررسی نتیجه پرداخت بانکی</Button>
           )}
           {order.status === "delivered" && (
             <>

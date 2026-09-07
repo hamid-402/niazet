@@ -51,7 +51,7 @@ export function Card({
 }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={`rounded-card border border-border bg-surface p-5 shadow-elevation-1 transition-colors ${className}`}
+      className={`premium-card rounded-card border border-border bg-surface p-5 shadow-elevation-1 transition-colors ${className}`}
       {...props}
     >
       {children}
@@ -60,7 +60,7 @@ export function Card({
 }
 
 const BUTTON_BASE =
-  'control-density inline-flex items-center justify-center gap-2 rounded-control text-body-sm font-bold transition-colors duration-150';
+  'premium-button control-density inline-flex items-center justify-center gap-2 rounded-control text-body-sm font-bold transition-colors duration-150';
 
 const BUTTON_VARIANTS: Record<string, string> = {
   primary:

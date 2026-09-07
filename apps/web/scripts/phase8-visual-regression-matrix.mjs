@@ -17,6 +17,7 @@ export const viewports = [
 ];
 
 export const scenarios = [
+  { id: 'ops-bi', role: 'ops', phone: '09120000002', route: '/admin/reports/bi', source: 'src/app/(admin)/admin/reports/bi/page.tsx' },
   { id: 'public-home', role: 'guest', route: '/', source: 'src/app/page.tsx' },
   { id: 'public-services', role: 'guest', route: '/services', source: 'src/app/services/page.tsx' },
   { id: 'public-status', role: 'guest', route: '/status', source: 'src/app/status/page.tsx' },
@@ -64,4 +65,3 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === fileURLToPath(new URL(
   const count = validateVisualMatrix();
   console.log(`Phase 8 visual matrix valid: ${scenarios.length} scenarios × ${viewports.length} viewports × ${themes.length} themes = ${count} deterministic snapshots.`);
 }
-

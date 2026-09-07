@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
+import { hasReviewedLicense } from './dependency-license-policy.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const allowedLicenses = new Set([
@@ -70,7 +71,7 @@ for (const app of ['api', 'web']) {
     }
     const license = dependency.license ?? exceptions[identity];
     assert.ok(license, `${identity} has no reviewed license metadata.`);
-    assert.ok(allowedLicenses.has(license), `${identity} uses an unapproved license: ${license}`);
+    assert.ok(allowedLicenses.has(license) || hasReviewedLicense(identity, license), `${identity} uses an unapproved license: ${license}`);
     licenses.set(license, (licenses.get(license) ?? 0) + 1);
     components.push(cyclonedxComponent(name, dependency, path, license));
   }

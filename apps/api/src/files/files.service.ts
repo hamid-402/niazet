@@ -15,13 +15,7 @@ import {
   UserRole,
 } from '@prisma/client';
 import { createHash, randomUUID } from 'crypto';
-import {
-  existsSync,
-  mkdirSync,
-  renameSync,
-  unlinkSync,
-  writeFileSync,
-} from 'fs';
+import { existsSync, mkdirSync, unlinkSync, writeFileSync } from 'fs';
 import { basename, extname, join } from 'path';
 import { PrismaService } from '../prisma/prisma.service';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
@@ -29,8 +23,12 @@ import { matchesDeclaredMime } from './file-signature';
 import { AuditService } from '../audit/audit.service';
 import { AntivirusService, type ScanResult } from './antivirus.service';
 
-export const UPLOAD_ROOT = join(process.cwd(), 'storage', 'uploads');
-export const QUARANTINE_ROOT = join(process.cwd(), 'storage', 'quarantine');
+import {
+  ObjectStorageService,
+  QUARANTINE_ROOT,
+  UPLOAD_ROOT,
+} from './object-storage.service';
+export { UPLOAD_ROOT, QUARANTINE_ROOT } from './object-storage.service';
 
 const ALLOWED_MIME_TYPES = new Set([
   'application/pdf',
@@ -96,6 +94,7 @@ export class FilesService {
     private readonly config: ConfigService,
     private readonly audit: AuditService,
     private readonly antivirus: AntivirusService,
+    private readonly storage: ObjectStorageService,
   ) {
     if (!existsSync(UPLOAD_ROOT)) {
       mkdirSync(UPLOAD_ROOT, { recursive: true });
@@ -199,7 +198,12 @@ export class FilesService {
         ? FileScanStatus.clean
         : FileScanStatus.infected;
     if (scanResult.status === 'clean') {
-      renameSync(quarantinePath, join(UPLOAD_ROOT, storageKey));
+      await this.storage.put(
+        storageKey,
+        params.file.buffer,
+        params.file.mimetype,
+      );
+      unlinkSync(quarantinePath);
     }
 
     const fileData = {
@@ -242,11 +246,9 @@ export class FilesService {
             })
           : await this.prisma.orderFile.create({ data: fileData });
     } catch (error) {
-      const storedPath =
-        scanStatus === FileScanStatus.clean
-          ? join(UPLOAD_ROOT, storageKey)
-          : quarantinePath;
-      if (existsSync(storedPath)) unlinkSync(storedPath);
+      if (scanStatus === FileScanStatus.clean)
+        await this.storage.delete(storageKey);
+      if (existsSync(quarantinePath)) unlinkSync(quarantinePath);
       throw error;
     }
 
@@ -403,7 +405,7 @@ export class FilesService {
       if (file.scanStatus !== 'clean') {
         throw new ForbiddenException('فایل برای دانلود امن نیست.');
       }
-      if (!existsSync(join(UPLOAD_ROOT, file.storageKey))) {
+      if (!(await this.storage.exists(file.storageKey))) {
         throw new NotFoundException('محتوای فایل یافت نشد.');
       }
       await this.audit.record({
@@ -415,10 +417,17 @@ export class FilesService {
         sensitivity: 'sensitive',
         ipAddress,
       });
-      await this.prisma.signedUrlGrant.update({
-        where: { id: grant.id },
+      const claimed = await this.prisma.signedUrlGrant.updateMany({
+        where: {
+          id: grant.id,
+          usedAt: null,
+          revokedAt: null,
+          expiresAt: { gt: new Date() },
+        },
         data: { usedAt: new Date() },
       });
+      if (claimed.count !== 1)
+        throw new ForbiddenException('مجوز دانلود قبلاً استفاده شده است.');
       return file;
     } catch {
       throw new ForbiddenException('لینک دانلود منقضی یا نامعتبر است.');
@@ -430,8 +439,7 @@ export class FilesService {
       where: { id: fileId },
     });
     if (!file) return;
-    const path = join(UPLOAD_ROOT, file.storageKey);
-    if (existsSync(path)) unlinkSync(path);
+    await this.storage.delete(file.storageKey);
     await this.prisma.orderFile.delete({ where: { id: fileId } });
   }
 

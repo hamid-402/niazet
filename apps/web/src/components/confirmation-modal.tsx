@@ -86,7 +86,7 @@ export function ConfirmationModal({
   }
 
   return (
-    <div className="fixed inset-0 z-modal flex items-center justify-center bg-overlay p-4" onMouseDown={(event) => { if (event.target === event.currentTarget && !submitting) onCancel(); }}>
+    <div className="motion-dialog fixed inset-0 z-modal flex items-center justify-center bg-overlay p-4" onMouseDown={(event) => { if (event.target === event.currentTarget && !submitting) onCancel(); }}>
       <div ref={dialogRef} role="alertdialog" aria-modal="true" aria-labelledby="confirmation-title" aria-describedby="confirmation-description" className="w-full max-w-lg rounded-modal border border-border bg-surface p-5 shadow-elevation-4">
         <h2 id="confirmation-title" className="text-lg font-extrabold text-fg">{title}</h2>
         <p id="confirmation-description" className="mt-2 text-sm leading-7 text-fg-muted">{description}</p>

@@ -2,10 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 /**
- * Abstract payment gateway adapter (docs/ROADMAP.md §۲ — سوال ۲).
- * فقط یک درایور Mock پیاده‌سازی شده که verify را همیشه موفق برمی‌گرداند؛
- * برای اتصال به زرین‌پال/آیدی‌پی/نکست‌پی واقعی کافی است یک پیاده‌سازی
- * جدید از همین اینترفیس اضافه شود، بدون تغییر در PaymentsService.
+ * Shared payment contract. PaymentGatewayService selects mock or Zarinpal;
+ * live verification always uses the stored amount and gateway reference.
  */
 export interface PaymentGatewayAdapter {
   createPaymentRequest(input: {

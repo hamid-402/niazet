@@ -18,6 +18,7 @@ import type { AuthenticatedUser } from '../common/types/authenticated-user';
 import { AuditService } from '../audit/audit.service';
 import { ReportQueryDto } from './dto/report-query.dto';
 import { ReportingService } from './reporting.service';
+import { BiService } from './bi.service';
 
 @Controller('v1/admin/reports')
 @UseGuards(RolesGuard, AdminScopeGuard)
@@ -26,7 +27,28 @@ export class ReportingController {
   constructor(
     private readonly reporting: ReportingService,
     private readonly audit: AuditService,
+    private readonly bi: BiService,
   ) {}
+
+  @Get('bi')
+  @AdminScopes(AdminScope.ops_admin, AdminScope.finance_admin)
+  @RateLimit({ name: 'bi-report', limit: 10, windowMs: 60_000 })
+  async businessIntelligence(
+    @Query() query: ReportQueryDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    const report = await this.bi.report(query);
+    await this.audit.record({
+      actorUserId: user.id,
+      actorRole: user.role,
+      action: 'report.bi.read',
+      entityType: 'report',
+      entityId: 'bi',
+      sensitivity: 'sensitive',
+      after: { period: report.period },
+    });
+    return report;
+  }
 
   @Get('operations/export')
   @AdminScopes(AdminScope.ops_admin)

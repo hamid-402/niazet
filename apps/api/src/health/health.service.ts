@@ -1,11 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OutboxStatus } from '@prisma/client';
-import { randomUUID } from 'node:crypto';
-import { rm, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
-import { UPLOAD_ROOT } from '../files/files.service';
-import { MockPaymentGateway } from '../finance/payment-gateway';
+import { ObjectStorageService } from '../files/object-storage.service';
+import { PaymentGatewayService } from '../finance/zarinpal.gateway';
 import { EmailService } from '../notifications/email.service';
 import { SmsService } from '../notifications/sms.service';
 import { MetricsRegistry } from '../observability/metrics-registry.service';
@@ -76,9 +73,10 @@ export class HealthService {
     private readonly config: ConfigService,
     private readonly sms: SmsService,
     private readonly email: EmailService,
-    private readonly payment: MockPaymentGateway,
+    private readonly payment: PaymentGatewayService,
     private readonly metrics: MetricsRegistry,
     private readonly alerts: ObservabilityAlertService,
+    private readonly storage: ObjectStorageService,
   ) {}
 
   liveness() {
@@ -160,17 +158,8 @@ export class HealthService {
   }
 
   private async storageProbe(): Promise<ProbeResult> {
-    const probePath = join(UPLOAD_ROOT, `.readiness-${randomUUID()}.tmp`);
-    try {
-      await writeFile(probePath, 'ready', {
-        encoding: 'utf8',
-        flag: 'wx',
-        mode: 0o600,
-      });
-      return { status: 'ready' };
-    } finally {
-      await rm(probePath, { force: true });
-    }
+    await this.storage.probe();
+    return { status: 'ready', details: { activeAdapter: this.storage.name } };
   }
 
   private async queueProbe(): Promise<ProbeResult> {

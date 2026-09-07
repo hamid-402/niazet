@@ -29,7 +29,7 @@ assert.match(
 );
 assert.match(
   service,
-  /writeFile\(probePath/,
+  /storage\.probe\(\)/,
   'Storage readiness must verify write access.',
 );
 assert.match(

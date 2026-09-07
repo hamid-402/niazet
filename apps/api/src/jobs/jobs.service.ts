@@ -2,13 +2,16 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FileScanStatus, NotificationChannel } from '@prisma/client';
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, renameSync } from 'node:fs';
+import { existsSync, readFileSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { ExecutorService } from '../executor/executor.service';
 import { runPerformanceBatch } from '../executor/performance-metrics';
 import { AntivirusService } from '../files/antivirus.service';
 import { FileCleanupService } from '../files/file-cleanup.service';
-import { QUARANTINE_ROOT, UPLOAD_ROOT } from '../files/files.service';
+import {
+  QUARANTINE_ROOT,
+  ObjectStorageService,
+} from '../files/object-storage.service';
 import { FinanceReportingService } from '../finance/finance-reporting.service';
 import { PaymentsService } from '../finance/payments.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -41,6 +44,7 @@ export class JobsService implements OnModuleInit {
     private readonly orders: OrdersService,
     private readonly sms: SmsService,
     private readonly email: EmailService,
+    private readonly storage: ObjectStorageService,
   ) {}
 
   onModuleInit() {
@@ -335,7 +339,8 @@ export class JobsService implements OnModuleInit {
       const buffer = readFileSync(source);
       const scan = await this.antivirus.scan(buffer);
       if (scan.status === 'clean') {
-        renameSync(source, join(UPLOAD_ROOT, file.storageKey));
+        if (!(await this.storage.exists(file.storageKey)))
+          await this.storage.put(file.storageKey, buffer, file.mimeType);
       }
       await this.prisma.orderFile.update({
         where: { id: file.id },
@@ -346,6 +351,7 @@ export class JobsService implements OnModuleInit {
               : FileScanStatus.infected,
         },
       });
+      if (scan.status === 'clean' && existsSync(source)) unlinkSync(source);
       processed += 1;
     }
     return { processed, skipped };

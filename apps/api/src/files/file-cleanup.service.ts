@@ -3,7 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { AuditSensitivity, FileScanStatus, Prisma } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
 import { PrismaService } from '../prisma/prisma.service';
-import { QUARANTINE_ROOT, UPLOAD_ROOT } from './files.service';
+import {
+  QUARANTINE_ROOT,
+  ObjectStorageService,
+} from './object-storage.service';
 import {
   deleteContainedFile,
   listStalePhysicalFiles,
@@ -25,6 +28,7 @@ export class FileCleanupService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
+    private readonly storage: ObjectStorageService,
   ) {}
 
   async cleanup(now = new Date()) {
@@ -65,7 +69,7 @@ export class FileCleanupService {
 
           let rejectedPhysicalFiles = 0;
           for (const file of rejectedFiles) {
-            if (deleteContainedFile(UPLOAD_ROOT, file.storageKey)) {
+            if (await this.storage.delete(file.storageKey)) {
               rejectedPhysicalFiles += 1;
             }
             if (deleteContainedFile(QUARANTINE_ROOT, file.storageKey)) {
@@ -81,7 +85,7 @@ export class FileCleanupService {
 
           const physicalKeys = [
             ...new Set([
-              ...listStalePhysicalFiles(UPLOAD_ROOT, orphanCutoff),
+              ...(await this.storage.listStale(orphanCutoff)),
               ...listStalePhysicalFiles(QUARANTINE_ROOT, orphanCutoff),
             ]),
           ];
@@ -96,7 +100,7 @@ export class FileCleanupService {
 
           let orphanPhysicalFiles = 0;
           for (const key of orphanKeys) {
-            if (deleteContainedFile(UPLOAD_ROOT, key)) orphanPhysicalFiles += 1;
+            if (await this.storage.delete(key)) orphanPhysicalFiles += 1;
             if (deleteContainedFile(QUARANTINE_ROOT, key)) {
               orphanPhysicalFiles += 1;
             }

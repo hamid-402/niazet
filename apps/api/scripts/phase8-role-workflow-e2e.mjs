@@ -6,6 +6,7 @@ import { basename, join } from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { PrismaClient } from '@prisma/client';
+import { verifyBi } from './phase9-bi-checks.mjs';
 
 const apiRoot = fileURLToPath(new URL('../', import.meta.url));
 const prismaCli = fileURLToPath(new URL('../node_modules/prisma/build/index.js', import.meta.url));
@@ -146,6 +147,9 @@ try {
     ...process.env,
     DATABASE_URL: isolatedUrl.toString(),
     NODE_ENV: 'test',
+    LIVE_PROVIDERS_ENABLED: 'false',
+    PAYMENT_GATEWAY_DRIVER: 'mock',
+    STORAGE_DRIVER: 'local',
     FILE_SCAN_DRIVER: 'mock',
     SMS_DRIVER: 'mock',
     EMAIL_DRIVER: 'mock',
@@ -377,6 +381,7 @@ try {
     'Customer confirmation did not release escrow.',
   );
   await ok(origin, '/admin/audit-log?pageSize=100', { token: token.superAdmin });
+  await verifyBi({ databaseUrl: isolatedUrl.toString(), origin, token, serviceId: service.id, ok, expectStatus });
 
   console.log(
     `Phase 8 role/workflow API E2E passed: ${positiveRoleCases.length} positive role boundaries, ${negativeRoleCases.length} negative boundaries, and complete order/payment/file/QC/delivery/settlement/ticket lifecycle.`,
@@ -402,4 +407,3 @@ try {
   }
   await control.$disconnect();
 }
-

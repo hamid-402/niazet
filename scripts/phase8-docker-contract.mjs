@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { createRequire } from 'node:module';
 
 const root = resolve(import.meta.dirname, '..');
 const read = (path) => readFileSync(resolve(root, path), 'utf8');
@@ -9,6 +10,9 @@ const backup = read('apps/api/Dockerfile.backup');
 const web = read('apps/web/Dockerfile');
 const start = read('apps/api/scripts/production-start.mjs');
 const compose = read('docker-compose.production.yml');
+const require = createRequire(resolve(root, 'apps/api/package.json'));
+const parsedCompose = require('js-yaml').load(compose);
+assert.deepEqual(Object.keys(parsedCompose.services).sort(), ['api', 'web'], 'Production Compose must parse and contain API/Web services.');
 const nextConfig = read('apps/web/next.config.ts');
 const envExample = read('.env.production.example');
 

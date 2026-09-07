@@ -274,6 +274,32 @@ async function verifyKeyboardFlows(pages, webOrigin) {
   assert.equal(await workspaceDrawerTrigger.evaluate((element) => document.activeElement === element), true, 'Workspace drawer does not restore trigger focus.');
 }
 
+async function verifyDrawerMotion(pages) {
+  for (const [role, id] of [['guest', 'public-mobile-drawer'], ['customer', 'workspace-mobile-drawer']]) {
+    const page = pages.get(role);
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.evaluate(() => document.querySelector('#ui-runtime-motion-lock')?.remove());
+    const trigger = page.locator(`[aria-controls="${id}"]`);
+    await trigger.click();
+    const drawer = page.locator(`#${id}`);
+    await drawer.waitFor({ state: 'visible' });
+    assert.equal(await drawer.evaluate(element => element.parentElement.inert), false);
+    assert.notEqual(await drawer.evaluate(element => getComputedStyle(element).transitionDuration), '0s', 'Normal motion should animate the drawer.');
+    await page.waitForTimeout(350);
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(drawerId => document.getElementById(drawerId)?.parentElement.inert, id);
+    await drawer.waitFor({ state: 'hidden' });
+    assert.equal(await trigger.evaluate(element => document.activeElement === element), true, 'Animated close must restore trigger focus.');
+    assert.equal(await page.evaluate(() => document.body.style.overflow), '', 'Animated close must unlock body scroll.');
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await trigger.click();
+    assert.ok(await drawer.evaluate(element => getComputedStyle(element).transitionDuration.split(',').every(value => parseFloat(value) <= 0.001)), 'Reduced motion must neutralize drawer motion (global fallback uses 0.01ms).');
+    await page.keyboard.press('Escape');
+    await drawer.waitFor({ state: 'hidden' });
+    await settle(page);
+  }
+}
+
 validateVisualMatrix();
 assert.ok(existsSync(apiEntry), 'Build apps/api before runtime UI tests.');
 mkdirSync(artifactRoot, { recursive: true });
@@ -313,6 +339,8 @@ try {
     [pathEnvironmentKey]: `${resolve(apiRoot, 'node_modules/.bin')}${delimiter}${process.env[pathEnvironmentKey] ?? ''}`,
     DATABASE_URL: isolatedUrl.toString(),
     NODE_ENV: 'test',
+    LIVE_PROVIDERS_ENABLED: 'false',
+    STORAGE_DRIVER: 'local',
     BACKGROUND_JOBS_ENABLED: 'false',
     PAYMENT_GATEWAY_DRIVER: 'mock',
     FILE_SCAN_DRIVER: 'mock',
@@ -389,7 +417,9 @@ try {
   }
 
   await verifyKeyboardFlows(pages, webOrigin);
+  await verifyDrawerMotion(pages);
   report.keyboard = 'passed';
+  report.motion = 'passed';
 
   for (const scenario of scenarios) {
     const page = pages.get(scenario.role);

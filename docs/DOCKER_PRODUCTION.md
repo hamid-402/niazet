@@ -14,9 +14,8 @@
 - دو secret تصادفی و متفاوت با حداقل ۳۲ نویسه برای access و download token
 - دامنه HTTPS و reverse proxy یا load balancer برای TLS
 
-اتصال adapterهای واقعی پرداخت، SMS و Email هنوز آیتم جداگانه فاز ۸ است. تا تکمیل و آزمون
-آن آیتم، این compose زیرساخت امن ساخت و اجرا را آماده می‌کند اما مجوز انتشار عمومی محصول
-نیست.
+Adapterهای پرداخت، SMS، SMTP و S3 پیاده‌سازی شده‌اند؛ تنظیمات و پذیرش زنده در
+`PRODUCTION_PROVIDERS.md` آمده است. فعال‌سازی زنده به کلیدهای معتبر و آزمون staging وابسته است.
 
 ## آماده‌سازی و اجرا
 
@@ -39,9 +38,8 @@ Web روی پورت `3002` و API روی `3001` منتشر می‌شود. در �
 
 startup API فقط migrationهای forward و ثبت‌شده Prisma را با `migrate deploy` اعمال می‌کند.
 اگر migration شکست بخورد API با exit code غیرصفر متوقف می‌شود و Web به دلیل health dependency
-بالا نمی‌آید. rollback دیتابیس نباید با تغییر دستی schema انجام شود؛ ابتدا سرویس متوقف، snapshot
-رمزنگاری‌شده بازیابی و سپس image قبلی deploy شود. Runbook کامل backup/restore و rollback در
-آیتم‌های بعدی فاز ۸ تکمیل می‌شود.
+بالا نمی‌آید. روش expand/contract، rollback کد، migration شکست‌خورده و Restore در مقصد جدا
+در `OPERATIONS_RUNBOOK.md` و `DISASTER_RECOVERY.md` آمده است؛ Restore روی داده جاری خودکار نیست.
 
 ## بررسی مستقل
 

@@ -62,7 +62,7 @@ for (const token of ['useId()', 'aria-controls={panelId}', 'aria-haspopup="dialo
 const snapshotCount = validateVisualMatrix();
 assert.equal(themes.length, 2);
 assert.deepEqual(viewports.map((item) => item.width), [320, 768, 1280, 1920]);
-assert.equal(snapshotCount, 144);
+assert.equal(snapshotCount, 152);
 assert.equal(snapshotPolicy.disableAnimations, true);
 assert.ok(snapshotPolicy.maxDiffPixelRatio <= 0.005);
 for (const role of ['guest', 'customer', 'ops', 'finance', 'executor', 'support']) {
@@ -70,4 +70,3 @@ for (const role of ['guest', 'customer', 'ops', 'finance', 'executor', 'support'
 }
 
 console.log(`Phase 8 static UI quality contract passed: ${inheritedContracts.length} inherited suites, linked/focus-safe disclosures, RTL semantics, four responsive widths and a ${snapshotCount}-snapshot two-theme visual matrix.`);
-

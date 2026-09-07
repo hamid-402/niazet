@@ -6,6 +6,7 @@ import { FilesService } from './files.service';
 import { FilesController } from './files.controller';
 import { FileCleanupService } from './file-cleanup.service';
 import { AntivirusService } from './antivirus.service';
+import { ObjectStorageService } from './object-storage.service';
 
 @Module({
   imports: [
@@ -14,7 +15,17 @@ import { AntivirusService } from './antivirus.service';
     MulterModule.register({ storage: undefined }),
   ],
   controllers: [FilesController],
-  providers: [FilesService, FileCleanupService, AntivirusService],
-  exports: [FilesService, FileCleanupService, AntivirusService],
+  providers: [
+    FilesService,
+    FileCleanupService,
+    AntivirusService,
+    ObjectStorageService,
+  ],
+  exports: [
+    FilesService,
+    FileCleanupService,
+    AntivirusService,
+    ObjectStorageService,
+  ],
 })
 export class FilesModule {}

@@ -56,9 +56,8 @@ export function MobileDrawer({
     };
   }, [onClose, open]);
 
-  if (!open) return null;
   return (
-    <div className="fixed inset-0 z-overlay md:hidden">
+    <div hidden={!open} inert={!open} className="motion-drawer fixed inset-0 z-overlay md:hidden">
       <button
         type="button"
         className="absolute inset-0 h-full w-full bg-overlay"

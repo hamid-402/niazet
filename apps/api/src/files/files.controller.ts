@@ -13,11 +13,10 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileKind } from '@prisma/client';
 import type { Request, Response } from 'express';
-import { join } from 'path';
+import { ObjectStorageService } from './object-storage.service';
 import {
   FilesService,
   MAX_FILE_SIZE_BYTES,
-  UPLOAD_ROOT,
   isAllowedMimeType,
 } from './files.service';
 import { Public } from '../common/decorators/public.decorator';
@@ -27,7 +26,10 @@ import { RateLimit } from '../common/decorators/rate-limit.decorator';
 
 @Controller('v1/files')
 export class FilesController {
-  constructor(private readonly files: FilesService) {}
+  constructor(
+    private readonly files: FilesService,
+    private readonly storage: ObjectStorageService,
+  ) {}
 
   @Post('upload')
   @RateLimit({ name: 'file-upload', limit: 20, windowMs: 10 * 60 * 1000 })
@@ -66,6 +68,13 @@ export class FilesController {
     @Res() res: Response,
   ) {
     const file = await this.files.resolveSignedToken(token, req.ip);
-    return res.download(join(UPLOAD_ROOT, file.storageKey), file.originalName);
+    const body = await this.storage.get(file.storageKey);
+    res.setHeader('Cache-Control', 'private, no-store');
+    res.setHeader('Content-Type', file.mimeType);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename*=UTF-8''${encodeURIComponent(file.originalName)}`,
+    );
+    return res.send(body);
   }
 }

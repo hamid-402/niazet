@@ -7,6 +7,7 @@ import { useCallback, useState } from 'react';
 import { MobileDrawer } from './mobile-drawer';
 import { roleHomePath } from '@/lib/role-paths';
 import { ThemeSwitcher } from './theme-switcher';
+import { BrandMark } from './brand-mark';
 
 export function PublicNav() {
   const { user, logout } = useAuth();
@@ -20,10 +21,10 @@ export function PublicNav() {
   ];
 
   return (
-    <header className="sticky top-0 z-sticky border-b border-border bg-surface/90 backdrop-blur">
+    <header className="public-header sticky top-0 z-sticky border-b border-border bg-surface/90 backdrop-blur">
       <div className="page-container flex items-center justify-between py-4">
         <Link href="/" className="text-lg font-extrabold text-fg">
-          نیازت با ما
+          <BrandMark />
         </Link>
         <nav className="hidden items-center gap-6 text-sm font-medium text-fg-muted md:flex" aria-label="ناوبری عمومی">
           {publicLinks.map((item) => <Link key={item.href} href={item.href} className="transition-colors hover:text-fg">{item.label}</Link>)}
