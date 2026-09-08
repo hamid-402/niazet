@@ -8,6 +8,8 @@ import {
 } from './staff.admin.controller';
 import { OrdersModule } from '../orders/orders.module';
 import { AuthModule } from '../auth/auth.module';
+import { OnboardingController } from './onboarding.controller';
+import { OnboardingService } from './onboarding.service';
 
 @Module({
   imports: [OrdersModule, AuthModule],
@@ -16,8 +18,9 @@ import { AuthModule } from '../auth/auth.module';
     StaffAdminController,
     TeamsAdminController,
     SkillsAdminController,
+    OnboardingController,
   ],
-  providers: [ExecutorService],
+  providers: [ExecutorService, OnboardingService],
   exports: [ExecutorService],
 })
 export class ExecutorModule {}

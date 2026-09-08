@@ -17,6 +17,11 @@ export const viewports = [
 ];
 
 export const scenarios = [
+  { id: 'customer-organizations', role: 'customer', phone: '09120000009', route: '/organizations', source: 'src/app/(customer)/organizations/page.tsx' },
+  { id: 'customer-organization-detail', role: 'customer', phone: '09120000009', route: '/organizations/00000000-0000-4000-8000-000000000010', source: 'src/app/(customer)/organizations/[id]/page.tsx' },
+  { id: 'finance-organizations', role: 'finance', phone: '09120000003', route: '/admin/organizations', source: 'src/app/(admin)/admin/organizations/page.tsx' },
+  { id: 'ops-order-suggestions', role: 'ops', phone: '09120000002', route: '/admin/orders/00000000-0000-4000-8000-000000000011', source: 'src/app/(admin)/admin/orders/[id]/page.tsx' },
+  { id: 'ops-onboarding', role: 'ops', phone: '09120000002', route: '/admin/staff/00000000-0000-4000-8000-000000000009/onboarding', source: 'src/app/(admin)/admin/staff/[id]/onboarding/page.tsx' },
   { id: 'ops-bi', role: 'ops', phone: '09120000002', route: '/admin/reports/bi', source: 'src/app/(admin)/admin/reports/bi/page.tsx' },
   { id: 'public-home', role: 'guest', route: '/', source: 'src/app/page.tsx' },
   { id: 'public-services', role: 'guest', route: '/services', source: 'src/app/services/page.tsx' },

@@ -17,6 +17,7 @@ import type { OrderFile } from "@/lib/types";
 import { formatDate, formatToman } from "@/lib/format";
 import { OrderTimeline } from "@/components/order-timeline";
 import { SecureFileUpload } from "@/components/secure-file";
+import { OrderSuggestions } from "@/components/order-suggestions";
 
 export default function AdminOrderDetailPage({
   params,
@@ -121,6 +122,7 @@ export default function AdminOrderDetailPage({
       </Card>
 
       <Card className="mb-4">
+        <OrderSuggestions orderId={id} onUsePrice={order.status === 'pending_quote' ? (amount) => setQuotePrice(String(amount)) : undefined} />
         <SectionTitle as="h2">اقدامات عملیاتی</SectionTitle>
 
         {order.status === "pending_triage" || order.status === "triaging" ? (
@@ -438,10 +440,12 @@ export default function AdminOrderDetailPage({
           value={managementSummary}
           onChange={(event) => setManagementSummary(event.target.value)}
           placeholder="خلاصه مدیریتی سفارش"
+          aria-label="خلاصه مدیریتی سفارش"
         />
         <label className="my-3 flex items-center gap-2 text-sm text-fg-muted">
           <input
             type="checkbox"
+            className="size-6 shrink-0 accent-primary"
             checked={managementVisible}
             onChange={(event) => setManagementVisible(event.target.checked)}
           />

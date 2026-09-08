@@ -26,6 +26,7 @@ import { ReportingModule } from './reporting/reporting.module';
 import { ObservabilityModule } from './observability/observability.module';
 import { RequestTelemetryMiddleware } from './observability/request-telemetry.middleware';
 import { HealthModule } from './health/health.module';
+import { OrganizationsModule } from './organizations/organizations.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { HealthModule } from './health/health.module';
     ReportingModule,
     ObservabilityModule,
     HealthModule,
+    OrganizationsModule,
   ],
   controllers: [AppController],
   providers: [

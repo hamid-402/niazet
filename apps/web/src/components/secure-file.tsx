@@ -68,7 +68,8 @@ export function SecureFileUpload({
         ref={inputRef}
         type="file"
         accept={ACCEPTED_TYPES}
-        className="sr-only"
+        hidden
+        aria-label={label}
         disabled={disabled || uploading}
         onChange={(event) => {
           const file = event.target.files?.[0];

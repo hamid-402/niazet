@@ -12,6 +12,7 @@ import { ResponsiveTable,
   inputClass,
   PageLoading,
   SectionTitle,
+  LinkButton,
   TabList,
 } from '@/components/ui';
 import type {
@@ -326,6 +327,7 @@ export default function AdminStaffDetailPage({
           {profile.user?.fullName ?? profile.displayAlias}
         </SectionTitle>
         <div className="flex flex-wrap gap-2">
+          {profile.executorType === 'vetted_external' && <LinkButton href={`/admin/staff/${id}/onboarding`} variant="secondary">پرونده جذب و تأیید مرحله‌ای</LinkButton>}
           <Badge color={profile.status === 'active' ? 'green' : 'yellow'}>
             {STATUS_LABELS[profile.status] ?? profile.status}
           </Badge>
@@ -388,6 +390,7 @@ export default function AdminStaffDetailPage({
               <select
                 className={inputClass}
                 value={executorType}
+                disabled
                 onChange={(event) => setExecutorType(event.target.value)}
               >
                 <option value="internal_staff">کارمند داخلی</option>
@@ -398,6 +401,7 @@ export default function AdminStaffDetailPage({
               <select
                 className={inputClass}
                 value={verificationStatus}
+                disabled={profile.executorType === 'vetted_external'}
                 onChange={(event) => setVerificationStatus(event.target.value)}
               >
                 {Object.entries(VERIFICATION_LABELS).map(([value, label]) => (
@@ -426,7 +430,7 @@ export default function AdminStaffDetailPage({
                   displayAlias,
                   teamId: teamId || null,
                   executorType,
-                  verificationStatus,
+                  ...(profile.executorType === 'internal_staff' ? { verificationStatus } : {}),
                 },
                 success: 'مشخصات همکاری و احراز به‌روزرسانی شد.',
               })

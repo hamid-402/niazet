@@ -19,6 +19,7 @@ const OPS_NAV = [
 ];
 
 const FINANCE_NAV = [
+  { href: '/admin/organizations', label: 'سازمان‌ها و اشتراک‌ها' },
   { href: '/admin/finance', label: 'داشبورد مالی' },
   { href: '/admin/finance/payments', label: 'پرداخت‌ها' },
   { href: '/admin/finance/escrow', label: PRODUCT_TERMS.escrow },

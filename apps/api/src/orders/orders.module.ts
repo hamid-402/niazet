@@ -8,10 +8,16 @@ import { OrderDisputeService } from './domain/order-dispute.service';
 import { OrderMessagingService } from './domain/order-messaging.service';
 import { OrderWorkflowService } from './domain/order-workflow.service';
 import { OrderQueryService } from './domain/order-query.service';
+import { OrderSuggestionsController } from './order-suggestions.controller';
+import { OrderSuggestionsService } from './order-suggestions.service';
 
 @Module({
   imports: [FinanceModule],
-  controllers: [OrdersController, OrdersAdminController],
+  controllers: [
+    OrdersController,
+    OrdersAdminController,
+    OrderSuggestionsController,
+  ],
   providers: [
     OrdersService,
     OrderWorkflowService,
@@ -19,6 +25,7 @@ import { OrderQueryService } from './domain/order-query.service';
     OrderMessagingService,
     OrderDisputeService,
     OrderQueryService,
+    OrderSuggestionsService,
   ],
   exports: [OrdersService, OrderWorkflowService],
 })

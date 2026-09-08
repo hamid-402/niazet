@@ -384,7 +384,9 @@ model User {
   loginAttempts LoginAttempt[]
   otpCodes      OtpCode[]
 
-  executorProfile ExecutorProfile?
+  executorProfile         ExecutorProfile?
+  onboardingReviews       OnboardingReview[]
+  organizationMemberships OrganizationMember[]
 
   ordersAsCustomer Order[] @relation("OrderCustomer")
 
@@ -699,16 +701,34 @@ model StaffRiskAlert {
 
 // فاز بعد: جذب مجری بیرونی
 model ExecutorOnboarding {
-  id                String          @id @default(uuid())
-  executorProfileId String          @unique @map("executor_profile_id")
-  stage             OnboardingStage @default(registered)
+  id                String             @id @default(uuid())
+  executorProfileId String             @unique @map("executor_profile_id")
+  stage             OnboardingStage    @default(registered)
+  version           Int                @default(0)
+  reviews           OnboardingReview[]
   notes             String?
-  createdAt         DateTime        @default(now()) @map("created_at")
-  updatedAt         DateTime        @updatedAt @map("updated_at")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
 
   executorProfile ExecutorProfile @relation(fields: [executorProfileId], references: [id], onDelete: Cascade)
 
   @@map("executor_onboardings")
+}
+
+model OnboardingReview {
+  id                String             @id @default(uuid())
+  onboardingId      String             @map("onboarding_id")
+  actorUserId       String             @map("actor_user_id")
+  stage             OnboardingStage
+  decision          String
+  note              String
+  evidenceReference String?            @map("evidence_reference")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  onboarding        ExecutorOnboarding @relation(fields: [onboardingId], references: [id], onDelete: Restrict)
+  actor             User               @relation(fields: [actorUserId], references: [id], onDelete: Restrict)
+
+  @@index([onboardingId, createdAt])
+  @@map("onboarding_reviews")
 }
 
 // ---------------------------------------------------------------------------
@@ -813,9 +833,14 @@ model Order {
   id   String @id @default(uuid())
   code String @unique
 
-  customerId String  @map("customer_id")
-  serviceId  String  @map("service_id")
-  packageId  String? @map("package_id")
+  customerId             String            @map("customer_id")
+  organizationId         String?           @map("organization_id")
+  organizationAttachedAt DateTime?         @map("organization_attached_at")
+  organizationTeamId     String?           @map("organization_team_id")
+  organization           Organization?     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  organizationTeam       OrganizationTeam? @relation(fields: [organizationTeamId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  serviceId              String            @map("service_id")
+  packageId              String?           @map("package_id")
 
   title                String
   status               OrderStatus          @default(draft)
@@ -869,10 +894,88 @@ model Order {
   feedback           Feedback[]
 
   @@index([customerId])
+  @@index([organizationId, createdAt])
   @@index([status])
   @@index([status, createdAt])
   @@index([serviceId, status])
   @@map("orders")
+}
+
+model Organization {
+  id              String                    @id @default(uuid())
+  name            String
+  createdAt       DateTime                  @default(now()) @map("created_at")
+  requestedPlanId String?                   @map("requested_plan_id")
+  requestedPlan   OrganizationPlan?         @relation(fields: [requestedPlanId], references: [id], onDelete: Restrict)
+  members         OrganizationMember[]
+  teams           OrganizationTeam[]
+  orders          Order[]
+  subscription    OrganizationSubscription?
+
+  @@map("organizations")
+}
+
+model OrganizationTeam {
+  id             String               @id @default(uuid())
+  organizationId String               @map("organization_id")
+  name           String
+  organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  members        OrganizationMember[]
+  orders         Order[]
+
+  @@unique([organizationId, name])
+  @@unique([id, organizationId])
+  @@map("organization_teams")
+}
+
+model OrganizationMember {
+  id             String            @id @default(uuid())
+  organizationId String            @map("organization_id")
+  userId         String            @map("user_id")
+  role           String            @default("member")
+  status         String            @default("invited")
+  teamId         String?           @map("team_id")
+  createdAt      DateTime          @default(now()) @map("created_at")
+  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  user           User              @relation(fields: [userId], references: [id], onDelete: Restrict)
+  team           OrganizationTeam? @relation(fields: [teamId, organizationId], references: [id, organizationId], onDelete: Restrict)
+
+  @@unique([organizationId, userId])
+  @@index([userId, status])
+  @@map("organization_members")
+}
+
+model OrganizationPlan {
+  id              String                     @id @default(uuid())
+  name            String
+  seats           Int
+  ordersPerPeriod Int                        @map("orders_per_period")
+  feeToman        Int                        @map("fee_toman")
+  durationDays    Int                        @map("duration_days")
+  active          Boolean                    @default(true)
+  subscriptions   OrganizationSubscription[]
+  requests        Organization[]
+
+  @@map("organization_plans")
+}
+
+model OrganizationSubscription {
+  id                String           @id @default(uuid())
+  organizationId    String           @unique @map("organization_id")
+  planId            String           @map("plan_id")
+  planName          String           @map("plan_name")
+  seats             Int
+  ordersPerPeriod   Int              @map("orders_per_period")
+  feeToman          Int              @map("fee_toman")
+  startsAt          DateTime         @map("starts_at")
+  endsAt            DateTime         @map("ends_at")
+  status            String           @default("active")
+  contractReference String           @map("contract_reference")
+  version           Int              @default(0)
+  organization      Organization     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  plan              OrganizationPlan @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  @@map("organization_subscriptions")
 }
 
 model OrderStatusHistory {

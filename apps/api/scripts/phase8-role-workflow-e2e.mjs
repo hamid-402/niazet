@@ -7,6 +7,9 @@ import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { PrismaClient } from '@prisma/client';
 import { verifyBi } from './phase9-bi-checks.mjs';
+import { verifyOnboarding } from './phase9-onboarding-checks.mjs';
+import { verifySuggestions } from './phase9-suggestion-checks.mjs';
+import { verifyOrganizations } from './phase9-organization-checks.mjs';
 
 const apiRoot = fileURLToPath(new URL('../', import.meta.url));
 const prismaCli = fileURLToPath(new URL('../node_modules/prisma/build/index.js', import.meta.url));
@@ -283,6 +286,8 @@ try {
   assert.ok(financeEscrows.some((item) => item.orderId === order.id), 'Finance cannot see the escrow hold.');
   assert.ok(financeInvoices.some((item) => item.orderId === order.id), 'Finance cannot see the invoice.');
 
+  await verifyOnboarding({ databaseUrl: isolatedUrl.toString(), origin, token, orderId: order.id, executorProfileId: executorProfile.id, ok, call, expectStatus });
+  await verifySuggestions({ databaseUrl: isolatedUrl.toString(), origin, token, orderId: order.id, executorProfileId: executorProfile.id, ok, expectStatus });
   const assigned = await ok(origin, `/admin/orders/${order.id}/assign`, {
     method: 'POST', token: token.ops,
     body: { executorProfileId: executorProfile.id, assignmentRole: 'pursuit_owner', note: 'E2E assignment' },
@@ -382,6 +387,7 @@ try {
   );
   await ok(origin, '/admin/audit-log?pageSize=100', { token: token.superAdmin });
   await verifyBi({ databaseUrl: isolatedUrl.toString(), origin, token, serviceId: service.id, ok, expectStatus });
+  await verifyOrganizations({ databaseUrl: isolatedUrl.toString(), origin, token, serviceId: service.id, customerId: accounts.customer.user.id, ok, call, expectStatus });
 
   console.log(
     `Phase 8 role/workflow API E2E passed: ${positiveRoleCases.length} positive role boundaries, ${negativeRoleCases.length} negative boundaries, and complete order/payment/file/QC/delivery/settlement/ticket lifecycle.`,

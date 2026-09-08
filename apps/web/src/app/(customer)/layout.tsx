@@ -8,6 +8,7 @@ const NAV = [
   { href: '/dashboard', label: 'میز کار' },
   { href: '/orders/new', label: 'درخواست جدید' },
   { href: '/orders', label: 'سفارش‌ها' },
+  { href: '/organizations', label: 'سازمان‌ها و تیم‌ها' },
   { href: '/wallet', label: 'کیف پول و فاکتورها' },
   { href: '/tickets', label: 'تیکت‌ها' },
   { href: '/account/profile', label: 'پروفایل و حریم داده' },

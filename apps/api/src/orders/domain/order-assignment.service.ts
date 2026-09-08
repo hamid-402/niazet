@@ -14,11 +14,24 @@ export class OrderAssignmentService {
     requestedTeamId?: string,
     assignmentRole?: string,
   ) {
+    await client.$queryRaw`SELECT id FROM executor_profiles WHERE id = ${executorProfileId} FOR UPDATE`;
     const profile = await client.executorProfile.findUnique({
       where: { id: executorProfileId },
-      include: { user: true, skills: { include: { skill: true } } },
+      include: {
+        user: true,
+        onboarding: true,
+        skills: { include: { skill: true } },
+      },
     });
     if (!profile) throw new NotFoundException('مجری یافت نشد.');
+    if (
+      profile.executorType === 'vetted_external' &&
+      profile.onboarding?.stage !== 'approved'
+    ) {
+      throw new BadRequestException(
+        'مراحل جذب مجری بیرونی هنوز کامل نشده است.',
+      );
+    }
     if (
       profile.status !== 'active' ||
       profile.verificationStatus !== 'approved' ||

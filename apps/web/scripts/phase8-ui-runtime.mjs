@@ -300,6 +300,57 @@ async function verifyDrawerMotion(pages) {
   }
 }
 
+async function verifyOnboardingUi(page, webOrigin) {
+  await page.goto(`${webOrigin}/admin/staff/00000000-0000-4000-8000-000000000009/onboarding`);
+  await settle(page);
+  for (const [button, expected, evidence] of [['شروع بررسی هویت', 'بررسی هویت', null], ['تأیید این مرحله و ادامه', 'آزمون مهارت', 'DOC-UI-IDENTITY']]) {
+    if (evidence) await page.getByRole('textbox', { name: 'شناسه مدرک در مخزن خصوصی' }).fill(evidence);
+    await page.getByRole('button', { name: button, exact: true }).click();
+    const dialog = page.getByRole('alertdialog');
+    await dialog.getByRole('textbox').fill('مدرک آزمایشی توسط مسئول بررسی شد.');
+    await dialog.getByRole('button', { name: 'ثبت تصمیم انسانی', exact: true }).click();
+    await dialog.waitFor({ state: 'hidden' });
+    await page.waitForFunction(title => document.querySelector('[aria-current="step"]')?.textContent.includes(title), expected);
+  }
+  assert.equal(await page.getByText('مدرک آزمایشی توسط مسئول بررسی شد.', { exact: true }).count(), 2, 'Review history must show both saved decisions.');
+}
+
+async function verifyOrganizationsUi(pages, webOrigin) {
+  const customer = pages.get('customer'), finance = pages.get('finance');
+  await finance.goto(`${webOrigin}/admin/organizations`); await settle(finance);
+  for (const [label, value] of [['نام پلن','همکاری سازمانی آزمایشی'],['حداکثر اعضا','5'],['سفارش در هر دوره','10'],['هزینه قرارداد (تومان)','0'],['مدت دوره (روز)','30']]) await finance.getByLabel(label, { exact: true }).fill(value);
+  await finance.getByRole('button', { name: 'بررسی و ثبت پلن', exact: true }).click();
+  await finance.getByRole('alertdialog').getByRole('button', { name: 'تأیید و ثبت', exact: true }).click();
+  await finance.getByRole('alertdialog').waitFor({ state: 'hidden' });
+  await finance.getByRole('heading', { name: 'همکاری سازمانی آزمایشی', exact: true }).waitFor();
+  await customer.goto(`${webOrigin}/organizations/00000000-0000-4000-8000-000000000010`); await settle(customer);
+  await customer.getByLabel('درخواست پلن یا تمدید').selectOption({ label: 'همکاری سازمانی آزمایشی · ۰ تومان · ۳۰ روز' });
+  await customer.getByRole('button', { name: 'ارسال درخواست به مالی', exact: true }).click();
+  await customer.getByText('درخواست در صف بررسی مالی: همکاری سازمانی آزمایشی', { exact: true }).waitFor();
+  await finance.reload(); await settle(finance);
+  await finance.getByLabel('مرجع قرارداد سازمان نمایشی').fill('CONTRACT-UI-001');
+  await finance.getByRole('button', { name: 'بررسی و فعال‌سازی', exact: true }).click();
+  const dialog = finance.getByRole('alertdialog');
+  await dialog.getByRole('textbox').fill('قرارداد رایگان آزمایشی بررسی شد.');
+  await dialog.getByRole('button', { name: 'تأیید و ثبت', exact: true }).click();
+  await dialog.waitFor({ state: 'hidden' });
+  await finance.getByText('اشتراک فعال', { exact: true }).waitFor();
+  await customer.reload(); await settle(customer);
+  await customer.getByLabel('نام تیم جدید', { exact: true }).fill('تیم طراحی');
+  await customer.getByRole('button', { name: 'ایجاد تیم', exact: true }).click();
+  await customer.getByText('تیم طراحی', { exact: true }).first().waitFor();
+  await customer.getByLabel('پیش‌نویس متعلق به شما').selectOption('00000000-0000-4000-8000-000000000012');
+  await customer.getByRole('button', { name: 'بررسی و اتصال سفارش', exact: true }).click();
+  await customer.getByRole('alertdialog').getByRole('textbox').fill('خلاصه سفارش برای تیم به اشتراک گذاشته شود.');
+  await customer.getByRole('alertdialog').getByRole('button', { name: 'تأیید و ثبت', exact: true }).click();
+  await customer.getByRole('alertdialog').waitFor({ state: 'hidden' });
+  await customer.getByText('پیش‌نویس سازمانی نمایشی', { exact: true }).waitFor();
+  const ops = pages.get('ops');
+  await ops.goto(`${webOrigin}/admin/orders/00000000-0000-4000-8000-000000000011`); await settle(ops);
+  await ops.getByRole('button', { name: 'بررسی پیشنهادها', exact: true }).click();
+  await ops.getByRole('region', { name: 'مجریان پیشنهادی' }).waitFor();
+}
+
 validateVisualMatrix();
 assert.ok(existsSync(apiEntry), 'Build apps/api before runtime UI tests.');
 mkdirSync(artifactRoot, { recursive: true });
@@ -349,6 +400,18 @@ try {
   };
   runPrisma(['migrate', 'deploy'], 'Isolated migration deploy', isolatedEnvironment, [sourceUrl, isolatedUrl.toString()]);
   runPrisma(['db', 'seed'], 'Isolated database seed', isolatedEnvironment, [sourceUrl, isolatedUrl.toString()]);
+  const fixtureDb = new PrismaClient({ datasources: { db: { url: isolatedUrl.toString() } } });
+  try {
+    const customer = await fixtureDb.user.findUniqueOrThrow({ where: { phone: '09120000009' } });
+    const service = await fixtureDb.serviceLine.findFirstOrThrow({ orderBy: { id: 'asc' } });
+    await fixtureDb.organization.create({ data: { id: '00000000-0000-4000-8000-000000000010', name: 'سازمان نمایشی', members: { create: { userId: customer.id, role: 'owner', status: 'active' } } } });
+    for (const [id, code, title, status] of [['00000000-0000-4000-8000-000000000011','UI-SUGGESTIONS','بررسی پیشنهاد برای سفارش','pending_quote'],['00000000-0000-4000-8000-000000000012','UI-ORG-DRAFT','پیش‌نویس سازمانی نمایشی','draft']]) await fixtureDb.order.create({ data: { id, code, title, status, serviceId: service.id, customerId: customer.id, briefDescription: 'شرح خصوصی آزمایشی' } });
+    await fixtureDb.executorProfile.create({ data: {
+      id: '00000000-0000-4000-8000-000000000009', publicHandlerCode: 'VETTING-UI', displayAlias: 'مجری آزمایشی',
+      executorType: 'vetted_external', verificationStatus: 'pending', onboarding: { create: {} },
+      user: { create: { phone: 'onboarding-ui-fixture', fullName: 'مجری آزمایشی', role: 'executor', status: 'active' } },
+    } });
+  } finally { await fixtureDb.$disconnect(); }
 
   const apiPort = randomInt(47_001, 50_000);
   const webPort = randomInt(50_001, 53_000);
@@ -418,17 +481,31 @@ try {
 
   await verifyKeyboardFlows(pages, webOrigin);
   await verifyDrawerMotion(pages);
+  await verifyOnboardingUi(pages.get('ops'), webOrigin);
+  await verifyOrganizationsUi(pages, webOrigin);
   report.keyboard = 'passed';
   report.motion = 'passed';
 
   for (const scenario of scenarios) {
     const page = pages.get(scenario.role);
     assert.ok(page, `No browser context for ${scenario.role}.`);
-    await page.setViewportSize({ width: viewports[0].width, height: viewports[0].height });
-    const response = await page.goto(`${webOrigin}${scenario.route}`, { waitUntil: 'domcontentloaded' });
-    assert.ok(response && response.status() < 400, `${scenario.id} returned HTTP ${response?.status()}.`);
+    // Use the application's links between workspace pages. Repeated hard reloads
+    // across five accounts share an IP refresh budget unlike normal SPA navigation.
+    await page.setViewportSize({ width: 1280, height: 800 });
+    const navigationLink = page.locator(`a[href="${scenario.route}"]:visible`).first();
+    if (scenario.role !== 'guest' && await navigationLink.count()) {
+      await navigationLink.click();
+      await page.waitForURL(url => url.pathname === scenario.route);
+    } else {
+      const response = await page.goto(`${webOrigin}${scenario.route}`, { waitUntil: 'domcontentloaded' });
+      assert.ok(response && response.status() < 400, `${scenario.id} returned HTTP ${response?.status()}.`);
+    }
     await settle(page);
     assert.equal(new URL(page.url()).pathname, scenario.route, `${scenario.id} redirected to ${page.url()}.`);
+    if (scenario.id === 'ops-order-suggestions') {
+      await page.getByRole('button', { name: 'بررسی پیشنهادها', exact: true }).click();
+      await page.getByRole('region', { name: 'مجریان پیشنهادی' }).waitFor();
+    }
     for (const viewport of viewports) {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       for (const theme of themes) {
@@ -436,6 +513,8 @@ try {
         await page.evaluate((themeId) => {
           localStorage.setItem('niazat-theme', themeId);
           document.documentElement.dataset.theme = themeId;
+          if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+          window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
         }, theme.id);
         await settle(page);
         const key = `${scenario.id}__${viewport.id}__${theme.id}`;

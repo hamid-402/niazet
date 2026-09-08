@@ -62,7 +62,7 @@ for (const token of ['useId()', 'aria-controls={panelId}', 'aria-haspopup="dialo
 const snapshotCount = validateVisualMatrix();
 assert.equal(themes.length, 2);
 assert.deepEqual(viewports.map((item) => item.width), [320, 768, 1280, 1920]);
-assert.equal(snapshotCount, 152);
+assert.equal(snapshotCount, 192);
 assert.equal(snapshotPolicy.disableAnimations, true);
 assert.ok(snapshotPolicy.maxDiffPixelRatio <= 0.005);
 for (const role of ['guest', 'customer', 'ops', 'finance', 'executor', 'support']) {

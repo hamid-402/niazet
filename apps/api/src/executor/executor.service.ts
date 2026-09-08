@@ -173,6 +173,9 @@ export class ExecutorService {
           publicHandlerCode: generateReferenceCode('OPS'),
           displayAlias: dto.displayAlias,
           teamId: dto.teamId,
+          ...(executorType === 'vetted_external'
+            ? { onboarding: { create: {} } }
+            : {}),
         },
       });
       await tx.auditLog.create({
@@ -303,6 +306,7 @@ export class ExecutorService {
     ipAddress?: string,
   ) {
     return this.prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM executor_profiles WHERE id = ${id} FOR UPDATE`;
       const before = await tx.executorProfile.findUnique({ where: { id } });
       if (!before) throw new NotFoundException('پروفایل مجری یافت نشد.');
       const result = await tx.executorProfile.update({
@@ -406,8 +410,25 @@ export class ExecutorService {
     if (changes.teamId) await this.assertTeamExists(changes.teamId);
 
     return this.prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM executor_profiles WHERE id = ${id} FOR UPDATE`;
       const before = await tx.executorProfile.findUnique({ where: { id } });
       if (!before) throw new NotFoundException('پروفایل مجری یافت نشد.');
+      if (
+        changes.executorType &&
+        changes.executorType !== before.executorType
+      ) {
+        throw new BadRequestException(
+          'نوع همکاری پس از ایجاد پرونده قابل تغییر مستقیم نیست.',
+        );
+      }
+      if (
+        before.executorType === 'vetted_external' &&
+        changes.verificationStatus !== undefined
+      ) {
+        throw new BadRequestException(
+          'تأیید مجری بیرونی فقط از پرونده جذب مرحله‌ای انجام می‌شود.',
+        );
+      }
       const result = await tx.executorProfile.update({
         where: { id },
         data: changes,
