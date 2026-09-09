@@ -124,6 +124,7 @@ export function AppShell({
 
       {/* Mobile off-canvas nav */}
       <MobileDrawer id="workspace-mobile-drawer" open={mobileOpen} onClose={closeMobile} title="نیازت با ما">
+           <div className="mb-5"><BrandMark caption={false} /></div>
            <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-fg-subtle">
              {title}
            </p>
@@ -156,7 +157,7 @@ export function AppShell({
           >
             <MenuIcon />
           </button>
-          <span className="font-bold text-fg md:hidden">نیازت با ما</span>
+          <span className="md:hidden"><BrandMark caption={false} /></span>
           <span className="hidden text-sm font-bold text-fg md:block">
             {title}
           </span>

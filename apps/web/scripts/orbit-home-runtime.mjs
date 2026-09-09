@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import AxeBuilder from '@axe-core/playwright';
+import { verifyOrbitPublicSections } from './orbit-public-sections-runtime.mjs';
 
 export async function verifyOrbitHome(browser, origin) {
   const context = await browser.newContext({ locale: 'fa-IR', viewport: { width: 1280, height: 900 }, reducedMotion: 'no-preference' });
@@ -116,6 +117,8 @@ export async function verifyOrbitHome(browser, origin) {
       assert.equal(await details.getByRole('link').isVisible(), true, `No-JS category ${index} remains reachable.`);
     }
     assert.equal(await staticPage.getByRole('list', { name: 'دلایل اعتماد به نیازت' }).getByRole('listitem').count(), 3);
+    await verifyOrbitPublicSections(page, staticPage);
+    assert.deepEqual(errors, [], 'Public sections must not introduce runtime/hydration errors.');
     await staticPage.getByRole('link', { name: 'شروع ثبت درخواست', exact: true }).first().click();
     assert.equal(new URL(staticPage.url()).pathname, '/services', 'CTA must be a real link, not a demo action.');
     await staticPage.setViewportSize({ width: 1280, height: 900 });

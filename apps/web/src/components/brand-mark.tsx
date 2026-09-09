@@ -1,3 +1,15 @@
-export function BrandMark() {
-  return <span className="brand-lockup"><span className="brand-emblem" aria-hidden="true"><svg aria-hidden="true" viewBox="0 0 32 32" fill="none"><path d="M8 9v11a5 5 0 0 0 5 5h7a5 5 0 0 0 5-5V9M13 7h7M12 16l4 4 8-10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></span><span><span className="block text-lg font-extrabold">نیازت با ما</span><span className="brand-caption">همراهِ انجام کارهای مهم</span></span></span>;
+import Image from 'next/image';
+import styles from './brand-mark.module.css';
+
+export function BrandMark({ language = 'fa', caption = true }: { language?: 'fa' | 'en'; caption?: boolean }) {
+  return (
+    <span className={styles.lockup} data-brand-mark={language}>
+      <span className={styles.plate}>
+        <span className={styles.viewport} data-language={language}>
+          <Image src="/brand/niazet-approved.png" alt={language === 'fa' ? 'نیازت با ما' : 'Niazet Ba Ma'} width={1536} height={1024} sizes="320px" loading="eager" className={styles.artwork} />
+        </span>
+      </span>
+      {caption && <span className={`${styles.caption} brand-caption`}>همراهِ انجام کارهای مهم</span>}
+    </span>
+  );
 }

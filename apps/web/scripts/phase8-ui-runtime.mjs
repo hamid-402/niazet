@@ -132,6 +132,8 @@ async function settle(page) {
   }
   await page.locator('main').first().waitFor({ state: 'visible', timeout: 10_000 });
   await page.evaluate(() => document.fonts.ready);
+  await page.locator('[data-brand-mark] img').evaluateAll(images => Promise.all(images.map(image => image.decode())));
+  assert.ok(await page.locator('[data-brand-mark] img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0)), 'Every rendered brand asset must load.');
   await page.evaluate(() => {
     if (document.querySelector('#ui-runtime-motion-lock')) return;
     const style = document.createElement('style');

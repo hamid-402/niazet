@@ -9,6 +9,7 @@ import { ServiceAssurance } from '@/components/service-assurance';
 import { PublicFaqAndFinalCta } from '@/components/public-faq-cta';
 import { GeometricSectionDivider } from '@/components/geometric-section-divider';
 import { PublicStructuredData } from '@/components/public-structured-data';
+import { BrandMark } from '@/components/brand-mark';
 
 const TRUST_SIGNALS = [
   {
@@ -63,6 +64,7 @@ export default function HomePage() {
       </main>
 
       <footer className="border-t border-border bg-surface py-6 text-center text-xs text-fg-subtle">
+        <div className="mb-4"><BrandMark language="en" caption={false} /></div>
         © نیازت با ما — سامانه خدمات مدیریت‌شده
       </footer>
     </div>

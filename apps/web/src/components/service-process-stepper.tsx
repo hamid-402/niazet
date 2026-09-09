@@ -1,6 +1,8 @@
 'use client';
 
 import { type KeyboardEvent, useRef, useState } from 'react';
+import { OrbitSection } from './orbit-section';
+import styles from './orbit-sections.module.css';
 
 const PROCESS_STEPS = [
   {
@@ -76,6 +78,7 @@ export function ServiceProcessStepper() {
   };
 
   return (
+    <OrbitSection className={styles.process}>
     <section id="how-it-works" aria-labelledby="process-stepper-title" className="bg-surface py-16">
       <div className="mx-auto max-w-6xl px-4 md:px-8">
         <div className="mx-auto max-w-2xl text-center">
@@ -88,7 +91,7 @@ export function ServiceProcessStepper() {
           </p>
         </div>
 
-        <ol aria-label="مراحل سفارش خدمت" className="mt-8 grid gap-2 sm:grid-cols-2 lg:grid-cols-6">
+        <ol aria-label="مراحل سفارش خدمت" className={`${styles.stepList} mt-8 grid gap-2 sm:grid-cols-2 lg:grid-cols-6`}>
           {PROCESS_STEPS.map((step, index) => {
             const isActive = index === activeIndex;
             return (
@@ -113,7 +116,7 @@ export function ServiceProcessStepper() {
           })}
         </ol>
 
-        <div id="service-process-detail" aria-live="polite" aria-atomic="true" className="mt-4 rounded-card border border-border bg-bg p-5 shadow-elevation-1 md:p-7">
+        <div id="service-process-detail" aria-live="polite" aria-atomic="true" className={`${styles.processPanel} mt-4 rounded-card border border-border bg-bg p-5 shadow-elevation-1 md:p-7`}>
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-xs font-bold text-accent">مرحله {activeStep.number} از ۶</p>
@@ -144,6 +147,15 @@ export function ServiceProcessStepper() {
           </div>
         </div>
       </div>
+      <noscript>
+        <div data-static-process className="mx-auto max-w-6xl px-4 pb-8 md:px-8">
+          <p className="mb-3 text-sm font-bold text-fg">شرح کامل مراحل بدون نیاز به جاوااسکریپت</p>
+          <ol className="grid gap-3 md:grid-cols-2">
+            {PROCESS_STEPS.map((step) => <li key={step.number}><details className="rounded-card border border-border bg-bg p-4"><summary className="cursor-pointer font-bold text-fg">{step.number}. {step.title}</summary><p className="mt-3 text-sm leading-7 text-fg-muted">{step.summary}</p><dl className="mt-3 grid gap-2 text-sm leading-7"><div><dt className="font-bold">اقدام شما</dt><dd>{step.customerAction}</dd></div><div><dt className="font-bold">اقدام نیازت</dt><dd>{step.systemAction}</dd></div><div><dt className="font-bold">خروجی</dt><dd>{step.outcome}</dd></div></dl></details></li>)}
+          </ol>
+        </div>
+      </noscript>
     </section>
+    </OrbitSection>
   );
 }

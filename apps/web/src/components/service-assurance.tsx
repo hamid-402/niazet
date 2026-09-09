@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { formatNumber } from '@/lib/format';
+import { OrbitSection } from './orbit-section';
+import styles from './orbit-sections.module.css';
 
 const ASSURANCES = [
   {
@@ -36,6 +38,7 @@ const ASSURANCES = [
 
 export function ServiceAssurance() {
   return (
+    <OrbitSection className={styles.assurance}>
     <section aria-labelledby="assurance-title" className="border-y border-border bg-surface py-16">
       <div className="mx-auto max-w-6xl px-4 md:px-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -49,9 +52,9 @@ export function ServiceAssurance() {
           </Link>
         </div>
 
-        <ol className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        <ol className={`${styles.assuranceGrid} mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-5`}>
           {ASSURANCES.map((item, index) => (
-            <li key={item.title} className="flex min-w-0 flex-col rounded-card border border-border bg-bg p-4">
+            <li key={item.title} className={`${styles.assuranceCard} flex min-w-0 flex-col rounded-card border border-border bg-bg p-4`}>
               <div className="flex items-start gap-3">
                 <span aria-hidden="true" className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-extrabold text-fg-on-accent">{formatNumber(index + 1)}</span>
                 <h3 className="pt-1 text-sm font-extrabold text-fg">{item.title}</h3>
@@ -66,5 +69,6 @@ export function ServiceAssurance() {
         </ol>
       </div>
     </section>
+    </OrbitSection>
   );
 }

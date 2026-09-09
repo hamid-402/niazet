@@ -1,4 +1,6 @@
 import { formatNumber } from '@/lib/format';
+import { OrbitSection } from './orbit-section';
+import styles from './orbit-sections.module.css';
 
 const OUTPUT_SAMPLES = [
   {
@@ -29,6 +31,7 @@ const OUTPUT_SAMPLES = [
 
 export function ServiceOutputSamples() {
   return (
+    <OrbitSection className={styles.samples}>
     <section aria-labelledby="output-samples-title" className="mx-auto w-full max-w-6xl px-4 py-16 md:px-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div className="max-w-2xl">
@@ -43,9 +46,9 @@ export function ServiceOutputSamples() {
         </p>
       </div>
 
-      <ul className="mt-8 grid gap-4 md:grid-cols-2">
+      <ul className={`${styles.sampleGrid} mt-8 grid gap-4 md:grid-cols-2`}>
         {OUTPUT_SAMPLES.map((sample) => (
-          <li key={sample.title} className="overflow-hidden rounded-card border border-border bg-surface shadow-elevation-1">
+          <li key={sample.title} className={`${styles.sampleCard} overflow-hidden rounded-card border border-border bg-surface shadow-elevation-1`}>
             <div className="flex items-center justify-between gap-3 border-b border-border bg-bg-subtle px-4 py-3">
               <div className="flex items-center gap-2" aria-hidden="true">
                 <span className="h-2.5 w-2.5 rounded-full bg-danger" />
@@ -85,5 +88,6 @@ export function ServiceOutputSamples() {
         ))}
       </ul>
     </section>
+    </OrbitSection>
   );
 }

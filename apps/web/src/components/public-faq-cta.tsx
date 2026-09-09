@@ -3,6 +3,8 @@
 import { useAuth } from '@/lib/auth-context';
 import { roleHomePath } from '@/lib/role-paths';
 import { LinkButton } from '@/components/ui';
+import { OrbitSection } from './orbit-section';
+import styles from './orbit-sections.module.css';
 
 const FAQS = [
   {
@@ -37,14 +39,16 @@ export function PublicFaqAndFinalCta() {
 
   return (
     <>
-      <section id="faq" aria-labelledby="public-faq-title" className="mx-auto w-full max-w-3xl px-4 py-16 md:px-8">
-        <div className="text-center">
+      <OrbitSection className={styles.faq}>
+      <section id="faq" aria-labelledby="public-faq-title" className="mx-auto w-full max-w-6xl px-4 py-16 md:px-8">
+        <div className={styles.faqLayout}>
+        <div className={styles.faqHeading}>
           <p className="text-sm font-bold text-accent">پاسخ روشن پیش از شروع</p>
           <h2 id="public-faq-title" className="mt-2 text-xl font-extrabold text-fg">سوالات پرتکرار</h2>
         </div>
-        <div className="mt-7 flex flex-col gap-3">
+        <div className={`${styles.faqList} mt-7 flex flex-col gap-3`}>
           {FAQS.map((item) => (
-            <details key={item.question} className="group rounded-card border border-border bg-surface p-4 shadow-elevation-1 open:border-border-strong">
+            <details key={item.question} className={`${styles.question} group rounded-card border border-border bg-surface p-4 shadow-elevation-1 open:border-border-strong`}>
               <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between gap-3 rounded-control font-bold text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 [&::-webkit-details-marker]:hidden">
                 <span>{item.question}</span>
                 <span aria-hidden="true" className="text-xl leading-none text-accent transition-transform group-open:rotate-45">+</span>
@@ -53,8 +57,11 @@ export function PublicFaqAndFinalCta() {
             </details>
           ))}
         </div>
+        </div>
       </section>
+      </OrbitSection>
 
+      <OrbitSection className={styles.finalCta}>
       <section aria-labelledby="final-cta-title" className="border-t border-border bg-accent-soft py-14">
         <div className="mx-auto max-w-3xl px-4 text-center md:px-8">
           <h2 id="final-cta-title" className="text-2xl font-extrabold text-fg">آماده‌اید نیازتان را به یک سفارش شفاف تبدیل کنید؟</h2>
@@ -79,6 +86,7 @@ export function PublicFaqAndFinalCta() {
           )}
         </div>
       </section>
+      </OrbitSection>
     </>
   );
 }

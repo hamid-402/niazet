@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { formatNumber } from '@/lib/format';
+import { OrbitSection } from './orbit-section';
+import styles from './orbit-sections.module.css';
 
 const USE_CASES = [
   {
@@ -36,9 +38,10 @@ const USE_CASES = [
 
 export function ServiceUseCases() {
   return (
+    <OrbitSection className={styles.useCases}>
     <section aria-labelledby="use-cases-title" className="border-y border-border bg-bg-subtle py-16">
       <div className="mx-auto max-w-6xl px-4 md:px-8">
-        <div className="mx-auto max-w-2xl text-center">
+        <div className={styles.heading}>
           <p className="text-sm font-bold text-accent">از نیاز تا خروجی مشخص</p>
           <h2 id="use-cases-title" className="mt-2 text-xl font-extrabold text-fg">نیازت در عمل چه مسئله‌هایی را حل می‌کند؟</h2>
           <p className="mt-2 text-sm leading-7 text-fg-muted">
@@ -46,9 +49,9 @@ export function ServiceUseCases() {
           </p>
         </div>
 
-        <ul className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <ul className={`${styles.caseGrid} mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3`}>
           {USE_CASES.map((useCase, index) => (
-            <li key={useCase.audience} className="flex min-w-0 flex-col rounded-card border border-border bg-surface p-5 shadow-elevation-1">
+            <li key={useCase.audience} className={`${styles.caseCard} flex min-w-0 flex-col rounded-card border border-border bg-surface p-5 shadow-elevation-1`}>
               <div className="flex items-center justify-between gap-3">
                 <h3 className="font-extrabold text-fg">{useCase.audience}</h3>
                 <span aria-hidden="true" className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-extrabold text-accent">
@@ -84,5 +87,6 @@ export function ServiceUseCases() {
         </div>
       </div>
     </section>
+    </OrbitSection>
   );
 }
