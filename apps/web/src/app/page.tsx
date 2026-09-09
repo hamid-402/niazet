@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { OrbitServiceExplorer } from '@/components/orbit-service-explorer';
 import { PublicNav } from '@/components/public-nav';
 import { OrbitHero } from '@/components/orbit-hero';
 import { ManagedServiceFlow } from '@/components/managed-service-flow';
@@ -9,17 +9,6 @@ import { ServiceAssurance } from '@/components/service-assurance';
 import { PublicFaqAndFinalCta } from '@/components/public-faq-cta';
 import { GeometricSectionDivider } from '@/components/geometric-section-divider';
 import { PublicStructuredData } from '@/components/public-structured-data';
-
-const CATEGORIES = [
-  'طراحی و توسعه سایت',
-  'محتوا و سئو',
-  'تحقیق و تحلیل بازار',
-  'گزارش مدیریتی',
-  'طراحی گرافیک',
-  'امور اداری و پیگیری',
-  'دستیار کسب‌وکار',
-  'خدمات سفارشی',
-];
 
 const TRUST_SIGNALS = [
   {
@@ -58,22 +47,7 @@ export default function HomePage() {
 
         <GeometricSectionDivider />
 
-        <section className="mx-auto w-full max-w-6xl px-4 pb-16 md:px-8">
-        <h2 className="mb-4 text-center text-lg font-bold text-fg">
-          دسته‌های خدمات
-        </h2>
-        <div className="service-collection grid grid-cols-2 gap-3 md:grid-cols-4">
-          {CATEGORIES.map((cat) => (
-            <Link
-              key={cat}
-              href="/services"
-              className="rounded-card border border-border bg-surface p-4 text-center text-sm font-medium text-fg shadow-elevation-1 transition-colors hover:border-border-strong hover:bg-bg-subtle"
-            >
-              {cat}
-            </Link>
-          ))}
-        </div>
-        </section>
+        <OrbitServiceExplorer />
 
         <ServiceUseCases />
 

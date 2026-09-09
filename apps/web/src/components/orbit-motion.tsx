@@ -29,8 +29,12 @@ function snapshot() {
 }
 const reducedSnapshot = () => window.matchMedia(QUERY).matches;
 
+export function useOrbitMotionPreference() {
+  return useSyncExternalStore(subscribe, snapshot, serverSnapshot);
+}
+
 export function OrbitMotion({ children }: { children: ReactNode }) {
-  const enabled = useSyncExternalStore(subscribe, snapshot, serverSnapshot);
+  const enabled = useOrbitMotionPreference();
   const reduced = useSyncExternalStore(subscribe, reducedSnapshot, serverSnapshot);
   function toggle() {
     try { localStorage.setItem(KEY, enabled ? 'paused' : 'enabled'); } catch { return; }

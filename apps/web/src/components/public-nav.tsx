@@ -8,8 +8,13 @@ import { MobileDrawer } from './mobile-drawer';
 import { roleHomePath } from '@/lib/role-paths';
 import { ThemeSwitcher } from './theme-switcher';
 import { BrandMark } from './brand-mark';
+import { usePathname } from 'next/navigation';
+import { useOrbitMotionPreference } from './orbit-motion';
+import styles from './orbit-public-nav.module.css';
 
 export function PublicNav() {
+  const pathname = usePathname();
+  const motion = useOrbitMotionPreference();
   const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeMobile = useCallback(() => setMobileOpen(false), []);
@@ -21,13 +26,13 @@ export function PublicNav() {
   ];
 
   return (
-    <header className="public-header sticky top-0 z-sticky border-b border-border bg-surface/90 backdrop-blur">
+    <header data-motion={motion ? 'on' : 'off'} className={`${styles.header} public-header sticky top-0 z-sticky border-b border-border bg-surface/90 backdrop-blur`}>
       <div className="page-container flex items-center justify-between py-4">
         <Link href="/" className="text-lg font-extrabold text-fg">
           <BrandMark />
         </Link>
-        <nav className="hidden items-center gap-6 text-sm font-medium text-fg-muted md:flex" aria-label="ناوبری عمومی">
-          {publicLinks.map((item) => <Link key={item.href} href={item.href} className="transition-colors hover:text-fg">{item.label}</Link>)}
+        <nav className={`${styles.navigation} hidden items-center gap-6 text-sm font-medium text-fg-muted md:flex`} aria-label="ناوبری عمومی">
+          {publicLinks.map((item) => <Link key={item.href} href={item.href} aria-current={!item.href.includes('#') && (pathname === item.href || pathname.startsWith(`${item.href}/`)) ? 'page' : undefined} className="transition-colors hover:text-fg">{item.label}</Link>)}
         </nav>
         <div className="hidden items-center gap-3 md:flex">
           <ThemeSwitcher variant="compact" />
@@ -58,7 +63,7 @@ export function PublicNav() {
       </div>
       <MobileDrawer id="public-mobile-drawer" open={mobileOpen} onClose={closeMobile} title="منوی سایت">
         <nav className="flex flex-col gap-1" aria-label="ناوبری عمومی موبایل">
-          {publicLinks.map((item) => <Link key={item.href} href={item.href} onClick={closeMobile} className="rounded-control px-3 py-3 text-sm font-medium text-fg-muted hover:bg-bg-subtle hover:text-fg">{item.label}</Link>)}
+          {publicLinks.map((item) => <Link key={item.href} href={item.href} aria-current={!item.href.includes('#') && (pathname === item.href || pathname.startsWith(`${item.href}/`)) ? 'page' : undefined} onClick={closeMobile} className="rounded-control px-3 py-3 text-sm font-medium text-fg-muted hover:bg-bg-subtle hover:text-fg aria-[current=page]:bg-accent-subtle">{item.label}</Link>)}
         </nav>
         <div className="mt-auto grid gap-2 border-t border-border pt-5">
           {user ? <><LinkButton href={roleHomePath(user)}>میز کار</LinkButton><Button variant="secondary" onClick={() => { closeMobile(); void logout(); }}>خروج</Button></> : <><LinkButton href="/register">ثبت‌نام</LinkButton><LinkButton href="/login" variant="secondary">ورود</LinkButton></>}

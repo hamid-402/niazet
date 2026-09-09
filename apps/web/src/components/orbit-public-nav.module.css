@@ -1,0 +1,11 @@
+.header { border-bottom-color: var(--color-border); }
+.header .navigation { gap: .15rem; border: 1px solid var(--color-border); border-radius: 2rem; padding: .2rem; background: var(--color-bg-subtle); }
+.header .navigation a { border-radius: 2rem; min-height: 2.4rem; display: inline-flex; align-items: center; padding: .4rem .8rem; font-size: .75rem; }
+.header .navigation a::after { content: none; }
+.header .navigation a[aria-current='page'] { background: var(--color-surface); color: var(--color-fg); box-shadow: var(--shadow-elevation-1); }
+.header .navigation a:hover { background: var(--color-surface); color: var(--color-fg); }
+.header .navigation a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.header[data-motion='on'] .navigation a { transition: background .25s, color .25s, box-shadow .25s; }
+.header[data-motion='off'] .navigation a { transition: none; }
+@media (min-width: 48rem) and (max-width: 63.99rem) { .header .navigation a { padding-inline: .6rem; font-size: .7rem; } }
+@media (prefers-reduced-motion: reduce) { .header .navigation a { transition: none; } }
