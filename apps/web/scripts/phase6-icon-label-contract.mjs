@@ -11,7 +11,8 @@ for (const { path, source } of sources) {
   for (const match of source.matchAll(/<svg[\s\S]*?>/g)) assert(match[0].includes('aria-hidden="true"') || match[0].includes('role="img"'), `SVG lacks decorative/image semantics in ${path}`);
 }
 const theme = sources.find((item) => item.path.endsWith('theme-switcher.tsx'))?.source ?? '';
-for (const token of ['aria-label={`انتخاب پوسته', 'aria-expanded={open}', 'aria-controls={listboxId}', 'aria-label="پوسته‌های قابل انتخاب"', 'aria-selected={t.id === theme}', 'useId()']) assert(theme.includes(token), `Theme switcher accessibility misses ${token}`);
+for (const token of ['type="button"', 'data-theme-toggle', 'aria-label="حالت تیره"', 'aria-pressed={isDark}', 'onClick={() => setTheme(nextTheme)}']) assert(theme.includes(token), `Theme toggle accessibility misses ${token}`);
+assert(!theme.includes('aria-haspopup') && !theme.includes('role="listbox"'), 'The owner requested direct theme switching, not a popup.');
 const shell = sources.find((item) => item.path.endsWith('app-shell.tsx'))?.source ?? '';
 const publicNav = sources.find((item) => item.path.endsWith('public-nav.tsx'))?.source ?? '';
 const drawer = sources.find((item) => item.path.endsWith('mobile-drawer.tsx'))?.source ?? '';

@@ -20,6 +20,14 @@ export async function verifyOrbitPublicSections(page, staticPage) {
         assert.ok(rendering.filter.includes(theme === 'simple-dark' ? 'brand-dark-' : 'brand-light-'), 'Brand ink must follow the active theme.');
         assert.equal(rendering.background, 'rgba(0, 0, 0, 0)', 'Brand must not have a light plate.');
         assert.equal(rendering.border, 'rgba(0, 0, 0, 0)', 'Brand must not have a visible frame.');
+        const symbol = mark.locator('[data-brand-symbol]');
+        assert.equal(await symbol.count(), 1);
+        await symbol.evaluate(image => image.decode());
+        assert.ok((await symbol.evaluate(image => getComputedStyle(image).filter)).includes('brand-light-'), 'Emblem must retain the same source colors in both themes.');
+        if ((await mark.getAttribute('data-brand-mark')) === 'fa') {
+          assert.equal(await mark.locator('[data-brand-dot="noon"]').count(), 1);
+          assert.equal(await mark.locator('[data-brand-dot="zeh"]').count(), 1);
+        }
       }
       assert.equal(await page.locator('[aria-labelledby="use-cases-title"] > div > ul > li').count(), 5);
       assert.equal(await page.locator('[aria-labelledby="output-samples-title"] > ul > li').count(), 4);

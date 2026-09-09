@@ -63,9 +63,10 @@ for (const token of ['id: string', 'id={id}', 'aria-labelledby={`${id}-title`}',
 assert.ok(publicNav.includes('aria-controls="public-mobile-drawer"') && publicNav.includes('aria-expanded={mobileOpen}'), 'Public mobile trigger is not linked to its drawer.');
 assert.ok(appShell.includes('aria-controls="workspace-mobile-drawer"') && appShell.includes('aria-expanded={mobileOpen}'), 'Workspace mobile trigger is not linked to its drawer.');
 
-for (const token of ['useId()', 'role="listbox"', 'role="option"', 'aria-controls={listboxId}', "event.key === 'ArrowDown'", "event.key === 'ArrowUp'", "event.key === 'Home'", "event.key === 'End'", "event.key === 'Escape'", 'closeAndRestore()', 'triggerRef.current?.focus()']) {
-  assert.ok(themeSwitcher.includes(token), `Theme listbox keyboard contract misses ${token}.`);
+for (const token of ['type="button"', 'data-theme-toggle', 'aria-label="حالت تیره"', 'aria-pressed={isDark}', "isDark ? 'simple-light' : 'simple-dark'", 'onClick={() => setTheme(nextTheme)}']) {
+  assert.ok(themeSwitcher.includes(token), `Direct theme toggle contract misses ${token}.`);
 }
+assert.ok(!themeSwitcher.includes('aria-haspopup') && !themeSwitcher.includes('role="listbox"'), 'Theme switching must not open a menu.');
 for (const token of ['useId()', 'aria-controls={panelId}', 'aria-haspopup="dialog"', 'role="dialog"', 'event.key !== "Escape"', 'triggerRef.current?.focus()']) {
   assert.ok(notifications.includes(token), `Notification disclosure keyboard contract misses ${token}.`);
 }

@@ -249,17 +249,22 @@ async function verifyKeyboardFlows(pages, webOrigin) {
   await guest.keyboard.press('Enter');
   assert.equal(await guest.evaluate(() => document.activeElement?.id === 'main-content' || location.hash === '#main-content'), true, 'Skip link does not reach main content.');
 
-  const themeTrigger = guest.locator('button[aria-haspopup="listbox"]:visible').first();
-  await themeTrigger.focus();
-  await guest.keyboard.press('ArrowDown');
-  await guest.locator('[role="listbox"]').waitFor({ state: 'visible' });
-  await guest.waitForFunction(() => document.activeElement?.getAttribute('role') === 'option');
-  await guest.keyboard.press('End');
-  await guest.waitForFunction(() => document.activeElement?.getAttribute('role') === 'option');
-  assert.equal(await guest.evaluate(() => document.activeElement?.getAttribute('role')), 'option', 'Theme listbox does not move focus with End.');
-  await guest.keyboard.press('Escape');
-  await guest.waitForFunction(() => document.activeElement?.getAttribute('aria-haspopup') === 'listbox');
-  assert.equal(await themeTrigger.evaluate((element) => document.activeElement === element), true, 'Theme listbox does not restore trigger focus.');
+  const themeTrigger = guest.locator('[data-theme-toggle]:visible').first();
+  let expectedTheme = await guest.evaluate(() => document.documentElement.dataset.theme);
+  for (const action of ['click', 'Space', 'Enter', 'click']) {
+    expectedTheme = expectedTheme === 'simple-dark' ? 'simple-light' : 'simple-dark';
+    await themeTrigger.focus();
+    if (action === 'click') await themeTrigger.click();
+    else await guest.keyboard.press(action);
+    await guest.waitForFunction(value => document.documentElement.dataset.theme === value && localStorage.getItem('niazat-theme') === value, expectedTheme);
+    assert.equal(await themeTrigger.getAttribute('aria-pressed'), String(expectedTheme === 'simple-dark'));
+    assert.equal(await themeTrigger.evaluate(element => document.activeElement === element), true, 'Theme switching must keep focus on the button.');
+    assert.equal(await guest.locator('[role="listbox"]').count(), 0, 'Theme switching must not open a menu.');
+  }
+  await guest.reload();
+  await settle(guest);
+  assert.equal(await guest.evaluate(() => document.documentElement.dataset.theme), expectedTheme, 'Theme choice must survive a reload.');
+  await guest.waitForFunction(value => document.querySelector('[data-theme-toggle]')?.getAttribute('aria-pressed') === String(value === 'simple-dark'), expectedTheme);
 
   const publicDrawerTrigger = guest.locator('[aria-controls="public-mobile-drawer"]');
   await publicDrawerTrigger.click();
@@ -277,6 +282,13 @@ async function verifyKeyboardFlows(pages, webOrigin) {
   const workspaceDrawerTrigger = customer.locator('[aria-controls="workspace-mobile-drawer"]');
   await workspaceDrawerTrigger.click();
   await customer.locator('#workspace-mobile-drawer').waitFor({ state: 'visible' });
+  const drawerTheme = customer.locator('#workspace-mobile-drawer [data-theme-toggle]');
+  const nextDrawerTheme = (await drawerTheme.getAttribute('aria-pressed')) === 'true' ? 'simple-light' : 'simple-dark';
+  await drawerTheme.click();
+  await customer.waitForFunction(value => document.documentElement.dataset.theme === value && localStorage.getItem('niazat-theme') === value, nextDrawerTheme);
+  assert.equal(await customer.locator('#workspace-mobile-drawer').isVisible(), true, 'Theme switch must not close the navigation drawer.');
+  assert.equal(await drawerTheme.evaluate(element => document.activeElement === element), true);
+  assert.equal(await customer.locator('[role="listbox"]').count(), 0);
   await customer.keyboard.press('Escape');
   await customer.waitForFunction(() => document.activeElement?.getAttribute('aria-controls') === 'workspace-mobile-drawer');
   assert.equal(await workspaceDrawerTrigger.evaluate((element) => document.activeElement === element), true, 'Workspace drawer does not restore trigger focus.');
@@ -531,11 +543,24 @@ try {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       for (const theme of themes) {
         await page.emulateMedia({ colorScheme: theme.colorScheme, reducedMotion: 'reduce' });
+        const themeControl = page.locator('[data-theme-toggle]:visible').first();
+        if (await themeControl.count()) {
+          // Mobile workspaces hide their theme control inside the closed drawer.
+          // Their CSS-only snapshot setup can differ from the provider state;
+          // normalize through the actual button when it becomes visible again.
+          if ((await themeControl.getAttribute('aria-pressed')) === String(theme.id === 'simple-dark') && (await page.evaluate(() => document.documentElement.dataset.theme)) !== theme.id) {
+            await themeControl.click();
+            await page.waitForFunction(value => document.documentElement.dataset.theme !== value, theme.id);
+          }
+          if ((await themeControl.getAttribute('aria-pressed')) !== String(theme.id === 'simple-dark')) await themeControl.click();
+          await page.waitForFunction(value => document.documentElement.dataset.theme === value, theme.id);
+        }
         await page.evaluate((themeId) => {
           localStorage.setItem('niazat-theme', themeId);
           document.documentElement.dataset.theme = themeId;
           if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
           window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+          document.querySelectorAll('.workspace-sidebar').forEach(element => { element.scrollTop = 0; });
         }, theme.id);
         await settle(page);
         const key = `${scenario.id}__${viewport.id}__${theme.id}`;
