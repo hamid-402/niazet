@@ -444,18 +444,18 @@ textarea:disabled,
 /* Keyboard users can bypass repeated navigation without adding visual noise. */
 .skip-link {
   position: fixed;
-  inset-block-start: var(--space-3);
-  inset-inline-start: var(--space-3);
+  inset-block-start: var(--control-padding-block);
+  inset-inline-start: var(--layout-page-gutter);
   z-index: var(--z-toast);
-  padding: var(--space-2) var(--space-4);
+  padding: var(--control-padding-block) var(--control-padding-inline);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-control);
   background: var(--color-surface);
   color: var(--color-fg);
   box-shadow: var(--shadow-elevation-3);
-  font-size: var(--font-size-body-sm);
+  font-size: var(--text-body-sm, 0.875rem);
   font-weight: 700;
-  transform: translateY(calc(-100% - var(--space-6)));
+  transform: translateY(calc(-100% - var(--control-height)));
   transition: transform var(--duration-fast) var(--ease-standard);
 }
 

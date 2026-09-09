@@ -8,6 +8,17 @@ const root = new URL('../', import.meta.url);
 const rootPath = fileURLToPath(root);
 const read = (path) => readFileSync(new URL(path, root), 'utf8');
 const inheritedContracts = [
+  'phase7-hero-contract.mjs',
+  'phase7-flow-diagram-contract.mjs',
+  'phase7-stepper-contract.mjs',
+  'phase7-use-cases-contract.mjs',
+  'phase7-service-catalog-contract.mjs',
+  'phase7-output-samples-contract.mjs',
+  'phase7-assurance-contract.mjs',
+  'phase7-faq-cta-contract.mjs',
+  'phase7-visual-rhythm-contract.mjs',
+  'phase7-route-motion-contract.mjs',
+  'phase7-seo-contract.mjs',
   'phase6-design-system-contract.mjs',
   'phase6-mobile-navigation-contract.mjs',
   'phase6-responsive-table-contract.mjs',

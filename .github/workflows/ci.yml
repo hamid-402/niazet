@@ -20,6 +20,10 @@ jobs:
       DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/niazat_typecheck?schema=public
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Orbit preservation contract
+        run: node scripts/orbit-preservation-contract.mjs
       - uses: actions/setup-node@v5
         with:
           node-version: 24

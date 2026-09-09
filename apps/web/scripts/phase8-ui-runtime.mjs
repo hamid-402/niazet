@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import AxeBuilder from '@axe-core/playwright';
 import { chromium } from 'playwright';
 import { scenarios, themes, validateVisualMatrix, viewports } from './phase8-visual-regression-matrix.mjs';
+import { verifyOrbitHome } from './orbit-home-runtime.mjs';
 
 const webRoot = fileURLToPath(new URL('../', import.meta.url));
 const repositoryRoot = resolve(webRoot, '../..');
@@ -22,6 +23,11 @@ const { PrismaClient } = apiRequire('@prisma/client');
 const artifactRoot = resolve(repositoryRoot, '.artifacts/ui-runtime');
 const baselinePath = resolve(webRoot, 'tests/phase8-visual-baseline.json');
 const updateBaseline = process.argv.includes('--update-baseline');
+const updateScope = process.argv.find((argument) => argument.startsWith('--update-scenarios='))?.split('=')[1].split(',');
+if (updateScope) {
+  assert.ok(updateBaseline, '--update-scenarios requires --update-baseline.');
+  for (const id of updateScope) assert.ok(scenarios.some((scenario) => scenario.id === id), `Unknown baseline scope: ${id}`);
+}
 const runId = randomUUID();
 const pathEnvironmentKey = Object.keys(process.env).find((key) => key.toLowerCase() === 'path') ?? 'PATH';
 const rolePhones = {
@@ -403,7 +409,8 @@ try {
   const fixtureDb = new PrismaClient({ datasources: { db: { url: isolatedUrl.toString() } } });
   try {
     const customer = await fixtureDb.user.findUniqueOrThrow({ where: { phone: '09120000009' } });
-    const service = await fixtureDb.serviceLine.findFirstOrThrow({ orderBy: { id: 'asc' } });
+    // Random UUID ordering used to pick a different schema/pricing model each run.
+    const service = await fixtureDb.serviceLine.findUniqueOrThrow({ where: { slug: 'website-design-development' } });
     await fixtureDb.organization.create({ data: { id: '00000000-0000-4000-8000-000000000010', name: 'سازمان نمایشی', members: { create: { userId: customer.id, role: 'owner', status: 'active' } } } });
     for (const [id, code, title, status] of [['00000000-0000-4000-8000-000000000011','UI-SUGGESTIONS','بررسی پیشنهاد برای سفارش','pending_quote'],['00000000-0000-4000-8000-000000000012','UI-ORG-DRAFT','پیش‌نویس سازمانی نمایشی','draft']]) await fixtureDb.order.create({ data: { id, code, title, status, serviceId: service.id, customerId: customer.id, briefDescription: 'شرح خصوصی آزمایشی' } });
     await fixtureDb.executorProfile.create({ data: {
@@ -451,6 +458,8 @@ try {
   const executablePath = browserExecutable();
   assert.ok(executablePath, 'No Playwright Chromium, Chrome or Edge executable is available.');
   browser = await chromium.launch({ headless: true, executablePath, args: ['--disable-dev-shm-usage'] });
+  await verifyOrbitHome(browser, webOrigin);
+  report.orbit = 'passed';
   const pages = new Map();
   for (const role of ['guest', ...Object.keys(rolePhones)]) {
     const context = await browser.newContext({ locale: 'fa-IR', timezoneId: 'Asia/Tehran', reducedMotion: 'reduce' });
@@ -506,6 +515,16 @@ try {
       await page.getByRole('button', { name: 'بررسی پیشنهادها', exact: true }).click();
       await page.getByRole('region', { name: 'مجریان پیشنهادی' }).waitFor();
     }
+    if (scenario.id === 'ops-bi') {
+      // The real date filter gives a stable reporting period across calendar days.
+      await page.getByLabel('از تاریخ تحلیل').fill('2026-06-01');
+      await page.getByLabel('تا تاریخ تحلیل').fill('2026-08-31');
+      await Promise.all([
+        page.waitForResponse((response) => response.url().includes('/admin/reports/bi?') && response.ok()),
+        page.getByRole('button', { name: 'به‌روزرسانی تحلیل', exact: true }).click(),
+      ]);
+      await page.locator('[aria-busy="false"]').waitFor();
+    }
     for (const viewport of viewports) {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       for (const theme of themes) {
@@ -539,8 +558,18 @@ try {
   }
 
   if (updateBaseline) {
+    let snapshots = report.snapshots;
+    if (updateScope) {
+      const previous = JSON.parse(readFileSync(baselinePath, 'utf8')).snapshots;
+      const inScope = (entry) => updateScope.includes(entry.key.split('__')[0]);
+      compareBaseline(report.snapshots.filter((entry) => !inScope(entry)), previous.filter((entry) => !inScope(entry)));
+      const current = new Map(report.snapshots.map((entry) => [entry.key, entry]));
+      snapshots = previous.map((entry) => inScope(entry) ? current.get(entry.key) : entry);
+      assert.equal(snapshots.length, report.snapshots.length);
+      assert.ok(snapshots.every(Boolean));
+    }
     mkdirSync(dirname(baselinePath), { recursive: true });
-    writeFileSync(baselinePath, `${JSON.stringify({ schemaVersion: 1, snapshots: report.snapshots }, null, 2)}\n`);
+    writeFileSync(baselinePath, `${JSON.stringify({ schemaVersion: 1, snapshots }, null, 2)}\n`);
   } else {
     assert.ok(existsSync(baselinePath), 'Visual baseline is missing; use the guarded --update-baseline command.');
     const baseline = JSON.parse(readFileSync(baselinePath, 'utf8'));

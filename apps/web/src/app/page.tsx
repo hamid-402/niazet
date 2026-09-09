@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { PublicNav } from '@/components/public-nav';
-import { LinkButton } from '@/components/ui';
+import { OrbitHero } from '@/components/orbit-hero';
 import { ManagedServiceFlow } from '@/components/managed-service-flow';
 import { ServiceProcessStepper } from '@/components/service-process-stepper';
 import { ServiceUseCases } from '@/components/service-use-cases';
@@ -43,21 +43,7 @@ export default function HomePage() {
       <PublicNav />
 
       <main id="main-content">
-        <section className="editorial-hero mx-auto w-full max-w-6xl px-4 py-16 text-center md:px-8">
-          <p className="hero-eyebrow mb-5 text-sm font-bold text-accent">سامانه خدمات مدیریت‌شده</p>
-          <h1 className="text-3xl font-extrabold tracking-tight text-fg md:text-4xl">
-            خدمات تخصصی، با اجرای مدیریت‌شده و <span>پرداخت امن</span>
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-fg-muted">
-            درخواستتان را ثبت کنید؛ تیم داخلی نیازت مسیر اجرا، زمان و هزینه را شفاف
-            می‌کند و تا کنترل کیفیت و تحویل نهایی کنار شما می‌ماند.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <LinkButton href="/services">شروع ثبت درخواست</LinkButton>
-            <LinkButton href="/services" variant="secondary">
-              مشاهده خدمات و قیمت‌گذاری
-            </LinkButton>
-          </div>
+        <OrbitHero>
           <ul aria-label="دلایل اعتماد به نیازت" className="hero-trust mx-auto mt-10 grid max-w-5xl gap-3 text-right md:grid-cols-3">
             {TRUST_SIGNALS.map((signal) => (
               <li key={signal.title} className="rounded-card border border-border bg-surface p-4 shadow-elevation-1">
@@ -66,7 +52,7 @@ export default function HomePage() {
               </li>
             ))}
           </ul>
-        </section>
+        </OrbitHero>
 
         <ManagedServiceFlow />
 
