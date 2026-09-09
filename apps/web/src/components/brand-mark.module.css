@@ -1,8 +1,11 @@
 .lockup { display: inline-flex; flex-direction: column; align-items: center; gap: .2rem; vertical-align: middle; max-width: 100%; }
-/* The approved source is unchanged. A viewport shows one lockup from its two-row sheet. */
-.plate { display: block; padding: .25rem .4rem; background: #fff; border: 1px solid #e7ebf0; border-radius: .65rem; }
+/* Keep layout dimensions stable, but never paint a plate behind the logo. */
+.plate { display: block; padding: .25rem .4rem; background: transparent; border: 1px solid transparent; }
+.filters { position: absolute; pointer-events: none; }
+.lightInk { flood-color: var(--color-fg); }
 .viewport { position: relative; display: block; width: 10.5rem; aspect-ratio: 990 / 272; overflow: hidden; }
-.viewport .artwork { position: absolute; width: 155.1516%; height: auto; max-width: none; left: -25.7576%; top: -82.3529%; }
+.viewport .artwork { position: absolute; width: 155.1516%; height: auto; max-width: none; left: -25.7576%; top: -82.3529%; filter: var(--brand-light-filter); }
+:global([data-theme='simple-dark']) .artwork { filter: var(--brand-dark-filter); }
 .viewport[data-language='en'] { aspect-ratio: 1100 / 228; }
 .viewport[data-language='en'] .artwork { width: 139.6364%; left: -23.1818%; top: -261.4035%; }
 .caption { margin: 0; font-size: .6rem; line-height: 1.4; color: var(--color-fg-muted); font-weight: 500; }
