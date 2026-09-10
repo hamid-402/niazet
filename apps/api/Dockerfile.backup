@@ -1,0 +1,11 @@
+FROM node:24-bookworm-slim
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y ca-certificates postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /work
+COPY --chown=node:node scripts/backup-format.mjs /opt/niazat/backup-format.mjs
+COPY --chown=node:node scripts/backup-create.mjs /opt/niazat/backup-create.mjs
+COPY --chown=node:node scripts/backup-restore.mjs /opt/niazat/backup-restore.mjs
+COPY --chown=node:node scripts/backup-retention.mjs /opt/niazat/backup-retention.mjs
+USER node
+ENTRYPOINT ["node", "/opt/niazat/backup-create.mjs"]
