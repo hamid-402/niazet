@@ -1,5 +1,11 @@
-import { PublicNav } from '@/components/public-nav';
+'use client';
+
+import dynamic from 'next/dynamic';
 import { LinkButton } from '@/components/ui';
+
+// Keep the full navigation on 404 pages, but do not eagerly preload its CSS
+// for every successful route through the root not-found boundary.
+const PublicNav = dynamic(() => import('@/components/public-nav').then(module => module.PublicNav));
 
 export default function NotFound() {
   return (
