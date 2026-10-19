@@ -273,6 +273,7 @@ export default function CustomerOrderDetailPage({
       </Card>
 
       <TabList idPrefix="order" label="بخش‌های سفارش" items={TABS.map((item) => ({ value: item, label: item }))} value={tab} onChange={(value) => setTab(value as (typeof TABS)[number])} />
+      <p className={styles.tabHint}>برای دیدن بخش‌های دیگر، نوار بالا را افقی حرکت دهید.</p>
 
       {tab === "خلاصه" && (
         <Card role="tabpanel" id="order-panel-خلاصه" aria-labelledby="order-tab-خلاصه" tabIndex={0}>

@@ -443,6 +443,21 @@ async function verifyCustomerOrderDetailUi(page, webOrigin) {
   }
 }
 
+async function verifyCustomerWalletUi(page, webOrigin) {
+  await page.goto(`${webOrigin}/wallet`);
+  await page.getByRole('heading', { name: 'امور مالی من', exact: true }).waitFor();
+  const summary = page.getByRole('region', { name: 'خلاصه مالی' });
+  await summary.waitFor();
+  assert.equal(await summary.locator('.premium-card').count(), 5, 'Every financial summary value must remain visible.');
+  assert.equal(await page.getByRole('tab').count(), 6, 'All customer finance sections must remain available.');
+  for (const value of ['payments', 'escrow', 'refunds', 'invoices', 'wallet', 'overview']) {
+    await page.locator(`#finance-tab-${value}`).click();
+    await page.locator(`#finance-panel-${value}`).waitFor();
+    const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+    assert.deepEqual(axe.violations, [], `Customer finance ${value} must remain accessible.`);
+  }
+}
+
 validateVisualMatrix();
 assert.ok(existsSync(apiEntry), 'Build apps/api before runtime UI tests.');
 mkdirSync(artifactRoot, { recursive: true });
@@ -580,6 +595,7 @@ try {
   await verifyOrganizationsUi(pages, webOrigin);
   await verifyCustomerOrdersUi(pages.get('customer'), webOrigin);
   await verifyCustomerNewOrderUi(pages.get('customer'), webOrigin);
+  await verifyCustomerWalletUi(pages.get('customer'), webOrigin);
   report.keyboard = 'passed';
   report.motion = 'passed';
 

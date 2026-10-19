@@ -14,6 +14,8 @@ import {
   TabList,
 } from "@/components/ui";
 import { formatDate, formatNumber, formatToman } from "@/lib/format";
+import { OrbitCustomerSurface } from "@/components/orbit-customer-surface";
+import styles from "@/components/orbit-customer-surface.module.css";
 
 type FinanceTab = "overview" | "payments" | "escrow" | "refunds" | "invoices" | "wallet";
 
@@ -154,40 +156,46 @@ export default function WalletPage() {
   }
 
   return (
-    <div>
-      <SectionTitle subtitle="تصویر شفاف از پرداخت، وجه امانی، بازپرداخت و اسناد مالی">
-        امور مالی من
-      </SectionTitle>
+    <OrbitCustomerSurface>
+    <div className={styles.financePage}>
+      <div className={styles.heading}>
+        <div>
+          <p className={styles.eyebrow}>حساب و اسناد</p>
+          <SectionTitle subtitle="تصویر شفاف از پرداخت، وجه امانی، بازپرداخت و اسناد مالی">
+            امور مالی من
+          </SectionTitle>
+        </div>
+      </div>
       {error && <div className="mb-4"><ErrorBanner message={error} /></div>}
       {!data && !error && <PageLoading />}
 
       {data && (
         <>
-          <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-5">
-            <Card>
+          <section className={styles.financeMetrics} aria-label="خلاصه مالی">
+            <Card className={styles.financeMetric}>
               <p className="text-xs text-fg-subtle">موجودی کیف پول</p>
               <p className="mt-2 text-lg font-extrabold text-fg">{formatToman(data.summary.walletBalance)}</p>
             </Card>
-            <Card>
+            <Card className={styles.financeMetric}>
               <p className="text-xs text-fg-subtle">کل پرداخت موفق</p>
               <p className="mt-2 text-lg font-extrabold text-success">{formatToman(data.summary.totalPaid)}</p>
             </Card>
-            <Card>
+            <Card className={styles.financeMetric}>
               <p className="text-xs text-fg-subtle">وجه فعلاً در امانت</p>
               <p className="mt-2 text-lg font-extrabold text-purple">{formatToman(data.summary.totalHeld)}</p>
             </Card>
-            <Card>
+            <Card className={styles.financeMetric}>
               <p className="text-xs text-fg-subtle">بازپرداخت نهایی</p>
               <p className="mt-2 text-lg font-extrabold text-info">{formatToman(data.summary.totalRefunded)}</p>
             </Card>
-            <Card>
+            <Card className={styles.financeMetric}>
               <p className="text-xs text-fg-subtle">نیازمند پرداخت</p>
               <p className="mt-2 text-lg font-extrabold text-warning">{formatNumber(data.summary.pendingPaymentCount)}</p>
             </Card>
-          </div>
+          </section>
 
           {data.ordersNeedingPayment.length > 0 && (
-            <Card className="mb-5 border-warning-border bg-warning-subtle">
+            <Card className={`${styles.financeReminder} border-warning-border bg-warning-subtle`}>
               <h3 className="font-extrabold text-warning">سفارش‌های آماده پرداخت</h3>
               <div className="mt-3 grid gap-2 md:grid-cols-2">
                 {data.ordersNeedingPayment.map((order) => (
@@ -201,6 +209,7 @@ export default function WalletPage() {
           )}
 
           <TabList idPrefix="finance" label="بخش‌های مالی" items={TABS.map((item) => ({ value: item.id, label: item.label }))} value={tab} onChange={(value) => setTab(value as FinanceTab)} />
+          <p className={styles.tabHint}>برای دیدن بخش‌های دیگر، نوار بالا را افقی حرکت دهید.</p>
 
           {tab === "overview" && (
             <div role="tabpanel" id="finance-panel-overview" aria-labelledby="finance-tab-overview" tabIndex={0} className="grid gap-4 lg:grid-cols-2">
@@ -292,5 +301,6 @@ export default function WalletPage() {
         </>
       )}
     </div>
+    </OrbitCustomerSurface>
   );
 }
