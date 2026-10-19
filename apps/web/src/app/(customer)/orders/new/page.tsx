@@ -13,6 +13,8 @@ import {
   SectionTitle,
 } from "@/components/ui";
 import { SecureFileLink, SecureFileUpload } from "@/components/secure-file";
+import { OrbitCustomerSurface } from "@/components/orbit-customer-surface";
+import styles from "@/components/orbit-customer-surface.module.css";
 import type {
   OrderDetail,
   OrderFile,
@@ -495,10 +497,20 @@ function NewOrderForm() {
 
   if (!services && !ready) return <PageLoading />;
   return (
-    <div className="mx-auto max-w-3xl">
-      <SectionTitle subtitle="اطلاعات شما خودکار به‌عنوان پیش‌نویس ذخیره می‌شود">
-        ثبت درخواست جدید
-      </SectionTitle>
+    <OrbitCustomerSurface>
+    <div className={styles.orderComposer}>
+      <div className={styles.heading}>
+        <div>
+          <p className={styles.eyebrow}>از نیاز تا شروع همکاری</p>
+          <SectionTitle subtitle="اطلاعات شما خودکار به‌عنوان پیش‌نویس ذخیره می‌شود">
+            ثبت درخواست جدید
+          </SectionTitle>
+        </div>
+      </div>
+      <ol className={styles.composerSteps} aria-label="مراحل ثبت درخواست">
+        <li aria-current={!reviewing ? 'step' : undefined}><span aria-hidden="true">۰۱</span> تعریف نیاز</li>
+        <li aria-current={reviewing ? 'step' : undefined}><span aria-hidden="true">۰۲</span> مرور و ثبت</li>
+      </ol>
       {resumedDraft && !reviewing && (
         <p className="mb-4 rounded-control border border-info-border bg-info-subtle px-3 py-2 text-sm text-info">
           آخرین پیش‌نویس شما بازیابی شد؛ می‌توانید از همان‌جا ادامه دهید.
@@ -506,7 +518,7 @@ function NewOrderForm() {
       )}
       {reviewing ? (
         <div className="flex flex-col gap-5">
-          <Card>
+          <Card className={styles.composerCard}>
             <h2 className="mb-4 text-lg font-extrabold text-fg">
               مرور نهایی درخواست
             </h2>
@@ -582,7 +594,9 @@ function NewOrderForm() {
         </div>
       ) : (
         <form onSubmit={onReview} className="flex flex-col gap-5">
-          <Card>
+          <Card className={styles.composerCard}>
+            <h2 className={styles.composerSectionTitle}>تعریف درخواست</h2>
+            <p className={styles.composerSectionHint}>خدمت، خروجی موردنظر و زمان‌بندی را با جزئیات لازم مشخص کنید.</p>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label="نوع خدمت">
                 <select
@@ -678,7 +692,7 @@ function NewOrderForm() {
             </div>
           </Card>
           {selectedService && dynamicFields.length > 0 && (
-            <Card>
+            <Card className={styles.composerCard}>
               <h2 className="mb-1 text-base font-extrabold text-fg">
                 جزئیات تخصصی خدمت
               </h2>
@@ -702,7 +716,7 @@ function NewOrderForm() {
               </div>
             </Card>
           )}
-          <Card>
+          <Card className={styles.composerCard}>
             <h2 className="mb-1 text-base font-extrabold text-fg">
               فایل‌های ورودی
             </h2>
@@ -732,7 +746,7 @@ function NewOrderForm() {
               </div>
             )}
           </Card>
-          <Card>
+          <Card className={styles.composerCard}>
             <Field
               label="معیارهای پذیرش (اختیاری)"
               hint="هر معیار را در یک خط بنویسید؛ در صورت خالی‌بودن، معیارهای استاندارد خدمت استفاده می‌شوند."
@@ -745,7 +759,7 @@ function NewOrderForm() {
             </Field>
           </Card>
           {error && <ErrorBanner message={error} />}
-          <div className="flex items-center justify-between gap-3">
+          <div className={styles.composerSubmit}>
             <p
               role="status"
               className={`text-xs ${saveState === "error" ? "text-danger" : "text-fg-muted"}`}
@@ -768,6 +782,7 @@ function NewOrderForm() {
         </form>
       )}
     </div>
+    </OrbitCustomerSurface>
   );
 }
 

@@ -21,17 +21,29 @@
 .resultCount { color: var(--color-fg-muted); font-size: .8rem; }
 .ordersTable { border-radius: 1.25rem; }
 .ordersTable a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; border-radius: .2rem; }
+.orderComposer { width: min(100%, 56rem); margin-inline: auto; min-width: 0; }
+.composerSteps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin: 0 0 1.5rem; padding: 0; list-style: none; }
+.composerSteps li { display: flex; align-items: center; gap: .7rem; min-width: 0; min-height: 3.5rem; padding: .75rem 1rem; border: 1px solid var(--color-border); border-radius: .9rem; background: var(--color-surface); color: var(--color-fg-muted); font-size: .85rem; font-weight: 700; }
+.composerSteps li[aria-current='step'] { border-color: var(--color-accent); color: var(--color-fg); box-shadow: 0 8px 28px color-mix(in srgb, var(--color-accent) 10%, transparent); }
+.composerSteps span { color: var(--color-accent); font-size: .8rem; }
+.composerCard { border-radius: 1.25rem; border-top: 2px solid var(--color-border-strong); padding: clamp(1rem, 2.5vw, 1.7rem); }
+.composerSectionTitle { margin-bottom: .35rem; font-size: 1.05rem; font-weight: 800; }
+.composerSectionHint { margin-bottom: 1.35rem; color: var(--color-fg-muted); font-size: .85rem; line-height: 1.9; }
+.composerSubmit { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 0; border-top: 1px solid var(--color-border); }
+.composerSubmit button { min-height: 44px; }
 @media (min-width: 768px) {
   .metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .metric:last-child { grid-column: auto; }
   .filters { grid-template-columns: minmax(0, 2fr) minmax(12rem, 1fr); align-items: end; }
 }
+@media (max-width: 639px) { .composerSubmit button { width: 100%; } }
 @media (prefers-reduced-motion: no-preference) {
   .page[data-motion='on'] .metric, .page[data-motion='on'] .recentCard, .page[data-motion='on'] .filters { animation: customer-settle 360ms ease-out both; }
   .page[data-motion='on'] .metric:nth-child(2) { animation-delay: 45ms; }
   .page[data-motion='on'] .metric:nth-child(3) { animation-delay: 90ms; }
   .page[data-motion='on'] .recentLink { transition: background-color 180ms ease, transform 180ms ease; }
   .page[data-motion='on'] .recentLink:hover { transform: translateX(-3px); }
+  .page[data-motion='on'] .composerSteps li[aria-current='step'], .page[data-motion='on'] .composerCard { animation: customer-settle 360ms ease-out both; }
 }
 @keyframes customer-settle { from { opacity: .94; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .page *, .page *::before, .page *::after { animation: none !important; transition: none !important; } }

@@ -390,6 +390,34 @@ async function verifyCustomerOrdersUi(page, webOrigin) {
   assert.equal(await page.getByLabel('نمایش سفارش‌ها').inputValue(), 'all');
 }
 
+async function verifyCustomerNewOrderUi(page, webOrigin) {
+  await page.goto(`${webOrigin}/orders/new`);
+  await page.getByRole('heading', { name: 'ثبت درخواست جدید', exact: true }).waitFor();
+  const title = page.getByRole('textbox', { name: 'عنوان درخواست' });
+  await title.waitFor();
+  const originalTitle = await title.inputValue();
+  assert.ok(originalTitle.length >= 3, 'The fixture draft should resume without losing its title.');
+  assert.equal(await page.locator('[aria-current="step"]').count(), 1, 'The request flow must announce one current step.');
+  await page.getByRole('heading', { name: 'فایل‌های ورودی' }).waitFor();
+  const savedDraft = (response) => response.url().includes('/customer/orders/') && response.url().endsWith('/draft') && response.request().method() === 'PATCH' && response.ok();
+  await Promise.all([page.waitForResponse(savedDraft), title.fill(`${originalTitle} آزمایش`)]);
+  await page.getByText('پیش‌نویس ذخیره شد', { exact: true }).waitFor();
+  await Promise.all([page.waitForResponse(savedDraft), title.fill(originalTitle)]);
+  await page.getByText('پیش‌نویس ذخیره شد', { exact: true }).waitFor();
+}
+
+async function verifyCustomerReviewUi(page, webOrigin) {
+  await page.goto(`${webOrigin}/orders/new`);
+  await page.getByRole('textbox', { name: 'هدف سایت' }).fill('معرفی خدمات آزمایشی');
+  await page.getByRole('button', { name: 'مرور و ثبت نهایی' }).click();
+  await page.getByRole('heading', { name: 'مرور نهایی درخواست' }).waitFor();
+  assert.match(await page.locator('[aria-current="step"]').innerText(), /مرور و ثبت/);
+  const reviewAxe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+  assert.deepEqual(reviewAxe.violations, [], 'Customer order review must remain accessible.');
+  await page.getByRole('button', { name: 'بازگشت و ویرایش' }).click();
+  await page.getByRole('heading', { name: 'تعریف درخواست' }).waitFor();
+}
+
 validateVisualMatrix();
 assert.ok(existsSync(apiEntry), 'Build apps/api before runtime UI tests.');
 mkdirSync(artifactRoot, { recursive: true });
@@ -526,6 +554,7 @@ try {
   await verifyOnboardingUi(pages.get('ops'), webOrigin);
   await verifyOrganizationsUi(pages, webOrigin);
   await verifyCustomerOrdersUi(pages.get('customer'), webOrigin);
+  await verifyCustomerNewOrderUi(pages.get('customer'), webOrigin);
   report.keyboard = 'passed';
   report.motion = 'passed';
 
@@ -603,6 +632,8 @@ try {
       }
     }
   }
+
+  await verifyCustomerReviewUi(pages.get('customer'), webOrigin);
 
   if (updateBaseline) {
     let snapshots = report.snapshots;
