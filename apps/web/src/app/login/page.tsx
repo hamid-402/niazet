@@ -8,6 +8,7 @@ import { Button, Card, ErrorBanner, Field, inputClass } from '@/components/ui';
 import { roleHomePath } from '@/lib/role-paths';
 import { PasswordInput } from '@/components/password-input';
 import { GuestOnly } from '@/components/guest-only';
+import { OrbitAuthFrame } from '@/components/orbit-public-surface';
 
 type LoginMode = 'password' | 'otp';
 
@@ -90,7 +91,8 @@ export default function LoginPage() {
 
   return (
     <GuestOnly>
-      <main id="main-content" className="flex min-h-screen items-center justify-center bg-bg px-4 py-8">
+      <OrbitAuthFrame>
+      <main id="main-content">
       <Card className="w-full max-w-md">
         <h1 className="mb-1 text-xl font-extrabold text-fg">ورود به نیازت با ما</h1>
         <p className="mb-5 text-sm text-fg-muted">با رمز عبور یا کد یکبار مصرف وارد شوید.</p>
@@ -151,6 +153,7 @@ export default function LoginPage() {
         <p className="mt-5 text-center text-sm text-fg-muted">حساب ندارید؟{' '}<Link href="/register" className="font-medium text-fg hover:underline">ثبت‌نام</Link></p>
       </Card>
       </main>
+      </OrbitAuthFrame>
     </GuestOnly>
   );
 }

@@ -426,7 +426,7 @@ try {
     // Random UUID ordering used to pick a different schema/pricing model each run.
     const service = await fixtureDb.serviceLine.findUniqueOrThrow({ where: { slug: 'website-design-development' } });
     await fixtureDb.organization.create({ data: { id: '00000000-0000-4000-8000-000000000010', name: 'سازمان نمایشی', members: { create: { userId: customer.id, role: 'owner', status: 'active' } } } });
-    for (const [id, code, title, status] of [['00000000-0000-4000-8000-000000000011','UI-SUGGESTIONS','بررسی پیشنهاد برای سفارش','pending_quote'],['00000000-0000-4000-8000-000000000012','UI-ORG-DRAFT','پیش‌نویس سازمانی نمایشی','draft']]) await fixtureDb.order.create({ data: { id, code, title, status, serviceId: service.id, customerId: customer.id, briefDescription: 'شرح خصوصی آزمایشی' } });
+    for (const [id, code, title, status] of [['00000000-0000-4000-8000-000000000011','UI-SUGGESTIONS','بررسی پیشنهاد برای سفارش','pending_quote'],['00000000-0000-4000-8000-000000000012','UI-ORG-DRAFT','پیش‌نویس سازمانی نمایشی','draft']]) await fixtureDb.order.create({ data: { id, code, title, status, serviceId: service.id, customerId: customer.id, briefDescription: 'شرح خصوصی آزمایشی', createdAt: new Date('2026-09-09T12:32:50.000Z') } });
     await fixtureDb.executorProfile.create({ data: {
       id: '00000000-0000-4000-8000-000000000009', publicHandlerCode: 'VETTING-UI', displayAlias: 'مجری آزمایشی',
       executorType: 'vetted_external', verificationStatus: 'pending', onboarding: { create: {} },

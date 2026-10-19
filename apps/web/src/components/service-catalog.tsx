@@ -5,6 +5,7 @@ import { useDeferredValue, useMemo, useState } from 'react';
 import { Button, Card, EmptyState, inputClass } from '@/components/ui';
 import { formatNumber, formatToman } from '@/lib/format';
 import type { ServiceLine } from '@/lib/types';
+import styles from './orbit-public-surface.module.css';
 
 const PRICING_LABEL: Record<ServiceLine['pricingModel'], string> = {
   fixed: 'قیمت ثابت',
@@ -64,7 +65,7 @@ export function ServiceCatalog({ services }: { services: ServiceLine[] }) {
 
   return (
     <>
-      <form role="search" onSubmit={(event) => event.preventDefault()} className="mb-6 rounded-card border border-border bg-surface p-4 shadow-elevation-1">
+      <form role="search" onSubmit={(event) => event.preventDefault()} className={`${styles.catalogFilters} mb-6 rounded-card border border-border bg-surface p-4 shadow-elevation-1`}>
         <div className="grid gap-3 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] md:items-end">
           <label className="flex min-w-0 flex-col gap-1.5">
             <span className="text-sm font-bold text-fg">جست‌وجوی خدمات</span>
@@ -101,7 +102,7 @@ export function ServiceCatalog({ services }: { services: ServiceLine[] }) {
             return (
               <li key={service.id} className="min-w-0">
                 <Link href={`/services/${service.slug}`} className="block h-full rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2">
-                  <Card className="flex h-full flex-col hover:border-border-strong">
+                  <Card className={`${styles.catalogCard} flex h-full flex-col hover:border-border-strong`}>
                     <p className="mb-1 text-xs font-bold text-accent">{service.category}</p>
                     <h2 className="mb-2 text-base font-extrabold text-fg">{service.title}</h2>
                     <p className="mb-4 line-clamp-3 text-sm leading-6 text-fg-muted">{service.description}</p>

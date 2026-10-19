@@ -5,6 +5,8 @@ import { apiFetch } from '@/lib/api';
 import { PublicNav } from '@/components/public-nav';
 import { Badge, Button, Card, ErrorBanner, PageLoading } from '@/components/ui';
 import { formatDate } from '@/lib/format';
+import { OrbitPublicSurface } from '@/components/orbit-public-surface';
+import styles from '@/components/orbit-public-surface.module.css';
 
 type ComponentState = 'operational' | 'degraded' | 'unknown';
 type StatusResponse = {
@@ -57,10 +59,10 @@ export default function StatusPage() {
     };
   }, [load]);
 
-  return <div className="min-h-screen bg-bg">
+  return <OrbitPublicSurface>
     <PublicNav />
-    <main id="main-content" className="mx-auto w-full max-w-4xl px-4 py-12 md:px-8">
-      <div className="flex flex-wrap items-start justify-between gap-4">
+    <main id="main-content" className={styles.content}>
+      <div className={`${styles.intro} ${styles.statusHeading}`}>
         <div><h1 className="text-3xl font-extrabold text-fg">وضعیت سرویس‌های نیازت</h1><p className="mt-2 text-sm text-fg-muted">نمای عمومی سلامت سرویس‌ها؛ به‌روزرسانی خودکار هر ۶۰ ثانیه</p></div>
         <Button variant="secondary" disabled={refreshing} onClick={() => { setRefreshing(true); void load(); }}>{refreshing ? 'در حال بررسی...' : 'بررسی دوباره'}</Button>
       </div>
@@ -75,5 +77,5 @@ export default function StatusPage() {
         <p className="mt-8 rounded-control bg-bg-subtle p-3 text-xs leading-6 text-fg-subtle">{data.notice}</p>
       </>}
     </main>
-  </div>;
+  </OrbitPublicSurface>;
 }

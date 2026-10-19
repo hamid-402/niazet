@@ -8,6 +8,7 @@ import { Button, Card, ErrorBanner, Field, inputClass } from '@/components/ui';
 import { roleHomePath } from '@/lib/role-paths';
 import { PasswordInput } from '@/components/password-input';
 import { GuestOnly } from '@/components/guest-only';
+import { OrbitAuthFrame } from '@/components/orbit-public-surface';
 
 export default function RegisterPage() {
   const { register, loginWithOtp } = useAuth();
@@ -53,7 +54,8 @@ export default function RegisterPage() {
 
   return (
     <GuestOnly>
-      <main id="main-content" className="flex min-h-screen items-center justify-center bg-bg px-4">
+      <OrbitAuthFrame>
+      <main id="main-content">
       <Card className="w-full max-w-sm">
         <h1 className="mb-1 text-xl font-extrabold text-fg">
           ثبت‌نام در نیازت با ما
@@ -139,6 +141,7 @@ export default function RegisterPage() {
         </p>
       </Card>
       </main>
+      </OrbitAuthFrame>
     </GuestOnly>
   );
 }

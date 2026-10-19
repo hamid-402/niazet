@@ -6,6 +6,8 @@ import { Card } from '@/components/ui';
 import { formatNumber, formatToman } from '@/lib/format';
 import { publicApiFetch } from '@/lib/server-api';
 import type { ServiceLine } from '@/lib/types';
+import { OrbitPublicSurface } from '@/components/orbit-public-surface';
+import styles from '@/components/orbit-public-surface.module.css';
 
 export const revalidate = 300;
 
@@ -31,14 +33,16 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
   let service: ServiceLine;
   try { service = await publicApiFetch<ServiceLine>(`/services/${encodeURIComponent(slug)}`); } catch { notFound(); }
   return (
-    <div className="flex flex-1 flex-col">
+    <OrbitPublicSurface>
       <PublicNav />
-      <main id="main-content" className="mx-auto w-full max-w-4xl flex-1 px-4 py-10 md:px-8">
+      <main id="main-content" className={styles.content}>
+        <div className={styles.intro}>
         <p className="mb-1 text-xs font-medium text-fg-subtle">{service.category}</p>
         <h1 className="mb-3 text-2xl font-extrabold text-fg">{service.title}</h1>
         <p className="mb-6 text-fg-muted">{service.description}</p>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <div className="space-y-4 md:col-span-2">
+        </div>
+        <div className={styles.detailGrid}>
+          <div className={styles.detailBody}>
             {service.packages.length > 0 && <Card>
               <h2 className="mb-3 font-bold text-fg">پکیج‌ها</h2>
               <div className="space-y-3">{service.packages.map((pkg) => <div key={pkg.id} className="rounded-card border border-border bg-bg p-4">
@@ -66,7 +70,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
               </div>
             </Card>
           </div>
-          <div><Card>
+          <div className={styles.summary}><Card>
             <dl className="space-y-2 text-sm">
               <div className="flex justify-between gap-3"><dt className="text-fg-muted">SLA پایه</dt><dd className="text-left font-medium text-fg">{service.slaHours ? `${formatNumber(service.slaHours)} ساعت` : 'پس از بررسی'}</dd></div>
               <div className="flex justify-between gap-3"><dt className="text-fg-muted">سیاست اصلاح</dt><dd className="text-left font-medium text-fg">{service.revisionPolicy ?? 'در پیشنهاد نهایی'}</dd></div>
@@ -75,6 +79,6 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
           </Card></div>
         </div>
       </main>
-    </div>
+    </OrbitPublicSurface>
   );
 }
