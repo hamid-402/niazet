@@ -418,6 +418,31 @@ async function verifyCustomerReviewUi(page, webOrigin) {
   await page.getByRole('heading', { name: 'تعریف درخواست' }).waitFor();
 }
 
+async function verifyCustomerOrderDetailUi(page, webOrigin) {
+  await page.goto(`${webOrigin}/orders/00000000-0000-4000-8000-000000000011`);
+  await page.getByRole('heading', { name: 'بررسی پیشنهاد برای سفارش', exact: true }).waitFor();
+  assert.equal(await page.getByRole('region', { name: 'اطلاعات سفارش' }).locator('.premium-card').count(), 4);
+  assert.equal(await page.getByRole('tab').count(), 7, 'Every customer order section must remain available.');
+  await page.getByRole('tab', { name: 'مراحل' }).click();
+  await page.getByRole('tabpanel', { name: 'مراحل' }).waitFor();
+  await page.getByRole('tab', { name: 'فایل‌ها' }).click();
+  await page.getByRole('tabpanel', { name: 'فایل‌ها' }).waitFor();
+  await page.getByRole('tab', { name: 'خلاصه' }).click();
+  for (const [viewport, theme] of [[viewports[0], themes[0]], [viewports[2], themes[1]]]) {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    await page.emulateMedia({ colorScheme: theme.colorScheme, reducedMotion: 'reduce' });
+    await page.evaluate((themeId) => { localStorage.setItem('niazat-theme', themeId); document.documentElement.dataset.theme = themeId; }, theme.id);
+    await settle(page);
+    const snapshot = await runtimeSnapshot(page, `customer-order-detail__${viewport.id}__${theme.id}`);
+    assert.ok(snapshot.overflowX <= 1, 'Customer order detail must not overflow horizontally.');
+    assert.deepEqual(snapshot.duplicateIds, [], 'Customer order detail must not duplicate ids.');
+    const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+    assert.deepEqual(axe.violations, [], 'Customer order detail must remain accessible.');
+    const screenshotPath = join(artifactRoot, 'screenshots', `${snapshot.key}.png`);
+    await page.screenshot({ path: screenshotPath, fullPage: true, animations: 'disabled', caret: 'hide' });
+  }
+}
+
 validateVisualMatrix();
 assert.ok(existsSync(apiEntry), 'Build apps/api before runtime UI tests.');
 mkdirSync(artifactRoot, { recursive: true });
@@ -634,6 +659,7 @@ try {
   }
 
   await verifyCustomerReviewUi(pages.get('customer'), webOrigin);
+  await verifyCustomerOrderDetailUi(pages.get('customer'), webOrigin);
 
   if (updateBaseline) {
     let snapshots = report.snapshots;

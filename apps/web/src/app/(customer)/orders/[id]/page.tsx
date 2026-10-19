@@ -19,6 +19,8 @@ import { SecureFileLink, SecureFileUpload } from "@/components/secure-file";
 import type { OrderDetail, OrderFile } from "@/lib/types";
 import { formatDate, formatNumber, formatToman } from "@/lib/format";
 import { customerNextAction, OrderTimeline } from "@/components/order-timeline";
+import { OrbitCustomerSurface } from "@/components/orbit-customer-surface";
+import styles from "@/components/orbit-customer-surface.module.css";
 
 const TABS = [
   "خلاصه",
@@ -80,11 +82,12 @@ export default function CustomerOrderDetailPage({
   const handler = order.publicHandlers?.[0];
 
   return (
-    <div>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <OrbitCustomerSurface>
+    <div className={styles.orderDetail}>
+      <div className={styles.detailHeader}>
         <div>
-          <p className="text-xs text-fg-subtle">{order.code}</p>
-          <h1 className="text-xl font-extrabold text-fg">
+          <p className={styles.eyebrow}>سفارش {order.code}</p>
+          <h1 className={styles.detailTitle}>
             {order.title}
           </h1>
         </div>
@@ -97,14 +100,14 @@ export default function CustomerOrderDetailPage({
         </div>
       )}
 
-      <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Card>
+      <section className={styles.detailMetrics} aria-label="اطلاعات سفارش">
+        <Card className={styles.detailMetric}>
           <p className="text-xs text-fg-subtle">مبلغ سفارش</p>
           <p className="mt-1 font-bold text-fg">
             {formatToman(order.finalPrice)}
           </p>
         </Card>
-        <Card>
+        <Card className={styles.detailMetric}>
           <p className="text-xs text-fg-subtle">مسئول پیگیری</p>
           <p className="mt-1 font-bold text-fg">
             {handler
@@ -112,23 +115,23 @@ export default function CustomerOrderDetailPage({
               : "—"}
           </p>
         </Card>
-        <Card>
+        <Card className={styles.detailMetric}>
           <p className="text-xs text-fg-subtle">اصلاحات</p>
           <p className="mt-1 font-bold text-fg">
             {order.revisionsUsed} از {order.revisionsAllowed}
           </p>
         </Card>
-        <Card>
+        <Card className={styles.detailMetric}>
           <p className="text-xs text-fg-subtle">تاریخ ثبت</p>
           <p className="mt-1 font-bold text-fg">
             {formatDate(order.createdAt)}
           </p>
         </Card>
-      </div>
+      </section>
 
       {/* اقدام‌های وابسته به وضعیت */}
-      <Card className="mb-4">
-        <h3 className="mb-3 font-bold text-fg">اقدام بعدی</h3>
+      <Card className={styles.nextAction}>
+        <h2 className="mb-3 font-bold text-fg">اقدام بعدی</h2>
         <p className="mb-3 text-sm leading-7 text-fg-muted">
           {customerNextAction(order.status)}
         </p>
@@ -495,6 +498,7 @@ export default function CustomerOrderDetailPage({
         />
       )}
     </div>
+    </OrbitCustomerSurface>
   );
 }
 
