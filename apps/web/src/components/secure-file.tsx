@@ -117,9 +117,16 @@ export function SecureFileLink({
         "token",
       );
       if (!token) throw new Error("مجوز دانلود معتبر نیست.");
-      window.location.assign(
-        `/api/backend/files/download?token=${encodeURIComponent(token)}`,
-      );
+      // The response is an attachment, not an internal page for Next navigation.
+      const link = document.createElement("a");
+      link.href = `/api/backend/files/download?token=${encodeURIComponent(token)}`;
+      link.download = "";
+      document.body.append(link);
+      try {
+        link.click();
+      } finally {
+        link.remove();
+      }
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : "دریافت فایل ممکن نشد.",
