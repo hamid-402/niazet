@@ -13,15 +13,10 @@ import {
 } from '@/components/ui';
 import { OrderStatusBadge } from '@/components/status-badge';
 import type { OrderSummary } from '@/lib/types';
-import { formatDate } from '@/lib/format';
-
-const ACTIONABLE_STATUSES = new Set([
-  'quoted',
-  'pending_payment',
-  'delivered',
-  'revision_requested',
-  'qc_rejected',
-]);
+import { formatDate, formatNumber } from '@/lib/format';
+import { OrbitCustomerSurface } from '@/components/orbit-customer-surface';
+import styles from '@/components/orbit-customer-surface.module.css';
+import { isCustomerOrderActionable, isCustomerOrderOpen } from '@/lib/customer-order-view';
 
 export default function CustomerDashboardPage() {
   const [orders, setOrders] = useState<OrderSummary[] | null>(null);
@@ -33,41 +28,40 @@ export default function CustomerDashboardPage() {
       .catch((e) => setError(e.message));
   }, []);
 
-  const actionable =
-    orders?.filter((o) => ACTIONABLE_STATUSES.has(o.status)) ?? [];
-  const active =
-    orders?.filter((o) => !['closed', 'cancelled'].includes(o.status)) ?? [];
+  const actionable = orders?.filter((o) => isCustomerOrderActionable(o.status)) ?? [];
+  const active = orders?.filter((o) => isCustomerOrderOpen(o.status)) ?? [];
 
   return (
-    <div>
-      <SectionTitle subtitle="خلاصه وضعیت حساب شما">میز کار</SectionTitle>
+    <OrbitCustomerSurface>
+      <div className={styles.heading}>
+        <div>
+          <p className={styles.eyebrow}>فضای کاری شما</p>
+          <SectionTitle subtitle="از اقدام بعدی تا تحویل، سفارش‌هایت را اینجا دنبال کن.">میز کار</SectionTitle>
+        </div>
+        <LinkButton href="/orders/new" className={styles.headingAction}>ثبت درخواست جدید</LinkButton>
+      </div>
 
       {error && <ErrorBanner message={error} />}
       {!orders && !error && <PageLoading />}
 
       {orders && (
         <>
-          <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-            <Card>
+          <section className={styles.metrics} aria-label="خلاصه سفارش‌ها">
+            <Card className={styles.metric}>
               <p className="text-xs text-fg-subtle">نیازمند اقدام</p>
-              <p className="mt-1 text-2xl font-bold text-fg">
-                {actionable.length}
+              <p className={styles.metricValue}>
+                {formatNumber(actionable.length)}
               </p>
             </Card>
-            <Card>
-              <p className="text-xs text-fg-subtle">در حال اجرا</p>
-              <p className="mt-1 text-2xl font-bold text-fg">{active.length}</p>
+            <Card className={styles.metric}>
+              <p className="text-xs text-fg-subtle">در جریان</p>
+              <p className={styles.metricValue}>{formatNumber(active.length)}</p>
             </Card>
-            <Card>
+            <Card className={styles.metric}>
               <p className="text-xs text-fg-subtle">کل سفارش‌ها</p>
-              <p className="mt-1 text-2xl font-bold text-fg">{orders.length}</p>
+              <p className={styles.metricValue}>{formatNumber(orders.length)}</p>
             </Card>
-            <Card>
-              <LinkButton href="/orders/new" className="w-full">
-                ثبت درخواست جدید
-              </LinkButton>
-            </Card>
-          </div>
+          </section>
 
           {orders.length === 0 ? (
             <EmptyState
@@ -80,17 +74,21 @@ export default function CustomerDashboardPage() {
               }
             />
           ) : (
-            <Card>
-              <h3 className="mb-3 font-bold text-fg">سفارش‌های اخیر</h3>
+            <section aria-labelledby="recent-orders-title">
+              <div className={styles.sectionHeading}>
+                <h2 id="recent-orders-title">سفارش‌های اخیر</h2>
+                <Link href="/orders" className={styles.sectionLink}>مشاهدهٔ همهٔ سفارش‌ها</Link>
+              </div>
+              <Card className={styles.recentCard}>
               <div className="divide-y divide-border">
                 {orders.slice(0, 6).map((order) => (
                   <Link
                     key={order.id}
                     href={`/orders/${order.id}`}
-                    className="flex items-center justify-between rounded-control px-2 py-3 text-sm transition-colors hover:bg-bg-subtle"
+                    className={`${styles.recentLink} text-sm hover:bg-bg-subtle`}
                   >
                     <div>
-                      <p className="font-medium text-fg">{order.title}</p>
+                      <p className="font-bold text-fg">{order.title}</p>
                       <p className="text-xs text-fg-subtle">
                         {order.code} · {formatDate(order.createdAt)}
                       </p>
@@ -99,10 +97,11 @@ export default function CustomerDashboardPage() {
                   </Link>
                 ))}
               </div>
-            </Card>
+              </Card>
+            </section>
           )}
         </>
       )}
-    </div>
+    </OrbitCustomerSurface>
   );
 }

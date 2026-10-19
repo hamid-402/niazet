@@ -371,6 +371,25 @@ async function verifyOrganizationsUi(pages, webOrigin) {
   await ops.getByRole('region', { name: 'مجریان پیشنهادی' }).waitFor();
 }
 
+async function verifyCustomerOrdersUi(page, webOrigin) {
+  await page.goto(`${webOrigin}/orders`);
+  await page.getByRole('heading', { name: 'سفارش‌های من', exact: true }).waitFor();
+  const rows = page.locator('tbody tr');
+  await rows.first().waitFor();
+  assert.equal(await rows.count(), 2, 'The default customer order view must retain every fixture order.');
+  await page.getByRole('searchbox', { name: 'جست‌وجو در سفارش‌ها' }).fill('UI-SUGGESTIONS');
+  await page.waitForFunction(() => document.querySelectorAll('tbody tr').length === 1);
+  assert.match(await rows.first().innerText(), /UI-SUGGESTIONS/);
+  await page.getByLabel('نمایش سفارش‌ها').selectOption('closed');
+  await page.getByRole('heading', { name: 'سفارشی با این معیارها پیدا نشد' }).waitFor();
+  const emptyAxe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+  assert.deepEqual(emptyAxe.violations, [], 'Filtered-empty customer orders must remain accessible.');
+  await page.getByRole('button', { name: 'نمایش همهٔ سفارش‌ها' }).click();
+  await page.waitForFunction(() => document.querySelectorAll('tbody tr').length === 2);
+  assert.equal(await page.getByRole('searchbox', { name: 'جست‌وجو در سفارش‌ها' }).inputValue(), '');
+  assert.equal(await page.getByLabel('نمایش سفارش‌ها').inputValue(), 'all');
+}
+
 validateVisualMatrix();
 assert.ok(existsSync(apiEntry), 'Build apps/api before runtime UI tests.');
 mkdirSync(artifactRoot, { recursive: true });
@@ -506,6 +525,7 @@ try {
   await verifyDrawerMotion(pages);
   await verifyOnboardingUi(pages.get('ops'), webOrigin);
   await verifyOrganizationsUi(pages, webOrigin);
+  await verifyCustomerOrdersUi(pages.get('customer'), webOrigin);
   report.keyboard = 'passed';
   report.motion = 'passed';
 
