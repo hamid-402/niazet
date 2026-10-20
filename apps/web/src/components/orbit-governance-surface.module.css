@@ -1,0 +1,15 @@
+.scopeControls { display: flex; flex-wrap: wrap; gap: .5rem; min-width: 12rem; }
+.scopeControls select { flex: 1 1 12rem; min-width: 0; }
+.scopeControls button { flex: 0 0 auto; white-space: nowrap; }
+@media (max-width: 63.999rem) {
+  .table { display: block; min-width: 0 !important; width: 100%; }
+  .table thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+  .table tbody { display: grid; gap: var(--layout-grid-gap); }
+  .table tbody tr { display: grid; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-surface); box-shadow: var(--shadow-elevation-1); }
+  .table tbody td { display: grid; grid-template-columns: minmax(6.5rem, 38%) minmax(0, 1fr); align-items: center; gap: .75rem; min-width: 0; padding: .75rem 1rem !important; border-bottom: 1px solid var(--color-border); text-align: start; }
+  .table tbody td:last-child { border-bottom: 0; }
+  .table tbody td::before { content: attr(data-label); color: var(--color-fg-subtle); font-size: .75rem; font-weight: 600; line-height: 1.6; }
+  .table tbody td > * { min-width: 0; }
+  .table tbody td.actionCell { grid-template-columns: minmax(0, 1fr) !important; }
+  .scopeControls { width: 100%; min-width: 0; }
+}

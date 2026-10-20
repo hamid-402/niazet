@@ -44,8 +44,8 @@ export default function AdminSettingsPage() {
       <div className="flex items-start justify-between gap-3"><div><h3 className="font-bold text-fg">{item.label}</h3><p className="mt-1 text-sm text-fg-muted">{item.description}</p></div>{item.isDefault && <span className="rounded-pill bg-warning-subtle px-2 py-1 text-xs text-warning">پیش‌فرض</span>}</div>
       <p className="mt-2 text-xs text-fg-subtle" dir="ltr">{item.key}</p>
       {item.valueType === 'date_array'
-        ? <textarea className={`${inputClass} mt-3 min-h-28`} dir="ltr" value={drafts[item.key] ?? ''} onChange={(event) => setDrafts((current) => ({ ...current, [item.key]: event.target.value }))} placeholder="2026-03-21" />
-        : <input className={`${inputClass} mt-3`} type="number" dir="ltr" step={item.valueType === 'rate' ? '0.01' : '1'} value={drafts[item.key] ?? ''} onChange={(event) => setDrafts((current) => ({ ...current, [item.key]: event.target.value }))} />}
+        ? <textarea aria-label={item.label} className={`${inputClass} mt-3 min-h-28`} dir="ltr" value={drafts[item.key] ?? ''} onChange={(event) => setDrafts((current) => ({ ...current, [item.key]: event.target.value }))} placeholder="2026-03-21" />
+        : <input aria-label={item.label} className={`${inputClass} mt-3`} type="number" dir="ltr" step={item.valueType === 'rate' ? '0.01' : '1'} value={drafts[item.key] ?? ''} onChange={(event) => setDrafts((current) => ({ ...current, [item.key]: event.target.value }))} />}
       <Button className="mt-3" disabled={busy === item.key || drafts[item.key] === ''} onClick={() => void save(item)}>{busy === item.key ? 'در حال ذخیره...' : 'ذخیره تنظیم'}</Button>
     </Card>)}</div>
   </div>;

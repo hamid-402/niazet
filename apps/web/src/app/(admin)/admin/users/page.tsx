@@ -12,6 +12,7 @@ import { ResponsiveTable,
 } from '@/components/ui';
 import { formatDate } from '@/lib/format';
 import { ConfirmationModal } from '@/components/confirmation-modal';
+import styles from '@/components/orbit-governance-surface.module.css';
 
 interface UserRow {
   id: string;
@@ -61,7 +62,7 @@ export default function AdminUsersPage() {
 
       {users && (
         <Card className="overflow-x-auto p-0">
-          <ResponsiveTable className="w-full min-w-[720px] text-sm">
+          <ResponsiveTable className={`${styles.table} w-full min-w-[720px] text-sm`}>
             <thead>
               <tr className="border-b border-border text-right text-xs text-fg-subtle">
                 <th className="px-4 py-3 font-medium">نام</th>
@@ -91,8 +92,9 @@ export default function AdminUsersPage() {
                   <td className="px-4 py-3 text-fg-subtle">
                     {formatDate(u.createdAt)}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className={`px-4 py-3 ${styles.actionCell}`}>
                     <Button
+                      className="whitespace-nowrap"
                       variant="secondary"
                       disabled={busy}
                       onClick={() => setPending(u)}

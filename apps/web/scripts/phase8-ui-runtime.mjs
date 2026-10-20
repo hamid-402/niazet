@@ -31,6 +31,7 @@ if (updateScope) {
 const runId = randomUUID();
 const pathEnvironmentKey = Object.keys(process.env).find((key) => key.toLowerCase() === 'path') ?? 'PATH';
 const rolePhones = {
+  super: '09120000001',
   customer: '09120000009',
   ops: '09120000002',
   finance: '09120000003',
@@ -38,6 +39,7 @@ const rolePhones = {
   support: '09120000004',
 };
 const roleHomes = {
+  super: '/admin',
   customer: '/dashboard',
   ops: '/admin',
   finance: '/admin/finance',
@@ -548,7 +550,7 @@ async function verifyFinanceWorkspace(page, databaseUrl) {
     const executor = await db.user.findUniqueOrThrow({ where: { phone: '09120000005' }, include: { executorProfile: true } });
     const service = await db.serviceLine.findUniqueOrThrow({ where: { slug: 'website-design-development' } });
     const orderId = randomUUID(), amount = 250000, title = 'سفارش مالی پذیرش مدار';
-    await db.order.create({ data: { id: orderId, code: `UI-FIN-${orderId.slice(0, 8)}`, customerId: customer.id, serviceId: service.id, status: 'paid', title, briefDescription: 'سفارش ایزوله برای پذیرش حساب امانی و فاکتور', finalPrice: amount } });
+    await db.order.create({ data: { id: orderId, code: `UI-FIN-${orderId.slice(0, 8)}`, customerId: customer.id, serviceId: service.id, status: 'paid', paidAt: new Date(), title, briefDescription: 'سفارش ایزوله برای پذیرش حساب امانی و فاکتور', finalPrice: amount } });
     const payment = await db.payment.create({ data: { orderId, customerId: customer.id, amount, gateway: 'mock', status: 'succeeded', verifiedAt: new Date(), idempotencyKey: randomUUID() } });
     const hold = await db.escrowHold.create({ data: { orderId, paymentId: payment.id, amount } });
     const invoice = await db.invoice.create({ data: { orderId, customerId: customer.id, amount, invoiceNumber: `INV-UI-${orderId.slice(0, 8)}` } });
@@ -611,6 +613,119 @@ async function verifyFinanceWorkspace(page, databaseUrl) {
       }
     }
     console.log('Finance flow passed: real PDF/CSV downloads, escrow refund, withdrawal note/masking/approval, balanced wallet ledgers, 48 extra Axe/screenshots.');
+  } finally { await db.$disconnect(); }
+}
+
+async function verifyGovernanceWorkspace(pages, webOrigin, databaseUrl) {
+  const db = new PrismaClient({ datasources: { db: { url: databaseUrl } } });
+  const page = pages.get('super');
+  async function navigate(path) {
+    if (new URL(page.url()).pathname === path) return;
+    await page.locator(`a[href="${path}"]:visible`).first().click();
+    await page.waitForURL(url => url.pathname === path);
+  }
+  async function confirm(label) {
+    const dialog = page.getByRole('alertdialog');
+    await dialog.getByRole('textbox').fill('تصمیم آزمایشی مدیریت با بررسی اثر دسترسی و سابقه');
+    await dialog.getByRole('button', { name: label, exact: true }).click();
+    await dialog.waitFor({ state: 'hidden' });
+  }
+  try {
+    const target = await db.user.create({ data: { phone: '09129998876', fullName: 'کاربر آزمون حاکمیت مدار', role: 'customer', status: 'active' } });
+    const session = await db.session.create({ data: { userId: target.id, familyId: randomUUID(), refreshTokenHash: 'isolated-test-session-hash', expiresAt: new Date(Date.now() + 3600000) } });
+    await navigate('/admin/users');
+    let row = page.getByRole('row').filter({ hasText: target.fullName });
+    await row.getByRole('button', { name: 'مسدودسازی', exact: true }).click();
+    await confirm('مسدودکردن کاربر');
+    assert.equal((await db.user.findUniqueOrThrow({ where: { id: target.id } })).status, 'blocked');
+    assert.ok((await db.session.findUniqueOrThrow({ where: { id: session.id } })).revokedAt);
+    await row.getByRole('button', { name: 'فعال‌سازی', exact: true }).click();
+    await confirm('فعال‌سازی کاربر');
+    assert.equal((await db.user.findUniqueOrThrow({ where: { id: target.id } })).status, 'active');
+    assert.ok((await db.session.findUniqueOrThrow({ where: { id: session.id } })).revokedAt, 'Reactivation must not resurrect revoked sessions.');
+    await navigate('/admin/admins');
+    await page.getByRole('button', { name: 'افزودن ادمین', exact: true }).click();
+    await page.getByLabel('شماره موبایل', { exact: true }).fill('09129998877');
+    await page.getByLabel('نام کامل', { exact: true }).fill('ادمین آزمون حاکمیت مدار');
+    await page.getByRole('button', { name: 'ثبت', exact: true }).click();
+    row = page.getByRole('row').filter({ hasText: 'ادمین آزمون حاکمیت مدار' });
+    await row.waitFor();
+    const admin = await db.user.findUniqueOrThrow({ where: { phone: '09129998877' } });
+    const adminSession = await db.session.create({ data: { userId: admin.id, familyId: randomUUID(), refreshTokenHash: 'isolated-admin-session-hash', expiresAt: new Date(Date.now() + 3600000) } });
+    await row.getByRole('combobox', { name: `سطح دسترسی ${admin.fullName}`, exact: true }).selectOption('finance_admin');
+    await row.getByRole('button', { name: 'اعمال', exact: true }).click();
+    await confirm('اعمال Scope جدید');
+    assert.equal((await db.user.findUniqueOrThrow({ where: { id: admin.id } })).adminScope, 'finance_admin');
+    assert.ok((await db.session.findUniqueOrThrow({ where: { id: adminSession.id } })).revokedAt);
+    await navigate('/admin/settings');
+    const settingCard = page.locator('.premium-card').filter({ hasText: 'finance.withdrawal_min' });
+    const originalMin = Number(await page.getByRole('spinbutton', { name: 'حداقل برداشت', exact: true }).inputValue());
+    for (const value of [originalMin + 1, originalMin]) {
+      await page.getByRole('spinbutton', { name: 'حداقل برداشت', exact: true }).fill(String(value));
+      await Promise.all([
+        page.waitForResponse(r => r.url().endsWith('/admin/settings') && r.request().method() === 'PUT' && r.ok()),
+        settingCard.getByRole('button', { name: 'ذخیره تنظیم', exact: true }).click(),
+      ]);
+      await settingCard.getByRole('button', { name: 'ذخیره تنظیم', exact: true }).waitFor();
+      assert.equal(await page.getByRole('spinbutton', { name: 'حداقل برداشت', exact: true }).inputValue(), String(value));
+      assert.equal((await db.systemSetting.findUniqueOrThrow({ where: { key: 'finance.withdrawal_min' } })).value, value);
+    }
+    // Isolated flag state only: no AI provider is enabled or called by this test.
+    await db.systemSetting.upsert({ where: { key: 'ai.enabled' }, create: { key: 'ai.enabled', value: true }, update: { value: true } });
+    await navigate('/admin/ai-controls');
+    const master = page.locator('.premium-card').filter({ hasText: 'ai.enabled' });
+    await master.getByRole('button', { name: 'خاموش‌کردن', exact: true }).click();
+    await master.getByRole('button', { name: 'روشن‌کردن', exact: true }).waitFor();
+    assert.equal((await db.systemSetting.findUniqueOrThrow({ where: { key: 'ai.enabled' } })).value, false);
+    assert.equal(await page.getByRole('button', { name: 'همیشه اجباری', exact: true }).isDisabled(), true);
+    assert.ok(await db.auditLog.count({ where: { entityId: target.id, action: 'user.status_changed' } }) >= 2);
+    assert.equal(await db.auditLog.count({ where: { entityId: admin.id, action: 'admin.scope_changed' } }), 1);
+    const finance = pages.get('finance');
+    const denied = finance.waitForResponse(r => new URL(r.url()).pathname === '/api/backend/admin/settings' && r.request().method() === 'GET');
+    await finance.goto(`${webOrigin}/admin/settings`);
+    assert.equal((await denied).status(), 403);
+    await finance.getByText('دسترسی مدیریتی شما کافی نیست.', { exact: true }).waitFor();
+    for (const path of ['/admin/users', '/admin/admins', '/admin/settings', '/admin/ai-controls', '/admin/security', '/admin/audit', '/admin/feedback', '/admin/reports/bi']) {
+      await navigate(path);
+      await page.getByRole('heading', { level: 1 }).waitFor();
+      if (path === '/admin/audit') {
+        await page.getByRole('textbox', { name: 'فیلتر نوع موجودیت', exact: true }).fill('user');
+        await page.getByText('admin.scope_changed', { exact: true }).waitFor();
+      }
+      if (path.endsWith('/bi')) {
+        await page.getByLabel('از تاریخ تحلیل').fill(`${new Date().getUTCFullYear()}-01-01`);
+        await page.getByLabel('تا تاریخ تحلیل').fill(`${new Date().getUTCFullYear()}-12-31`);
+        const response = page.waitForResponse(r => new URL(r.url()).pathname === '/api/backend/admin/reports/bi' && new URL(r.url()).searchParams.has('from'));
+        await page.getByRole('button', { name: 'به‌روزرسانی تحلیل', exact: true }).click();
+        const result = await response;
+        assert.equal(result.status(), 200);
+        const analysis = await result.json();
+        assert.ok(analysis.cohorts.some(row => row.suppressed), 'The paid fixture must exercise small-cohort privacy.');
+        for (const row of analysis.cohorts.filter(row => row.suppressed)) {
+          assert.equal(row.customers, null);
+          assert.equal(row.day30, null); assert.equal(row.day60, null); assert.equal(row.day90, null);
+        }
+        await page.locator('[aria-busy="false"]').waitFor();
+        await page.getByText('گروه کوچک', { exact: true }).first().waitFor();
+      }
+      for (const viewport of viewports) for (const theme of themes) {
+        await page.setViewportSize({ width: viewport.width, height: viewport.height });
+        await page.evaluate(id => { document.documentElement.dataset.theme = id; document.activeElement?.blur(); window.scrollTo({ top: 0, behavior: 'instant' }); }, theme.id);
+        await settle(page);
+        if (path === '/admin/admins') {
+          const scopeRow = page.getByRole('row').filter({ hasText: admin.fullName });
+          const select = await scopeRow.getByRole('combobox').boundingBox();
+          const apply = await scopeRow.getByRole('button', { name: 'اعمال', exact: true }).boundingBox();
+          assert.ok(select && select.width >= 150, `Scope selection must remain readable at ${viewport.id}: ${JSON.stringify(select)}.`);
+          assert.ok(apply && apply.width >= 44 && apply.height <= 56, `Scope action must remain a usable single-line touch target at ${viewport.id}: ${JSON.stringify(apply)}.`);
+        }
+        assert.deepEqual((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()).violations, [], `Governance ${path} must remain accessible.`);
+        assert.ok((await runtimeSnapshot(page, path)).overflowX <= 1);
+        await page.screenshot({ path: resolve(artifactRoot, `governance-${path.split('/').at(-1)}-${viewport.id}-${theme.id}.png`), fullPage: true, animations: 'disabled' });
+      }
+    }
+    console.log('Governance passed: block/reactivate with session revocation, admin scope/Audit, settings round-trip, isolated AI stop, finance 403, BI cohort privacy, 64 extra Axe/screenshots.');
+    return { status: 'passed', additionalAxeScans: 64, additionalScreenshots: 64, financeSettingsStatus: 403, smallCohortsSuppressed: true, scopeControlsReadable: true };
   } finally { await db.$disconnect(); }
 }
 
@@ -987,6 +1102,7 @@ try {
   await verifyOpsWorkspace(pages.get('ops'), webOrigin, isolatedUrl.toString(), executorOrderId);
   await verifySupportWorkspace(pages, webOrigin, isolatedUrl.toString());
   await verifyFinanceWorkspace(pages.get('finance'), isolatedUrl.toString());
+  report.governance = await verifyGovernanceWorkspace(pages, webOrigin, isolatedUrl.toString());
   console.log(`Phase 8 runtime UI passed: ${report.snapshots.length} screenshots, ${report.axe.length} axe scans, responsive overflow checks, keyboard flows and compact visual baseline.`);
 } catch (error) {
   testError = error;

@@ -13,6 +13,9 @@ import { ResponsiveTable,
   SectionTitle,
 } from '@/components/ui';
 import { ConfirmationModal } from '@/components/confirmation-modal';
+import styles from '@/components/orbit-governance-surface.module.css';
+
+const SCOPE_LABELS: Record<string, string> = { ops_admin: 'مدیر عملیات', finance_admin: 'مدیر مالی', super_admin: 'مدیر کل' };
 
 interface AdminRow {
   id: string;
@@ -121,9 +124,9 @@ export default function AdminsPage() {
                 value={scope}
                 onChange={(e) => setScope(e.target.value)}
               >
-                <option value="ops_admin">ops_admin</option>
-                <option value="finance_admin">finance_admin</option>
-                <option value="super_admin">super_admin</option>
+                <option value="ops_admin">مدیر عملیات</option>
+                <option value="finance_admin">مدیر مالی</option>
+                <option value="super_admin">مدیر کل</option>
               </select>
             </Field>
             <Button type="submit" disabled={busy}>
@@ -138,7 +141,7 @@ export default function AdminsPage() {
 
       {admins && (
         <Card className="overflow-x-auto p-0">
-          <ResponsiveTable className="w-full min-w-[560px] text-sm">
+          <ResponsiveTable className={`${styles.table} w-full min-w-[560px] text-sm`}>
             <thead>
               <tr className="border-b border-border text-right text-xs text-fg-subtle">
                 <th className="px-4 py-3 font-medium">نام</th>
@@ -159,19 +162,19 @@ export default function AdminsPage() {
                     {a.phone}
                   </td>
                   <td className="px-4 py-3">
-                    <Badge color="purple">{a.adminScope}</Badge>
+                    <Badge color="purple">{SCOPE_LABELS[a.adminScope] ?? a.adminScope}</Badge>
                   </td>
                   <td className="px-4 py-3">
                     <Badge color={a.status === 'active' ? 'green' : 'red'}>
                       {a.status}
                     </Badge>
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-2">
-                      <select className={inputClass} value={scopeDrafts[a.id] ?? a.adminScope} onChange={(event) => setScopeDrafts((current) => ({ ...current, [a.id]: event.target.value }))}>
-                        <option value="ops_admin">ops_admin</option>
-                        <option value="finance_admin">finance_admin</option>
-                        <option value="super_admin">super_admin</option>
+                  <td className={`px-4 py-3 ${styles.actionCell}`}>
+                    <div className={styles.scopeControls}>
+                      <select aria-label={`سطح دسترسی ${a.fullName}`} className={inputClass} value={scopeDrafts[a.id] ?? a.adminScope} onChange={(event) => setScopeDrafts((current) => ({ ...current, [a.id]: event.target.value }))}>
+                        <option value="ops_admin">مدیر عملیات</option>
+                        <option value="finance_admin">مدیر مالی</option>
+                        <option value="super_admin">مدیر کل</option>
                       </select>
                       <Button variant="secondary" disabled={busy || (scopeDrafts[a.id] ?? a.adminScope) === a.adminScope} onClick={() => setPendingScope(a)}>
                         اعمال
