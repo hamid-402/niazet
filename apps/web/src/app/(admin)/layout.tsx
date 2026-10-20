@@ -5,6 +5,7 @@ import { AppShell } from '@/components/app-shell';
 import { RequireRole } from '@/components/require-role';
 import { PRODUCT_TERMS } from '@/lib/product-copy';
 import { useAuth } from '@/lib/auth-context';
+import { OrbitOpsSurface } from '@/components/orbit-ops-surface';
 
 const OPS_NAV = [
   { href: '/admin', label: 'داشبورد عملیات' },
@@ -65,7 +66,7 @@ function AdminShell({ children }: { children: ReactNode }) {
 
   return (
     <AppShell navItems={nav} title={title}>
-      {children}
+      <OrbitOpsSurface>{children}</OrbitOpsSurface>
     </AppShell>
   );
 }

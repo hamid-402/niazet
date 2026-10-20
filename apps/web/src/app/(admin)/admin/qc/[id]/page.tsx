@@ -144,6 +144,7 @@ export default function AdminQcDetailPage({
 
       <Card>
         <textarea
+          aria-label="یادداشت کنترل کیفیت"
           className={`${inputClass} mb-3 min-h-20`}
           placeholder="یادداشت reviewer"
           value={comment}

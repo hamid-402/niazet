@@ -450,6 +450,80 @@ async function verifyExecutorWorkspace(page, webOrigin, databaseUrl) {
       await page.screenshot({ path: resolve(artifactRoot, `executor-performance-${viewport.id}-${theme.id}.png`), fullPage: true, animations: 'disabled' });
     }
     console.log('Executor flow passed: assigned queue, accept/start, progress, checklist delivery guard, real upload/download bytes, QC submission, 16 extra Axe/screenshots.');
+    return orderId;
+  } finally { await db.$disconnect(); }
+}
+
+async function verifyOpsWorkspace(page, webOrigin, databaseUrl, orderId) {
+  const db = new PrismaClient({ datasources: { db: { url: databaseUrl } } });
+  async function navigate(path) {
+    if (new URL(page.url()).pathname === path) return;
+    let link = page.locator(`a[href="${path}"]:visible`).first();
+    if (!await link.count()) {
+      const parent = path.startsWith('/admin/qc/') ? '/admin/qc' : '/admin/staff';
+      await page.locator(`a[href="${parent}"]:visible`).first().click();
+      await page.waitForURL(url => url.pathname === parent);
+      link = page.locator(`a[href="${path}"]:visible`).first();
+    }
+    await link.click();
+    await page.waitForURL(url => url.pathname === path);
+  }
+  try {
+    const suffix = randomUUID().slice(0, 8), title = `خدمت آزمایشی مدار ${suffix}`;
+    await navigate('/admin/services');
+    await page.getByRole('textbox', { name: 'عنوان خدمت', exact: true }).fill(title);
+    await page.getByRole('textbox', { name: 'slug-example', exact: true }).fill(`orbit-${suffix}`);
+    await page.getByRole('textbox', { name: 'دسته‌بندی', exact: true }).fill('digital');
+    await page.getByRole('textbox', { name: 'شرح خدمت', exact: true }).fill('خدمت مخصوص پذیرش ایزوله عملیات');
+    await page.getByRole('button', { name: 'ایجاد خدمت', exact: true }).click();
+    await page.getByRole('button', { name: new RegExp(title) }).click();
+    await page.getByRole('textbox', { name: 'نام بسته', exact: true }).fill('بسته پذیرش');
+    await page.getByRole('button', { name: 'افزودن بسته', exact: true }).click();
+    await page.getByText('بسته پذیرش', { exact: true }).waitFor();
+    await page.getByRole('textbox', { name: 'عنوان فیلد', exact: true }).fill('هدف اجرای خدمت');
+    await page.getByRole('textbox', { name: 'field_key', exact: true }).fill('orbit_goal');
+    await page.getByRole('button', { name: 'افزودن فیلد', exact: true }).click();
+    await page.getByText('هدف اجرای خدمت · text', { exact: true }).waitFor();
+    await page.getByRole('textbox', { name: 'معیار تحویل قابل سنجش', exact: true }).fill('خروجی با شرح منطبق باشد');
+    await page.getByRole('button', { name: 'افزودن', exact: true }).click();
+    await page.getByText('خروجی با شرح منطبق باشد', { exact: true }).waitFor();
+    await page.getByRole('textbox', { name: 'نام قالب QC', exact: true }).fill('کنترل پذیرش مدار');
+    await page.getByRole('button', { name: 'ساخت قالب', exact: true }).click();
+    await page.getByRole('combobox', { name: 'قالب کنترل کیفیت', exact: true }).selectOption({ label: 'کنترل پذیرش مدار' });
+    await page.getByRole('textbox', { name: 'آیتم کنترل کیفیت', exact: true }).fill('فایل خروجی قابل دریافت است');
+    await page.getByRole('button', { name: 'افزودن آیتم', exact: true }).click();
+    await page.getByText('فایل خروجی قابل دریافت است', { exact: true }).waitFor();
+    const service = await db.serviceLine.findUniqueOrThrow({ where: { slug: `orbit-${suffix}` }, include: { packages: true, formFields: true, acceptanceCriteria: true, qcChecklistTemplates: { include: { items: true } } } });
+    assert.equal(service.packages.length, 1); assert.equal(service.formFields.length, 1); assert.equal(service.acceptanceCriteria.length, 1); assert.equal(service.qcChecklistTemplates[0].items.length, 1);
+    const review = await db.qcReview.findFirstOrThrow({ where: { orderId }, orderBy: { createdAt: 'desc' } });
+    const executor = await db.user.findUniqueOrThrow({ where: { phone: '09120000005' }, include: { executorProfile: true } });
+    for (const [label, path] of [['services', '/admin/services'], ['staff-detail', `/admin/staff/${executor.executorProfile.id}`], ['operations-report', '/admin/reports/operations'], ['qc-detail', `/admin/qc/${review.id}`]]) {
+      await navigate(path);
+      await page.getByRole('heading', { level: 1 }).waitFor();
+      await settle(page);
+      for (const viewport of viewports) for (const theme of themes) {
+        await page.setViewportSize({ width: viewport.width, height: viewport.height });
+        await page.evaluate(id => { document.documentElement.dataset.theme = id; document.activeElement?.blur(); window.scrollTo({ top: 0, behavior: 'instant' }); }, theme.id);
+        await settle(page);
+        assert.deepEqual((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()).violations, [], `Ops ${label} must remain accessible.`);
+        assert.ok((await runtimeSnapshot(page, label)).overflowX <= 1, `Ops ${label} must not overflow.`);
+        await page.screenshot({ path: resolve(artifactRoot, `ops-${label}-${viewport.id}-${theme.id}.png`), fullPage: true, animations: 'disabled' });
+      }
+    }
+    await navigate(`/admin/qc/${review.id}`);
+    await page.getByRole('textbox', { name: 'یادداشت کنترل کیفیت', exact: true }).fill('خروجی و فایل امن با معیارهای پذیرش تطبیق داده شد.');
+    if (await page.getByRole('checkbox').count()) {
+      await page.getByRole('button', { name: 'تایید برای مشتری', exact: true }).click();
+      await page.getByText('تأیید QC نیازمند قبولی همه آیتم‌ها است.', { exact: true }).waitFor();
+      assert.equal((await db.qcReview.findUniqueOrThrow({ where: { id: review.id } })).result, null, 'Incomplete QC must not persist approval.');
+    }
+    for (const checkbox of await page.getByRole('checkbox').all()) await checkbox.check();
+    await page.getByRole('button', { name: 'تایید برای مشتری', exact: true }).click();
+    await page.waitForURL(url => url.pathname === '/admin/qc');
+    assert.equal((await db.order.findUniqueOrThrow({ where: { id: orderId } })).status, 'delivered');
+    assert.equal((await db.qcReview.findUniqueOrThrow({ where: { id: review.id } })).result, 'passed');
+    assert.equal(await db.orderStatusHistory.count({ where: { orderId, toStatus: { in: ['ready_for_customer_review', 'delivered'] } } }), 2, 'QC approval must preserve both official status transitions.');
+    console.log('Ops flow passed: service/package/form/criterion/QC-template persistence, executor delivery approved by QC, 32 extra Axe/screenshots.');
   } finally { await db.$disconnect(); }
 }
 
@@ -822,7 +896,8 @@ try {
     assert.equal(baseline.schemaVersion, 1, 'Unsupported visual baseline schema.');
     compareBaseline(report.snapshots, baseline.snapshots);
   }
-  await verifyExecutorWorkspace(pages.get('executor'), webOrigin, isolatedUrl.toString());
+  const executorOrderId = await verifyExecutorWorkspace(pages.get('executor'), webOrigin, isolatedUrl.toString());
+  await verifyOpsWorkspace(pages.get('ops'), webOrigin, isolatedUrl.toString(), executorOrderId);
   await verifySupportWorkspace(pages, webOrigin, isolatedUrl.toString());
   console.log(`Phase 8 runtime UI passed: ${report.snapshots.length} screenshots, ${report.axe.length} axe scans, responsive overflow checks, keyboard flows and compact visual baseline.`);
 } catch (error) {

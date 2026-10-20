@@ -28,7 +28,7 @@ export default function AdminOpsDashboardPage() {
     <div>
       <SectionTitle>داشبورد عملیات</SectionTitle>
 
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-3">
         <Card>
           <p className="text-xs text-fg-subtle">سفارش‌های در اجرا/ارجاع‌شده</p>
           <p className="mt-1 text-2xl font-bold text-fg">
