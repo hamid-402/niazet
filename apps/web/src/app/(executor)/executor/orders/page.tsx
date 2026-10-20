@@ -13,6 +13,8 @@ import { ResponsiveTable,
 import { OrderStatusBadge } from '@/components/status-badge';
 import type { OrderSummary } from '@/lib/types';
 import { formatDate } from '@/lib/format';
+import { OrbitStaffSurface } from '@/components/orbit-staff-surface';
+import styles from '@/components/orbit-staff-surface.module.css';
 
 export default function ExecutorOrdersPage() {
   const [orders, setOrders] = useState<OrderSummary[] | null>(null);
@@ -25,8 +27,8 @@ export default function ExecutorOrdersPage() {
   }, []);
 
   return (
-    <div>
-      <SectionTitle>سفارش‌های ارجاع‌شده</SectionTitle>
+    <OrbitStaffSurface>
+      <div className={styles.heading}><div><p className={styles.eyebrow}>پیگیری اجرا</p><SectionTitle>سفارش‌های ارجاع‌شده</SectionTitle></div></div>
       {error && <ErrorBanner message={error} />}
       {!orders && !error && <PageLoading />}
       {orders && orders.length === 0 && (
@@ -34,7 +36,7 @@ export default function ExecutorOrdersPage() {
       )}
 
       {orders && orders.length > 0 && (
-        <Card className="overflow-x-auto p-0">
+        <Card className={`${styles.ordersTable} overflow-x-auto p-0`}>
           <ResponsiveTable className="w-full min-w-[560px] text-sm">
             <thead>
               <tr className="border-b border-border text-right text-xs text-fg-subtle">
@@ -70,6 +72,6 @@ export default function ExecutorOrdersPage() {
           </ResponsiveTable>
         </Card>
       )}
-    </div>
+    </OrbitStaffSurface>
   );
 }

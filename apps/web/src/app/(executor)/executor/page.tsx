@@ -6,6 +6,8 @@ import { apiFetch } from '@/lib/api';
 import { Card, ErrorBanner, PageLoading, SectionTitle } from '@/components/ui';
 import { OrderStatusBadge } from '@/components/status-badge';
 import type { ExecutorProfile, OrderStatus } from '@/lib/types';
+import { OrbitStaffSurface } from '@/components/orbit-staff-surface';
+import styles from '@/components/orbit-staff-surface.module.css';
 
 interface DashboardData {
   profile: ExecutorProfile;
@@ -35,33 +37,29 @@ export default function ExecutorDashboardPage() {
   if (!data) return <PageLoading />;
 
   return (
-    <div>
-      <SectionTitle
-        subtitle={`مسئول پیگیری: ${data.profile.displayAlias} (${data.profile.publicHandlerCode})`}
-      >
-        کارهای من
-      </SectionTitle>
+    <OrbitStaffSurface>
+      <div className={styles.heading}><div><p className={styles.eyebrow}>میز کار مجری</p><SectionTitle subtitle={`مسئول پیگیری: ${data.profile.displayAlias} (${data.profile.publicHandlerCode})`}>کارهای من</SectionTitle></div></div>
 
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Card>
+      <div className={styles.metrics}>
+        <Card className={styles.metric}>
           <p className="text-xs text-fg-subtle">کارهای فعال</p>
           <p className="mt-1 text-2xl font-bold text-fg">
             {data.activeOrders}
           </p>
         </Card>
-        <Card>
+        <Card className={styles.metric}>
           <p className="text-xs text-fg-subtle">نیازمند اصلاح پس از کنترل کیفیت</p>
           <p className="mt-1 text-2xl font-bold text-fg">
             {data.needsRework}
           </p>
         </Card>
-        <Card>
+        <Card className={styles.metric}>
           <p className="text-xs text-fg-subtle">نرخ تأیید کنترل کیفیت</p>
           <p className="mt-1 text-2xl font-bold text-fg">
             {Number(data.profile.qcPassRate).toFixed(0)}٪
           </p>
         </Card>
-        <Card>
+        <Card className={styles.metric}>
           <p className="text-xs text-fg-subtle">تحویل به‌موقع</p>
           <p className="mt-1 text-2xl font-bold text-fg">
             {Number(data.profile.onTimeDeliveryRate).toFixed(0)}٪
@@ -69,8 +67,8 @@ export default function ExecutorDashboardPage() {
         </Card>
       </div>
 
-      <Card>
-        <h3 className="mb-3 font-bold text-fg">کارهای در صف</h3>
+      <Card className={styles.section}>
+        <h2>کارهای در صف</h2>
         {data.dueSoon.length === 0 ? (
           <p className="text-sm text-fg-subtle">کاری در صف نیست.</p>
         ) : (
@@ -79,7 +77,7 @@ export default function ExecutorDashboardPage() {
               <Link
                 key={order.id}
                 href={`/executor/orders/${order.id}`}
-                className="flex items-center justify-between py-3 text-sm hover:bg-bg-subtle"
+                className={`${styles.queueLink} text-sm hover:bg-bg-subtle`}
               >
                 <div>
                   <p className="font-medium text-fg">{order.title}</p>
@@ -91,6 +89,6 @@ export default function ExecutorDashboardPage() {
           </div>
         )}
       </Card>
-    </div>
+    </OrbitStaffSurface>
   );
 }
