@@ -12,6 +12,10 @@
 .queueLink > div { min-width: 0; overflow-wrap: anywhere; }
 .queueLink:focus-visible, .ordersTable a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 .ordersTable { min-width: 0; border-radius: 1.2rem; }
+.detailTitle { max-width: 55rem; overflow-wrap: anywhere; font-weight: 850; }
+.detailMetrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
+.nextAction { min-width: 0; border-radius: 1.2rem; border-inline-start: 3px solid var(--color-accent); padding: clamp(1rem, 2vw, 1.5rem); }
+@media (max-width: 639px) { .detailMetrics { grid-template-columns: 1fr; } }
 @media (min-width: 768px) { .metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (prefers-reduced-motion: no-preference) {
   .page[data-motion='on'] .metric, .page[data-motion='on'] .section { animation: staff-settle 360ms ease-out both; }

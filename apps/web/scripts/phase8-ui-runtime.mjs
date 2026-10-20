@@ -390,6 +390,69 @@ async function verifyCustomerOrdersUi(page, webOrigin) {
   assert.equal(await page.getByLabel('نمایش سفارش‌ها').inputValue(), 'all');
 }
 
+async function verifyExecutorWorkspace(page, webOrigin, databaseUrl) {
+  const db = new PrismaClient({ datasources: { db: { url: databaseUrl } } });
+  const orderId = randomUUID();
+  const orderTitle = 'اجرای واقعی سفارش آزمایشی';
+  try {
+    const user = await db.user.findUniqueOrThrow({ where: { phone: '09120000005' }, include: { executorProfile: true } });
+    const customer = await db.user.findUniqueOrThrow({ where: { phone: '09120000009' } });
+    const service = await db.serviceLine.findUniqueOrThrow({ where: { slug: 'website-design-development' } });
+    await db.order.create({ data: { id: orderId, code: `UI-EXEC-${orderId.slice(0, 8)}`, title: orderTitle, status: 'assigned', customerId: customer.id, serviceId: service.id, briefDescription: 'بررسی ورودی و تحویل فایل امن', acceptanceCriteria: { create: { description: 'خروجی با معیار توافق‌شده منطبق است' } }, assignments: { create: { executorProfileId: user.executorProfile.id, assignedByUserId: user.id } } } });
+    await page.goto(`${webOrigin}/executor`);
+    await page.getByRole('link', { name: new RegExp(orderTitle) }).waitFor();
+    await page.goto(`${webOrigin}/executor/orders`);
+    await page.getByRole('link', { name: orderTitle, exact: true }).click();
+    await page.getByRole('button', { name: 'پذیرش مسئولیت سفارش', exact: true }).click();
+    await page.getByRole('button', { name: 'شروع اجرای کار', exact: true }).click();
+    await page.getByRole('textbox', { name: 'شرح گزارش پیشرفت', exact: true }).fill('ورودی بررسی و ساختار اولیه آماده شد.');
+    await page.getByRole('button', { name: 'ثبت گزارش پیشرفت', exact: true }).click();
+    await page.getByText('ورودی بررسی و ساختار اولیه آماده شد.', { exact: true }).waitFor();
+    await page.getByRole('textbox', { name: 'شرح تحویل خروجی', exact: true }).fill('خروجی مطابق معیار پذیرش آماده بررسی است.');
+    const payload = Buffer.from('Niazat executor acceptance file.');
+    await page.locator('input[type="file"][aria-label="افزودن فایل خروجی"]').setInputFiles({ name: 'executor-output.txt', mimeType: 'text/plain', buffer: payload });
+    const fileLink = page.getByRole('button', { name: 'executor-output.txt', exact: true });
+    await fileLink.waitFor();
+    assert.equal(await page.getByRole('button', { name: 'ارسال برای QC', exact: true }).isDisabled(), true, 'Incomplete checklist must block delivery even with an output file.');
+    await Promise.all([
+      page.waitForResponse(response => response.url().includes('/checklist/') && response.request().method() === 'PATCH' && response.ok()),
+      page.getByRole('checkbox', { name: 'خروجی با معیار توافق‌شده منطبق است', exact: true }).click(),
+    ]);
+    await page.waitForFunction(() => document.querySelector('[role="progressbar"]')?.getAttribute('aria-valuenow') === '1');
+    const [download] = await Promise.all([page.waitForEvent('download'), fileLink.click()]);
+    assert.equal(await download.failure(), null);
+    const chunks = [];
+    for await (const chunk of await download.createReadStream()) chunks.push(chunk);
+    assert.deepEqual(Buffer.concat(chunks), payload, 'Authenticated download must preserve uploaded bytes.');
+    for (const viewport of viewports) for (const theme of themes) {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.evaluate(id => { localStorage.setItem('niazat-theme', id); document.documentElement.dataset.theme = id; }, theme.id);
+      await settle(page);
+      const scan = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+      assert.deepEqual(scan.violations, [], 'Active executor order must remain accessible.');
+      const snapshot = await runtimeSnapshot(page, 'executor-active');
+      assert.ok(snapshot.overflowX <= 1);
+      await page.screenshot({ path: resolve(artifactRoot, `executor-active-${viewport.id}-${theme.id}.png`), fullPage: true, animations: 'disabled' });
+    }
+    await page.getByRole('button', { name: 'ارسال برای QC', exact: true }).click();
+    await page.getByText('در این وضعیت اقدام اجرایی تازه‌ای از شما لازم نیست.', { exact: true }).waitFor();
+    const saved = await db.order.findUniqueOrThrow({ where: { id: orderId } });
+    assert.ok(['qc_in_review', 'ready_for_customer_review'].includes(saved.status));
+    assert.equal(await db.orderReport.count({ where: { orderId, reportType: 'delivery' } }), 1);
+    await page.goto(`${webOrigin}/executor/performance`);
+    await page.getByRole('heading', { name: 'عملکرد من', exact: true }).waitFor();
+    for (const viewport of viewports) for (const theme of themes) {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.evaluate(id => { document.documentElement.dataset.theme = id; }, theme.id);
+      await settle(page);
+      assert.deepEqual((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()).violations, []);
+      assert.ok((await runtimeSnapshot(page, 'executor-performance')).overflowX <= 1);
+      await page.screenshot({ path: resolve(artifactRoot, `executor-performance-${viewport.id}-${theme.id}.png`), fullPage: true, animations: 'disabled' });
+    }
+    console.log('Executor flow passed: assigned queue, accept/start, progress, checklist delivery guard, real upload/download bytes, QC submission, 16 extra Axe/screenshots.');
+  } finally { await db.$disconnect(); }
+}
+
 async function verifyCustomerNewOrderUi(page, webOrigin) {
   await page.goto(`${webOrigin}/orders/new`);
   await page.getByRole('heading', { name: 'ثبت درخواست جدید', exact: true }).waitFor();
@@ -527,7 +590,7 @@ try {
   const apiOrigin = `http://127.0.0.1:${apiPort}`;
   const webOrigin = `http://127.0.0.1:${webPort}`;
   apiProcess = spawn(process.execPath, [apiEntry], {
-    cwd: apiRoot,
+    cwd: artifactRoot,
     env: { ...isolatedEnvironment, APP_PORT: String(apiPort), APP_URL: apiOrigin, WEB_URL: webOrigin },
     windowsHide: true,
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -697,6 +760,7 @@ try {
     assert.equal(baseline.schemaVersion, 1, 'Unsupported visual baseline schema.');
     compareBaseline(report.snapshots, baseline.snapshots);
   }
+  await verifyExecutorWorkspace(pages.get('executor'), webOrigin, isolatedUrl.toString());
   console.log(`Phase 8 runtime UI passed: ${report.snapshots.length} screenshots, ${report.axe.length} axe scans, responsive overflow checks, keyboard flows and compact visual baseline.`);
 } catch (error) {
   testError = error;

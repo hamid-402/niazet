@@ -13,6 +13,9 @@ import { OrderStatusBadge } from "@/components/status-badge";
 import { SecureFileLink, SecureFileUpload } from "@/components/secure-file";
 import type { OrderDetail, OrderFile } from "@/lib/types";
 import { OrderTimeline } from "@/components/order-timeline";
+import { OrbitStaffSurface } from "@/components/orbit-staff-surface";
+import styles from "@/components/orbit-staff-surface.module.css";
+import { formatNumber } from "@/lib/format";
 
 function displayValue(value: unknown) {
   if (Array.isArray(value)) return value.join("، ");
@@ -80,11 +83,11 @@ export default function ExecutorOrderDetailPage({
   const needsRework = latestQc?.result === "needs_rework";
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <OrbitStaffSurface>
+      <div className={styles.heading}>
         <div>
           <p className="text-xs text-fg-subtle">{order.code}</p>
-          <h1 className="text-xl font-extrabold text-fg">
+          <h1 className={styles.detailTitle}>
             {order.title}
           </h1>
         </div>
@@ -92,6 +95,11 @@ export default function ExecutorOrderDetailPage({
       </div>
 
       {error && <ErrorBanner message={error} />}
+      <div className={styles.detailMetrics} aria-label="خلاصه اجرای سفارش">
+        <Card className={styles.metric}><p className="text-xs text-fg-muted">چک‌لیست تکمیل‌شده</p><p>{formatNumber(completedChecklist)} / {formatNumber(checklist.length)}</p></Card>
+        <Card className={styles.metric}><p className="text-xs text-fg-muted">فایل‌های ورودی</p><p>{formatNumber(inputFiles.length)}</p></Card>
+        <Card className={styles.metric}><p className="text-xs text-fg-muted">گزارش‌های ثبت‌شده</p><p>{formatNumber(order.reports?.length ?? 0)}</p></Card>
+      </div>
 
       {needsRework && (
         <Card className="border-warning-border bg-warning-subtle">
@@ -214,7 +222,7 @@ export default function ExecutorOrderDetailPage({
         </Card>
       </div>
 
-      <Card>
+      <Card className={styles.nextAction}>
         <h2 className="mb-3 font-bold text-fg">اقدام بعدی</h2>
         {order.status === "assigned" && !assignment?.acceptedAt && (
           <div>
@@ -252,6 +260,7 @@ export default function ExecutorOrderDetailPage({
             <section className="space-y-3">
               <h3 className="text-sm font-bold text-fg">گزارش پیشرفت</h3>
               <textarea
+                aria-label="شرح گزارش پیشرفت"
                 className={inputClass}
                 rows={3}
                 placeholder="کارهای انجام‌شده و اقدام بعدی را بنویسید"
@@ -309,6 +318,7 @@ export default function ExecutorOrderDetailPage({
                 {needsRework ? "ارسال نسخه اصلاح‌شده" : "تحویل خروجی برای QC"}
               </h3>
               <textarea
+                aria-label="شرح تحویل خروجی"
                 className={inputClass}
                 rows={3}
                 placeholder="خلاصه خروجی و نکات لازم برای بازبین"
@@ -400,6 +410,6 @@ export default function ExecutorOrderDetailPage({
         <h2 className="mb-3 font-bold text-fg">خط زمانی سفارش و مراحل</h2>
         <OrderTimeline order={order} showFinancials={false} />
       </Card>
-    </div>
+    </OrbitStaffSurface>
   );
 }
