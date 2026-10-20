@@ -11,6 +11,7 @@ import { ResponsiveTable,
   SectionTitle,
 } from '@/components/ui';
 import { formatDate, formatToman } from '@/lib/format';
+import { FINANCE_STATUS_LABELS_FA } from '@/lib/finance-labels';
 
 interface Payment {
   id: string;
@@ -50,7 +51,7 @@ export default function AdminPaymentsPage() {
       )}
 
       {payments && payments.length > 0 && (
-        <Card className="overflow-x-auto p-0">
+        <Card tabIndex={0} role="region" aria-label="جدول پرداخت‌ها" className="overflow-x-auto p-0">
           <ResponsiveTable className="w-full min-w-[720px] text-sm">
             <thead>
               <tr className="border-b border-border text-right text-xs text-fg-subtle">
@@ -76,7 +77,7 @@ export default function AdminPaymentsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <Badge color={STATUS_COLOR[p.status] ?? 'gray'}>
-                      {p.status}
+                      {FINANCE_STATUS_LABELS_FA[p.status] ?? p.status}
                     </Badge>
                   </td>
                   <td className="px-4 py-3 text-fg-subtle">

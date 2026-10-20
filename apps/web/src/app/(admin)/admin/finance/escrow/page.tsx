@@ -14,6 +14,7 @@ import {
 import { formatToman } from '@/lib/format';
 import { PRODUCT_TERMS } from '@/lib/product-copy';
 import { ConfirmationModal } from '@/components/confirmation-modal';
+import { FINANCE_STATUS_LABELS_FA } from '@/lib/finance-labels';
 
 interface Escrow {
   id: string;
@@ -82,7 +83,7 @@ export default function AdminEscrowPage() {
                 <p className="text-xs text-fg-subtle">{e.order.code}</p>
               </div>
               <Badge color={e.status === 'held' ? 'yellow' : 'green'}>
-                {e.status}
+                {FINANCE_STATUS_LABELS_FA[e.status] ?? e.status}
               </Badge>
             </div>
             <p className="mb-3 text-sm text-fg-muted">
@@ -101,7 +102,7 @@ export default function AdminEscrowPage() {
                   disabled={busy}
                   onClick={() => setPending({ item: e, action: 'refund' })}
                 >
-                  رفاند
+                  بازپرداخت
                 </Button>
               </div>
             )}

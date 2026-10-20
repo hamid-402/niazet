@@ -527,6 +527,93 @@ async function verifyOpsWorkspace(page, webOrigin, databaseUrl, orderId) {
   } finally { await db.$disconnect(); }
 }
 
+async function verifyFinanceWorkspace(page, databaseUrl) {
+  const db = new PrismaClient({ datasources: { db: { url: databaseUrl } } });
+  const { LedgerService } = apiRequire(resolve(apiRoot, 'dist/finance/ledger.service.js'));
+  const ledger = new LedgerService(db);
+  async function navigate(path) {
+    if (new URL(page.url()).pathname === path) return;
+    await page.locator(`a[href="${path}"]:visible`).first().click();
+    await page.waitForURL(url => url.pathname === path);
+  }
+  async function downloadBytes(button) {
+    const [download] = await Promise.all([page.waitForEvent('download'), button.click()]);
+    assert.equal(await download.failure(), null);
+    const chunks = [];
+    for await (const chunk of await download.createReadStream()) chunks.push(chunk);
+    return Buffer.concat(chunks);
+  }
+  try {
+    const customer = await db.user.findUniqueOrThrow({ where: { phone: '09120000009' } });
+    const executor = await db.user.findUniqueOrThrow({ where: { phone: '09120000005' }, include: { executorProfile: true } });
+    const service = await db.serviceLine.findUniqueOrThrow({ where: { slug: 'website-design-development' } });
+    const orderId = randomUUID(), amount = 250000, title = 'سفارش مالی پذیرش مدار';
+    await db.order.create({ data: { id: orderId, code: `UI-FIN-${orderId.slice(0, 8)}`, customerId: customer.id, serviceId: service.id, status: 'paid', title, briefDescription: 'سفارش ایزوله برای پذیرش حساب امانی و فاکتور', finalPrice: amount } });
+    const payment = await db.payment.create({ data: { orderId, customerId: customer.id, amount, gateway: 'mock', status: 'succeeded', verifiedAt: new Date(), idempotencyKey: randomUUID() } });
+    const hold = await db.escrowHold.create({ data: { orderId, paymentId: payment.id, amount } });
+    const invoice = await db.invoice.create({ data: { orderId, customerId: customer.id, amount, invoiceNumber: `INV-UI-${orderId.slice(0, 8)}` } });
+    await db.$transaction(async tx => {
+      const clearing = await ledger.getSystemAccount('payment_gateway_clearing', tx);
+      const escrow = await ledger.getSystemAccount('platform_escrow', tx);
+      const executorAccount = await ledger.getOrCreateUserAccount(tx, executor.id, 'executor_wallet');
+      await ledger.postEntry({ debitAccountId: clearing.id, creditAccountId: escrow.id, amount, referenceType: 'payment', referenceId: payment.id }, tx);
+      await ledger.postEntry({ debitAccountId: clearing.id, creditAccountId: executorAccount.id, amount: 200000, referenceType: 'payment', referenceId: `fixture-${orderId}` }, tx);
+    });
+    const shaba = 'IR820540102680020817909002';
+    await db.executorProfile.update({ where: { id: executor.executorProfile.id }, data: { shabaNumber: shaba, shabaVerifiedAt: new Date() } });
+    const withdrawal = await db.withdrawal.create({ data: { executorProfileId: executor.executorProfile.id, amount: 100000, shabaNumber: shaba, shabaVerifiedAt: new Date() } });
+    const customerBefore = (await db.wallet.findUnique({ where: { userId: customer.id } }))?.balance ?? 0;
+    const executorBefore = (await db.wallet.findUniqueOrThrow({ where: { userId: executor.id } })).balance;
+    await navigate('/admin/finance/invoices');
+    const invoiceRow = page.getByRole('row').filter({ hasText: invoice.invoiceNumber });
+    const pdf = await downloadBytes(invoiceRow.getByRole('button', { name: 'دانلود PDF', exact: true }));
+    assert.ok(pdf.toString().startsWith('%PDF-')); assert.ok(pdf.includes(Buffer.from(invoice.invoiceNumber))); assert.ok(pdf.includes(Buffer.from('250,000 IRT')));
+    await navigate('/admin/finance/escrow');
+    const escrowCard = page.locator('.premium-card').filter({ has: page.getByText(title, { exact: true }) });
+    await escrowCard.getByRole('button', { name: 'بازپرداخت', exact: true }).click();
+    let dialog = page.getByRole('alertdialog');
+    await dialog.getByRole('textbox').fill('بازپرداخت آزمایشی با بررسی مبلغ و حساب مقصد');
+    await dialog.getByRole('button', { name: 'ثبت بازپرداخت', exact: true }).click();
+    await dialog.waitFor({ state: 'hidden' });
+    assert.equal((await db.escrowHold.findUniqueOrThrow({ where: { id: hold.id } })).status, 'refunded');
+    assert.equal((await db.wallet.findUniqueOrThrow({ where: { userId: customer.id } })).balance, customerBefore + amount);
+    assert.equal(await db.refund.count({ where: { orderId, status: 'processed', amount } }), 1);
+    await navigate('/admin/finance/withdrawals');
+    assert.equal(await page.getByText(shaba, { exact: true }).count(), 0);
+    await page.getByRole('button', { name: 'نمایش شبا', exact: true }).click();
+    await page.getByText(shaba, { exact: true }).waitFor();
+    await page.getByRole('button', { name: 'پنهان‌کردن', exact: true }).click();
+    assert.equal(await page.getByRole('button', { name: 'تأیید و ثبت تسویه', exact: true }).isDisabled(), true);
+    await page.getByRole('textbox', { name: 'یادداشت تصمیم (اجباری)', exact: true }).fill('تسویه آزمون با کنترل سند و شبای تأییدشده');
+    await Promise.all([
+      page.waitForResponse(r => r.url().includes(`/withdrawals/${withdrawal.id}/approve`) && r.request().method() === 'PATCH' && r.ok()),
+      page.getByRole('button', { name: 'تأیید و ثبت تسویه', exact: true }).click(),
+    ]);
+    assert.equal((await db.withdrawal.findUniqueOrThrow({ where: { id: withdrawal.id } })).status, 'approved');
+    assert.equal((await db.wallet.findUniqueOrThrow({ where: { userId: executor.id } })).balance, executorBefore - 100000);
+    assert.equal(await db.ledgerEntry.count({ where: { referenceId: withdrawal.id, referenceType: 'withdrawal' } }), 1);
+    assert.equal((await ledger.verifyWalletConsistency(customer.id)).consistent, true);
+    assert.equal((await ledger.verifyWalletConsistency(executor.id)).consistent, true);
+    await navigate('/admin/finance/ledger');
+    const csv = await downloadBytes(page.getByRole('button', { name: 'خروجی CSV', exact: true }));
+    assert.ok(csv.toString().includes('escrow_refund')); assert.ok(csv.toString().includes(withdrawal.id));
+    for (const name of ['payments', 'escrow', 'refunds', 'invoices', 'withdrawals', 'report']) {
+      await navigate(name === 'report' ? '/admin/reports/finance' : `/admin/finance/${name}`);
+      await page.getByRole('heading', { level: 1 }).waitFor();
+      if (name === 'withdrawals') await page.getByLabel('فیلتر وضعیت برداشت', { exact: true }).selectOption('');
+      for (const viewport of viewports) for (const theme of themes) {
+        await page.setViewportSize({ width: viewport.width, height: viewport.height });
+        await page.evaluate(id => { document.documentElement.dataset.theme = id; document.activeElement?.blur(); window.scrollTo({ top: 0, behavior: 'instant' }); }, theme.id);
+        await settle(page);
+        assert.deepEqual((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()).violations, [], `Finance ${name} must remain accessible.`);
+        assert.ok((await runtimeSnapshot(page, name)).overflowX <= 1);
+        await page.screenshot({ path: resolve(artifactRoot, `finance-${name}-${viewport.id}-${theme.id}.png`), fullPage: true, animations: 'disabled' });
+      }
+    }
+    console.log('Finance flow passed: real PDF/CSV downloads, escrow refund, withdrawal note/masking/approval, balanced wallet ledgers, 48 extra Axe/screenshots.');
+  } finally { await db.$disconnect(); }
+}
+
 async function verifySupportWorkspace(pages, webOrigin, databaseUrl) {
   const db = new PrismaClient({ datasources: { db: { url: databaseUrl } } });
   const page = pages.get('support'), customerPage = pages.get('customer');
@@ -899,6 +986,7 @@ try {
   const executorOrderId = await verifyExecutorWorkspace(pages.get('executor'), webOrigin, isolatedUrl.toString());
   await verifyOpsWorkspace(pages.get('ops'), webOrigin, isolatedUrl.toString(), executorOrderId);
   await verifySupportWorkspace(pages, webOrigin, isolatedUrl.toString());
+  await verifyFinanceWorkspace(pages.get('finance'), isolatedUrl.toString());
   console.log(`Phase 8 runtime UI passed: ${report.snapshots.length} screenshots, ${report.axe.length} axe scans, responsive overflow checks, keyboard flows and compact visual baseline.`);
 } catch (error) {
   testError = error;

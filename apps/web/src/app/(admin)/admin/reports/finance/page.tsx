@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { apiFetch, downloadAuthenticated } from '@/lib/api';
 import { formatDateOnly, formatNumber, formatToman } from '@/lib/format';
+import { FINANCE_STATUS_LABELS_FA } from '@/lib/finance-labels';
 import { ResponsiveTable, Button, Card, ErrorBanner, Field, PageLoading, SectionTitle, inputClass } from '@/components/ui';
 
 interface FinanceReport {
@@ -67,10 +68,10 @@ export default function FinanceReportPage() {
         {metric('ورودی Escrow بازه', formatToman(data.escrow.periodInflow), `${nf(data.escrow.periodCount)} رکورد`)}
       </div>
       <div className="grid gap-4 xl:grid-cols-2">
-        <Card><h3 className="mb-3 font-bold text-fg">وضعیت Escrow</h3><div className="grid grid-cols-2 gap-2 text-sm">{Object.entries(data.escrow.byStatus).map(([status,count]) => <div key={status} className="flex justify-between rounded-control bg-bg-subtle p-3"><span>{status}</span><b>{nf(count)}</b></div>)}</div></Card>
-        <Card><h3 className="mb-3 font-bold text-fg">بازپرداخت‌ها</h3><p className="mb-3 text-sm">مبلغ درخواست‌شده: <b>{formatToman(data.refunds.requestedAmount)}</b></p><div className="grid grid-cols-2 gap-2 text-sm">{Object.entries(data.refunds.byStatus).map(([status,count]) => <div key={status} className="flex justify-between rounded-control bg-bg-subtle p-3"><span>{status}</span><b>{nf(count)}</b></div>)}</div></Card>
+        <Card><h3 className="mb-3 font-bold text-fg">وضعیت Escrow</h3><div className="grid grid-cols-2 gap-2 text-sm">{Object.entries(data.escrow.byStatus).map(([status,count]) => <div key={status} className="flex justify-between rounded-control bg-bg-subtle p-3"><span>{FINANCE_STATUS_LABELS_FA[status] ?? status}</span><b>{nf(count)}</b></div>)}</div></Card>
+        <Card><h3 className="mb-3 font-bold text-fg">بازپرداخت‌ها</h3><p className="mb-3 text-sm">مبلغ درخواست‌شده: <b>{formatToman(data.refunds.requestedAmount)}</b></p><div className="grid grid-cols-2 gap-2 text-sm">{Object.entries(data.refunds.byStatus).map(([status,count]) => <div key={status} className="flex justify-between rounded-control bg-bg-subtle p-3"><span>{FINANCE_STATUS_LABELS_FA[status] ?? status}</span><b>{nf(count)}</b></div>)}</div></Card>
       </div>
-      <Card className="mt-4 overflow-x-auto"><h3 className="mb-3 font-bold text-fg">روند روزانه بر مبنای تهران</h3><ResponsiveTable className="w-full min-w-[650px] text-sm"><thead><tr className="text-right text-fg-muted"><th className="pb-2">تاریخ</th><th>GMV</th><th>درآمد</th><th>بازپرداخت</th></tr></thead><tbody>{data.daily.map((item) => <tr key={item.date} className="border-t border-border"><td className="py-2">{formatDateOnly(item.date)}</td><td>{formatToman(item.gmv)}</td><td>{formatToman(item.revenue)}</td><td>{formatToman(item.refunds)}</td></tr>)}</tbody></ResponsiveTable></Card>
+      <Card tabIndex={0} role="region" aria-label="جدول روند روزانه مالی" className="mt-4 overflow-x-auto"><h3 className="mb-3 font-bold text-fg">روند روزانه بر مبنای تهران</h3><ResponsiveTable className="w-full min-w-[650px] text-sm"><thead><tr className="text-right text-fg-muted"><th className="pb-2">تاریخ</th><th>GMV</th><th>درآمد</th><th>بازپرداخت</th></tr></thead><tbody>{data.daily.map((item) => <tr key={item.date} className="border-t border-border"><td className="py-2">{formatDateOnly(item.date)}</td><td>{formatToman(item.gmv)}</td><td>{formatToman(item.revenue)}</td><td>{formatToman(item.refunds)}</td></tr>)}</tbody></ResponsiveTable></Card>
     </>}
   </div>;
 }

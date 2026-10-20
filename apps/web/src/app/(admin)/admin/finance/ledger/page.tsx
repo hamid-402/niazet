@@ -69,7 +69,7 @@ export default function AdminLedgerPage() {
       )}
 
       {entries && entries.length > 0 && (
-        <Card className="overflow-x-auto p-0">
+        <Card tabIndex={0} role="region" aria-label="جدول دفتر مالی" className="overflow-x-auto p-0">
           <ResponsiveTable className="w-full min-w-[720px] text-sm">
             <thead>
               <tr className="border-b border-border text-right text-xs text-fg-subtle">
