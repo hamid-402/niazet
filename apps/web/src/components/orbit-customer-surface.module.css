@@ -50,11 +50,24 @@
 .financePage [role='tablist'] { margin-bottom: 0; }
 .financePage [role='tabpanel'] { min-width: 0; border-radius: 1.2rem; padding: clamp(1rem, 2vw, 1.5rem); }
 .tabHint { margin-top: -.6rem; color: var(--color-fg-subtle); font-size: .75rem; line-height: 1.7; }
+.organizationPage { display: grid; gap: 1.35rem; min-width: 0; }
+.organizationGrid { display: grid; gap: 1rem; min-width: 0; }
+.organizationCard { min-width: 0; overflow-wrap: anywhere; border-radius: 1.2rem; border-top: 2px solid var(--color-border-strong); }
+.organizationGrid .organizationCard { border-top-color: var(--color-accent); }
+.organizationMetrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
+.organizationMetric { min-width: 0; min-height: 7rem; border-radius: 1rem; border-top: 2px solid var(--color-border-strong); padding: clamp(.9rem, 2vw, 1.3rem); }
+.organizationMetric:first-child { border-top-color: var(--color-accent); }
+.organizationMetric:last-child { grid-column: span 2; }
+.organizationMetric p { color: var(--color-fg-muted); font-size: .8rem; }
+.organizationMetric strong { display: block; margin-top: .65rem; font-size: clamp(1.35rem, 2.4vw, 1.85rem); line-height: 1.4; }
 @media (min-width: 768px) {
   .metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .metric:last-child { grid-column: auto; }
   .filters { grid-template-columns: minmax(0, 2fr) minmax(12rem, 1fr); align-items: end; }
   .detailMetrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .organizationGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .organizationMetrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .organizationMetric:last-child { grid-column: auto; }
 }
 @media (min-width: 1024px) { .financeMetrics { grid-template-columns: repeat(5, minmax(0, 1fr)); } .financeMetric:last-child { grid-column: auto; } }
 @media (min-width: 768px) { .tabHint { display: none; } }
@@ -68,6 +81,7 @@
   .page[data-motion='on'] .composerSteps li[aria-current='step'], .page[data-motion='on'] .composerCard { animation: customer-settle 360ms ease-out both; }
   .page[data-motion='on'] .detailMetric, .page[data-motion='on'] .nextAction { animation: customer-settle 360ms ease-out both; }
   .page[data-motion='on'] .financeMetric, .page[data-motion='on'] .financeReminder { animation: customer-settle 360ms ease-out both; }
+  .page[data-motion='on'] .organizationMetric, .page[data-motion='on'] .organizationCard { animation: customer-settle 360ms ease-out both; }
 }
 @keyframes customer-settle { from { opacity: .94; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .page *, .page *::before, .page *::after { animation: none !important; transition: none !important; } }

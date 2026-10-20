@@ -395,6 +395,7 @@ async function verifyCustomerNewOrderUi(page, webOrigin) {
   await page.getByRole('heading', { name: 'ثبت درخواست جدید', exact: true }).waitFor();
   const title = page.getByRole('textbox', { name: 'عنوان درخواست' });
   await title.waitFor();
+  await page.getByText('آخرین پیش‌نویس شما بازیابی شد؛ می‌توانید از همان‌جا ادامه دهید.', { exact: true }).waitFor();
   const originalTitle = await title.inputValue();
   assert.ok(originalTitle.length >= 3, 'The fixture draft should resume without losing its title.');
   assert.equal(await page.locator('[aria-current="step"]').count(), 1, 'The request flow must announce one current step.');
