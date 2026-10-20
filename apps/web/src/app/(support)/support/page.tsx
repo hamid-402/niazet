@@ -6,6 +6,8 @@ import { apiFetch } from "@/lib/api";
 import { Card, ErrorBanner, PageLoading, SectionTitle } from "@/components/ui";
 import { TicketStatusBadge } from "@/components/status-badge";
 import type { Ticket } from "@/lib/types";
+import { OrbitStaffSurface } from "@/components/orbit-staff-surface";
+import styles from "@/components/orbit-staff-surface.module.css";
 
 type Dashboard = {
   unassigned: number;
@@ -29,23 +31,23 @@ export default function SupportDashboardPage() {
   if (!data) return <PageLoading />;
 
   return (
-    <div className="space-y-4">
-      <SectionTitle>داشبورد پشتیبانی</SectionTitle>
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <OrbitStaffSurface>
+      <div className={styles.heading}><div><p className={styles.eyebrow}>همراه مشتری</p><SectionTitle>داشبورد پشتیبانی</SectionTitle></div></div>
+      <div className={styles.metrics}>
         {[
           ["صف بدون مسئول", data.unassigned, "text-info"],
           ["تیکت‌های من", data.mine, "text-success"],
           ["ریسک SLA تا یک ساعت", data.slaAtRisk, "text-warning"],
           ["SLA عبورکرده", data.breached, "text-danger"],
         ].map(([label, value, color]) => (
-          <Card key={String(label)}>
+          <Card className={styles.metric} key={String(label)}>
             <p className="text-xs text-fg-muted">{label}</p>
             <p className={`mt-2 text-2xl font-extrabold ${color}`}>{value}</p>
           </Card>
         ))}
       </div>
 
-      <Card>
+      <Card className={styles.section}>
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-bold text-fg">اقدام‌های بعدی من</h2>
           <Link href="/support/tickets?view=mine" className="text-sm text-success">
@@ -58,7 +60,7 @@ export default function SupportDashboardPage() {
               <Link
                 key={ticket.id}
                 href={`/support/tickets/${ticket.id}`}
-                className="flex flex-wrap items-center justify-between gap-3 py-3"
+                className={styles.queueLink}
               >
                 <div>
                   <p className="font-medium text-fg">{ticket.subject}</p>
@@ -72,6 +74,6 @@ export default function SupportDashboardPage() {
           <p className="text-sm text-fg-subtle">تیکت فعالی به شما تخصیص ندارد.</p>
         )}
       </Card>
-    </div>
+    </OrbitStaffSurface>
   );
 }

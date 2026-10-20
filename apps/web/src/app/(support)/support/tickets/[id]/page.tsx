@@ -8,6 +8,8 @@ import { TicketStatusBadge } from "@/components/status-badge";
 import type { OrderFile, Ticket, TicketMessage } from "@/lib/types";
 import { SecureFileLink, SecureFileUpload } from "@/components/secure-file";
 import { formatDate } from "@/lib/format";
+import { OrbitStaffSurface } from "@/components/orbit-staff-surface";
+import styles from "@/components/orbit-staff-surface.module.css";
 
 type CannedReply = { id: string; title: string; category: string; body: string };
 type SupportTicket = Ticket & { messages: TicketMessage[] };
@@ -54,14 +56,14 @@ export default function SupportTicketDetailPage({ params }: { params: Promise<{ 
   const closed = ticket.status === "closed";
 
   return (
-    <div className="mx-auto max-w-3xl space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div><p className="text-xs text-fg-subtle">{ticket.code}</p><h1 className="text-xl font-extrabold text-fg">{ticket.subject}</h1></div>
+    <OrbitStaffSurface><div className={styles.ticketWorkspace}>
+      <div className={styles.heading}>
+        <div><p className={styles.eyebrow}>{ticket.code}</p><h1 className={styles.detailTitle}>{ticket.subject}</h1></div>
         <TicketStatusBadge status={ticket.status} />
       </div>
       {error && <ErrorBanner message={error} />}
 
-      <Card className="grid gap-3 text-sm sm:grid-cols-2">
+      <Card className={`${styles.section} grid gap-3 text-sm sm:grid-cols-2`}>
         <div><p className="text-xs text-fg-subtle">مشتری</p><p className="mt-1 text-fg">{ticket.customer?.fullName ?? "—"}</p></div>
         <div><p className="text-xs text-fg-subtle">مسئول</p><p className="mt-1 text-fg">{ticket.assignedTo?.fullName ?? "بدون مسئول"}</p></div>
         <div><p className="text-xs text-fg-subtle">اولویت</p><p className="mt-1 text-fg">{ticket.priority}</p></div>
@@ -78,11 +80,11 @@ export default function SupportTicketDetailPage({ params }: { params: Promise<{ 
         <Card className="border-warning-border bg-warning-subtle text-sm text-warning">این تیکت به پشتیبان دیگری تخصیص دارد و برای شما فقط خواندنی است.</Card>
       )}
 
-      <Card>
+      <Card className={styles.conversation}>
         <h2 className="mb-4 font-bold text-fg">گفت‌وگو و یادداشت‌ها</h2>
         <div className="mb-5 space-y-3">
           {ticket.messages.map((message) => (
-            <div key={message.id} className={`rounded-card p-3 text-sm ${message.visibility === "internal_only" ? "border border-warning-border bg-warning-subtle" : "bg-bg-subtle"}`}>
+            <div key={message.id} className={`${styles.message} rounded-card p-3 text-sm ${message.visibility === "internal_only" ? "border border-warning-border bg-warning-subtle" : "bg-bg-subtle"}`}>
               {message.visibility === "internal_only" && <p className="mb-1 text-xs font-bold text-warning">یادداشت داخلی · فقط تیم پشتیبانی</p>}
               <p className="whitespace-pre-wrap text-fg">{message.body}</p>
               <p className="mt-1 text-xs text-fg-subtle">{formatDate(message.createdAt)}</p>
@@ -102,7 +104,7 @@ export default function SupportTicketDetailPage({ params }: { params: Promise<{ 
                 {cannedReplies.map((reply) => <option key={reply.id} value={reply.id}>{reply.title}</option>)}
               </select>
             </label>
-            <textarea className={`${inputClass} min-h-28`} value={body} onChange={(event) => setBody(event.target.value)} placeholder={internal ? "یادداشت داخلی را بنویسید…" : "پاسخ مشتری را بنویسید…"} />
+            <textarea aria-label="متن پاسخ یا یادداشت" className={`${inputClass} min-h-28`} value={body} onChange={(event) => setBody(event.target.value)} placeholder={internal ? "یادداشت داخلی را بنویسید…" : "پاسخ مشتری را بنویسید…"} />
             <label className="flex items-center gap-2 text-sm text-fg-muted"><input type="checkbox" checked={internal} onChange={(event) => setInternal(event.target.checked)} />یادداشت داخلی؛ مشتری آن را نمی‌بیند</label>
             {ticket.orderId && <SecureFileUpload orderId={ticket.orderId} fileKind="ticket_attachment" label={attachment ? "تغییر پیوست" : "افزودن پیوست پاسخ"} disabled={busy} onUploaded={setAttachment} />}
             {attachment && <p className="text-xs text-success">پیوست آماده ارسال: {attachment.originalName}</p>}
@@ -115,10 +117,10 @@ export default function SupportTicketDetailPage({ params }: { params: Promise<{ 
       </Card>
 
       {canAct && !closed && (
-        <Card>
+        <Card className={styles.nextAction}>
           <h2 className="mb-3 font-bold text-fg">عملیات تیکت</h2>
           <div className="space-y-3">
-            <div className="flex flex-col gap-2 sm:flex-row"><input className={inputClass} placeholder="دلیل ارجاع ویژه" value={escalateReason} onChange={(event) => setEscalateReason(event.target.value)} /><Button variant="secondary" disabled={busy || escalateReason.trim().length < 3} onClick={() => runAction(() => apiFetch(`/support/tickets/${id}/escalate`, { method: "POST", body: { reason: escalateReason.trim() } }))}>ارجاع ویژه</Button></div>
+            <div className="flex flex-col gap-2 sm:flex-row"><input aria-label="دلیل ارجاع ویژه" className={inputClass} placeholder="دلیل ارجاع ویژه" value={escalateReason} onChange={(event) => setEscalateReason(event.target.value)} /><Button variant="secondary" disabled={busy || escalateReason.trim().length < 3} onClick={() => runAction(() => apiFetch(`/support/tickets/${id}/escalate`, { method: "POST", body: { reason: escalateReason.trim() } }))}>ارجاع ویژه</Button></div>
             <div className="flex flex-wrap gap-2">
               {ticket.status !== "resolved" && <Button variant="secondary" disabled={busy} onClick={() => runAction(() => apiFetch(`/support/tickets/${id}/resolve`, { method: "POST" }))}>علامت‌گذاری به‌عنوان حل‌شده</Button>}
               {ticket.status === "resolved" && <Button variant="danger" disabled={busy} onClick={() => runAction(() => apiFetch(`/support/tickets/${id}/close`, { method: "POST" }))}>بستن تیکت حل‌شده</Button>}
@@ -126,6 +128,6 @@ export default function SupportTicketDetailPage({ params }: { params: Promise<{ 
           </div>
         </Card>
       )}
-    </div>
+    </div></OrbitStaffSurface>
   );
 }

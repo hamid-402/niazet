@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { Card, ErrorBanner, PageLoading, SectionTitle } from "@/components/ui";
+import { OrbitStaffSurface } from "@/components/orbit-staff-surface";
+import styles from "@/components/orbit-staff-surface.module.css";
 
 type Performance = {
   totalReplied: number;
@@ -24,18 +26,18 @@ export default function SupportPerformancePage() {
   if (!data) return <PageLoading />;
 
   return (
-    <div className="space-y-4">
-      <SectionTitle>عملکرد من</SectionTitle>
-      <div className="grid gap-3 md:grid-cols-3">
-        <Card>
+    <OrbitStaffSurface>
+      <div className={styles.heading}><div><p className={styles.eyebrow}>کیفیت پاسخ‌گویی</p><SectionTitle>عملکرد من</SectionTitle></div></div>
+      <div className={styles.detailMetrics}>
+        <Card className={styles.metric}>
           <p className="text-xs text-fg-muted">پاسخ‌های قابل مشاهده مشتری</p>
           <p className="mt-2 text-2xl font-extrabold text-info">{data.totalReplied}</p>
         </Card>
-        <Card>
+        <Card className={styles.metric}>
           <p className="text-xs text-fg-muted">تیکت حل یا بسته‌شده</p>
           <p className="mt-2 text-2xl font-extrabold text-success">{data.resolved}</p>
         </Card>
-        <Card>
+        <Card className={styles.metric}>
           <p className="text-xs text-fg-muted">عبور از SLA</p>
           <p className="mt-2 text-2xl font-extrabold text-danger">{data.slaBreaches}</p>
         </Card>
@@ -43,6 +45,6 @@ export default function SupportPerformancePage() {
       <Card className="text-sm leading-7 text-fg-muted">
         این شاخص‌ها فقط فعالیت حساب فعلی را نشان می‌دهند و یادداشت‌های داخلی در تعداد پاسخ‌های مشتری محاسبه نمی‌شوند.
       </Card>
-    </div>
+    </OrbitStaffSurface>
   );
 }

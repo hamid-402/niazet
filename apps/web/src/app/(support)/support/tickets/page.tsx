@@ -8,6 +8,8 @@ import { ResponsiveTable, Button, Card, EmptyState, ErrorBanner, inputClass, Pag
 import { TicketStatusBadge } from "@/components/status-badge";
 import type { Ticket } from "@/lib/types";
 import { formatDate } from "@/lib/format";
+import { OrbitStaffSurface } from "@/components/orbit-staff-surface";
+import styles from "@/components/orbit-staff-surface.module.css";
 
 function slaState(dueAt: string | null) {
   if (!dueAt) return { label: "بدون SLA", className: "text-fg-subtle" };
@@ -59,23 +61,23 @@ function SupportTicketsQueueContent() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <SectionTitle>{view === "mine" ? "تیکت‌های من" : "صف تیکت‌ها"}</SectionTitle>
+    <OrbitStaffSurface>
+      <div className={styles.heading}>
+        <div><p className={styles.eyebrow}>رسیدگی و پیگیری</p><SectionTitle>{view === "mine" ? "تیکت‌های من" : "صف تیکت‌ها"}</SectionTitle></div>
         <div className="flex rounded-card border border-border p-1 text-sm">
-          <button className={`rounded-control px-3 py-2 ${view === "queue" ? "bg-accent text-fg-on-accent" : "text-fg-muted"}`} onClick={() => router.replace("/support/tickets")}>کل صف</button>
-          <button className={`rounded-control px-3 py-2 ${view === "mine" ? "bg-accent text-fg-on-accent" : "text-fg-muted"}`} onClick={() => router.replace("/support/tickets?view=mine")}>تیکت‌های من</button>
+          <button aria-pressed={view === "queue"} className={`rounded-control px-3 py-2 ${view === "queue" ? "bg-accent text-fg-on-accent" : "text-fg-muted"}`} onClick={() => router.replace("/support/tickets")}>کل صف</button>
+          <button aria-pressed={view === "mine"} className={`rounded-control px-3 py-2 ${view === "mine" ? "bg-accent text-fg-on-accent" : "text-fg-muted"}`} onClick={() => router.replace("/support/tickets?view=mine")}>تیکت‌های من</button>
         </div>
       </div>
 
-      <Card className="grid gap-3 md:grid-cols-2">
+      <Card className={`${styles.section} grid gap-3 md:grid-cols-2`}>
         <label className="text-xs text-fg-muted">وضعیت
-          <select className={`${inputClass} mt-1`} value={status} onChange={(event) => setStatus(event.target.value)}>
+          <select aria-label="فیلتر وضعیت" className={`${inputClass} mt-1`} value={status} onChange={(event) => setStatus(event.target.value)}>
             <option value="">همه وضعیت‌ها</option><option value="open">باز</option><option value="assigned">تخصیص‌یافته</option><option value="waiting_internal">منتظر اقدام داخلی</option><option value="waiting_customer">منتظر مشتری</option><option value="escalated">ارجاع ویژه</option><option value="resolved">حل‌شده</option><option value="closed">بسته‌شده</option>
           </select>
         </label>
         <label className="text-xs text-fg-muted">اولویت
-          <select className={`${inputClass} mt-1`} value={priority} onChange={(event) => setPriority(event.target.value)}>
+          <select aria-label="فیلتر اولویت" className={`${inputClass} mt-1`} value={priority} onChange={(event) => setPriority(event.target.value)}>
             <option value="">همه اولویت‌ها</option><option value="low">کم</option><option value="normal">عادی</option><option value="high">زیاد</option><option value="urgent">فوری</option>
           </select>
         </label>
@@ -86,7 +88,7 @@ function SupportTicketsQueueContent() {
       {tickets?.length === 0 && <EmptyState title="تیکتی با این فیلتر یافت نشد." />}
 
       {tickets && tickets.length > 0 && (
-        <Card className="overflow-x-auto p-0">
+        <Card className={`${styles.ordersTable} overflow-x-auto p-0`}>
           <ResponsiveTable className="w-full min-w-[880px] text-sm">
             <thead><tr className="border-b border-border text-right text-xs text-fg-subtle"><th className="px-4 py-3 font-medium">موضوع</th><th className="px-4 py-3 font-medium">مشتری</th><th className="px-4 py-3 font-medium">اولویت</th><th className="px-4 py-3 font-medium">وضعیت</th><th className="px-4 py-3 font-medium">SLA</th><th className="px-4 py-3 font-medium">ایجاد</th><th className="px-4 py-3 font-medium">اقدام</th></tr></thead>
             <tbody>{tickets.map((ticket) => {
@@ -100,7 +102,7 @@ function SupportTicketsQueueContent() {
           </ResponsiveTable>
         </Card>
       )}
-    </div>
+    </OrbitStaffSurface>
   );
 }
 

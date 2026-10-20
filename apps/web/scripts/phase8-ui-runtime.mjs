@@ -453,6 +453,68 @@ async function verifyExecutorWorkspace(page, webOrigin, databaseUrl) {
   } finally { await db.$disconnect(); }
 }
 
+async function verifySupportWorkspace(pages, webOrigin, databaseUrl) {
+  const db = new PrismaClient({ datasources: { db: { url: databaseUrl } } });
+  const page = pages.get('support'), customerPage = pages.get('customer');
+  const id = randomUUID(), subject = 'پیگیری آزمایشی پشتیبانی مدار';
+  const publicBody = 'پاسخ عمومی آزمایشی برای مشتری ثبت شد.';
+  const privateBody = 'یادداشت محرمانه فقط برای پشتیبانی مدار';
+  try {
+    const customer = await db.user.findUniqueOrThrow({ where: { phone: '09120000009' } });
+    await db.ticket.create({ data: { id, code: `UI-SUP-${id.slice(0, 8)}`, customerId: customer.id, subject, category: 'support', priority: 'high', slaDueAt: new Date(Date.now() + 7_200_000), messages: { create: { senderUserId: customer.id, body: 'لطفاً درخواست مرا بررسی کنید.' } } } });
+    await page.goto(`${webOrigin}/support/tickets`);
+    await page.getByRole('link', { name: subject, exact: true }).waitFor();
+    await page.getByLabel('فیلتر اولویت', { exact: true }).selectOption('low');
+    await page.getByRole('link', { name: subject, exact: true }).waitFor({ state: 'hidden' });
+    await page.getByLabel('فیلتر اولویت', { exact: true }).selectOption('high');
+    const row = page.getByRole('row').filter({ has: page.getByRole('link', { name: subject, exact: true }) });
+    await row.getByRole('button', { name: 'برداشتن تیکت', exact: true }).click();
+    await page.waitForURL(url => url.searchParams.get('view') === 'mine');
+    await page.getByRole('link', { name: subject, exact: true }).click();
+    const editor = page.getByRole('textbox', { name: 'متن پاسخ یا یادداشت', exact: true });
+    await editor.fill(publicBody);
+    await page.getByRole('button', { name: 'ارسال پاسخ به مشتری', exact: true }).click();
+    await page.getByText(publicBody, { exact: true }).waitFor();
+    await page.getByRole('checkbox', { name: 'یادداشت داخلی؛ مشتری آن را نمی‌بیند', exact: true }).check();
+    await editor.fill(privateBody);
+    await page.getByRole('button', { name: 'ثبت یادداشت داخلی', exact: true }).click();
+    await page.getByText(privateBody, { exact: true }).waitFor();
+    await customerPage.goto(`${webOrigin}/tickets/${id}`);
+    await customerPage.getByText(publicBody, { exact: true }).waitFor();
+    assert.equal(await customerPage.getByText(privateBody, { exact: true }).count(), 0, 'Customer must never see internal notes.');
+    await page.getByRole('textbox', { name: 'دلیل ارجاع ویژه', exact: true }).fill('برای بررسی دقیق به مسئول مربوط ارجاع شود.');
+    await Promise.all([
+      page.waitForResponse(response => response.url().endsWith(`/support/tickets/${id}`) && response.request().method() === 'GET' && response.ok()),
+      page.getByRole('button', { name: 'ارجاع ویژه', exact: true }).click(),
+    ]);
+    assert.equal((await db.ticket.findUniqueOrThrow({ where: { id } })).status, 'escalated');
+    for (const viewport of viewports) for (const theme of themes) {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.evaluate(id => { document.documentElement.dataset.theme = id; }, theme.id);
+      await settle(page);
+      await page.evaluate(() => { document.activeElement?.blur(); window.scrollTo({ top: 0, behavior: 'instant' }); });
+      assert.deepEqual((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()).violations, []);
+      assert.ok((await runtimeSnapshot(page, 'support-active')).overflowX <= 1);
+      await page.screenshot({ path: resolve(artifactRoot, `support-active-${viewport.id}-${theme.id}.png`), fullPage: true, animations: 'disabled' });
+    }
+    await page.getByRole('button', { name: 'علامت‌گذاری به‌عنوان حل‌شده', exact: true }).click();
+    await page.getByRole('button', { name: 'بستن تیکت حل‌شده', exact: true }).click();
+    await editor.waitFor({ state: 'hidden' });
+    assert.equal((await db.ticket.findUniqueOrThrow({ where: { id } })).status, 'closed');
+    await page.goto(`${webOrigin}/support/performance`);
+    await page.getByRole('heading', { name: 'عملکرد من', exact: true }).waitFor();
+    for (const viewport of viewports) for (const theme of themes) {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.evaluate(id => { document.documentElement.dataset.theme = id; }, theme.id);
+      await settle(page);
+      assert.deepEqual((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()).violations, []);
+      assert.ok((await runtimeSnapshot(page, 'support-performance')).overflowX <= 1);
+      await page.screenshot({ path: resolve(artifactRoot, `support-performance-${viewport.id}-${theme.id}.png`), fullPage: true, animations: 'disabled' });
+    }
+    console.log('Support flow passed: filters, claim, public reply, internal-note privacy, escalation, resolve/close, 16 extra Axe/screenshots.');
+  } finally { await db.$disconnect(); }
+}
+
 async function verifyCustomerNewOrderUi(page, webOrigin) {
   await page.goto(`${webOrigin}/orders/new`);
   await page.getByRole('heading', { name: 'ثبت درخواست جدید', exact: true }).waitFor();
@@ -761,6 +823,7 @@ try {
     compareBaseline(report.snapshots, baseline.snapshots);
   }
   await verifyExecutorWorkspace(pages.get('executor'), webOrigin, isolatedUrl.toString());
+  await verifySupportWorkspace(pages, webOrigin, isolatedUrl.toString());
   console.log(`Phase 8 runtime UI passed: ${report.snapshots.length} screenshots, ${report.axe.length} axe scans, responsive overflow checks, keyboard flows and compact visual baseline.`);
 } catch (error) {
   testError = error;

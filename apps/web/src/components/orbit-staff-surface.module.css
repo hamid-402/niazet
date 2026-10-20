@@ -15,6 +15,10 @@
 .detailTitle { max-width: 55rem; overflow-wrap: anywhere; font-weight: 850; }
 .detailMetrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
 .nextAction { min-width: 0; border-radius: 1.2rem; border-inline-start: 3px solid var(--color-accent); padding: clamp(1rem, 2vw, 1.5rem); }
+.ticketWorkspace { display: grid; gap: 1.35rem; width: min(100%, 56rem); margin-inline: auto; min-width: 0; }
+.conversation { min-width: 0; border-radius: 1.2rem; padding: clamp(1rem, 2vw, 1.5rem); }
+.message { overflow-wrap: anywhere; border-inline-start: 2px solid var(--color-border-strong); }
+.conversation textarea { line-height: 1.9; }
 @media (max-width: 639px) { .detailMetrics { grid-template-columns: 1fr; } }
 @media (min-width: 768px) { .metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (prefers-reduced-motion: no-preference) {
