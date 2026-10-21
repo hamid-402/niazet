@@ -1,0 +1,53 @@
+.section { --section-ease: cubic-bezier(.22,1,.36,1); position: relative; scroll-margin-top: 7rem; }
+.section h2 { font-size: clamp(1.65rem, 3vw, 2.6rem); line-height: 1.75; letter-spacing: -.035em; text-wrap: balance; }
+.section h3 { line-height: 1.9; }
+.section > section { scroll-margin-top: 7rem; }
+.useCases > section, .assurance > section { background: transparent; }
+.finalCta { background: var(--color-accent-subtle); }
+.finalCta > section { background: transparent; padding-block: 0; border: 0; }
+.heading { margin-inline: 0; text-align: start; max-width: 43rem; }
+.useCases { background: linear-gradient(150deg, var(--color-accent-subtle), transparent 50%), var(--color-bg-subtle); }
+.useCases .caseGrid { gap: 1rem; }
+.useCases .caseCard { position: relative; border-radius: 1.4rem; padding: 1.6rem; box-shadow: none; overflow: hidden; }
+.caseCard::before { content: ''; position: absolute; inset-inline-start: 0; top: 1.6rem; width: 3px; height: 2rem; background: var(--color-brand-secondary); }
+.caseCard > div:first-child > span { width: 2.8rem; height: 2.8rem; border-radius: .85rem; font-size: 1rem; }
+.caseCard dl > div:last-child { margin-top: auto; background: var(--color-accent-subtle); border: 1px solid var(--color-accent-border); border-radius: .8rem; padding: 1rem; }
+.samples .sampleGrid { gap: 1.5rem; }
+.samples .sampleCard { border-radius: 1.5rem; box-shadow: none; }
+.sampleCard > div:first-child { background: var(--color-accent-subtle); padding: 1rem 1.5rem; }
+.sampleCard > div:nth-child(2) { padding: 1.5rem; }
+.sampleCard [aria-label] { padding: 1.3rem; border-radius: .8rem; background: linear-gradient(160deg, var(--color-surface), var(--color-bg)); box-shadow: .45rem .45rem 0 var(--color-bg-subtle); }
+.assurance { background: radial-gradient(ellipse at 100% 0, var(--color-accent-subtle), transparent 60%), var(--color-surface); }
+.assurance .assuranceGrid { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--color-border); }
+.assurance .assuranceCard { display: grid; grid-template-columns: 1fr; gap: 1rem; border: 0; border-bottom: 1px solid var(--color-border); border-radius: 0; background: transparent; padding: 1.7rem 0; }
+.assuranceCard > p { margin: 0; }
+.assuranceCard > dl { margin: 0; padding: 0; border: 0; display: grid; grid-template-columns: 1fr; align-items: start; }
+.assuranceCard > dl > div:last-child { margin: 0; padding: 1rem; border: 1px solid var(--color-border); background: var(--color-bg-subtle); }
+.assuranceCard > dl > div:last-child dt { color: var(--color-fg); }
+.process .stepList { gap: .55rem; position: relative; }
+.process .stepList button { border-radius: 1rem; padding: 1rem .65rem; }
+.process .stepList button[aria-current='step'] { box-shadow: inset 0 -3px var(--color-brand-secondary); }
+.process .processPanel { position: relative; border-radius: 1.5rem; padding: clamp(1.2rem, 3vw, 2.7rem); background: linear-gradient(135deg, var(--color-accent-subtle), transparent 65%), var(--color-bg); }
+.processPanel > dl > div { border: 1px solid var(--color-border); border-radius: .85rem; }
+.faq { max-width: 72rem; }
+.faq .faqLayout { display: grid; gap: 2rem; }
+.faq .faqHeading { text-align: start; }
+.faq .faqList { margin: 0; gap: 0; border-top: 1px solid var(--color-border); }
+.faq .question { border: 0; border-bottom: 1px solid var(--color-border); border-radius: 0; padding: 1.25rem .5rem; background: transparent; box-shadow: none; }
+.faq .question[open] { background: var(--color-accent-subtle); padding-inline: 1rem; }
+.faq summary { line-height: 1.9; font-size: .9rem; }
+.finalCta { padding: clamp(3rem, 7vw, 6rem) 1rem; overflow: hidden; isolation: isolate; }
+.finalCta::before { content: ''; position: absolute; width: 24rem; aspect-ratio: 1; border: 1px solid var(--color-accent-border); border-radius: 50%; left: -15rem; top: -7rem; box-shadow: 0 0 0 2.5rem var(--color-accent-subtle), 0 0 0 2.55rem var(--color-accent-border); z-index: -1; }
+.finalCta h2 { font-size: clamp(1.85rem, 3.6vw, 3rem); }
+.section[data-motion='on'][data-entered='true'] :is(.caseCard, .sampleCard, .assuranceCard) { animation: arrive .65s var(--section-ease) backwards; }
+.section[data-motion='on'][data-entered='true'] :is(.caseCard, .sampleCard, .assuranceCard):nth-child(2) { animation-delay: 60ms; }
+.section[data-motion='on'][data-entered='true'] :is(.caseCard, .sampleCard, .assuranceCard):nth-child(3) { animation-delay: 120ms; }
+.section[data-motion='on'][data-entered='true'] :is(.caseCard, .sampleCard, .assuranceCard):nth-child(4) { animation-delay: 180ms; }
+.section[data-motion='on'][data-entered='true'] :is(.caseCard, .assuranceCard):nth-child(5) { animation-delay: 240ms; }
+.section[data-motion='on'] :is(.caseCard, .sampleCard, .stepList button) { transition: transform .3s var(--section-ease), border-color .3s; }
+.section[data-motion='on'] .question[open] > p { animation: arrive .3s var(--section-ease); }
+.section[data-motion='off'] *, .section[data-motion='off'] *::after { animation: none !important; transition: none !important; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) { .section[data-motion='on'] :is(.caseCard, .sampleCard):hover { transform: translateY(-4px); border-color: var(--color-accent-border); } .section[data-motion='on'] .stepList button:hover { transform: translateY(-2px); } }
+@media (min-width: 64rem) { .useCases .caseGrid { grid-template-columns: repeat(3, minmax(0,1fr)); } .useCases .caseCard:first-child { grid-column: span 2; } .caseCard:first-child dl { display: grid; grid-template-columns: 1fr 1fr; align-items: start; } .caseCard:first-child dl > div:last-child { grid-column: 1 / -1; } .assurance .assuranceCard { grid-template-columns: 1fr 1fr 2fr; gap: 1.6rem; } .assuranceCard > dl { grid-template-columns: 1fr 1fr; } .faq .faqLayout { grid-template-columns: 1fr 1.6fr; gap: 4rem; } .faqHeading { position: sticky; top: 8rem; align-self: start; } }
+@media (prefers-reduced-motion: reduce) { .section *, .section *::after { animation: none !important; transition: none !important; } }
+@keyframes arrive { from { opacity: .65; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }

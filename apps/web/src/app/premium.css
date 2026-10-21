@@ -1,0 +1,66 @@
+/* Shared finish for public pages, account forms and all workspaces. */
+:root {
+  --radius-card: 1.25rem;
+  --radius-modal: 1.5rem;
+  --premium-lapis: #183a68;
+  --premium-honey: #d4ab58;
+  --premium-ease: cubic-bezier(.22, 1, .36, 1);
+}
+.brand-lockup { display: inline-flex; align-items: center; gap: .75rem; white-space: nowrap; }
+.brand-emblem { display: grid; place-items: center; width: 2.65rem; height: 2.65rem; border-radius: .9rem; color: #f5d48d; background: #183a68; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .15), 0 5px 15px rgb(24 58 104 / .12); }
+.brand-emblem svg { width: 1.85rem; height: 1.85rem; }
+.brand-caption { display: block; margin-top: .18rem; font-size: .6rem; font-weight: 500; color: var(--color-fg-muted); }
+.public-header { border-bottom-color: color-mix(in srgb, var(--color-border) 70%, transparent); }
+.public-header nav a { position: relative; padding-block: .5rem; }
+.public-header nav a::after { content: ''; position: absolute; bottom: 0; inset-inline: 0; height: 2px; background: var(--premium-honey); transform: scaleX(0); transition: transform .22s var(--premium-ease); transform-origin: right; }
+.public-header nav a:is(:hover, :focus-visible)::after { transform: scaleX(1); }
+.workspace-shell { background-image: radial-gradient(ellipse at 0 0, color-mix(in srgb, var(--color-info) 4%, transparent), transparent 60%); }
+.workspace-sidebar { position: sticky; top: 0; height: 100dvh; overflow-y: auto; scrollbar-width: thin; padding-block: 1.8rem; }
+.workspace-navigation { gap: .3rem; }
+.workspace-nav-link { display: flex; align-items: center; gap: .7rem; min-height: 2.75rem; transition: background .2s, color .2s, transform .2s var(--premium-ease); }
+.workspace-nav-link svg { flex-shrink: 0; }
+.workspace-nav-link[aria-current='page'] { box-shadow: inset -3px 0 var(--color-accent); background: linear-gradient(90deg, transparent, var(--color-accent-subtle)); font-weight: 800; }
+.workspace-nav-link:hover { transform: translateX(-2px); }
+.workspace-header { min-height: 4.6rem; }
+.workspace-shell main { padding-top: clamp(1.6rem, 3vw, 2.75rem); padding-bottom: 4rem; }
+.premium-card { box-shadow: 0 2px 3px rgb(15 30 55 / .025), 0 12px 35px -25px rgb(15 30 55 / .22); transition: border-color .22s, box-shadow .22s; }
+.premium-card > h2, .premium-card > h3 { letter-spacing: -.025em; }
+.premium-button { min-height: 2.75rem; transition: transform .18s var(--premium-ease), background .18s, box-shadow .18s; }
+.premium-button:not(:disabled):active { transform: translateY(1px) scale(.985); }
+.premium-button.bg-accent { box-shadow: inset 0 1px rgb(255 255 255 / .14), 0 5px 16px -9px var(--color-accent); }
+.premium-button.bg-accent:hover:not(:disabled) { box-shadow: inset 0 1px rgb(255 255 255 / .18), 0 8px 20px -9px var(--color-accent); }
+:is(input, textarea, select):not([type='checkbox'], [type='radio']) { transition: border-color .18s, box-shadow .18s; }
+:is(input, textarea, select):focus-visible { box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent) 10%, transparent); }
+[role='tab'] { transition: color .2s, background .2s, border-color .2s; }
+[role='tabpanel'] { animation: panel-arrive .22s var(--premium-ease); }
+.responsive-table th { font-size: .75rem; letter-spacing: -.01em; }
+.responsive-table tbody tr { transition: background .18s; }
+@media (hover: hover) {
+  .responsive-table tbody tr:hover { background: color-mix(in srgb, var(--color-accent-subtle) 25%, transparent); }
+  .premium-button:not(:disabled):hover { transform: translateY(-1px); }
+}
+.editorial-hero { position: relative; isolation: isolate; padding-block: clamp(4rem, 9vw, 7.8rem); }
+.editorial-hero::before { content: ''; position: absolute; z-index: -1; inset: 1.5rem 0 0; border-radius: 2rem; background: radial-gradient(ellipse at 50% 15%, color-mix(in srgb, var(--premium-honey) 10%, transparent), transparent 60%); pointer-events: none; }
+.hero-eyebrow { display: inline-flex; align-items: center; gap: .6rem; border: 1px solid var(--color-accent-border); background: var(--color-accent-subtle); border-radius: 999px; padding: .5rem 1rem; font-size: .75rem; }
+.hero-eyebrow::before { content: ''; width: .4rem; height: .4rem; background: var(--color-accent); border-radius: 50%; }
+.editorial-hero h1 { max-width: 55rem; margin-inline: auto; font-size: clamp(2rem, 4.8vw, 3.8rem); line-height: 1.65; letter-spacing: -.05em; text-wrap: balance; }
+.editorial-hero h1 span { color: var(--color-accent); }
+.hero-trust { border-block-start: 1px solid var(--color-border); padding-block-start: 2rem; }
+.hero-trust li { background: transparent; border: 0; box-shadow: none; padding-inline: 1.3rem; }
+.hero-trust li + li { border-inline-start: 1px solid var(--color-border); border-radius: 0; }
+.service-collection a { text-align: start; min-height: 6rem; display: flex; align-items: end; position: relative; transition: transform .25s var(--premium-ease), border-color .25s, box-shadow .25s; }
+.service-collection a::after { content: '↖'; margin-inline-start: auto; padding-inline-start: .7rem; color: var(--color-accent); font-size: 1.1rem; }
+.service-collection a:hover { transform: translateY(-3px); border-color: var(--color-accent-border); box-shadow: var(--shadow-elevation-2); }
+.motion-dialog { animation: panel-arrive .24s var(--premium-ease); }
+.motion-drawer { transition: opacity .2s, display .2s allow-discrete; opacity: 1; }
+.motion-drawer[hidden] { display: none; opacity: 0; }
+.motion-drawer > aside { transition: transform .26s var(--premium-ease); transform: translateX(0); }
+.motion-drawer[hidden] > aside { transform: translateX(100%); }
+@starting-style { .motion-drawer { opacity: 0; } .motion-drawer > aside { transform: translateX(100%); } }
+@keyframes panel-arrive { from { opacity: .35; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (max-width: 47.999rem) { .brand-caption { display: none; } .brand-emblem { width: 2.2rem; height: 2.2rem; } .hero-trust li + li { border-inline-start: 0; border-block-start: 1px solid var(--color-border); padding-top: 1.3rem; } .editorial-hero { padding-top: 3rem; } }
+@media (prefers-reduced-motion: reduce) {
+  .motion-dialog, [role='tabpanel'] { animation: none; }
+  .motion-drawer, .motion-drawer > aside, .workspace-nav-link, .premium-button, .service-collection a { transition: none; }
+  .workspace-nav-link:hover, .premium-button:not(:disabled):hover, .premium-button:not(:disabled):active, .service-collection a:hover { transform: none; }
+}

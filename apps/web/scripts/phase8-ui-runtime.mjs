@@ -1,0 +1,1142 @@
+import assert from 'node:assert/strict';
+import { spawn, spawnSync } from 'node:child_process';
+import { randomInt, randomUUID } from 'node:crypto';
+import { once } from 'node:events';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { delimiter, dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import AxeBuilder from '@axe-core/playwright';
+import { chromium } from 'playwright';
+import { scenarios, themes, validateVisualMatrix, viewports } from './phase8-visual-regression-matrix.mjs';
+import { verifyOrbitHome } from './orbit-home-runtime.mjs';
+import { verifyCustomerDecisions } from './orbit-customer-decisions-runtime.mjs';
+
+const webRoot = fileURLToPath(new URL('../', import.meta.url));
+const repositoryRoot = resolve(webRoot, '../..');
+const apiRoot = resolve(repositoryRoot, 'apps/api');
+const apiEnvironmentPath = resolve(apiRoot, '.env');
+const prismaCli = resolve(apiRoot, 'node_modules/prisma/build/index.js');
+const apiEntry = resolve(apiRoot, 'dist/main.js');
+const nextCli = resolve(webRoot, 'node_modules/next/dist/bin/next');
+const apiRequire = createRequire(resolve(apiRoot, 'package.json'));
+const { PrismaClient } = apiRequire('@prisma/client');
+const artifactRoot = resolve(repositoryRoot, '.artifacts/ui-runtime');
+const baselinePath = resolve(webRoot, 'tests/phase8-visual-baseline.json');
+const updateBaseline = process.argv.includes('--update-baseline');
+const updateScope = process.argv.find((argument) => argument.startsWith('--update-scenarios='))?.split('=')[1].split(',');
+if (updateScope) {
+  assert.ok(updateBaseline, '--update-scenarios requires --update-baseline.');
+  for (const id of updateScope) assert.ok(scenarios.some((scenario) => scenario.id === id), `Unknown baseline scope: ${id}`);
+}
+const runId = randomUUID();
+const pathEnvironmentKey = Object.keys(process.env).find((key) => key.toLowerCase() === 'path') ?? 'PATH';
+const rolePhones = {
+  super: '09120000001',
+  customer: '09120000009',
+  ops: '09120000002',
+  finance: '09120000003',
+  executor: '09120000005',
+  support: '09120000004',
+};
+const roleHomes = {
+  super: '/admin',
+  customer: '/dashboard',
+  ops: '/admin',
+  finance: '/admin/finance',
+  executor: '/executor',
+  support: '/support/tickets',
+};
+
+if (updateBaseline) {
+  assert.equal(
+    process.env.UI_BASELINE_UPDATE_CONFIRM,
+    'niazat_update_visual_baseline',
+    'Updating the visual baseline requires UI_BASELINE_UPDATE_CONFIRM=niazat_update_visual_baseline.',
+  );
+}
+
+function readEnvironmentFile() {
+  if (!existsSync(apiEnvironmentPath)) return {};
+  return Object.fromEntries(
+    readFileSync(apiEnvironmentPath, 'utf8')
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line && !line.startsWith('#') && line.includes('='))
+      .map((line) => {
+        const separator = line.indexOf('=');
+        const key = line.slice(0, separator).trim();
+        const raw = line.slice(separator + 1).trim();
+        return [key, raw.replace(/^(['"])(.*)\1$/, '$2')];
+      }),
+  );
+}
+
+function runPrisma(args, label, environment, redactions) {
+  const result = spawnSync(process.execPath, [prismaCli, ...args], {
+    cwd: apiRoot,
+    env: environment,
+    encoding: 'utf8',
+    windowsHide: true,
+  });
+  if (result.status !== 0) {
+    let output = `${result.stdout ?? ''}\n${result.stderr ?? ''}`;
+    for (const value of redactions) output = output.replaceAll(value, '<DATABASE_URL redacted>');
+    throw new Error(`${label} failed.\n${output.slice(-6_000)}`);
+  }
+}
+
+function buildWeb(environment) {
+  const result = spawnSync(process.execPath, [nextCli, 'build'], {
+    cwd: webRoot,
+    env: environment,
+    encoding: 'utf8',
+    windowsHide: true,
+  });
+  if (result.status !== 0) {
+    throw new Error(`Isolated Web build failed.\n${`${result.stdout ?? ''}\n${result.stderr ?? ''}`.slice(-8_000)}`);
+  }
+}
+
+async function waitForUrl(url, processRef, output) {
+  const deadline = Date.now() + 45_000;
+  while (Date.now() < deadline) {
+    if (processRef.exitCode != null) throw new Error(`Process exited while waiting for ${url}.\n${output().slice(-6_000)}`);
+    try {
+      const response = await fetch(url);
+      if (response.ok) return;
+    } catch {}
+    await new Promise((resolveWait) => setTimeout(resolveWait, 250));
+  }
+  throw new Error(`Timed out waiting for ${url}.\n${output().slice(-6_000)}`);
+}
+
+function browserExecutable() {
+  const candidates = [
+    process.env.PLAYWRIGHT_EXECUTABLE_PATH,
+    chromium.executablePath(),
+    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+    'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+    'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
+  ].filter(Boolean);
+  return candidates.find((candidate) => existsSync(candidate));
+}
+
+function rounded(value, unit = 4) {
+  return Math.round(value / unit) * unit;
+}
+
+async function settle(page) {
+  await page.waitForLoadState('domcontentloaded');
+  const loadingState = page.locator('[aria-label="در حال آماده‌سازی صفحه"]');
+  if (await loadingState.count()) {
+    await loadingState.first().waitFor({ state: 'detached', timeout: 15_000 });
+  }
+  await page.locator('main').first().waitFor({ state: 'visible', timeout: 10_000 });
+  await page.evaluate(() => document.fonts.ready);
+  await page.locator('[data-brand-mark] img').evaluateAll(images => Promise.all(images.map(image => image.decode())));
+  assert.ok(await page.locator('[data-brand-mark] img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0)), 'Every rendered brand asset must load.');
+  await page.evaluate(() => {
+    if (document.querySelector('#ui-runtime-motion-lock')) return;
+    const style = document.createElement('style');
+    style.id = 'ui-runtime-motion-lock';
+    style.textContent = '*,*::before,*::after{animation-duration:0s!important;animation-delay:0s!important;transition:none!important;caret-color:transparent!important;scroll-behavior:auto!important}';
+    document.head.append(style);
+  });
+  await page.waitForTimeout(100);
+}
+
+async function runtimeSnapshot(page, key) {
+  const raw = await page.evaluate(() => {
+    const visible = (element) => {
+      const style = getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+    };
+    const rect = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element || !visible(element)) return null;
+      const box = element.getBoundingClientRect();
+      return { x: box.x, y: box.y, width: box.width, height: box.height };
+    };
+    const text = (value) => value.replace(/\s+/g, ' ').trim();
+    const headings = [...document.querySelectorAll('h1,h2,h3')]
+      .filter(visible)
+      .slice(0, 24)
+      .map((element) => `${element.tagName}:${text(element.textContent ?? '').slice(0, 100)}`);
+    const duplicateIds = [...document.querySelectorAll('[id]')]
+      .map((element) => element.id)
+      .filter((id, index, ids) => id && ids.indexOf(id) !== index);
+    const controls = [...document.querySelectorAll('button,input,select,textarea,[role="button"]')].filter(visible);
+    const undersizedControls = controls
+      .filter((element) => {
+        const box = element.getBoundingClientRect();
+        return box.width < 24 || box.height < 24;
+      })
+      .map((element) => `${element.tagName}:${text(element.getAttribute('aria-label') ?? element.textContent ?? '').slice(0, 60)}`);
+    const rootStyle = getComputedStyle(document.body);
+    return {
+      lang: document.documentElement.lang,
+      dir: document.documentElement.dir,
+      theme: document.documentElement.dataset.theme,
+      title: document.title,
+      bodyHeight: document.documentElement.scrollHeight,
+      overflowX: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      colors: { background: rootStyle.backgroundColor, foreground: rootStyle.color },
+      rects: { main: rect('main'), header: rect('header'), nav: rect('nav'), footer: rect('footer') },
+      counts: {
+        headings: headings.length,
+        links: [...document.querySelectorAll('a[href]')].filter(visible).length,
+        controls: controls.length,
+        landmarks: [...document.querySelectorAll('main,header,nav,aside,footer,[role="main"],[role="navigation"]')].filter(visible).length,
+      },
+      headings,
+      duplicateIds: [...new Set(duplicateIds)],
+      undersizedControls,
+    };
+  });
+  const normalizeRect = (box) => box && Object.fromEntries(Object.entries(box).map(([name, value]) => [name, rounded(value)]));
+  return {
+    key,
+    ...raw,
+    bodyHeight: rounded(raw.bodyHeight, 8),
+    overflowX: rounded(raw.overflowX),
+    rects: Object.fromEntries(Object.entries(raw.rects).map(([name, box]) => [name, normalizeRect(box)])),
+  };
+}
+
+function compareBaseline(actual, expected) {
+  assert.equal(actual.length, expected.length, 'Visual baseline entry count changed.');
+  const expectedByKey = new Map(expected.map((entry) => [entry.key, entry]));
+  for (const entry of actual) {
+    const baseline = expectedByKey.get(entry.key);
+    assert.ok(baseline, `Missing visual baseline: ${entry.key}`);
+    for (const field of ['lang', 'dir', 'theme', 'title']) assert.equal(entry[field], baseline[field], `${entry.key} changed ${field}.`);
+    assert.deepEqual(entry.colors, baseline.colors, `${entry.key} changed theme colors.`);
+    assert.deepEqual(entry.counts, baseline.counts, `${entry.key} changed visible semantic counts.`);
+    assert.deepEqual(entry.headings, baseline.headings, `${entry.key} changed visible heading structure.`);
+    assert.ok(Math.abs(entry.bodyHeight - baseline.bodyHeight) <= 32, `${entry.key} body height drifted beyond 32px.`);
+    for (const landmark of ['main', 'header', 'nav', 'footer']) {
+      const current = entry.rects[landmark];
+      const previous = baseline.rects[landmark];
+      assert.equal(Boolean(current), Boolean(previous), `${entry.key} changed ${landmark} visibility.`);
+      if (!current || !previous) continue;
+      for (const dimension of ['x', 'y', 'width', 'height']) {
+        assert.ok(
+          Math.abs(current[dimension] - previous[dimension]) <= 16,
+          `${entry.key} ${landmark}.${dimension} drifted beyond 16px.`,
+        );
+      }
+    }
+  }
+}
+
+async function verifyKeyboardFlows(pages, webOrigin) {
+  const guest = pages.get('guest');
+  await guest.setViewportSize({ width: 320, height: 740 });
+  if (new URL(guest.url()).pathname !== '/') {
+    await guest.goto(`${webOrigin}/`);
+    await settle(guest);
+  }
+  await guest.evaluate(() => {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+  });
+  await guest.keyboard.press('Tab');
+  const firstFocus = await guest.evaluate(() => ({
+    isSkipLink: document.activeElement?.classList.contains('skip-link') ?? false,
+    tag: document.activeElement?.tagName ?? 'none',
+    text: document.activeElement?.textContent?.replace(/\s+/g, ' ').trim().slice(0, 80) ?? '',
+  }));
+  assert.equal(firstFocus.isSkipLink, true, `Skip link is not the first keyboard target; focused ${firstFocus.tag} "${firstFocus.text}".`);
+  await guest.keyboard.press('Enter');
+  assert.equal(await guest.evaluate(() => document.activeElement?.id === 'main-content' || location.hash === '#main-content'), true, 'Skip link does not reach main content.');
+
+  const themeTrigger = guest.locator('[data-theme-toggle]:visible').first();
+  let expectedTheme = await guest.evaluate(() => document.documentElement.dataset.theme);
+  for (const action of ['click', 'Space', 'Enter', 'click']) {
+    expectedTheme = expectedTheme === 'simple-dark' ? 'simple-light' : 'simple-dark';
+    await themeTrigger.focus();
+    if (action === 'click') await themeTrigger.click();
+    else await guest.keyboard.press(action);
+    await guest.waitForFunction(value => document.documentElement.dataset.theme === value && localStorage.getItem('niazat-theme') === value, expectedTheme);
+    assert.equal(await themeTrigger.getAttribute('aria-pressed'), String(expectedTheme === 'simple-dark'));
+    assert.equal(await themeTrigger.evaluate(element => document.activeElement === element), true, 'Theme switching must keep focus on the button.');
+    assert.equal(await guest.locator('[role="listbox"]').count(), 0, 'Theme switching must not open a menu.');
+  }
+  await guest.reload();
+  await settle(guest);
+  assert.equal(await guest.evaluate(() => document.documentElement.dataset.theme), expectedTheme, 'Theme choice must survive a reload.');
+  await guest.waitForFunction(value => document.querySelector('[data-theme-toggle]')?.getAttribute('aria-pressed') === String(value === 'simple-dark'), expectedTheme);
+
+  const publicDrawerTrigger = guest.locator('[aria-controls="public-mobile-drawer"]');
+  await publicDrawerTrigger.click();
+  await guest.locator('#public-mobile-drawer').waitFor({ state: 'visible' });
+  await guest.keyboard.press('Escape');
+  await guest.waitForFunction(() => document.activeElement?.getAttribute('aria-controls') === 'public-mobile-drawer');
+  assert.equal(await publicDrawerTrigger.evaluate((element) => document.activeElement === element), true, 'Public drawer does not restore trigger focus.');
+
+  const customer = pages.get('customer');
+  await customer.setViewportSize({ width: 320, height: 740 });
+  if (new URL(customer.url()).pathname !== '/dashboard') {
+    await customer.goto(`${webOrigin}/dashboard`);
+    await settle(customer);
+  }
+  const workspaceDrawerTrigger = customer.locator('[aria-controls="workspace-mobile-drawer"]');
+  await workspaceDrawerTrigger.click();
+  await customer.locator('#workspace-mobile-drawer').waitFor({ state: 'visible' });
+  const drawerTheme = customer.locator('#workspace-mobile-drawer [data-theme-toggle]');
+  const nextDrawerTheme = (await drawerTheme.getAttribute('aria-pressed')) === 'true' ? 'simple-light' : 'simple-dark';
+  await drawerTheme.click();
+  await customer.waitForFunction(value => document.documentElement.dataset.theme === value && localStorage.getItem('niazat-theme') === value, nextDrawerTheme);
+  assert.equal(await customer.locator('#workspace-mobile-drawer').isVisible(), true, 'Theme switch must not close the navigation drawer.');
+  assert.equal(await drawerTheme.evaluate(element => document.activeElement === element), true);
+  assert.equal(await customer.locator('[role="listbox"]').count(), 0);
+  await customer.keyboard.press('Escape');
+  await customer.waitForFunction(() => document.activeElement?.getAttribute('aria-controls') === 'workspace-mobile-drawer');
+  assert.equal(await workspaceDrawerTrigger.evaluate((element) => document.activeElement === element), true, 'Workspace drawer does not restore trigger focus.');
+}
+
+async function verifyDrawerMotion(pages) {
+  for (const [role, id] of [['guest', 'public-mobile-drawer'], ['customer', 'workspace-mobile-drawer']]) {
+    const page = pages.get(role);
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.evaluate(() => document.querySelector('#ui-runtime-motion-lock')?.remove());
+    const trigger = page.locator(`[aria-controls="${id}"]`);
+    await trigger.click();
+    const drawer = page.locator(`#${id}`);
+    await drawer.waitFor({ state: 'visible' });
+    assert.equal(await drawer.evaluate(element => element.parentElement.inert), false);
+    assert.notEqual(await drawer.evaluate(element => getComputedStyle(element).transitionDuration), '0s', 'Normal motion should animate the drawer.');
+    await page.waitForTimeout(350);
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(drawerId => document.getElementById(drawerId)?.parentElement.inert, id);
+    await drawer.waitFor({ state: 'hidden' });
+    assert.equal(await trigger.evaluate(element => document.activeElement === element), true, 'Animated close must restore trigger focus.');
+    assert.equal(await page.evaluate(() => document.body.style.overflow), '', 'Animated close must unlock body scroll.');
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await trigger.click();
+    assert.ok(await drawer.evaluate(element => getComputedStyle(element).transitionDuration.split(',').every(value => parseFloat(value) <= 0.001)), 'Reduced motion must neutralize drawer motion (global fallback uses 0.01ms).');
+    await page.keyboard.press('Escape');
+    await drawer.waitFor({ state: 'hidden' });
+    await settle(page);
+  }
+}
+
+async function verifyOnboardingUi(page, webOrigin) {
+  await page.goto(`${webOrigin}/admin/staff/00000000-0000-4000-8000-000000000009/onboarding`);
+  await settle(page);
+  for (const [button, expected, evidence] of [['شروع بررسی هویت', 'بررسی هویت', null], ['تأیید این مرحله و ادامه', 'آزمون مهارت', 'DOC-UI-IDENTITY']]) {
+    if (evidence) await page.getByRole('textbox', { name: 'شناسه مدرک در مخزن خصوصی' }).fill(evidence);
+    await page.getByRole('button', { name: button, exact: true }).click();
+    const dialog = page.getByRole('alertdialog');
+    await dialog.getByRole('textbox').fill('مدرک آزمایشی توسط مسئول بررسی شد.');
+    await dialog.getByRole('button', { name: 'ثبت تصمیم انسانی', exact: true }).click();
+    await dialog.waitFor({ state: 'hidden' });
+    await page.waitForFunction(title => document.querySelector('[aria-current="step"]')?.textContent.includes(title), expected);
+  }
+  assert.equal(await page.getByText('مدرک آزمایشی توسط مسئول بررسی شد.', { exact: true }).count(), 2, 'Review history must show both saved decisions.');
+}
+
+async function verifyOrganizationsUi(pages, webOrigin) {
+  const customer = pages.get('customer'), finance = pages.get('finance');
+  await finance.goto(`${webOrigin}/admin/organizations`); await settle(finance);
+  for (const [label, value] of [['نام پلن','همکاری سازمانی آزمایشی'],['حداکثر اعضا','5'],['سفارش در هر دوره','10'],['هزینه قرارداد (تومان)','0'],['مدت دوره (روز)','30']]) await finance.getByLabel(label, { exact: true }).fill(value);
+  await finance.getByRole('button', { name: 'بررسی و ثبت پلن', exact: true }).click();
+  await finance.getByRole('alertdialog').getByRole('button', { name: 'تأیید و ثبت', exact: true }).click();
+  await finance.getByRole('alertdialog').waitFor({ state: 'hidden' });
+  await finance.getByRole('heading', { name: 'همکاری سازمانی آزمایشی', exact: true }).waitFor();
+  await customer.goto(`${webOrigin}/organizations/00000000-0000-4000-8000-000000000010`); await settle(customer);
+  await customer.getByLabel('درخواست پلن یا تمدید').selectOption({ label: 'همکاری سازمانی آزمایشی · ۰ تومان · ۳۰ روز' });
+  await customer.getByRole('button', { name: 'ارسال درخواست به مالی', exact: true }).click();
+  await customer.getByText('درخواست در صف بررسی مالی: همکاری سازمانی آزمایشی', { exact: true }).waitFor();
+  await finance.reload(); await settle(finance);
+  await finance.getByLabel('مرجع قرارداد سازمان نمایشی').fill('CONTRACT-UI-001');
+  await finance.getByRole('button', { name: 'بررسی و فعال‌سازی', exact: true }).click();
+  const dialog = finance.getByRole('alertdialog');
+  await dialog.getByRole('textbox').fill('قرارداد رایگان آزمایشی بررسی شد.');
+  await dialog.getByRole('button', { name: 'تأیید و ثبت', exact: true }).click();
+  await dialog.waitFor({ state: 'hidden' });
+  await finance.getByText('اشتراک فعال', { exact: true }).waitFor();
+  await customer.reload(); await settle(customer);
+  await customer.getByLabel('نام تیم جدید', { exact: true }).fill('تیم طراحی');
+  await customer.getByRole('button', { name: 'ایجاد تیم', exact: true }).click();
+  await customer.getByText('تیم طراحی', { exact: true }).first().waitFor();
+  await customer.getByLabel('پیش‌نویس متعلق به شما').selectOption('00000000-0000-4000-8000-000000000012');
+  await customer.getByRole('button', { name: 'بررسی و اتصال سفارش', exact: true }).click();
+  await customer.getByRole('alertdialog').getByRole('textbox').fill('خلاصه سفارش برای تیم به اشتراک گذاشته شود.');
+  await customer.getByRole('alertdialog').getByRole('button', { name: 'تأیید و ثبت', exact: true }).click();
+  await customer.getByRole('alertdialog').waitFor({ state: 'hidden' });
+  await customer.getByText('پیش‌نویس سازمانی نمایشی', { exact: true }).waitFor();
+  const ops = pages.get('ops');
+  await ops.goto(`${webOrigin}/admin/orders/00000000-0000-4000-8000-000000000011`); await settle(ops);
+  await ops.getByRole('button', { name: 'بررسی پیشنهادها', exact: true }).click();
+  await ops.getByRole('region', { name: 'مجریان پیشنهادی' }).waitFor();
+}
+
+async function verifyCustomerOrdersUi(page, webOrigin) {
+  await page.goto(`${webOrigin}/orders`);
+  await page.getByRole('heading', { name: 'سفارش‌های من', exact: true }).waitFor();
+  const rows = page.locator('tbody tr');
+  await rows.first().waitFor();
+  assert.equal(await rows.count(), 2, 'The default customer order view must retain every fixture order.');
+  await page.getByRole('searchbox', { name: 'جست‌وجو در سفارش‌ها' }).fill('UI-SUGGESTIONS');
+  await page.waitForFunction(() => document.querySelectorAll('tbody tr').length === 1);
+  assert.match(await rows.first().innerText(), /UI-SUGGESTIONS/);
+  await page.getByLabel('نمایش سفارش‌ها').selectOption('closed');
+  await page.getByRole('heading', { name: 'سفارشی با این معیارها پیدا نشد' }).waitFor();
+  const emptyAxe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+  assert.deepEqual(emptyAxe.violations, [], 'Filtered-empty customer orders must remain accessible.');
+  await page.getByRole('button', { name: 'نمایش همهٔ سفارش‌ها' }).click();
+  await page.waitForFunction(() => document.querySelectorAll('tbody tr').length === 2);
+  assert.equal(await page.getByRole('searchbox', { name: 'جست‌وجو در سفارش‌ها' }).inputValue(), '');
+  assert.equal(await page.getByLabel('نمایش سفارش‌ها').inputValue(), 'all');
+}
+
+async function verifyExecutorWorkspace(page, webOrigin, databaseUrl) {
+  const db = new PrismaClient({ datasources: { db: { url: databaseUrl } } });
+  const orderId = randomUUID();
+  const orderTitle = 'اجرای واقعی سفارش آزمایشی';
+  try {
+    const user = await db.user.findUniqueOrThrow({ where: { phone: '09120000005' }, include: { executorProfile: true } });
+    const customer = await db.user.findUniqueOrThrow({ where: { phone: '09120000009' } });
+    const service = await db.serviceLine.findUniqueOrThrow({ where: { slug: 'website-design-development' } });
+    await db.order.create({ data: { id: orderId, code: `UI-EXEC-${orderId.slice(0, 8)}`, title: orderTitle, status: 'assigned', customerId: customer.id, serviceId: service.id, briefDescription: 'بررسی ورودی و تحویل فایل امن', acceptanceCriteria: { create: { description: 'خروجی با معیار توافق‌شده منطبق است' } }, assignments: { create: { executorProfileId: user.executorProfile.id, assignedByUserId: user.id } } } });
+    await page.goto(`${webOrigin}/executor`);
+    await page.getByRole('link', { name: new RegExp(orderTitle) }).waitFor();
+    await page.goto(`${webOrigin}/executor/orders`);
+    await page.getByRole('link', { name: orderTitle, exact: true }).click();
+    await page.getByRole('button', { name: 'پذیرش مسئولیت سفارش', exact: true }).click();
+    await page.getByRole('button', { name: 'شروع اجرای کار', exact: true }).click();
+    await page.getByRole('textbox', { name: 'شرح گزارش پیشرفت', exact: true }).fill('ورودی بررسی و ساختار اولیه آماده شد.');
+    await page.getByRole('button', { name: 'ثبت گزارش پیشرفت', exact: true }).click();
+    await page.getByText('ورودی بررسی و ساختار اولیه آماده شد.', { exact: true }).waitFor();
+    await page.getByRole('textbox', { name: 'شرح تحویل خروجی', exact: true }).fill('خروجی مطابق معیار پذیرش آماده بررسی است.');
+    const payload = Buffer.from('Niazat executor acceptance file.');
+    await page.locator('input[type="file"][aria-label="افزودن فایل خروجی"]').setInputFiles({ name: 'executor-output.txt', mimeType: 'text/plain', buffer: payload });
+    const fileLink = page.getByRole('button', { name: 'executor-output.txt', exact: true });
+    await fileLink.waitFor();
+    assert.equal(await page.getByRole('button', { name: 'ارسال برای QC', exact: true }).isDisabled(), true, 'Incomplete checklist must block delivery even with an output file.');
+    await Promise.all([
+      page.waitForResponse(response => response.url().includes('/checklist/') && response.request().method() === 'PATCH' && response.ok()),
+      page.getByRole('checkbox', { name: 'خروجی با معیار توافق‌شده منطبق است', exact: true }).click(),
+    ]);
+    await page.waitForFunction(() => document.querySelector('[role="progressbar"]')?.getAttribute('aria-valuenow') === '1');
+    const [download] = await Promise.all([page.waitForEvent('download'), fileLink.click()]);
+    assert.equal(await download.failure(), null);
+    const chunks = [];
+    for await (const chunk of await download.createReadStream()) chunks.push(chunk);
+    assert.deepEqual(Buffer.concat(chunks), payload, 'Authenticated download must preserve uploaded bytes.');
+    for (const viewport of viewports) for (const theme of themes) {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.evaluate(id => { localStorage.setItem('niazat-theme', id); document.documentElement.dataset.theme = id; }, theme.id);
+      await settle(page);
+      const scan = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+      assert.deepEqual(scan.violations, [], 'Active executor order must remain accessible.');
+      const snapshot = await runtimeSnapshot(page, 'executor-active');
+      assert.ok(snapshot.overflowX <= 1);
+      await page.screenshot({ path: resolve(artifactRoot, `executor-active-${viewport.id}-${theme.id}.png`), fullPage: true, animations: 'disabled' });
+    }
+    await page.getByRole('button', { name: 'ارسال برای QC', exact: true }).click();
+    await page.getByText('در این وضعیت اقدام اجرایی تازه‌ای از شما لازم نیست.', { exact: true }).waitFor();
+    const saved = await db.order.findUniqueOrThrow({ where: { id: orderId } });
+    assert.ok(['qc_in_review', 'ready_for_customer_review'].includes(saved.status));
+    assert.equal(await db.orderReport.count({ where: { orderId, reportType: 'delivery' } }), 1);
+    await page.goto(`${webOrigin}/executor/performance`);
+    await page.getByRole('heading', { name: 'عملکرد من', exact: true }).waitFor();
+    for (const viewport of viewports) for (const theme of themes) {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.evaluate(id => { document.documentElement.dataset.theme = id; }, theme.id);
+      await settle(page);
+      assert.deepEqual((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()).violations, []);
+      assert.ok((await runtimeSnapshot(page, 'executor-performance')).overflowX <= 1);
+      await page.screenshot({ path: resolve(artifactRoot, `executor-performance-${viewport.id}-${theme.id}.png`), fullPage: true, animations: 'disabled' });
+    }
+    console.log('Executor flow passed: assigned queue, accept/start, progress, checklist delivery guard, real upload/download bytes, QC submission, 16 extra Axe/screenshots.');
+    return orderId;
+  } finally { await db.$disconnect(); }
+}
+
+async function verifyOpsWorkspace(page, webOrigin, databaseUrl, orderId) {
+  const db = new PrismaClient({ datasources: { db: { url: databaseUrl } } });
+  async function navigate(path) {
+    if (new URL(page.url()).pathname === path) return;
+    let link = page.locator(`a[href="${path}"]:visible`).first();
+    if (!await link.count()) {
+      const parent = path.startsWith('/admin/qc/') ? '/admin/qc' : '/admin/staff';
+      await page.locator(`a[href="${parent}"]:visible`).first().click();
+      await page.waitForURL(url => url.pathname === parent);
+      link = page.locator(`a[href="${path}"]:visible`).first();
+    }
+    await link.click();
+    await page.waitForURL(url => url.pathname === path);
+  }
+  try {
+    const suffix = randomUUID().slice(0, 8), title = `خدمت آزمایشی مدار ${suffix}`;
+    await navigate('/admin/services');
+    await page.getByRole('textbox', { name: 'عنوان خدمت', exact: true }).fill(title);
+    await page.getByRole('textbox', { name: 'slug-example', exact: true }).fill(`orbit-${suffix}`);
+    await page.getByRole('textbox', { name: 'دسته‌بندی', exact: true }).fill('digital');
+    await page.getByRole('textbox', { name: 'شرح خدمت', exact: true }).fill('خدمت مخصوص پذیرش ایزوله عملیات');
+    await page.getByRole('button', { name: 'ایجاد خدمت', exact: true }).click();
+    await page.getByRole('button', { name: new RegExp(title) }).click();
+    await page.getByRole('textbox', { name: 'نام بسته', exact: true }).fill('بسته پذیرش');
+    await page.getByRole('button', { name: 'افزودن بسته', exact: true }).click();
+    await page.getByText('بسته پذیرش', { exact: true }).waitFor();
+    await page.getByRole('textbox', { name: 'عنوان فیلد', exact: true }).fill('هدف اجرای خدمت');
+    await page.getByRole('textbox', { name: 'field_key', exact: true }).fill('orbit_goal');
+    await page.getByRole('button', { name: 'افزودن فیلد', exact: true }).click();
+    await page.getByText('هدف اجرای خدمت · text', { exact: true }).waitFor();
+    await page.getByRole('textbox', { name: 'معیار تحویل قابل سنجش', exact: true }).fill('خروجی با شرح منطبق باشد');
+    await page.getByRole('button', { name: 'افزودن', exact: true }).click();
+    await page.getByText('خروجی با شرح منطبق باشد', { exact: true }).waitFor();
+    await page.getByRole('textbox', { name: 'نام قالب QC', exact: true }).fill('کنترل پذیرش مدار');
+    await page.getByRole('button', { name: 'ساخت قالب', exact: true }).click();
+    await page.getByRole('combobox', { name: 'قالب کنترل کیفیت', exact: true }).selectOption({ label: 'کنترل پذیرش مدار' });
+    await page.getByRole('textbox', { name: 'آیتم کنترل کیفیت', exact: true }).fill('فایل خروجی قابل دریافت است');
+    await page.getByRole('button', { name: 'افزودن آیتم', exact: true }).click();
+    await page.getByText('فایل خروجی قابل دریافت است', { exact: true }).waitFor();
+    const service = await db.serviceLine.findUniqueOrThrow({ where: { slug: `orbit-${suffix}` }, include: { packages: true, formFields: true, acceptanceCriteria: true, qcChecklistTemplates: { include: { items: true } } } });
+    assert.equal(service.packages.length, 1); assert.equal(service.formFields.length, 1); assert.equal(service.acceptanceCriteria.length, 1); assert.equal(service.qcChecklistTemplates[0].items.length, 1);
+    const review = await db.qcReview.findFirstOrThrow({ where: { orderId }, orderBy: { createdAt: 'desc' } });
+    const executor = await db.user.findUniqueOrThrow({ where: { phone: '09120000005' }, include: { executorProfile: true } });
+    for (const [label, path] of [['services', '/admin/services'], ['staff-detail', `/admin/staff/${executor.executorProfile.id}`], ['operations-report', '/admin/reports/operations'], ['qc-detail', `/admin/qc/${review.id}`]]) {
+      await navigate(path);
+      await page.getByRole('heading', { level: 1 }).waitFor();
+      await settle(page);
+      for (const viewport of viewports) for (const theme of themes) {
+        await page.setViewportSize({ width: viewport.width, height: viewport.height });
+        await page.evaluate(id => { document.documentElement.dataset.theme = id; document.activeElement?.blur(); window.scrollTo({ top: 0, behavior: 'instant' }); }, theme.id);
+        await settle(page);
+        assert.deepEqual((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()).violations, [], `Ops ${label} must remain accessible.`);
+        assert.ok((await runtimeSnapshot(page, label)).overflowX <= 1, `Ops ${label} must not overflow.`);
+        await page.screenshot({ path: resolve(artifactRoot, `ops-${label}-${viewport.id}-${theme.id}.png`), fullPage: true, animations: 'disabled' });
+      }
+    }
+    await navigate(`/admin/qc/${review.id}`);
+    await page.getByRole('textbox', { name: 'یادداشت کنترل کیفیت', exact: true }).fill('خروجی و فایل امن با معیارهای پذیرش تطبیق داده شد.');
+    if (await page.getByRole('checkbox').count()) {
+      await page.getByRole('button', { name: 'تایید برای مشتری', exact: true }).click();
+      await page.getByText('تأیید QC نیازمند قبولی همه آیتم‌ها است.', { exact: true }).waitFor();
+      assert.equal((await db.qcReview.findUniqueOrThrow({ where: { id: review.id } })).result, null, 'Incomplete QC must not persist approval.');
+    }
+    for (const checkbox of await page.getByRole('checkbox').all()) await checkbox.check();
+    await page.getByRole('button', { name: 'تایید برای مشتری', exact: true }).click();
+    await page.waitForURL(url => url.pathname === '/admin/qc');
+    assert.equal((await db.order.findUniqueOrThrow({ where: { id: orderId } })).status, 'delivered');
+    assert.equal((await db.qcReview.findUniqueOrThrow({ where: { id: review.id } })).result, 'passed');
+    assert.equal(await db.orderStatusHistory.count({ where: { orderId, toStatus: { in: ['ready_for_customer_review', 'delivered'] } } }), 2, 'QC approval must preserve both official status transitions.');
+    console.log('Ops flow passed: service/package/form/criterion/QC-template persistence, executor delivery approved by QC, 32 extra Axe/screenshots.');
+  } finally { await db.$disconnect(); }
+}
+
+async function verifyFinanceWorkspace(page, databaseUrl) {
+  const db = new PrismaClient({ datasources: { db: { url: databaseUrl } } });
+  const { LedgerService } = apiRequire(resolve(apiRoot, 'dist/finance/ledger.service.js'));
+  const ledger = new LedgerService(db);
+  async function navigate(path) {
+    if (new URL(page.url()).pathname === path) return;
+    await page.locator(`a[href="${path}"]:visible`).first().click();
+    await page.waitForURL(url => url.pathname === path);
+  }
+  async function downloadBytes(button) {
+    const [download] = await Promise.all([page.waitForEvent('download'), button.click()]);
+    assert.equal(await download.failure(), null);
+    const chunks = [];
+    for await (const chunk of await download.createReadStream()) chunks.push(chunk);
+    return Buffer.concat(chunks);
+  }
+  try {
+    const customer = await db.user.findUniqueOrThrow({ where: { phone: '09120000009' } });
+    const executor = await db.user.findUniqueOrThrow({ where: { phone: '09120000005' }, include: { executorProfile: true } });
+    const service = await db.serviceLine.findUniqueOrThrow({ where: { slug: 'website-design-development' } });
+    const orderId = randomUUID(), amount = 250000, title = 'سفارش مالی پذیرش مدار';
+    await db.order.create({ data: { id: orderId, code: `UI-FIN-${orderId.slice(0, 8)}`, customerId: customer.id, serviceId: service.id, status: 'paid', paidAt: new Date(), title, briefDescription: 'سفارش ایزوله برای پذیرش حساب امانی و فاکتور', finalPrice: amount } });
+    const payment = await db.payment.create({ data: { orderId, customerId: customer.id, amount, gateway: 'mock', status: 'succeeded', verifiedAt: new Date(), idempotencyKey: randomUUID() } });
+    const hold = await db.escrowHold.create({ data: { orderId, paymentId: payment.id, amount } });
+    const invoice = await db.invoice.create({ data: { orderId, customerId: customer.id, amount, invoiceNumber: `INV-UI-${orderId.slice(0, 8)}` } });
+    await db.$transaction(async tx => {
+      const clearing = await ledger.getSystemAccount('payment_gateway_clearing', tx);
+      const escrow = await ledger.getSystemAccount('platform_escrow', tx);
+      const executorAccount = await ledger.getOrCreateUserAccount(tx, executor.id, 'executor_wallet');
+      await ledger.postEntry({ debitAccountId: clearing.id, creditAccountId: escrow.id, amount, referenceType: 'payment', referenceId: payment.id }, tx);
+      await ledger.postEntry({ debitAccountId: clearing.id, creditAccountId: executorAccount.id, amount: 200000, referenceType: 'payment', referenceId: `fixture-${orderId}` }, tx);
+    });
+    const shaba = 'IR820540102680020817909002';
+    await db.executorProfile.update({ where: { id: executor.executorProfile.id }, data: { shabaNumber: shaba, shabaVerifiedAt: new Date() } });
+    const withdrawal = await db.withdrawal.create({ data: { executorProfileId: executor.executorProfile.id, amount: 100000, shabaNumber: shaba, shabaVerifiedAt: new Date() } });
+    const customerBefore = (await db.wallet.findUnique({ where: { userId: customer.id } }))?.balance ?? 0;
+    const executorBefore = (await db.wallet.findUniqueOrThrow({ where: { userId: executor.id } })).balance;
+    await navigate('/admin/finance/invoices');
+    const invoiceRow = page.getByRole('row').filter({ hasText: invoice.invoiceNumber });
+    const pdf = await downloadBytes(invoiceRow.getByRole('button', { name: 'دانلود PDF', exact: true }));
+    assert.ok(pdf.toString().startsWith('%PDF-')); assert.ok(pdf.includes(Buffer.from(invoice.invoiceNumber))); assert.ok(pdf.includes(Buffer.from('250,000 IRT')));
+    await navigate('/admin/finance/escrow');
+    const escrowCard = page.locator('.premium-card').filter({ has: page.getByText(title, { exact: true }) });
+    await escrowCard.getByRole('button', { name: 'بازپرداخت', exact: true }).click();
+    let dialog = page.getByRole('alertdialog');
+    await dialog.getByRole('textbox').fill('بازپرداخت آزمایشی با بررسی مبلغ و حساب مقصد');
+    await dialog.getByRole('button', { name: 'ثبت بازپرداخت', exact: true }).click();
+    await dialog.waitFor({ state: 'hidden' });
+    assert.equal((await db.escrowHold.findUniqueOrThrow({ where: { id: hold.id } })).status, 'refunded');
+    assert.equal((await db.wallet.findUniqueOrThrow({ where: { userId: customer.id } })).balance, customerBefore + amount);
+    assert.equal(await db.refund.count({ where: { orderId, status: 'processed', amount } }), 1);
+    await navigate('/admin/finance/withdrawals');
+    assert.equal(await page.getByText(shaba, { exact: true }).count(), 0);
+    await page.getByRole('button', { name: 'نمایش شبا', exact: true }).click();
+    await page.getByText(shaba, { exact: true }).waitFor();
+    await page.getByRole('button', { name: 'پنهان‌کردن', exact: true }).click();
+    assert.equal(await page.getByRole('button', { name: 'تأیید و ثبت تسویه', exact: true }).isDisabled(), true);
+    await page.getByRole('textbox', { name: 'یادداشت تصمیم (اجباری)', exact: true }).fill('تسویه آزمون با کنترل سند و شبای تأییدشده');
+    await Promise.all([
+      page.waitForResponse(r => r.url().includes(`/withdrawals/${withdrawal.id}/approve`) && r.request().method() === 'PATCH' && r.ok()),
+      page.getByRole('button', { name: 'تأیید و ثبت تسویه', exact: true }).click(),
+    ]);
+    assert.equal((await db.withdrawal.findUniqueOrThrow({ where: { id: withdrawal.id } })).status, 'approved');
+    assert.equal((await db.wallet.findUniqueOrThrow({ where: { userId: executor.id } })).balance, executorBefore - 100000);
+    assert.equal(await db.ledgerEntry.count({ where: { referenceId: withdrawal.id, referenceType: 'withdrawal' } }), 1);
+    assert.equal((await ledger.verifyWalletConsistency(customer.id)).consistent, true);
+    assert.equal((await ledger.verifyWalletConsistency(executor.id)).consistent, true);
+    await navigate('/admin/finance/ledger');
+    const csv = await downloadBytes(page.getByRole('button', { name: 'خروجی CSV', exact: true }));
+    assert.ok(csv.toString().includes('escrow_refund')); assert.ok(csv.toString().includes(withdrawal.id));
+    for (const name of ['payments', 'escrow', 'refunds', 'invoices', 'withdrawals', 'report']) {
+      await navigate(name === 'report' ? '/admin/reports/finance' : `/admin/finance/${name}`);
+      await page.getByRole('heading', { level: 1 }).waitFor();
+      if (name === 'withdrawals') await page.getByLabel('فیلتر وضعیت برداشت', { exact: true }).selectOption('');
+      for (const viewport of viewports) for (const theme of themes) {
+        await page.setViewportSize({ width: viewport.width, height: viewport.height });
+        await page.evaluate(id => { document.documentElement.dataset.theme = id; document.activeElement?.blur(); window.scrollTo({ top: 0, behavior: 'instant' }); }, theme.id);
+        await settle(page);
+        assert.deepEqual((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()).violations, [], `Finance ${name} must remain accessible.`);
+        assert.ok((await runtimeSnapshot(page, name)).overflowX <= 1);
+        await page.screenshot({ path: resolve(artifactRoot, `finance-${name}-${viewport.id}-${theme.id}.png`), fullPage: true, animations: 'disabled' });
+      }
+    }
+    console.log('Finance flow passed: real PDF/CSV downloads, escrow refund, withdrawal note/masking/approval, balanced wallet ledgers, 48 extra Axe/screenshots.');
+  } finally { await db.$disconnect(); }
+}
+
+async function verifyGovernanceWorkspace(pages, webOrigin, databaseUrl) {
+  const db = new PrismaClient({ datasources: { db: { url: databaseUrl } } });
+  const page = pages.get('super');
+  async function navigate(path) {
+    if (new URL(page.url()).pathname === path) return;
+    await page.locator(`a[href="${path}"]:visible`).first().click();
+    await page.waitForURL(url => url.pathname === path);
+  }
+  async function confirm(label) {
+    const dialog = page.getByRole('alertdialog');
+    await dialog.getByRole('textbox').fill('تصمیم آزمایشی مدیریت با بررسی اثر دسترسی و سابقه');
+    await dialog.getByRole('button', { name: label, exact: true }).click();
+    await dialog.waitFor({ state: 'hidden' });
+  }
+  try {
+    const target = await db.user.create({ data: { phone: '09129998876', fullName: 'کاربر آزمون حاکمیت مدار', role: 'customer', status: 'active' } });
+    const session = await db.session.create({ data: { userId: target.id, familyId: randomUUID(), refreshTokenHash: 'isolated-test-session-hash', expiresAt: new Date(Date.now() + 3600000) } });
+    await navigate('/admin/users');
+    let row = page.getByRole('row').filter({ hasText: target.fullName });
+    await row.getByRole('button', { name: 'مسدودسازی', exact: true }).click();
+    await confirm('مسدودکردن کاربر');
+    assert.equal((await db.user.findUniqueOrThrow({ where: { id: target.id } })).status, 'blocked');
+    assert.ok((await db.session.findUniqueOrThrow({ where: { id: session.id } })).revokedAt);
+    await row.getByRole('button', { name: 'فعال‌سازی', exact: true }).click();
+    await confirm('فعال‌سازی کاربر');
+    assert.equal((await db.user.findUniqueOrThrow({ where: { id: target.id } })).status, 'active');
+    assert.ok((await db.session.findUniqueOrThrow({ where: { id: session.id } })).revokedAt, 'Reactivation must not resurrect revoked sessions.');
+    await navigate('/admin/admins');
+    await page.getByRole('button', { name: 'افزودن ادمین', exact: true }).click();
+    await page.getByLabel('شماره موبایل', { exact: true }).fill('09129998877');
+    await page.getByLabel('نام کامل', { exact: true }).fill('ادمین آزمون حاکمیت مدار');
+    await page.getByRole('button', { name: 'ثبت', exact: true }).click();
+    row = page.getByRole('row').filter({ hasText: 'ادمین آزمون حاکمیت مدار' });
+    await row.waitFor();
+    const admin = await db.user.findUniqueOrThrow({ where: { phone: '09129998877' } });
+    const adminSession = await db.session.create({ data: { userId: admin.id, familyId: randomUUID(), refreshTokenHash: 'isolated-admin-session-hash', expiresAt: new Date(Date.now() + 3600000) } });
+    await row.getByRole('combobox', { name: `سطح دسترسی ${admin.fullName}`, exact: true }).selectOption('finance_admin');
+    await row.getByRole('button', { name: 'اعمال', exact: true }).click();
+    await confirm('اعمال Scope جدید');
+    assert.equal((await db.user.findUniqueOrThrow({ where: { id: admin.id } })).adminScope, 'finance_admin');
+    assert.ok((await db.session.findUniqueOrThrow({ where: { id: adminSession.id } })).revokedAt);
+    await navigate('/admin/settings');
+    const settingCard = page.locator('.premium-card').filter({ hasText: 'finance.withdrawal_min' });
+    const originalMin = Number(await page.getByRole('spinbutton', { name: 'حداقل برداشت', exact: true }).inputValue());
+    for (const value of [originalMin + 1, originalMin]) {
+      await page.getByRole('spinbutton', { name: 'حداقل برداشت', exact: true }).fill(String(value));
+      await Promise.all([
+        page.waitForResponse(r => r.url().endsWith('/admin/settings') && r.request().method() === 'PUT' && r.ok()),
+        settingCard.getByRole('button', { name: 'ذخیره تنظیم', exact: true }).click(),
+      ]);
+      await settingCard.getByRole('button', { name: 'ذخیره تنظیم', exact: true }).waitFor();
+      assert.equal(await page.getByRole('spinbutton', { name: 'حداقل برداشت', exact: true }).inputValue(), String(value));
+      assert.equal((await db.systemSetting.findUniqueOrThrow({ where: { key: 'finance.withdrawal_min' } })).value, value);
+    }
+    // Isolated flag state only: no AI provider is enabled or called by this test.
+    await db.systemSetting.upsert({ where: { key: 'ai.enabled' }, create: { key: 'ai.enabled', value: true }, update: { value: true } });
+    await navigate('/admin/ai-controls');
+    const master = page.locator('.premium-card').filter({ hasText: 'ai.enabled' });
+    await master.getByRole('button', { name: 'خاموش‌کردن', exact: true }).click();
+    await master.getByRole('button', { name: 'روشن‌کردن', exact: true }).waitFor();
+    assert.equal((await db.systemSetting.findUniqueOrThrow({ where: { key: 'ai.enabled' } })).value, false);
+    assert.equal(await page.getByRole('button', { name: 'همیشه اجباری', exact: true }).isDisabled(), true);
+    assert.ok(await db.auditLog.count({ where: { entityId: target.id, action: 'user.status_changed' } }) >= 2);
+    assert.equal(await db.auditLog.count({ where: { entityId: admin.id, action: 'admin.scope_changed' } }), 1);
+    const finance = pages.get('finance');
+    const denied = finance.waitForResponse(r => new URL(r.url()).pathname === '/api/backend/admin/settings' && r.request().method() === 'GET');
+    await finance.goto(`${webOrigin}/admin/settings`);
+    assert.equal((await denied).status(), 403);
+    await finance.getByText('دسترسی مدیریتی شما کافی نیست.', { exact: true }).waitFor();
+    for (const path of ['/admin/users', '/admin/admins', '/admin/settings', '/admin/ai-controls', '/admin/security', '/admin/audit', '/admin/feedback', '/admin/reports/bi']) {
+      await navigate(path);
+      await page.getByRole('heading', { level: 1 }).waitFor();
+      if (path === '/admin/audit') {
+        await page.getByRole('textbox', { name: 'فیلتر نوع موجودیت', exact: true }).fill('user');
+        await page.getByText('admin.scope_changed', { exact: true }).waitFor();
+      }
+      if (path.endsWith('/bi')) {
+        await page.getByLabel('از تاریخ تحلیل').fill(`${new Date().getUTCFullYear()}-01-01`);
+        await page.getByLabel('تا تاریخ تحلیل').fill(`${new Date().getUTCFullYear()}-12-31`);
+        const response = page.waitForResponse(r => new URL(r.url()).pathname === '/api/backend/admin/reports/bi' && new URL(r.url()).searchParams.has('from'));
+        await page.getByRole('button', { name: 'به‌روزرسانی تحلیل', exact: true }).click();
+        const result = await response;
+        assert.equal(result.status(), 200);
+        const analysis = await result.json();
+        assert.ok(analysis.cohorts.some(row => row.suppressed), 'The paid fixture must exercise small-cohort privacy.');
+        for (const row of analysis.cohorts.filter(row => row.suppressed)) {
+          assert.equal(row.customers, null);
+          assert.equal(row.day30, null); assert.equal(row.day60, null); assert.equal(row.day90, null);
+        }
+        await page.locator('[aria-busy="false"]').waitFor();
+        await page.getByText('گروه کوچک', { exact: true }).first().waitFor();
+      }
+      for (const viewport of viewports) for (const theme of themes) {
+        await page.setViewportSize({ width: viewport.width, height: viewport.height });
+        await page.evaluate(id => { document.documentElement.dataset.theme = id; document.activeElement?.blur(); window.scrollTo({ top: 0, behavior: 'instant' }); }, theme.id);
+        await settle(page);
+        if (path === '/admin/admins') {
+          const scopeRow = page.getByRole('row').filter({ hasText: admin.fullName });
+          const select = await scopeRow.getByRole('combobox').boundingBox();
+          const apply = await scopeRow.getByRole('button', { name: 'اعمال', exact: true }).boundingBox();
+          assert.ok(select && select.width >= 150, `Scope selection must remain readable at ${viewport.id}: ${JSON.stringify(select)}.`);
+          assert.ok(apply && apply.width >= 44 && apply.height <= 56, `Scope action must remain a usable single-line touch target at ${viewport.id}: ${JSON.stringify(apply)}.`);
+        }
+        assert.deepEqual((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()).violations, [], `Governance ${path} must remain accessible.`);
+        assert.ok((await runtimeSnapshot(page, path)).overflowX <= 1);
+        await page.screenshot({ path: resolve(artifactRoot, `governance-${path.split('/').at(-1)}-${viewport.id}-${theme.id}.png`), fullPage: true, animations: 'disabled' });
+      }
+    }
+    console.log('Governance passed: block/reactivate with session revocation, admin scope/Audit, settings round-trip, isolated AI stop, finance 403, BI cohort privacy, 64 extra Axe/screenshots.');
+    return { status: 'passed', additionalAxeScans: 64, additionalScreenshots: 64, financeSettingsStatus: 403, smallCohortsSuppressed: true, scopeControlsReadable: true };
+  } finally { await db.$disconnect(); }
+}
+
+async function verifySupportWorkspace(pages, webOrigin, databaseUrl) {
+  const db = new PrismaClient({ datasources: { db: { url: databaseUrl } } });
+  const page = pages.get('support'), customerPage = pages.get('customer');
+  const id = randomUUID(), subject = 'پیگیری آزمایشی پشتیبانی مدار';
+  const publicBody = 'پاسخ عمومی آزمایشی برای مشتری ثبت شد.';
+  const privateBody = 'یادداشت محرمانه فقط برای پشتیبانی مدار';
+  try {
+    const customer = await db.user.findUniqueOrThrow({ where: { phone: '09120000009' } });
+    await db.ticket.create({ data: { id, code: `UI-SUP-${id.slice(0, 8)}`, customerId: customer.id, subject, category: 'support', priority: 'high', slaDueAt: new Date(Date.now() + 7_200_000), messages: { create: { senderUserId: customer.id, body: 'لطفاً درخواست مرا بررسی کنید.' } } } });
+    await page.goto(`${webOrigin}/support/tickets`);
+    await page.getByRole('link', { name: subject, exact: true }).waitFor();
+    await page.getByLabel('فیلتر اولویت', { exact: true }).selectOption('low');
+    await page.getByRole('link', { name: subject, exact: true }).waitFor({ state: 'hidden' });
+    await page.getByLabel('فیلتر اولویت', { exact: true }).selectOption('high');
+    const row = page.getByRole('row').filter({ has: page.getByRole('link', { name: subject, exact: true }) });
+    await row.getByRole('button', { name: 'برداشتن تیکت', exact: true }).click();
+    await page.waitForURL(url => url.searchParams.get('view') === 'mine');
+    await page.getByRole('link', { name: subject, exact: true }).click();
+    const editor = page.getByRole('textbox', { name: 'متن پاسخ یا یادداشت', exact: true });
+    await editor.fill(publicBody);
+    await page.getByRole('button', { name: 'ارسال پاسخ به مشتری', exact: true }).click();
+    await page.getByText(publicBody, { exact: true }).waitFor();
+    await page.getByRole('checkbox', { name: 'یادداشت داخلی؛ مشتری آن را نمی‌بیند', exact: true }).check();
+    await editor.fill(privateBody);
+    await page.getByRole('button', { name: 'ثبت یادداشت داخلی', exact: true }).click();
+    await page.getByText(privateBody, { exact: true }).waitFor();
+    await customerPage.goto(`${webOrigin}/tickets/${id}`);
+    await customerPage.getByText(publicBody, { exact: true }).waitFor();
+    assert.equal(await customerPage.getByText(privateBody, { exact: true }).count(), 0, 'Customer must never see internal notes.');
+    await page.getByRole('textbox', { name: 'دلیل ارجاع ویژه', exact: true }).fill('برای بررسی دقیق به مسئول مربوط ارجاع شود.');
+    await Promise.all([
+      page.waitForResponse(response => response.url().endsWith(`/support/tickets/${id}`) && response.request().method() === 'GET' && response.ok()),
+      page.getByRole('button', { name: 'ارجاع ویژه', exact: true }).click(),
+    ]);
+    assert.equal((await db.ticket.findUniqueOrThrow({ where: { id } })).status, 'escalated');
+    for (const viewport of viewports) for (const theme of themes) {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.evaluate(id => { document.documentElement.dataset.theme = id; }, theme.id);
+      await settle(page);
+      await page.evaluate(() => { document.activeElement?.blur(); window.scrollTo({ top: 0, behavior: 'instant' }); });
+      assert.deepEqual((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()).violations, []);
+      assert.ok((await runtimeSnapshot(page, 'support-active')).overflowX <= 1);
+      await page.screenshot({ path: resolve(artifactRoot, `support-active-${viewport.id}-${theme.id}.png`), fullPage: true, animations: 'disabled' });
+    }
+    await page.getByRole('button', { name: 'علامت‌گذاری به‌عنوان حل‌شده', exact: true }).click();
+    await page.getByRole('button', { name: 'بستن تیکت حل‌شده', exact: true }).click();
+    await editor.waitFor({ state: 'hidden' });
+    assert.equal((await db.ticket.findUniqueOrThrow({ where: { id } })).status, 'closed');
+    await page.goto(`${webOrigin}/support/performance`);
+    await page.getByRole('heading', { name: 'عملکرد من', exact: true }).waitFor();
+    for (const viewport of viewports) for (const theme of themes) {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.evaluate(id => { document.documentElement.dataset.theme = id; }, theme.id);
+      await settle(page);
+      assert.deepEqual((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze()).violations, []);
+      assert.ok((await runtimeSnapshot(page, 'support-performance')).overflowX <= 1);
+      await page.screenshot({ path: resolve(artifactRoot, `support-performance-${viewport.id}-${theme.id}.png`), fullPage: true, animations: 'disabled' });
+    }
+    console.log('Support flow passed: filters, claim, public reply, internal-note privacy, escalation, resolve/close, 16 extra Axe/screenshots.');
+  } finally { await db.$disconnect(); }
+}
+
+async function verifyCustomerNewOrderUi(page, webOrigin) {
+  await page.goto(`${webOrigin}/orders/new`);
+  await page.getByRole('heading', { name: 'ثبت درخواست جدید', exact: true }).waitFor();
+  const title = page.getByRole('textbox', { name: 'عنوان درخواست' });
+  await title.waitFor();
+  await page.getByText('آخرین پیش‌نویس شما بازیابی شد؛ می‌توانید از همان‌جا ادامه دهید.', { exact: true }).waitFor();
+  const originalTitle = await title.inputValue();
+  assert.ok(originalTitle.length >= 3, 'The fixture draft should resume without losing its title.');
+  assert.equal(await page.locator('[aria-current="step"]').count(), 1, 'The request flow must announce one current step.');
+  await page.getByRole('heading', { name: 'فایل‌های ورودی' }).waitFor();
+  const savedDraft = (response) => response.url().includes('/customer/orders/') && response.url().endsWith('/draft') && response.request().method() === 'PATCH' && response.ok();
+  await Promise.all([page.waitForResponse(savedDraft), title.fill(`${originalTitle} آزمایش`)]);
+  await page.getByText('پیش‌نویس ذخیره شد', { exact: true }).waitFor();
+  await Promise.all([page.waitForResponse(savedDraft), title.fill(originalTitle)]);
+  await page.getByText('پیش‌نویس ذخیره شد', { exact: true }).waitFor();
+}
+
+async function verifyCustomerReviewUi(page, webOrigin) {
+  await page.goto(`${webOrigin}/orders/new`);
+  await page.getByRole('textbox', { name: 'هدف سایت' }).fill('معرفی خدمات آزمایشی');
+  await page.getByRole('button', { name: 'مرور و ثبت نهایی' }).click();
+  await page.getByRole('heading', { name: 'مرور نهایی درخواست' }).waitFor();
+  assert.match(await page.locator('[aria-current="step"]').innerText(), /مرور و ثبت/);
+  const reviewAxe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+  assert.deepEqual(reviewAxe.violations, [], 'Customer order review must remain accessible.');
+  await page.getByRole('button', { name: 'بازگشت و ویرایش' }).click();
+  await page.getByRole('heading', { name: 'تعریف درخواست' }).waitFor();
+}
+
+async function verifyCustomerOrderDetailUi(page, webOrigin) {
+  await page.goto(`${webOrigin}/orders/00000000-0000-4000-8000-000000000011`);
+  await page.getByRole('heading', { name: 'بررسی پیشنهاد برای سفارش', exact: true }).waitFor();
+  assert.equal(await page.getByRole('region', { name: 'اطلاعات سفارش' }).locator('.premium-card').count(), 4);
+  assert.equal(await page.getByRole('tab').count(), 7, 'Every customer order section must remain available.');
+  await page.getByRole('tab', { name: 'مراحل' }).click();
+  await page.getByRole('tabpanel', { name: 'مراحل' }).waitFor();
+  await page.getByRole('tab', { name: 'فایل‌ها' }).click();
+  await page.getByRole('tabpanel', { name: 'فایل‌ها' }).waitFor();
+  await page.getByRole('tab', { name: 'خلاصه' }).click();
+  for (const [viewport, theme] of [[viewports[0], themes[0]], [viewports[2], themes[1]]]) {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    await page.emulateMedia({ colorScheme: theme.colorScheme, reducedMotion: 'reduce' });
+    await page.evaluate((themeId) => { localStorage.setItem('niazat-theme', themeId); document.documentElement.dataset.theme = themeId; }, theme.id);
+    await settle(page);
+    const snapshot = await runtimeSnapshot(page, `customer-order-detail__${viewport.id}__${theme.id}`);
+    assert.ok(snapshot.overflowX <= 1, 'Customer order detail must not overflow horizontally.');
+    assert.deepEqual(snapshot.duplicateIds, [], 'Customer order detail must not duplicate ids.');
+    const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+    assert.deepEqual(axe.violations, [], 'Customer order detail must remain accessible.');
+    const screenshotPath = join(artifactRoot, 'screenshots', `${snapshot.key}.png`);
+    await page.screenshot({ path: screenshotPath, fullPage: true, animations: 'disabled', caret: 'hide' });
+  }
+}
+
+async function verifyCustomerWalletUi(page, webOrigin) {
+  await page.goto(`${webOrigin}/wallet`);
+  await page.getByRole('heading', { name: 'امور مالی من', exact: true }).waitFor();
+  const summary = page.getByRole('region', { name: 'خلاصه مالی' });
+  await summary.waitFor();
+  assert.equal(await summary.locator('.premium-card').count(), 5, 'Every financial summary value must remain visible.');
+  assert.equal(await page.getByRole('tab').count(), 6, 'All customer finance sections must remain available.');
+  for (const value of ['payments', 'escrow', 'refunds', 'invoices', 'wallet', 'overview']) {
+    await page.locator(`#finance-tab-${value}`).click();
+    await page.locator(`#finance-panel-${value}`).waitFor();
+    const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+    assert.deepEqual(axe.violations, [], `Customer finance ${value} must remain accessible.`);
+  }
+}
+
+validateVisualMatrix();
+assert.ok(existsSync(apiEntry), 'Build apps/api before runtime UI tests.');
+mkdirSync(artifactRoot, { recursive: true });
+
+const fileEnvironment = readEnvironmentFile();
+const sourceUrl = process.env.DATABASE_URL?.trim() || fileEnvironment.DATABASE_URL;
+if (!sourceUrl) throw new Error('DATABASE_URL is required for runtime UI tests.');
+const parsedUrl = new URL(sourceUrl);
+assert.match(parsedUrl.protocol, /^postgres(?:ql)?:$/);
+const sourceDatabaseName = decodeURIComponent(parsedUrl.pathname.replace(/^\//, ''));
+const databaseName = `niazat_ui_${Date.now()}_${runId.replaceAll('-', '').slice(0, 8)}`;
+assert.match(databaseName, /^niazat_ui_[a-z0-9_]+$/);
+assert.notEqual(databaseName, sourceDatabaseName);
+const maintenanceUrl = new URL(parsedUrl);
+maintenanceUrl.pathname = '/postgres';
+maintenanceUrl.searchParams.set('schema', 'public');
+const isolatedUrl = new URL(parsedUrl);
+isolatedUrl.pathname = `/${databaseName}`;
+isolatedUrl.searchParams.set('schema', 'public');
+const control = new PrismaClient({ datasources: { db: { url: maintenanceUrl.toString() } } });
+let databaseCreated = false;
+let apiProcess;
+let webProcess;
+let browser;
+const contexts = [];
+let apiOutput = '';
+let webOutput = '';
+const report = { schemaVersion: 1, generatedAt: new Date().toISOString(), snapshots: [], axe: [], keyboard: 'pending' };
+let testError;
+
+try {
+  await control.$executeRawUnsafe(`CREATE DATABASE "${databaseName}"`);
+  databaseCreated = true;
+  const isolatedEnvironment = {
+    ...fileEnvironment,
+    ...process.env,
+    [pathEnvironmentKey]: `${resolve(apiRoot, 'node_modules/.bin')}${delimiter}${process.env[pathEnvironmentKey] ?? ''}`,
+    DATABASE_URL: isolatedUrl.toString(),
+    NODE_ENV: 'test',
+    LIVE_PROVIDERS_ENABLED: 'false',
+    STORAGE_DRIVER: 'local',
+    BACKGROUND_JOBS_ENABLED: 'false',
+    PAYMENT_GATEWAY_DRIVER: 'mock',
+    FILE_SCAN_DRIVER: 'mock',
+    SMS_DRIVER: 'mock',
+    EMAIL_DRIVER: 'mock',
+  };
+  runPrisma(['migrate', 'deploy'], 'Isolated migration deploy', isolatedEnvironment, [sourceUrl, isolatedUrl.toString()]);
+  runPrisma(['db', 'seed'], 'Isolated database seed', isolatedEnvironment, [sourceUrl, isolatedUrl.toString()]);
+  const fixtureDb = new PrismaClient({ datasources: { db: { url: isolatedUrl.toString() } } });
+  try {
+    const customer = await fixtureDb.user.findUniqueOrThrow({ where: { phone: '09120000009' } });
+    // Random UUID ordering used to pick a different schema/pricing model each run.
+    const service = await fixtureDb.serviceLine.findUniqueOrThrow({ where: { slug: 'website-design-development' } });
+    await fixtureDb.organization.create({ data: { id: '00000000-0000-4000-8000-000000000010', name: 'سازمان نمایشی', members: { create: { userId: customer.id, role: 'owner', status: 'active' } } } });
+    for (const [id, code, title, status] of [['00000000-0000-4000-8000-000000000011','UI-SUGGESTIONS','بررسی پیشنهاد برای سفارش','pending_quote'],['00000000-0000-4000-8000-000000000012','UI-ORG-DRAFT','پیش‌نویس سازمانی نمایشی','draft']]) await fixtureDb.order.create({ data: { id, code, title, status, serviceId: service.id, customerId: customer.id, briefDescription: 'شرح خصوصی آزمایشی', createdAt: new Date('2026-09-09T12:32:50.000Z') } });
+    await fixtureDb.executorProfile.create({ data: {
+      id: '00000000-0000-4000-8000-000000000009', publicHandlerCode: 'VETTING-UI', displayAlias: 'مجری آزمایشی',
+      executorType: 'vetted_external', verificationStatus: 'pending', onboarding: { create: {} },
+      user: { create: { phone: 'onboarding-ui-fixture', fullName: 'مجری آزمایشی', role: 'executor', status: 'active' } },
+    } });
+  } finally { await fixtureDb.$disconnect(); }
+
+  const apiPort = randomInt(47_001, 50_000);
+  const webPort = randomInt(50_001, 53_000);
+  const apiOrigin = `http://127.0.0.1:${apiPort}`;
+  const webOrigin = `http://127.0.0.1:${webPort}`;
+  apiProcess = spawn(process.execPath, [apiEntry], {
+    cwd: artifactRoot,
+    env: { ...isolatedEnvironment, APP_PORT: String(apiPort), APP_URL: apiOrigin, WEB_URL: webOrigin },
+    windowsHide: true,
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  const captureApi = (chunk) => { apiOutput = `${apiOutput}${chunk.toString()}`.slice(-20_000); };
+  apiProcess.stdout.on('data', captureApi);
+  apiProcess.stderr.on('data', captureApi);
+  await waitForUrl(`${apiOrigin}/health`, apiProcess, () => apiOutput);
+
+  const webEnvironment = {
+    ...process.env,
+    NODE_ENV: 'production',
+    API_INTERNAL_URL: `${apiOrigin}/v1`,
+    NEXT_PUBLIC_API_URL: `${apiOrigin}/v1`,
+    NEXT_PUBLIC_API_BASE_PATH: '/api/backend',
+    NEXT_PUBLIC_SITE_URL: webOrigin,
+  };
+  buildWeb(webEnvironment);
+  webProcess = spawn(process.execPath, [nextCli, 'start', '--hostname', '127.0.0.1', '--port', String(webPort)], {
+    cwd: webRoot,
+    env: webEnvironment,
+    windowsHide: true,
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  const captureWeb = (chunk) => { webOutput = `${webOutput}${chunk.toString()}`.slice(-20_000); };
+  webProcess.stdout.on('data', captureWeb);
+  webProcess.stderr.on('data', captureWeb);
+  await waitForUrl(`${webOrigin}/`, webProcess, () => webOutput);
+
+  const executablePath = browserExecutable();
+  assert.ok(executablePath, 'No Playwright Chromium, Chrome or Edge executable is available.');
+  browser = await chromium.launch({ headless: true, executablePath, args: ['--disable-dev-shm-usage'] });
+  await verifyOrbitHome(browser, webOrigin);
+  report.orbit = 'passed';
+  const pages = new Map();
+  for (const role of ['guest', ...Object.keys(rolePhones)]) {
+    const context = await browser.newContext({ locale: 'fa-IR', timezoneId: 'Asia/Tehran', reducedMotion: 'reduce' });
+    contexts.push(context);
+    const refreshRoute = '**/api/backend/auth/refresh';
+    const rejectMissingSession = (route) => route.fulfill({
+      status: 401,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: 'No runtime session is available yet.' }),
+    });
+    await context.route(refreshRoute, rejectMissingSession);
+    const page = await context.newPage();
+    pages.set(role, page);
+    await page.goto(`${webOrigin}${role === 'guest' ? '/' : '/login'}`);
+    await settle(page);
+    if (role !== 'guest') {
+      await page.locator('input[autocomplete="tel"]').fill(rolePhones[role]);
+      await page.locator('input[autocomplete="current-password"]').fill('Passw0rd!123');
+      await Promise.all([
+        page.waitForURL((url) => url.pathname === roleHomes[role], { timeout: 15_000 }),
+        page.locator('button[type="submit"]').click(),
+      ]);
+      await settle(page);
+      assert.equal(new URL(page.url()).pathname, roleHomes[role], `Browser login failed for ${role}: ${page.url()}.`);
+      await context.unroute(refreshRoute, rejectMissingSession);
+    }
+  }
+
+  await verifyKeyboardFlows(pages, webOrigin);
+  await verifyDrawerMotion(pages);
+  await verifyOnboardingUi(pages.get('ops'), webOrigin);
+  await verifyOrganizationsUi(pages, webOrigin);
+  await verifyCustomerOrdersUi(pages.get('customer'), webOrigin);
+  await verifyCustomerNewOrderUi(pages.get('customer'), webOrigin);
+  await verifyCustomerWalletUi(pages.get('customer'), webOrigin);
+  report.keyboard = 'passed';
+  report.motion = 'passed';
+
+  for (const scenario of scenarios) {
+    const page = pages.get(scenario.role);
+    assert.ok(page, `No browser context for ${scenario.role}.`);
+    // Use the application's links between workspace pages. Repeated hard reloads
+    // across five accounts share an IP refresh budget unlike normal SPA navigation.
+    await page.setViewportSize({ width: 1280, height: 800 });
+    const navigationLink = page.locator(`a[href="${scenario.route}"]:visible`).first();
+    if (scenario.role !== 'guest' && await navigationLink.count()) {
+      await navigationLink.click();
+      await page.waitForURL(url => url.pathname === scenario.route);
+    } else {
+      const response = await page.goto(`${webOrigin}${scenario.route}`, { waitUntil: 'domcontentloaded' });
+      assert.ok(response && response.status() < 400, `${scenario.id} returned HTTP ${response?.status()}.`);
+    }
+    await settle(page);
+    assert.equal(new URL(page.url()).pathname, scenario.route, `${scenario.id} redirected to ${page.url()}.`);
+    if (scenario.id === 'ops-order-suggestions') {
+      await page.getByRole('button', { name: 'بررسی پیشنهادها', exact: true }).click();
+      await page.getByRole('region', { name: 'مجریان پیشنهادی' }).waitFor();
+    }
+    if (scenario.id === 'ops-bi') {
+      // The real date filter gives a stable reporting period across calendar days.
+      await page.getByLabel('از تاریخ تحلیل').fill('2026-06-01');
+      await page.getByLabel('تا تاریخ تحلیل').fill('2026-08-31');
+      await Promise.all([
+        page.waitForResponse((response) => response.url().includes('/admin/reports/bi?') && response.ok()),
+        page.getByRole('button', { name: 'به‌روزرسانی تحلیل', exact: true }).click(),
+      ]);
+      await page.locator('[aria-busy="false"]').waitFor();
+    }
+    for (const viewport of viewports) {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      for (const theme of themes) {
+        await page.emulateMedia({ colorScheme: theme.colorScheme, reducedMotion: 'reduce' });
+        const themeControl = page.locator('[data-theme-toggle]:visible').first();
+        if (await themeControl.count()) {
+          // Mobile workspaces hide their theme control inside the closed drawer.
+          // Their CSS-only snapshot setup can differ from the provider state;
+          // normalize through the actual button when it becomes visible again.
+          if ((await themeControl.getAttribute('aria-pressed')) === String(theme.id === 'simple-dark') && (await page.evaluate(() => document.documentElement.dataset.theme)) !== theme.id) {
+            await themeControl.click();
+            await page.waitForFunction(value => document.documentElement.dataset.theme !== value, theme.id);
+          }
+          if ((await themeControl.getAttribute('aria-pressed')) !== String(theme.id === 'simple-dark')) await themeControl.click();
+          await page.waitForFunction(value => document.documentElement.dataset.theme === value, theme.id);
+        }
+        await page.evaluate((themeId) => {
+          localStorage.setItem('niazat-theme', themeId);
+          document.documentElement.dataset.theme = themeId;
+          if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+          window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+          document.querySelectorAll('.workspace-sidebar').forEach(element => { element.scrollTop = 0; });
+        }, theme.id);
+        await settle(page);
+        const key = `${scenario.id}__${viewport.id}__${theme.id}`;
+        const snapshot = await runtimeSnapshot(page, key);
+        assert.equal(snapshot.lang, 'fa', `${key} lost Persian language metadata.`);
+        assert.equal(snapshot.dir, 'rtl', `${key} lost RTL direction.`);
+        assert.equal(snapshot.theme, theme.id, `${key} rendered the wrong theme.`);
+        assert.ok(snapshot.overflowX <= 1, `${key} has ${snapshot.overflowX}px horizontal overflow.`);
+        assert.deepEqual(snapshot.duplicateIds, [], `${key} contains duplicate ids.`);
+        assert.deepEqual(snapshot.undersizedControls, [], `${key} contains controls smaller than 24px.`);
+        report.snapshots.push(snapshot);
+        const axe = await new AxeBuilder({ page })
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+          .analyze();
+        report.axe.push({ key, violations: axe.violations.map(({ id, impact, help, nodes }) => ({ id, impact, help, nodes: nodes.length })) });
+        assert.deepEqual(axe.violations, [], `${key} has axe violations: ${axe.violations.map((item) => item.id).join(', ')}`);
+        const screenshotPath = join(artifactRoot, 'screenshots', `${key}.png`);
+        mkdirSync(dirname(screenshotPath), { recursive: true });
+        await page.screenshot({ path: screenshotPath, fullPage: true, animations: 'disabled', caret: 'hide' });
+      }
+    }
+  }
+
+  await verifyCustomerReviewUi(pages.get('customer'), webOrigin);
+  await verifyCustomerOrderDetailUi(pages.get('customer'), webOrigin);
+
+  if (updateBaseline) {
+    let snapshots = report.snapshots;
+    if (updateScope) {
+      const previous = JSON.parse(readFileSync(baselinePath, 'utf8')).snapshots;
+      const inScope = (entry) => updateScope.includes(entry.key.split('__')[0]);
+      compareBaseline(report.snapshots.filter((entry) => !inScope(entry)), previous.filter((entry) => !inScope(entry)));
+      const current = new Map(report.snapshots.map((entry) => [entry.key, entry]));
+      snapshots = previous.map((entry) => inScope(entry) ? current.get(entry.key) : entry);
+      assert.equal(snapshots.length, report.snapshots.length);
+      assert.ok(snapshots.every(Boolean));
+    }
+    mkdirSync(dirname(baselinePath), { recursive: true });
+    writeFileSync(baselinePath, `${JSON.stringify({ schemaVersion: 1, snapshots }, null, 2)}\n`);
+  } else {
+    assert.ok(existsSync(baselinePath), 'Visual baseline is missing; use the guarded --update-baseline command.');
+    const baseline = JSON.parse(readFileSync(baselinePath, 'utf8'));
+    assert.equal(baseline.schemaVersion, 1, 'Unsupported visual baseline schema.');
+    compareBaseline(report.snapshots, baseline.snapshots);
+  }
+  const executorOrderId = await verifyExecutorWorkspace(pages.get('executor'), webOrigin, isolatedUrl.toString());
+  await verifyOpsWorkspace(pages.get('ops'), webOrigin, isolatedUrl.toString(), executorOrderId);
+  await verifySupportWorkspace(pages, webOrigin, isolatedUrl.toString());
+  await verifyFinanceWorkspace(pages.get('finance'), isolatedUrl.toString());
+  report.governance = await verifyGovernanceWorkspace(pages, webOrigin, isolatedUrl.toString());
+  report.customerDecisions = await verifyCustomerDecisions({ pages, webOrigin, databaseUrl: isolatedUrl.toString(), orderId: executorOrderId, PrismaClient, LedgerService: apiRequire(resolve(apiRoot, 'dist/finance/ledger.service.js')).LedgerService, artifactRoot, viewports, themes, settle, runtimeSnapshot });
+  console.log(`Phase 8 runtime UI passed: ${report.snapshots.length} screenshots, ${report.axe.length} axe scans, responsive overflow checks, keyboard flows and compact visual baseline.`);
+} catch (error) {
+  testError = error;
+  report.failure = error instanceof Error ? error.message : String(error);
+} finally {
+  report.completedAt = new Date().toISOString();
+  writeFileSync(resolve(artifactRoot, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
+  for (const context of contexts) await context.close().catch(() => undefined);
+  await browser?.close().catch(() => undefined);
+  for (const processRef of [webProcess, apiProcess]) {
+    if (processRef && processRef.exitCode == null) {
+      processRef.kill();
+      await Promise.race([once(processRef, 'exit'), new Promise((resolveWait) => setTimeout(resolveWait, 5_000))]);
+    }
+  }
+  if (databaseCreated) {
+    await control.$queryRawUnsafe(
+      'SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = $1 AND pid <> pg_backend_pid()',
+      databaseName,
+    );
+    await control.$executeRawUnsafe(`DROP DATABASE IF EXISTS "${databaseName}"`);
+  }
+  await control.$disconnect();
+}
+
+if (testError) {
+  if (process.env.GITHUB_ACTIONS === 'true') {
+    const annotation = report.failure
+      .replaceAll('%', '%25')
+      .replaceAll('\r', '%0D')
+      .replaceAll('\n', '%0A');
+    console.error(`::error title=Phase 8 runtime UI::${annotation}`);
+  }
+  throw testError;
+}
