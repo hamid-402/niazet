@@ -2,10 +2,9 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { PrismaClient } from '@prisma/client';
-
-const require = createRequire(import.meta.url);
-const { LedgerService } = require('../dist/finance/ledger.service.js');
+const apiRequire = createRequire(new URL('../../apps/api/package.json', import.meta.url));
+const { PrismaClient } = apiRequire('@prisma/client');
+const { LedgerService } = apiRequire('./dist/finance/ledger.service.js');
 
 export async function verifyOrderBranches({ databaseUrl, origin, token, accounts, serviceId, executorProfileId, uploadedStorageKeys, ok, call }) {
   assert.match(new URL(databaseUrl).pathname, /^\/niazat_e2e_[a-z0-9_]+$/);
@@ -223,7 +222,7 @@ export async function verifyOrderBranches({ databaseUrl, origin, token, accounts
     throw error;
   } finally {
     report.completedAt = new Date().toISOString();
-    const directory = new URL('../../../.artifacts/acceptance/', import.meta.url);
+    const directory = new URL('../../.artifacts/acceptance/', import.meta.url);
     mkdirSync(directory, { recursive: true });
     writeFileSync(new URL('order-branches.json', directory), `${JSON.stringify(report, null, 2)}\n`);
     await db.$disconnect();

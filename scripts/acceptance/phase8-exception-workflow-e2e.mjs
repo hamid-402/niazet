@@ -5,12 +5,14 @@ import { existsSync, mkdirSync, readFileSync, unlinkSync } from 'node:fs';
 import { basename, delimiter, join } from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { PrismaClient } from '@prisma/client';
+import { createRequire } from 'node:module';
 import { verifyOrderBranches } from './phase8-order-branches.mjs';
 
 // Additive acceptance runner: inherited/protected E2E and application code stay unchanged.
-const apiRoot = fileURLToPath(new URL('../', import.meta.url));
-const runtimeRoot = fileURLToPath(new URL('../../../.artifacts/acceptance/order-branches-runtime/', import.meta.url));
+const apiRoot = fileURLToPath(new URL('../../apps/api/', import.meta.url));
+const apiRequire = createRequire(new URL('../../apps/api/package.json', import.meta.url));
+const { PrismaClient } = apiRequire('@prisma/client');
+const runtimeRoot = fileURLToPath(new URL('../../.artifacts/acceptance/order-branches-runtime/', import.meta.url));
 const prismaCli = join(apiRoot, 'node_modules/prisma/build/index.js');
 const apiEntry = join(apiRoot, 'dist/main.js');
 const envPath = join(apiRoot, '.env');

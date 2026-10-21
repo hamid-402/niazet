@@ -20,6 +20,7 @@ import type { OrderDetail, OrderFile } from "@/lib/types";
 import { formatDate, formatNumber, formatToman } from "@/lib/format";
 import { customerNextAction, OrderTimeline } from "@/components/order-timeline";
 import { OrbitCustomerSurface } from "@/components/orbit-customer-surface";
+import { ConfirmationModal } from "@/components/confirmation-modal";
 import styles from "@/components/orbit-customer-surface.module.css";
 
 const TABS = [
@@ -46,13 +47,15 @@ export default function CustomerOrderDetailPage({
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState("");
   const [revisionReason, setRevisionReason] = useState("");
+  const [customerDecision, setCustomerDecision] = useState<"confirm" | "dispute" | null>(null);
+  const cancelCustomerDecision = useCallback(() => setCustomerDecision(null), []);
   const [messageBody, setMessageBody] = useState("");
   const [messageAttachment, setMessageAttachment] = useState<OrderFile | null>(
     null,
   );
 
   const load = useCallback(() => {
-    apiFetch<OrderDetail>(`/customer/orders/${id}`)
+    return apiFetch<OrderDetail>(`/customer/orders/${id}`)
       .then(setOrder)
       .catch((e) => setError(e.message));
   }, [id]);
@@ -76,6 +79,24 @@ export default function CustomerOrderDetailPage({
     }
   }
 
+  async function submitCustomerDecision(note: string) {
+    if (!customerDecision) return;
+    setActionError("");
+    setBusy(true);
+    try {
+      await apiFetch(`/customer/orders/${id}/${customerDecision}`, {
+        method: "POST",
+        ...(customerDecision === "dispute" ? { body: { reason: note, note } } : {}),
+      });
+      setCustomerDecision(null);
+      await load();
+    } catch (err) {
+      setActionError(err instanceof ApiError ? err.message : "ثبت تصمیم ممکن نشد؛ دوباره تلاش کنید.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   if (error) return <ErrorBanner message={error} />;
   if (!order) return <PageLoading />;
 
@@ -94,7 +115,7 @@ export default function CustomerOrderDetailPage({
         <OrderStatusBadge status={order.status} />
       </div>
 
-      {actionError && (
+      {actionError && !customerDecision && (
         <div className="mb-4">
           <ErrorBanner message={actionError} />
         </div>
@@ -190,13 +211,7 @@ export default function CustomerOrderDetailPage({
             <>
               <Button
                 disabled={busy}
-                onClick={() =>
-                  runAction(() =>
-                    apiFetch(`/customer/orders/${id}/confirm`, {
-                      method: "POST",
-                    }),
-                  )
-                }
+                onClick={() => { setActionError(""); setCustomerDecision("confirm"); }}
               >
                 تایید تحویل
               </Button>
@@ -206,6 +221,7 @@ export default function CustomerOrderDetailPage({
                 </summary>
                 <div className="mt-2 flex gap-2">
                   <input
+                    aria-label="دلیل درخواست اصلاح"
                     className={inputClass}
                     placeholder="دلیل درخواست اصلاح"
                     value={revisionReason}
@@ -228,6 +244,11 @@ export default function CustomerOrderDetailPage({
                 </div>
               </details>
             </>
+          )}
+          {["in_progress", "delivered"].includes(order.status) && (
+            <Button variant="secondary" disabled={busy} onClick={() => { setActionError(""); setCustomerDecision("dispute"); }}>
+              ثبت اختلاف
+            </Button>
           )}
           {[
             "draft",
@@ -262,6 +283,8 @@ export default function CustomerOrderDetailPage({
             "quoted",
             "pending_payment",
             "quoted",
+            "in_progress",
+            "delivered",
             "closed",
             "cancelled",
           ].includes(order.status) && (
@@ -271,6 +294,19 @@ export default function CustomerOrderDetailPage({
           )}
         </div>
       </Card>
+
+      {customerDecision === "confirm" && <ConfirmationModal
+        open title="تأیید تحویل سفارش" description={`سفارش ${order.code} — ${order.title}`}
+        impacts={["فقط پس از بررسی فایل‌ها و تطبیق خروجی با توافق، تحویل را تأیید کنید.", "با تأیید شما، سفارش بسته و مبلغ امانی طبق قرارداد تسویه می‌شود."]}
+        confirmLabel="تأیید نهایی تحویل" tone="primary" showNote={false} requireNote={false}
+        errorMessage={actionError} onCancel={cancelCustomerDecision} onConfirm={submitCustomerDecision}
+      />}
+      {customerDecision === "dispute" && <ConfirmationModal
+        open title="ثبت اختلاف سفارش" description={`دلیل اعتراض و موارد مغایر با توافق را برای سفارش ${order.code} توضیح دهید.`}
+        impacts={["سفارش وارد وضعیت اختلاف می‌شود تا تصمیم نهایی از مسیر رسیدگی انجام شود.", "ثبت اختلاف به‌تنهایی باعث بازپرداخت یا آزادسازی وجه نمی‌شود."]}
+        confirmLabel="ثبت و ارسال اختلاف" noteLabel="شرح اختلاف" notePlaceholder="موارد مغایر با توافق و درخواست خود را توضیح دهید"
+        errorMessage={actionError} onCancel={cancelCustomerDecision} onConfirm={submitCustomerDecision}
+      />}
 
       <TabList idPrefix="order" label="بخش‌های سفارش" items={TABS.map((item) => ({ value: item, label: item }))} value={tab} onChange={(value) => setTab(value as (typeof TABS)[number])} />
       <p className={styles.tabHint}>برای دیدن بخش‌های دیگر، نوار بالا را افقی حرکت دهید.</p>

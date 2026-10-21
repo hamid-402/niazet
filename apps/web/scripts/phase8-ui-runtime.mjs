@@ -10,6 +10,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { chromium } from 'playwright';
 import { scenarios, themes, validateVisualMatrix, viewports } from './phase8-visual-regression-matrix.mjs';
 import { verifyOrbitHome } from './orbit-home-runtime.mjs';
+import { verifyCustomerDecisions } from './orbit-customer-decisions-runtime.mjs';
 
 const webRoot = fileURLToPath(new URL('../', import.meta.url));
 const repositoryRoot = resolve(webRoot, '../..');
@@ -1103,6 +1104,7 @@ try {
   await verifySupportWorkspace(pages, webOrigin, isolatedUrl.toString());
   await verifyFinanceWorkspace(pages.get('finance'), isolatedUrl.toString());
   report.governance = await verifyGovernanceWorkspace(pages, webOrigin, isolatedUrl.toString());
+  report.customerDecisions = await verifyCustomerDecisions({ pages, webOrigin, databaseUrl: isolatedUrl.toString(), orderId: executorOrderId, PrismaClient, LedgerService: apiRequire(resolve(apiRoot, 'dist/finance/ledger.service.js')).LedgerService, artifactRoot, viewports, themes, settle, runtimeSnapshot });
   console.log(`Phase 8 runtime UI passed: ${report.snapshots.length} screenshots, ${report.axe.length} axe scans, responsive overflow checks, keyboard flows and compact visual baseline.`);
 } catch (error) {
   testError = error;

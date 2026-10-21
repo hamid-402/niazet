@@ -4,7 +4,7 @@ import test from 'node:test';
 
 const runner = readFileSync(new URL('./phase8-exception-workflow-e2e.mjs', import.meta.url), 'utf8');
 const branches = readFileSync(new URL('./phase8-order-branches.mjs', import.meta.url), 'utf8');
-test('exception acceptance stays isolated with mock providers and bounded cleanup', () => {
+test('repo-level exception acceptance stays isolated with mock providers and bounded cleanup', () => {
   for (const marker of ['assert.notEqual(databaseName, sourceDatabaseName)', 'CREATE DATABASE', 'DROP DATABASE IF EXISTS', 'finally', 'uploadedStorageKeys', "BACKGROUND_JOBS_ENABLED: 'false'", "LIVE_PROVIDERS_ENABLED: 'false'", "PAYMENT_GATEWAY_DRIVER: 'mock'", 'await verifyOrderBranches(']) assert.ok(runner.includes(marker), marker);
   assert.ok(branches.includes('niazat_e2e_'));
 });
