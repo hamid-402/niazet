@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { matchesInvoiceApproval, verifyInvoiceDomain } from './orbit-invoice-approval.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 // Fixed pre-redesign checkpoint. Never silently rebase this gate to HEAD.
@@ -14,10 +15,10 @@ const protectedPath = (path) => path.startsWith('apps/api/') || [
   'apps/web/src/lib/types.ts', 'apps/web/src/lib/themes.ts',
 ].includes(path);
 
-function violations(files, present, changed) {
+function violations(files, present, changed, approved = () => false) {
   return [
     ...files.filter((path) => !present(path)).map((path) => `Baseline file missing: ${path}`),
-    ...changed.filter(protectedPath).map((path) => `Protected domain/auth contract changed: ${path}`),
+    ...changed.filter(path => protectedPath(path) && !approved(path)).map((path) => `Protected domain/auth contract changed: ${path}`),
   ];
 }
 
@@ -32,10 +33,12 @@ try {
   assert.ok(files.length > 0, 'Missing baseline history. CI checkout needs fetch-depth: 0.');
   const changed = split(git('diff', '--name-only', '--no-renames', '-z', baseline, '--'));
   const tracked = new Set(split(git('ls-files', '-z')));
-  const failures = violations(files, (path) => tracked.has(path) && existsSync(new URL(path, new URL('../', import.meta.url))), changed);
+  const read = path => readFileSync(new URL(path, new URL('../', import.meta.url)));
+  verifyInvoiceDomain(path => git('show', `${baseline}:${path}`), path => read(path).toString('utf8'));
+  const failures = violations(files, (path) => tracked.has(path) && existsSync(new URL(path, new URL('../', import.meta.url))), changed, path => existsSync(new URL(path, new URL('../', import.meta.url))) && matchesInvoiceApproval(path, read(path)));
   const routes = files.filter((path) => path.startsWith('apps/web/src/app/') && path.endsWith('/page.tsx'));
   assert.deepEqual(failures, [], failures.join('\n'));
-  console.log(`Orbit preservation passed: ${files.length} baseline files, ${routes.length} page routes retained; backend/auth contracts unchanged; 4 guard self-tests passed.`);
+  console.log(`Orbit preservation passed: ${files.length} baseline files, ${routes.length} page routes retained; only byte-pinned owner-approved invoice presentation changes; financial domain/auth unchanged; 4 guard self-tests passed.`);
 } catch (error) {
   console.error(error.message);
   process.exitCode = 1;

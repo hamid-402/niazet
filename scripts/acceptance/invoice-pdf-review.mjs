@@ -10,7 +10,7 @@ const directory = new URL('../../.artifacts/acceptance/invoice-review/', import.
 mkdirSync(directory, { recursive: true });
 const base = { invoiceNumber: 'INV-00000000-0000-4000-8000-000000000123', orderCode: 'NIA-20261021-001', amount: 250000, issuedAt: new Date('2026-10-21T06:00:00.000Z') };
 for (const [name, values] of [['current-standard', base], ['persian-probe', { ...base, orderCode: 'نیازت-آزمایش-۱۲۳' }]]) {
-  const pdf = buildInvoicePdf(values);
+  const pdf = await buildInvoicePdf(values);
   assert.equal(pdf.subarray(0, 8).toString(), '%PDF-1.4');
   assert.ok(pdf.toString().includes('250,000 IRT'));
   writeFileSync(new URL(`${name}.pdf`, directory), pdf);

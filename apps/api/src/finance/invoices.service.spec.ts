@@ -14,8 +14,8 @@ describe('invoice PDF', () => {
     });
   });
 
-  it('creates a valid single-page PDF payload', () => {
-    const pdf = buildInvoicePdf({
+  it('creates a valid single-page PDF payload', async () => {
+    const pdf = await buildInvoicePdf({
       invoiceNumber: 'INV-1',
       orderCode: 'ORD-1',
       amount: 250_000,
