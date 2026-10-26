@@ -3,6 +3,8 @@ import { createHash } from 'node:crypto';
 // Owner-approved Z1.1-Z1.6, 2026-10-25. These exact files only.
 // Fixed baseline remains 2c701d7. EXEC-008 separately accepted local/mock
 // activation; EXEC-009 pins only accepted order/payment/session refinements.
+// Delivery correction: the wallet test uses public get() mocking rather than
+// ConfigService's private setter. Same assertions and production sources.
 export const z1DomainPins = {
   "apps/api/prisma/schema.prisma": {
     "before": "bfa97ddb906f4d2bdfb7e02940bd8b07a4bf6f375371b4df47408d87b66e99be",
@@ -54,7 +56,7 @@ export const z1DomainPins = {
   },
   "apps/api/src/finance/wallet-payments.service.spec.ts": {
     "before": null,
-    "after": "459dda6c0c5cea2117f6121fcf3c1fecce075abf0859b39be67e418884bb2bd1"
+    "after": "21000eed99fc17e7289867db9d917c51af878c4c52c37d310ec717d57689d56c"
   },
   "apps/api/src/orders/domain/order-workflow.service.ts": {
     "before": "d458f9f5ab95474feafc89df44ded81e002d348d7fc5a28aa86821875da5ca53",
