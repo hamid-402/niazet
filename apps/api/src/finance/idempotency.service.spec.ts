@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/require-await */
 import { ConflictException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { IdempotencyService, requestFingerprint } from './idempotency.service';
 
 describe('requestFingerprint', () => {
@@ -151,5 +152,56 @@ describe('IdempotencyService replay contract', () => {
         work: async () => ({ recovered: true }),
       }),
     ).resolves.toEqual({ recovered: true });
+  });
+});
+
+describe('PostgreSQL serialization retry contract', () => {
+  const request = {
+    key: 'raw-retry-123',
+    scope: 'wallet.test',
+    request: {},
+    work: jest.fn(),
+  };
+  it.each(['40001', '40P01'])('retries raw query SQLSTATE %s', async (code) => {
+    const error = new Prisma.PrismaClientKnownRequestError(
+      'isolated conflict',
+      { code: 'P2010', clientVersion: 'test', meta: { code } },
+    );
+    const transaction = jest
+      .fn()
+      .mockRejectedValueOnce(error)
+      .mockResolvedValueOnce({ ok: true });
+    const service = new IdempotencyService({
+      $transaction: transaction,
+    } as never);
+    await expect(service.execute(request)).resolves.toEqual({ ok: true });
+    expect(transaction).toHaveBeenCalledTimes(2);
+  });
+  it('returns a conflict after three attempts, never an unbounded retry', async () => {
+    const error = new Prisma.PrismaClientKnownRequestError('conflict', {
+      code: 'P2034',
+      clientVersion: 'test',
+    });
+    const transaction = jest.fn().mockRejectedValue(error);
+    await expect(
+      new IdempotencyService({ $transaction: transaction } as never).execute(
+        request,
+      ),
+    ).rejects.toBeInstanceOf(ConflictException);
+    expect(transaction).toHaveBeenCalledTimes(3);
+  });
+  it('does not retry constraint errors or arbitrary raw SQL failures', async () => {
+    const error = new Prisma.PrismaClientKnownRequestError('not retryable', {
+      code: 'P2010',
+      clientVersion: 'test',
+      meta: { code: '23514' },
+    });
+    const transaction = jest.fn().mockRejectedValue(error);
+    await expect(
+      new IdempotencyService({ $transaction: transaction } as never).execute(
+        request,
+      ),
+    ).rejects.toBe(error);
+    expect(transaction).toHaveBeenCalledTimes(1);
   });
 });

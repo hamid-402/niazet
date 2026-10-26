@@ -13,10 +13,13 @@ import {
   TicketPriority,
   TicketStatus,
   UserRole,
+  AdminScope,
 } from '@prisma/client';
 import { TicketsService } from './tickets.service';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { SupportScopeGuard } from '../contracts/support-scope.guard';
+import { AdminScopes } from '../common/decorators/admin-scopes.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
 import {
@@ -26,8 +29,9 @@ import {
 } from './dto/ticket.dto';
 
 @Controller('v1/support/tickets')
-@UseGuards(RolesGuard)
+@UseGuards(RolesGuard, SupportScopeGuard)
 @Roles(UserRole.support, UserRole.admin)
+@AdminScopes(AdminScope.ops_admin)
 export class TicketsSupportController {
   constructor(private readonly tickets: TicketsService) {}
 

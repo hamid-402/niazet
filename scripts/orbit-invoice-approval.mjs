@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+import { inverseParserInput } from './orbit-parser-approval.mjs';
 
 // Owner approval 2026-10-21: presentation only (M5-PDF-01). Each accepted byte
 // sequence (LF-normalized for text) is pinned, not an API/finance allowlist.
@@ -19,11 +20,15 @@ export const approvedInvoiceFiles = {
 };
 
 export function matchesInvoiceApproval(path, bytes) {
-  const content = path.endsWith('.ttf') ? bytes : bytes.toString('utf8').replaceAll('\r\n', '\n');
+  const content = path.endsWith('.ttf') ? bytes : inverseParserInput(path, bytes);
   return Boolean(approvedInvoiceFiles[path]) && createHash('sha256').update(content).digest('hex') === approvedInvoiceFiles[path];
 }
 
 export function verifyInvoiceDomain(baseline, current) {
+  // Owner-approved parser inputs must reconstruct the exact invoice checkpoint;
+  // all inherited invoice/manifest/dependency assertions below remain intact.
+  const actualCurrent = current;
+  current = path => inverseParserInput(path, actualCurrent(path));
   const servicePath = 'apps/api/src/finance/invoices.service.ts';
   const classBody = source => {
     source = source.replaceAll('\r\n', '\n');

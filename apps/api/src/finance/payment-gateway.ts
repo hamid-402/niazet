@@ -38,9 +38,12 @@ export class MockPaymentGateway implements PaymentGatewayAdapter {
     this.logger.log(
       `[MOCK GATEWAY] payment request for order ${input.orderId}, amount=${input.amount}`,
     );
+    const redirect = new URL(input.callbackUrl);
+    redirect.searchParams.set('gatewayRef', gatewayRef);
+    redirect.searchParams.set('status', 'success');
     return Promise.resolve({
       gatewayRef,
-      redirectUrl: `${input.callbackUrl}?gatewayRef=${gatewayRef}&status=success`,
+      redirectUrl: redirect.toString(),
     });
   }
 

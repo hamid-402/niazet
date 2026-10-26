@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-24",
+  "scope": "Z0 planning decisions only; product/runtime acceptance and implementation authority remain separate",
+  "decisions": {
+    "DEC01": {
+      "status": "approved",
+      "date": "2026-10-22",
+      "choice": "Keep Next.js/NestJS/Prisma; complete source capabilities; disclose literal technology deviation"
+    },
+    "DEC02": {
+      "status": "approved-with-price-and-state-guards",
+      "date": "2026-10-22",
+      "choice": "Payment during registration only for definitively priced services; negotiated services require a final quote accepted by the customer; retain workflow, QC and idempotency"
+    },
+    "DEC03": {
+      "status": "approved-with-consent-and-moderation",
+      "date": "2026-10-22",
+      "choice": "Optional moderated public order/service reviews; no internal staff identity/profile disclosure; retain existing private feedback and complaints"
+    },
+    "DEC04": {
+      "status": "target-contract-explicitly-approved",
+      "date": "2026-10-24",
+      "choice": "Four working hours for the first meaningful public support reply, not resolution time. Versioned configurable Asia/Tehran calendar; default Saturday–Thursday 09:00–18:00, Friday and registered holidays closed. Automated replies/internal notes do not count; customer-wait does not pause first-response clock. Resolution metric separate; preserve legacy tickets.",
+      "implementationAuthority": "Target policy only. No blanket protected-source exception, production migration, live connection, cost, account merge or financial mutation authorization."
+    },
+    "DEC05": {
+      "status": "target-contract-explicitly-approved",
+      "date": "2026-10-24",
+      "choice": "Eligible service on a working day strictly before 14:00 Asia/Tehran, atomic capacity reservation. Payment reservation lasts 15 minutes capped at 14:00; retry never extends it. Delivery by 21:00 only after successful payment inside valid hold. Late verified funds require financial reconciliation, without automatic refund or same/next-day commitment absent customer consent. Snapshot calendar/rules; live providers deferred.",
+      "implementationAuthority": "Target policy only. No blanket protected-source exception, production migration, live connection, cost, account merge or financial mutation authorization."
+    },
+    "DEC06": {
+      "status": "feature-scope-approved-with-ledger-guards",
+      "date": "2026-10-22",
+      "choice": "Add wallet top-up and order payment from wallet balance, retaining existing wallet/refunds; balanced ledger, concurrency and duplicate-spend prevention required. Live gateway remains deferred; no production migration authorized by this record"
+    },
+    "DEC07": {
+      "status": "approved-preserve-current-formats",
+      "date": "2026-10-22",
+      "choice": "Keep all current identifier/document formats for now, including new orders; do not activate the proposed new source format or rewrite historic identifiers. Do not fabricate deadlines; any literal source-format deviation remains disclosed"
+    },
+    "DEC08": {
+      "status": "approved-by-owner-delegated-choice",
+      "date": "2026-10-24",
+      "choice": "Owner delegated the choice; interpret original operator as existing support role. Keep four roles, scopes and capabilities; no fifth role, new runtime alias or permission expansion"
+    },
+    "DEC09": {
+      "status": "approved-preserve-current-api-and-disclose-path-deviation",
+      "date": "2026-10-24",
+      "choice": "Owner accepted the proposed preservation of current API routes, with explicit documentation of source path/method differences. Use validated domain commands, not a generic direct status setter; do not add compatibility aliases merely for literal source matching"
+    },
+    "DEC10": {
+      "status": "approved-live-connections-still-deferred",
+      "date": "2026-10-24",
+      "choice": "Live payment/SMS/email/storage/antivirus and AI engine remain deferred. Complete infrastructure and local/mock tests only; live acceptance and whole-scope completion claims stay open until separately authorized and evidenced"
+    },
+    "DEC11": {
+      "status": "approved-with-sensitive-conflicts-held",
+      "date": "2026-10-22",
+      "choice": "v4 plus addendum for technical logic; UI blueprint for interaction; preserve additional initial capabilities; approve financial/SLA/cancellation/privacy conflicts separately"
+    },
+    "DEC12": {
+      "status": "target-contract-explicitly-approved",
+      "date": "2026-10-24",
+      "choice": "Explicit D4 transition rows take precedence over blanket nonfinal-cancel sentence; preserve existing prepayment customer cancellation. Ops paid/assigned refund 100%; in_progress follows currently approved refund policy. QC/delivery use revision/dispute routes; disputed exits only resolve-dispute. Partial-refund remainder requires explicit finance disposition, never automatic release.",
+      "implementationAuthority": "Target policy only. No blanket protected-source exception, production migration, live connection, cost, account merge or financial mutation authorization."
+    },
+    "DEC13": {
+      "status": "target-contract-explicitly-approved",
+      "date": "2026-10-24",
+      "choice": "Command-specific proxy capability with explicit true owner/subject and separate admin actor audit. No impersonation/token fabrication; Support gets no payment/settlement authority. Ops/Finance remain within their own scopes; Super Admin does not bypass state/QC/financial preconditions. Per-command permission implementation remains a separately authorized package.",
+      "implementationAuthority": "Target policy only. No blanket protected-source exception, production migration, live connection, cost, account merge or financial mutation authorization."
+    },
+    "DEC14": {
+      "status": "target-ui-contract-selected-by-owner-delegation",
+      "date": "2026-10-24",
+      "choice": "Preserve current design system, two themes and canonical pages. Apply D5 section/tab semantics additively; entity drawers are progressive enhancements with direct-page fallback, URL allowlists, focus/dirty/pending guards and no permission bypass. No new brand, removed page or runtime acceptance inferred"
+    },
+    "DEC15": {
+      "status": "target-contract-explicitly-approved",
+      "date": "2026-10-24",
+      "choice": "Verified unique email can identify an account; no automatic legacy-account linking/merging by similar email. Preserve password/mobile/OTP/recovery. Optional email; nonblocking onboarding; collaboration interest cannot grant executor capability. SMS/email live sending remains deferred. Auth/DB changes require scoped implementation approval.",
+      "implementationAuthority": "Target policy only. No blanket protected-source exception, production migration, live connection, cost, account merge or financial mutation authorization."
+    },
+    "DEC16": {
+      "status": "target-contract-explicitly-approved",
+      "date": "2026-10-24",
+      "choice": "Metrics/rules/AI are proposals and alerts only; sensitive employee status/access effects require authorized human command plus audit. Existing automatic under_review job change is a later protected package. Server trims and rejects blank reasons for sensitive commands that actually consume a reason; keep approved customer confirmation without decorative unused note. Unknown data is not zero or definite risk.",
+      "implementationAuthority": "Target policy only. No blanket protected-source exception, production migration, live connection, cost, account merge or financial mutation authorization."
+    }
+  },
+  "implementationExceptions": [
+    "M5-PDF-01: exact invoice pins",
+    "ZEUS-EXEC-002: exact nonbinding-pricing pins",
+    "ZEUS-EXEC-004: one exact missing-account-diagnosis pin"
+  ],
+  "protectedBaseline": "2c701d7",
+  "phaseAccepted": false
+}

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { WalletFundingPanel } from "@/components/wallet-actions";
 import { apiFetch, downloadAuthenticated } from "@/lib/api";
 import {
   Badge,
@@ -132,9 +133,11 @@ export default function WalletPage() {
   const [error, setError] = useState("");
   const [downloadingInvoiceId, setDownloadingInvoiceId] = useState("");
 
+  const refreshFinance = useCallback(async () => {
+    setData(await apiFetch<FinanceOverview>("/customer/finance/overview", { dedupe: false }));
+  }, []);
   useEffect(() => {
-    apiFetch<FinanceOverview>("/customer/finance/overview", { dedupe: false })
-      .then(setData)
+    apiFetch<FinanceOverview>("/customer/finance/overview", { dedupe: false }).then(setData)
       .catch((cause) =>
         setError(cause instanceof Error ? cause.message : "دریافت اطلاعات مالی ممکن نشد."),
       );
@@ -193,6 +196,8 @@ export default function WalletPage() {
               <p className="mt-2 text-lg font-extrabold text-warning">{formatNumber(data.summary.pendingPaymentCount)}</p>
             </Card>
           </section>
+
+          <WalletFundingPanel onChanged={refreshFinance} />
 
           {data.ordersNeedingPayment.length > 0 && (
             <Card className={`${styles.financeReminder} border-warning-border bg-warning-subtle`}>

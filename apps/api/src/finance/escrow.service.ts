@@ -75,16 +75,19 @@ export function calculateEscrowReleaseDistribution(
 
 interface ReleaseParams {
   orderId: string;
+  escrowHoldId?: string;
+  allowDisputeResolution?: boolean;
   milestoneId?: string;
   amount?: number;
-  decidedByUserId: string;
-  decidedByRole?: UserRole;
+  decidedByUserId: string | null;
+  decidedByRole?: UserRole | null;
   note: string;
   idempotencyKey: string;
 }
 
 interface RefundParams {
   orderId: string;
+  escrowHoldId?: string;
   amount?: number;
   reason: string;
   note: string;
@@ -132,9 +135,61 @@ export class EscrowService {
     params: ReleaseParams,
     tx: Prisma.TransactionClient,
   ) {
+    params = { ...params, note: params.note?.trim() };
+    if (!params.note)
+      throw new BadRequestException('علت واقعی آزادسازی الزامی است.');
+    const order = await tx.order.findUnique({ where: { id: params.orderId } });
+    if (!order) throw new NotFoundException('سفارش یافت نشد.');
+    const actor = params.decidedByUserId
+      ? await tx.user.findUnique({ where: { id: params.decidedByUserId } })
+      : null;
+    const activeAdmin = actor?.role === 'admin' && actor.status === 'active';
+    const financeActor =
+      activeAdmin &&
+      ['finance_admin', 'super_admin'].includes(actor.adminScope ?? '');
+    const resolving =
+      params.allowDisputeResolution &&
+      order.status === 'disputed' &&
+      activeAdmin &&
+      ['ops_admin', 'finance_admin', 'super_admin'].includes(
+        actor.adminScope ?? '',
+      ) &&
+      (await tx.dispute.count({
+        where: { orderId: order.id, status: 'open' },
+      }));
+    const confirmed =
+      order.status === 'confirmed' &&
+      (params.decidedByUserId === null ||
+        financeActor ||
+        (actor?.id === order.customerId &&
+          params.decidedByRole === UserRole.customer));
+    const explicitRemainder =
+      ['closed', 'cancelled'].includes(order.status) && financeActor;
+    if (!resolving && !confirmed && !explicitRemainder)
+      throw new BadRequestException(
+        'آزادسازی فقط پس از تأیید تحویل، حل اختلاف مجاز یا تعیین تکلیف صریح مانده توسط مالی ممکن است.',
+      );
+    // Durable ledger keys outlive the 24h response cache. Never mutate escrow
+    // again when a financial key has already been consumed (even after expiry).
+    if (
+      await tx.ledgerEntry.count({
+        where: {
+          idempotencyKey: {
+            in: [
+              `${params.idempotencyKey}:executor`,
+              `${params.idempotencyKey}:commission`,
+            ],
+          },
+        },
+      })
+    )
+      throw new ConflictException(
+        'این کلید مالی قبلاً مصرف شده است؛ اسناد قبلی را بررسی کنید.',
+      );
     const escrow = await tx.escrowHold.findFirst({
       where: {
         orderId: params.orderId,
+        ...(params.escrowHoldId ? { id: params.escrowHoldId } : {}),
         ...(params.milestoneId
           ? { payment: { milestoneId: params.milestoneId } }
           : {}),
@@ -239,7 +294,9 @@ export class EscrowService {
     await tx.auditLog.create({
       data: {
         actorUserId: params.decidedByUserId,
-        actorRole: params.decidedByRole ?? UserRole.admin,
+        actorRole: params.decidedByUserId
+          ? (params.decidedByRole ?? UserRole.admin)
+          : null,
         action: 'escrow.release',
         entityType: 'order',
         entityId: params.orderId,
@@ -276,16 +333,118 @@ export class EscrowService {
     });
   }
 
+  async refundAllInTransaction(
+    params: RefundParams,
+    tx: Prisma.TransactionClient,
+  ) {
+    const holds = await tx.escrowHold.findMany({
+      where: {
+        orderId: params.orderId,
+        status: { in: ['held', 'partially_released', 'partially_refunded'] },
+      },
+      orderBy: { id: 'asc' },
+    });
+    const available = holds.reduce(
+      (sum, h) => sum + calculateEscrowBalance(h).remaining,
+      0,
+    );
+    const requested = params.amount ?? available;
+    if (
+      !Number.isSafeInteger(requested) ||
+      requested < 1 ||
+      requested > available
+    )
+      throw new BadRequestException(
+        'مبلغ بازپرداخت از مجموع مانده امانی معتبر نیست.',
+      );
+    let left = requested;
+    const refunds: Awaited<ReturnType<EscrowService['refundInTransaction']>>[] =
+      [];
+    for (const hold of holds) {
+      const amount = Math.min(left, calculateEscrowBalance(hold).remaining);
+      if (!amount) continue;
+      refunds.push(
+        await this.refundInTransaction(
+          {
+            ...params,
+            escrowHoldId: hold.id,
+            amount,
+            idempotencyKey:
+              holds.length === 1
+                ? params.idempotencyKey
+                : `${params.idempotencyKey}:${hold.id}`,
+          },
+          tx,
+        ),
+      );
+      left -= amount;
+    }
+    return { amount: requested, refunds };
+  }
+
+  async releaseAllInTransaction(
+    params: ReleaseParams,
+    tx: Prisma.TransactionClient,
+  ) {
+    const holds = await tx.escrowHold.findMany({
+      where: {
+        orderId: params.orderId,
+        status: { in: ['held', 'partially_released', 'partially_refunded'] },
+      },
+      orderBy: { id: 'asc' },
+    });
+    if (!holds.length) throw new NotFoundException('مانده امانی یافت نشد.');
+    let executorAmount = 0,
+      commissionAmount = 0;
+    for (const hold of holds) {
+      const amount = calculateEscrowBalance(hold).remaining;
+      if (!amount) continue;
+      const result = await this.releaseInTransaction(
+        {
+          ...params,
+          escrowHoldId: hold.id,
+          amount,
+          idempotencyKey:
+            holds.length === 1
+              ? params.idempotencyKey
+              : `${params.idempotencyKey}:${hold.id}`,
+        },
+        tx,
+      );
+      executorAmount += result.executorAmount;
+      commissionAmount += result.commissionAmount;
+    }
+    return { executorAmount, commissionAmount };
+  }
+
   async refundInTransaction(
     params: RefundParams,
     tx: Prisma.TransactionClient,
   ) {
+    params = {
+      ...params,
+      note: params.note?.trim(),
+      reason: params.reason?.trim(),
+    };
+    if (!params.note || !params.reason)
+      throw new BadRequestException(
+        'علت و یادداشت واقعی بازپرداخت الزامی است.',
+      );
+    if (
+      await tx.ledgerEntry.count({
+        where: { idempotencyKey: `${params.idempotencyKey}:customer` },
+      })
+    )
+      throw new ConflictException(
+        'این کلید بازپرداخت قبلاً مصرف شده است؛ اسناد قبلی را بررسی کنید.',
+      );
     const order = await tx.order.findUnique({ where: { id: params.orderId } });
     if (!order) throw new NotFoundException('سفارش یافت نشد.');
 
     const escrow = await tx.escrowHold.findFirst({
       where: {
         orderId: params.orderId,
+        ...(params.escrowHoldId ? { id: params.escrowHoldId } : {}),
         status: {
           in: [
             EscrowStatus.held,

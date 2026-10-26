@@ -272,8 +272,7 @@ export class JobsService implements OnModuleInit {
     let skipped = 0;
     for (const order of eligible) {
       try {
-        await this.orders.confirm(
-          order.customerId,
+        await this.orders.confirmAutomatically(
           order.id,
           `worker-auto-confirm-${order.id}`,
         );

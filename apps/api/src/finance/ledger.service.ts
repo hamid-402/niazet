@@ -267,8 +267,18 @@ export class LedgerService {
     const account = await client.ledgerAccount.findUnique({
       where: { ownerUserId: userId },
     });
-    if (!account)
-      return { consistent: true, ledgerBalance: 0, walletBalance: 0 };
+    if (!account) {
+      const wallet = await client.wallet.findUnique({ where: { userId } });
+      const walletBalance = wallet?.balance ?? 0;
+      if (walletBalance === 0)
+        return { consistent: true, ledgerBalance: 0, walletBalance: 0 };
+      return {
+        consistent: false,
+        ledgerBalance: null,
+        walletBalance,
+        reason: 'missing_ledger_account',
+      };
+    }
 
     const [creditSum, debitSum, wallet] = await Promise.all([
       client.ledgerEntry.aggregate({

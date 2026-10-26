@@ -161,7 +161,7 @@ export class AuthController {
   ) {
     const refreshToken = this.readCookie(req, 'niazat_refresh');
     res.clearCookie('niazat_refresh', { path: '/v1/auth' });
-    return this.sessions.logout(user.id, refreshToken);
+    return this.sessions.logout(user.id, refreshToken, user.sessionId);
   }
 
   @Get('me')

@@ -9,12 +9,13 @@ describe('AuthSessionService session management', () => {
     []
   >();
   let lastUpdateInput: unknown;
+  const findFirst = jest.fn<Promise<{ familyId: string } | null>, [unknown]>();
   const updateMany = jest.fn((input: unknown) => {
     lastUpdateInput = input;
     return Promise.resolve({ count: 0 });
   });
   const prisma = {
-    session: { findMany, updateMany },
+    session: { findMany, updateMany, findFirst },
   } as unknown as PrismaService;
   const service = new AuthSessionService(prisma, {} as AuthTokenService);
 
@@ -96,6 +97,26 @@ describe('AuthSessionService session management', () => {
     await expect(service.revokeOthers('user-1')).rejects.toBeInstanceOf(
       UnauthorizedException,
     );
+    expect(updateMany).not.toHaveBeenCalled();
+  });
+
+  it('revokes only the current owned family on bearer-only logout', async () => {
+    findFirst.mockResolvedValue({ familyId: 'current-family' });
+    await service.logout('user-1', undefined, 'access-session');
+    expect(findFirst).toHaveBeenCalledWith({
+      where: { id: 'access-session', userId: 'user-1', revokedAt: null },
+    });
+    expect(lastUpdateInput).toMatchObject({
+      where: { familyId: 'current-family', userId: 'user-1', revokedAt: null },
+    });
+    expect(
+      (lastUpdateInput as { data: { revokedAt: unknown } }).data.revokedAt,
+    ).toBeInstanceOf(Date);
+  });
+
+  it('does not revoke a foreign family when the current session is absent', async () => {
+    findFirst.mockResolvedValue(null);
+    await service.logout('user-1', undefined, 'foreign-session');
     expect(updateMany).not.toHaveBeenCalled();
   });
 });

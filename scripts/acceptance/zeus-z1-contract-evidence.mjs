@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+const root = new URL('../../', import.meta.url);
+const read = path => readFileSync(new URL(path, root), 'utf8').replaceAll('\r\n', '\n');
+const evidence = JSON.parse(read('docs/zeus/z1-contract-acceptance.json'));
+assert.equal(evidence.packet, 'ZEUS-EXEC-009');
+assert.equal(evidence.baseline, '2c701d7');
+assert.equal(evidence.acceptedCommit, null);
+assert.equal(evidence.phaseAccepted, false);
+assert.equal(evidence.productAccepted, false);
+for (const key of ['newMainDatabaseMigration', 'mainDatabaseAcceptanceWrites', 'liveProviders', 'accountMerge', 'balanceRepair', 'newDependencyAudit']) assert.equal(evidence.scope[key], false);
+assert.deepEqual(evidence.localSubtasksAccepted, ['Z1.2', 'Z1.4', 'Z1.5', 'Z1.6']);
+assert.deepEqual(evidence.remainingZ1, ['Z1.1', 'Z1.3']);
+assert.equal(evidence.acceptance.api.suitesPassed, 43);
+assert.equal(evidence.acceptance.api.testsPassed, 316);
+assert.equal(evidence.acceptance.api.preExistingSkipped, 1);
+assert.equal(evidence.acceptance.postgres.groupsPassed, 26);
+assert.equal(evidence.acceptance.postgres.mainDatabaseConnected, false);
+assert.equal(evidence.acceptance.postgres.temporaryDatabasesRemoved, true);
+assert.equal(evidence.acceptance.orderWorkflow.casesPassed, 9);
+assert.equal(evidence.acceptance.orderWorkflow.rejectedMutations, 45);
+assert.equal(evidence.browser.uiFixturesOnly, true);
+assert.equal(evidence.browser.mainDatabaseTouched, false);
+assert.equal(evidence.browser.results.length, 4);
+for (const row of evidence.browser.results) {
+  assert.equal(row.status, 'passed'); assert.equal(row.axeViolations, 0);
+  assert.equal(row.retryAndCorrection, true); assert.equal(row.proofPayload, true);
+}
+for (const [path, expected] of Object.entries(evidence.fileHashes)) assert.equal(createHash('sha256').update(read(path)).digest('hex'), expected, 'EXEC-009 exact evidence drift: ' + path);
+console.log('EXEC-009 exact order/auth/UI/test/guard evidence passed. Local packet only; Z1.1/Z1.3, whole phase/product/CI/live acceptance remain open.');

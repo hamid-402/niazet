@@ -14,16 +14,22 @@ import {
 export class CatalogService {
   constructor(private readonly prisma: PrismaService) {}
 
-  listPublic() {
-    return this.prisma.serviceLine.findMany({
+  async listPublic() {
+    const services = await this.prisma.serviceLine.findMany({
       where: { isActive: true },
       include: {
         packages: { where: { isActive: true } },
         formFields: { orderBy: { sortOrder: 'asc' } },
         acceptanceCriteria: true,
+        contractPolicies: { orderBy: { version: 'desc' }, take: 1 },
       },
       orderBy: { title: 'asc' },
     });
+    return services.sort(
+      (a, b) =>
+        (a.contractPolicies[0]?.sortOrder ?? 0) -
+        (b.contractPolicies[0]?.sortOrder ?? 0),
+    );
   }
 
   async getPublicBySlug(slug: string) {
@@ -72,7 +78,9 @@ export class CatalogService {
   }
 
   create(dto: CreateServiceDto) {
-    return this.prisma.serviceLine.create({ data: dto });
+    return this.prisma.serviceLine.create({
+      data: { ...dto, contractPolicies: { create: { version: 1 } } },
+    });
   }
 
   async update(id: string, dto: UpdateServiceDto) {

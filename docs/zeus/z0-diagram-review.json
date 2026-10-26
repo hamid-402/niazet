@@ -1,0 +1,1896 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-25",
+  "kind": "D2 target-semantic-review",
+  "diagramPath": "C:/Users/hamid.kazemi/Desktop/project/نیازت/دیاگرام نیازت.png",
+  "diagramSha256": "5a833dfd3bfa35a44ab89b0e3d6d31c13e8089386b2e457b4e18f1b5ee73e92a",
+  "phaseAccepted": false,
+  "productAccepted": false,
+  "nodes": [
+    {
+      "id": "D2-R01",
+      "sourceLabel": "مشتری",
+      "indexedSubItems": [
+        "مشاهده خدمات",
+        "ثبت سفارش",
+        "آپلود فایل",
+        "پیگیری وضعیت",
+        "دریافت خروجی",
+        "ثبت اعتراض",
+        "امتیازدهی",
+        "کیف پول",
+        "تیکت پشتیبانی"
+      ],
+      "meaning": "Customer uses own orders/files/wallet/tickets; can dispute, review and receive output, not browse internal staff profiles. Every action rechecks owner; opt-in public review separate from private feedback.",
+      "phases": ["Z1", "Z3", "Z5"],
+      "codeReferences": [
+        "apps/web/src/app/(customer)/layout.tsx",
+        "apps/api/src/orders/orders.controller.ts",
+        "apps/api/src/finance/customer-finance.controller.ts"
+      ],
+      "modelReferences": ["User.role"],
+      "requirements": [
+        "ZEUS-API4-008",
+        "ZEUS-API4-010",
+        "ZEUS-API4-014",
+        "ZEUS-UI-021",
+        "ZEUS-UI-022"
+      ],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-R02",
+      "sourceLabel": "مجری",
+      "indexedSubItems": [
+        "مشاهده سفارش‌ها",
+        "قبول/رد سفارش",
+        "مدیریت پروژه",
+        "چک‌لیست انجام کار",
+        "مکاتبه",
+        "آپلود خروجی",
+        "درآمد و تسویه"
+      ],
+      "meaning": "Executor sees assignments, accepts OR declines with reason/reassignment history, works checklist/messages/output and sees own ledger-derived income/withdrawal. Decline is a separate target gap; not inferred from existing accept endpoint. No public project marketplace.",
+      "phases": ["Z1", "Z4"],
+      "codeReferences": [
+        "apps/web/src/app/(executor)/layout.tsx",
+        "apps/api/src/executor/executor.controller.ts",
+        "apps/api/src/orders/domain/order-assignment.service.ts"
+      ],
+      "modelReferences": ["User.role", "ExecutorProfile.id"],
+      "requirements": [
+        "ZEUS-API4-015",
+        "ZEUS-API4-016",
+        "ZEUS-API4-019",
+        "ZEUS-UI-028"
+      ],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-R03",
+      "sourceLabel": "کارمند پشتیبانی",
+      "indexedSubItems": [
+        "مشاهده تیکت‌ها",
+        "پاسخ‌گویی",
+        "SLA",
+        "پاسخ‌های آماده",
+        "یادداشت داخلی"
+      ],
+      "meaning": "Support operates ticket queue, meaningful public response, prepared replies/internal notes and versioned first-response SLA; no money/settlement privilege. Operator alias does not add role or impersonation.",
+      "phases": ["Z1", "Z5"],
+      "codeReferences": [
+        "apps/web/src/app/(support)/layout.tsx",
+        "apps/api/src/tickets/tickets.support.controller.ts"
+      ],
+      "modelReferences": ["User.role", "Ticket.id"],
+      "requirements": ["ZEUS-API4-021", "ZEUS-API4-023", "ZEUS-UI-031"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-R04",
+      "sourceLabel": "ادمین",
+      "indexedSubItems": [
+        "مدیریت کاربران",
+        "سفارش‌ها",
+        "مجریان",
+        "مالی",
+        "گزارش‌ها",
+        "تنظیمات",
+        "کنترل قابلیت‌های AI"
+      ],
+      "meaning": "Admin conceptual aggregate of Ops/Finance/Super, never all scopes for every admin. User/staff/order/catalog/report/settings/AI control each has explicit command capability, true actor/subject Audit.",
+      "phases": ["Z1", "Z5", "Z7"],
+      "codeReferences": [
+        "apps/web/src/app/(admin)/layout.tsx",
+        "apps/api/src/users/users.admin.controller.ts",
+        "apps/api/src/users/settings.controller.ts"
+      ],
+      "modelReferences": ["User.role", "User.adminScope", "User.capabilities"],
+      "requirements": ["API23", "API24", "ZEUS-UI-047", "ZEUS-UI-049"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-P01",
+      "sourceLabel": "Landing Page",
+      "indexedSubItems": ["صفحه عمومی", "ورود به خدمات/فرم"],
+      "meaning": "Public landing with service entry and preserved content/SEO/CTA; no giant image Hero. Current two-theme design/tokens/motion controls remain shared across new pages.",
+      "phases": ["Z3"],
+      "codeReferences": ["apps/web/src/app/page.tsx"],
+      "modelReferences": [],
+      "requirements": ["ZEUS-UI-001"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-P02",
+      "sourceLabel": "Login",
+      "indexedSubItems": ["ورود", "نشست"],
+      "meaning": "Mobile login/password+OTP/session flow remains; verified unique email is future identifier, not automatic merging. Standard empty/error/pending and logout/session semantics required.",
+      "phases": ["Z1", "Z3"],
+      "codeReferences": [
+        "apps/web/src/app/login/page.tsx",
+        "apps/api/src/auth/auth.controller.ts"
+      ],
+      "modelReferences": ["User.id"],
+      "requirements": ["API02"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-P03",
+      "sourceLabel": "Register",
+      "indexedSubItems": ["ثبت‌نام", "تأیید هویت"],
+      "meaning": "Registration proves mobile ownership before activation/credential binding; optional email/nonblocking onboarding/collaboration interest never grants executor automatically.",
+      "phases": ["Z1", "Z3"],
+      "codeReferences": [
+        "apps/web/src/app/register/page.tsx",
+        "apps/api/src/auth/auth.controller.ts"
+      ],
+      "modelReferences": ["User.id"],
+      "requirements": ["API01", "API04"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-P04",
+      "sourceLabel": "OTP Verification",
+      "indexedSubItems": ["ارسال OTP", "تأیید OTP"],
+      "meaning": "Request and verify OTP are distinct commands; embedded step can satisfy capability without inventing a separate canonical page. Mock/local code is not real SMS acceptance.",
+      "phases": ["Z1", "Z3"],
+      "codeReferences": [
+        "apps/web/src/app/register/page.tsx",
+        "apps/api/src/auth/auth.controller.ts"
+      ],
+      "modelReferences": ["User.id"],
+      "requirements": ["API03", "API04"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-P05",
+      "sourceLabel": "Services",
+      "indexedSubItems": ["فهرست خدمات", "جزئیات خدمت"],
+      "meaning": "Active service list + detail, package/form/outputs and server-controlled price; preserve every current category and all real service links, not a smaller mock catalog.",
+      "phases": ["Z2", "Z3"],
+      "codeReferences": [
+        "apps/web/src/app/services/page.tsx",
+        "apps/web/src/app/services/[slug]/page.tsx",
+        "apps/api/src/catalog/catalog.service.ts"
+      ],
+      "modelReferences": ["ServiceLine.id"],
+      "requirements": ["ZEUS-API4-050", "ZEUS-API4-051"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-P06",
+      "sourceLabel": "فرم ثبت سفارش سه‌مرحله‌ای",
+      "indexedSubItems": ["اطلاعات", "نیازها", "تأیید و پرداخت"],
+      "meaning": "Target three logical stages information -> requirements -> confirmation/payment; preserve current dynamic form/autosave/files. Fixed-price only can pay at registration; negotiated/formula requires approved quote first (DEC02). Current two-step form not accepted as all target stages implemented.",
+      "phases": ["Z2", "Z3"],
+      "codeReferences": [
+        "apps/web/src/app/(customer)/orders/new/page.tsx",
+        "apps/api/src/orders/orders.controller.ts"
+      ],
+      "modelReferences": ["Order.formResponses"],
+      "requirements": ["API07", "API20", "ZEUS-UI-016"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-N01",
+      "sourceLabel": "پنل مشتری",
+      "indexedSubItems": ["Dashboard", "Order Detail", "Wallet", "Delivery"],
+      "meaning": "Customer dashboard/detail/wallet/delivery may share canonical order page/tabs; maintain all actions and customer projection, not duplicate empty pages for file-name parity.",
+      "phases": ["Z1", "Z3"],
+      "codeReferences": [
+        "apps/web/src/app/(customer)/dashboard/page.tsx",
+        "apps/web/src/app/(customer)/orders/[id]/page.tsx",
+        "apps/web/src/app/(customer)/wallet/page.tsx"
+      ],
+      "modelReferences": ["Order.id"],
+      "requirements": ["ZEUS-UI-001"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-N02",
+      "sourceLabel": "پنل مجری",
+      "indexedSubItems": [
+        "سفارش‌های جدید",
+        "پروژه‌های فعال",
+        "چک‌لیست",
+        "آپلود خروجی",
+        "درآمد/برداشت"
+      ],
+      "meaning": "Newly assigned and active work queues, checklist, deliverables, own earnings/withdrawals all preserved. Drawer can deepen view but must not replace canonical navigation or backend assignment checks.",
+      "phases": ["Z1", "Z4"],
+      "codeReferences": [
+        "apps/web/src/app/(executor)/layout.tsx",
+        "apps/web/src/app/(executor)/executor/orders/[id]/page.tsx",
+        "apps/api/src/executor/executor.controller.ts"
+      ],
+      "modelReferences": ["ExecutorProfile.id", "OrderAssignment.id"],
+      "requirements": ["ZEUS-UI-001"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-N03",
+      "sourceLabel": "پنل پشتیبانی",
+      "indexedSubItems": ["Tickets", "SLA", "پاسخ آماده", "یادداشت داخلی"],
+      "meaning": "Support dashboard/queue/detail/performance need first public-response vs resolution metrics, prepared replies and private-note exclusion in payload as well as UI.",
+      "phases": ["Z1", "Z5"],
+      "codeReferences": [
+        "apps/web/src/app/(support)/layout.tsx",
+        "apps/api/src/tickets/tickets.service.ts"
+      ],
+      "modelReferences": ["Ticket.id", "TicketMessage.id"],
+      "requirements": ["ZEUS-UI-029", "ZEUS-UI-030", "ZEUS-UI-031"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-N04",
+      "sourceLabel": "پنل ادمین",
+      "indexedSubItems": [
+        "داشبورد مدیریتی",
+        "کاربران",
+        "سفارش‌ها",
+        "ارجاع سفارش",
+        "مجریان",
+        "مالی",
+        "گزارش‌ها",
+        "تنظیمات"
+      ],
+      "meaning": "All admin capabilities retained in scope-specific dashboards/pages/drawers; Super aggregate is not identical to Ops, Finance revenue is not order count, no new role needed.",
+      "phases": ["Z1", "Z5", "Z6"],
+      "codeReferences": [
+        "apps/web/src/app/(admin)/layout.tsx",
+        "apps/api/src/orders/orders.admin.controller.ts",
+        "apps/api/src/finance/finance.admin.controller.ts"
+      ],
+      "modelReferences": ["User.adminScope"],
+      "requirements": ["ZEUS-UI-047", "ZEUS-UI-050"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-C01",
+      "sourceLabel": "احراز هویت و OTP",
+      "indexedSubItems": ["هویت", "OTP", "نشست"],
+      "meaning": "Session-backed auth, purpose-bound one-time code, rate limits/recovery and cookie security; OTP is identity proof, never admin permission. Preserve existing rotation/reuse protections.",
+      "phases": ["Z1"],
+      "codeReferences": [
+        "apps/api/src/auth/auth.controller.ts",
+        "apps/api/src/auth/auth.service.ts"
+      ],
+      "modelReferences": ["User.id"],
+      "requirements": ["API01", "API02", "API03", "API04"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-C02",
+      "sourceLabel": "مدیریت کاربران و نقش‌ها",
+      "indexedSubItems": ["کاربران", "نقش‌ها", "Scope"],
+      "meaning": "Four primary roles plus existing customer/executor capabilities and three admin scopes, typed commands and safe projections; no generic unguarded role/status setter.",
+      "phases": ["Z1"],
+      "codeReferences": [
+        "apps/api/src/users/users.admin.controller.ts",
+        "apps/api/src/common/guards/roles.guard.ts",
+        "apps/api/src/common/guards/admin-scope.guard.ts"
+      ],
+      "modelReferences": ["User.role", "User.capabilities"],
+      "requirements": ["API23", "API24"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-C03",
+      "sourceLabel": "مدیریت خدمات",
+      "indexedSubItems": ["خدمات", "پکیج", "فرم", "معیار پذیرش"],
+      "meaning": "Service/package/form/acceptance/QC definitions managed with versioning and old-order snapshots; parent-scoped mutations, actor Audit and validation. Catalog existence alone not lifecycle parity.",
+      "phases": ["Z2", "Z5"],
+      "codeReferences": ["apps/api/src/catalog/catalog.service.ts"],
+      "modelReferences": [
+        "ServiceLine.id",
+        "ServiceLine.formFields",
+        "ServiceLine.acceptanceCriteria"
+      ],
+      "requirements": [
+        "ZEUS-API4-052",
+        "ZEUS-API4-053",
+        "ZEUS-API4-054",
+        "ZEUS-API4-055",
+        "ZEUS-V4-073"
+      ],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-C04",
+      "sourceLabel": "موتور قیمت‌گذاری",
+      "indexedSubItems": ["عادی", "فوری +۳۰٪", "همان‌روز +۸۰٪"],
+      "meaning": "Normal0/urgent30/same-day80 percent from server rules; current estimate nonbinding. Binding quote/version/rounding and DEC05 atomic capacity+hold+payment+deadline remain Z2 target; no promise from a surcharge.",
+      "phases": ["Z2"],
+      "codeReferences": [
+        "apps/api/src/catalog/catalog.service.ts",
+        "apps/api/src/orders/orders.service.ts"
+      ],
+      "modelReferences": ["Order.urgency", "Order.finalPrice"],
+      "requirements": ["API13"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-C05",
+      "sourceLabel": "مدیریت سفارش",
+      "indexedSubItems": ["ثبت", "وضعیت", "ارجاع", "QC", "تحویل"],
+      "meaning": "Preserve twenty-state order workflow including quote/QC/revision/dispute; commands enforce actor/owner/version/QC/money and history. No collapse to seven diagram stages or mutable front-end status.",
+      "phases": ["Z2", "Z3", "Z4"],
+      "codeReferences": [
+        "apps/api/src/orders/orders.service.ts",
+        "apps/api/src/orders/domain/order-workflow.service.ts"
+      ],
+      "modelReferences": ["Order.id", "OrderStatusHistory.id"],
+      "requirements": ["API07", "API08", "API09"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-C06",
+      "sourceLabel": "مدیریت فایل و تحویل خروجی",
+      "indexedSubItems": ["فایل ورودی", "اسکن", "خروجی", "دانلود"],
+      "meaning": "Owned input/output and attachments, MIME/signature/size, quarantine/scan, independent QC/visibility and revocable signed download. Mock scanner/S3 adapter not live acceptance; never public raw storage path.",
+      "phases": ["Z1", "Z4"],
+      "codeReferences": [
+        "apps/api/src/files/files.service.ts",
+        "apps/api/src/files/files.controller.ts"
+      ],
+      "modelReferences": ["OrderFile.id"],
+      "requirements": ["ZEUS-UI-021", "ZEUS-UI-027"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-C07",
+      "sourceLabel": "گفتگو و مکاتبه",
+      "indexedSubItems": ["پیام سفارش", "تفکیک visibility"],
+      "meaning": "Append to scoped order conversation, public/internal visibility and owned clean attachment; system-facing context can read order but message may not execute status/payment command.",
+      "phases": ["Z1", "Z4"],
+      "codeReferences": [
+        "apps/api/src/orders/domain/order-messaging.service.ts"
+      ],
+      "modelReferences": ["OrderMessage.id"],
+      "requirements": ["ZEUS-UI-026", "ZEUS-V4-083"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-C08",
+      "sourceLabel": "مدیریت تیکت پشتیبانی",
+      "indexedSubItems": ["تیکت", "پاسخ", "یادداشت", "SLA"],
+      "meaning": "Ticket may reference owned order/public handler, assignee and private/public messages; explicit transition/reopen/first-response policy, not money powers from ticket claim.",
+      "phases": ["Z5"],
+      "codeReferences": [
+        "apps/api/src/tickets/tickets.service.ts",
+        "apps/api/src/common/utils/business-hours.ts"
+      ],
+      "modelReferences": ["Ticket.id"],
+      "requirements": ["API14", "API15", "API16", "API17", "ZEUS-V4-039"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-C09",
+      "sourceLabel": "کیف پول، پرداخت و Escrow",
+      "indexedSubItems": ["موجودی", "تراکنش", "امانی", "بازپرداخت", "برداشت"],
+      "meaning": "Ledger source of truth, wallet cache, payload-bound idempotent payment/escrow/refund/release/withdrawal. Top-up/spend target DEC06; no balance mutation outside balanced journal, partial remainder explicit Finance.",
+      "phases": ["Z2", "Z4"],
+      "codeReferences": [
+        "apps/api/src/finance/wallet.service.ts",
+        "apps/api/src/finance/payments.service.ts",
+        "apps/api/src/finance/escrow.service.ts",
+        "apps/api/src/finance/ledger.service.ts"
+      ],
+      "modelReferences": ["Wallet.id", "LedgerEntry.id"],
+      "requirements": [
+        "API20",
+        "API21",
+        "API22",
+        "ZEUS-API4-043",
+        "ZEUS-API4-046"
+      ],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-C10",
+      "sourceLabel": "اعلان‌ها و نوتیفیکیشن‌ها",
+      "indexedSubItems": ["اعلان درون‌سامانه", "ارسال", "retry"],
+      "meaning": "Transactional Outbox, consent/channel preferences and deduplicated retry/failure evidence; enqueue/sent/displayed distinct. Unknown delivery never success; do not activate real channels.",
+      "phases": ["Z1", "Z6"],
+      "codeReferences": [
+        "apps/api/src/notifications/notifications.service.ts",
+        "apps/api/src/jobs/outbox-worker.service.ts"
+      ],
+      "modelReferences": ["NotificationLog.id", "OutboxEvent.payload"],
+      "requirements": ["ZEUS-UI-045", "ZEUS-V4-086", "ZEUS-V4-087"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-C11",
+      "sourceLabel": "گزارش‌گیری و تحلیل",
+      "indexedSubItems": ["گزارش", "داشبورد", "خروجی"],
+      "meaning": "Role-scoped read-model metrics with denominator/period/unknown, real authorized PDF/XLSX/CSV/RTL export. Audit read/export, minimize PII; no reporting-derived write authority or automatic staff punishment.",
+      "phases": ["Z5", "Z6"],
+      "codeReferences": [
+        "apps/api/src/reporting/reporting.controller.ts",
+        "apps/api/src/orders/domain/order-reports.ts"
+      ],
+      "modelReferences": ["Order.id"],
+      "requirements": ["API25", "API26"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-C12",
+      "sourceLabel": "لایه آمادگی هوش مصنوعی",
+      "indexedSubItems": ["AI Integration Ready", "اختیاری/آینده"],
+      "meaning": "Optional future AI-readiness adapter only. Minimized allowlisted context -> proposal -> authorized human; kill switch, no autonomous access/money/status/dispute decision, no live engine/cost until approval.",
+      "phases": ["Z7"],
+      "codeReferences": [
+        "apps/api/src/users/settings.controller.ts",
+        "apps/api/src/orders/order-suggestions.controller.ts"
+      ],
+      "modelReferences": ["SystemSetting.key"],
+      "requirements": ["API27", "API28", "API29"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-D01",
+      "sourceLabel": "Users",
+      "indexedSubItems": ["کاربران"],
+      "meaning": "User identity/verified contact/status with safe projection and historic identifiers; no credentials/password hashes exposed in customer API/export.",
+      "phases": ["Z1"],
+      "codeReferences": [],
+      "modelReferences": ["User.id"],
+      "requirements": ["API24"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-D02",
+      "sourceLabel": "Roles",
+      "indexedSubItems": ["نقش‌ها"],
+      "meaning": "Roles box is conceptual authorization data, currently Prisma UserRole enum plus scopes/capabilities, not proof of a separate Roles SQL table. Approved stack preserved; literal consolidation disclosed in Z8.",
+      "phases": ["Z1"],
+      "codeReferences": [],
+      "modelReferences": ["User.role", "User.adminScope", "User.capabilities"],
+      "requirements": ["A09", "ZEUS-V4-001"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-D03",
+      "sourceLabel": "Services",
+      "indexedSubItems": ["خدمات"],
+      "meaning": "ServiceLine plus packages/versioned form fields/acceptance/QC; current active catalog separate from immutable order specification/rate snapshot.",
+      "phases": ["Z2", "Z5"],
+      "codeReferences": [],
+      "modelReferences": ["ServiceLine.id"],
+      "requirements": ["ZEUS-API4-050", "ZEUS-API4-051"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-D04",
+      "sourceLabel": "Orders",
+      "indexedSubItems": ["سفارش‌ها"],
+      "meaning": "Order aggregate with customer/version/financial state/history, twenty states, assignments/milestones; no direct table CRUD from UI.",
+      "phases": ["Z2", "Z3", "Z4"],
+      "codeReferences": [],
+      "modelReferences": ["Order.id"],
+      "requirements": ["API07", "API08"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-D05",
+      "sourceLabel": "Order Items / Requirements",
+      "indexedSubItems": ["آیتم‌ها/نیازها"],
+      "meaning": "Requirements are current formResponses + formSnapshot/acceptance snapshot/milestones, not proof of generic cart OrderItems table. Preserve every submitted requirement/attachment, compare semantics and disclose consolidated storage.",
+      "phases": ["Z2", "Z3"],
+      "codeReferences": [],
+      "modelReferences": [
+        "Order.formResponses",
+        "Order.milestones",
+        "Order.acceptanceCriteria"
+      ],
+      "requirements": ["ZEUS-UI-017"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-D06",
+      "sourceLabel": "Files / Attachments",
+      "indexedSubItems": ["فایل/پیوست"],
+      "meaning": "OrderFile + owned attachment relationships/checksum/scan/grant lifecycle; per-kind visibility and cleanup retention, not arbitrary shared file table access.",
+      "phases": ["Z1", "Z4"],
+      "codeReferences": [],
+      "modelReferences": ["OrderFile.id"],
+      "requirements": ["ZEUS-UI-021"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-D07",
+      "sourceLabel": "Messages",
+      "indexedSubItems": ["پیام‌ها"],
+      "meaning": "OrderMessage/TicketMessage are separate contexts with sender/time/visibility/attachment; internal notes never customer-visible by payload or export.",
+      "phases": ["Z1", "Z4"],
+      "codeReferences": [],
+      "modelReferences": ["OrderMessage.id"],
+      "requirements": ["ZEUS-UI-026"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-D08",
+      "sourceLabel": "Tickets",
+      "indexedSubItems": ["تیکت‌ها"],
+      "meaning": "Ticket/message/escalation/SLA events, versioned policies for new tickets; historic unknown clock/rating not fabricated or overwritten.",
+      "phases": ["Z5"],
+      "codeReferences": [],
+      "modelReferences": ["Ticket.id"],
+      "requirements": ["API15"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-D09",
+      "sourceLabel": "Wallets & Transactions",
+      "indexedSubItems": ["کیف پول/تراکنش"],
+      "meaning": "Wallet projection/WalletTransaction + immutable double-entry LedgerAccount/LedgerEntry + idempotency/payment/holds/refunds/withdrawals; conceptual paired box not a one-table requirement.",
+      "phases": ["Z2", "Z4"],
+      "codeReferences": [],
+      "modelReferences": [
+        "Wallet.id",
+        "WalletTransaction.id",
+        "LedgerEntry.id"
+      ],
+      "requirements": ["ZEUS-UI-043", "ZEUS-UI-044"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-D10",
+      "sourceLabel": "Reviews",
+      "indexedSubItems": ["نظرها"],
+      "meaning": "Private Feedback supports order/team/executor/support/QC rating/complaint/thanks; public review optional, moderated and no internal staff identity. Consolidation is not three literal table acceptance.",
+      "phases": ["Z5"],
+      "codeReferences": [],
+      "modelReferences": ["Feedback.id"],
+      "requirements": ["API12", "ZEUS-UI-021"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-D11",
+      "sourceLabel": "Executor Profiles",
+      "indexedSubItems": ["پروفایل مجری"],
+      "meaning": "ExecutorProfile with internal/vetted_external, onboarding evidence, skills/team/capacity/performance; customer sees public alias/code only, not HR/payroll/risk details.",
+      "phases": ["Z4", "Z5"],
+      "codeReferences": [],
+      "modelReferences": ["ExecutorProfile.id"],
+      "requirements": ["ZEUS-API4-032", "ZEUS-API4-033"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-D12",
+      "sourceLabel": "Settings",
+      "indexedSubItems": ["تنظیمات"],
+      "meaning": "Typed allowlisted SystemSetting with versions/audit for effective policy; never arbitrary env secrets or runtime live-provider credentials through admin form.",
+      "phases": ["Z1", "Z5"],
+      "codeReferences": [],
+      "modelReferences": ["SystemSetting.id"],
+      "requirements": ["ZEUS-UI-049"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-X01",
+      "sourceLabel": "درگاه پرداخت",
+      "indexedSubItems": ["پرداخت آنلاین"],
+      "meaning": "Payment gateway adapter callback/amount/authority/idempotency/reconciliation; real gateway acceptance deferred DEC10. Late successful money explicitly handled, not silent lost funds/commitment/refund.",
+      "phases": ["Z2", "Z9"],
+      "codeReferences": ["apps/api/src/finance/payments.service.ts"],
+      "modelReferences": ["Payment.id"],
+      "requirements": ["API20", "API21"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-X02",
+      "sourceLabel": "سرویس پیامک / OTP",
+      "indexedSubItems": ["پیامک", "OTP"],
+      "meaning": "SMS/OTP adapter with rate/retry/failure boundaries; mock provides local infrastructure only, live recipient/delivery/security acceptance separately deferred.",
+      "phases": ["Z1", "Z9"],
+      "codeReferences": ["apps/api/src/notifications/sms.service.ts"],
+      "modelReferences": [],
+      "requirements": ["API03", "API04"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-X03",
+      "sourceLabel": "نوتیفیکیشن Push / In-App",
+      "indexedSubItems": ["Push", "In-App"],
+      "meaning": "In-app plus opt-in device Push with revocation/preferences/minimized content; neither missing Push nor live delivery counted complete from existing Outbox.",
+      "phases": ["Z6", "Z9"],
+      "codeReferences": [
+        "apps/api/src/notifications/notifications.controller.ts",
+        "apps/api/src/notifications/notifications.service.ts"
+      ],
+      "modelReferences": ["NotificationLog.id"],
+      "requirements": ["H04", "H05"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-X04",
+      "sourceLabel": "ایمیل در صورت نیاز",
+      "indexedSubItems": ["ایمیل اختیاری"],
+      "meaning": "Email optional contact/channel, verified unique email login separate DEC15; local/mock infrastructure and unsubscribe/consent; no SMTP activated.",
+      "phases": ["Z6", "Z9"],
+      "codeReferences": ["apps/api/src/notifications/email.service.ts"],
+      "modelReferences": [],
+      "requirements": ["H03", "ZEUS-V4-086", "ZEUS-OPS-013"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-X05",
+      "sourceLabel": "فایل نهایی به مشتری",
+      "indexedSubItems": ["دانلود خروجی"],
+      "meaning": "Authorized customer receives safe QC-approved deliverable through canonical order detail and revocable download, with correct version/MIME and retry; no public object path or unused token as delivered proof.",
+      "phases": ["Z4", "Z9"],
+      "codeReferences": [
+        "apps/api/src/files/files.controller.ts",
+        "apps/web/src/app/(customer)/orders/[id]/page.tsx"
+      ],
+      "modelReferences": ["OrderFile.id"],
+      "requirements": ["ZEUS-UI-021"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-X06",
+      "sourceLabel": "گزارش مدیریت",
+      "indexedSubItems": ["PDF", "Excel", "داشبورد"],
+      "meaning": "Management dashboard + actual PDF and Excel/XLSX targets retained (CSV is not XLSX). Scope/RTL/period/source/PII and authentic export acceptance, not renamed extension.",
+      "phases": ["Z6", "Z9"],
+      "codeReferences": [
+        "apps/api/src/reporting/reporting.controller.ts",
+        "apps/api/src/finance/invoices.service.ts"
+      ],
+      "modelReferences": [],
+      "requirements": ["API25", "API26"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-F01",
+      "sourceLabel": "مشتری",
+      "indexedSubItems": ["ورود/ثبت‌نام از صفحات عمومی"],
+      "meaning": "Customer enters from public pages and authenticates; anonymous catalog read not permission for orders/files/wallet.",
+      "phases": ["Z1", "Z3"],
+      "codeReferences": [
+        "apps/api/src/auth/auth.controller.ts",
+        "apps/web/src/app/login/page.tsx"
+      ],
+      "modelReferences": [],
+      "requirements": ["API01", "API02"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-F02",
+      "sourceLabel": "ثبت سفارش",
+      "indexedSubItems": ["ثبت و پرداخت سفارش"],
+      "meaning": "Registers needs and can pay fixed definitive service at registration; negotiated service must complete quote acceptance before payment, per DEC02.",
+      "phases": ["Z2", "Z3"],
+      "codeReferences": [
+        "apps/api/src/orders/orders.controller.ts",
+        "apps/api/src/finance/payments.service.ts"
+      ],
+      "modelReferences": [],
+      "requirements": ["API07", "API20"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-F03",
+      "sourceLabel": "ورود به سیستم",
+      "indexedSubItems": ["ثبت و پردازش در مدیریت سفارش"],
+      "meaning": "System records/processes valid command, idempotency and status history; UI submission is not payment confirmation or transition bypass.",
+      "phases": ["Z2", "Z3"],
+      "codeReferences": [
+        "apps/api/src/orders/orders.service.ts",
+        "apps/api/src/orders/domain/order-workflow.service.ts"
+      ],
+      "modelReferences": [],
+      "requirements": ["API07", "API08"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-F04",
+      "sourceLabel": "ارجاع توسط ادمین",
+      "indexedSubItems": ["مدیریت و ارجاع به مجری"],
+      "meaning": "Ops explicitly assigns eligible vetted/internal capacity under lock/version and audits real actor; reassign/decline preserve all prior history and privacy.",
+      "phases": ["Z4", "Z5"],
+      "codeReferences": [
+        "apps/api/src/orders/domain/order-assignment.service.ts",
+        "apps/api/src/orders/orders.admin.controller.ts"
+      ],
+      "modelReferences": [],
+      "requirements": ["ZEUS-API4-030"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-F05",
+      "sourceLabel": "انجام کار توسط مجری",
+      "indexedSubItems": ["کار روی سفارش و آپلود خروجی"],
+      "meaning": "Assigned executor accepts/works/checklists/reports/uploads clean file; independent QC before customer delivery. No parallel path directly releases money.",
+      "phases": ["Z4"],
+      "codeReferences": [
+        "apps/api/src/executor/executor.controller.ts",
+        "apps/api/src/files/files.service.ts"
+      ],
+      "modelReferences": [],
+      "requirements": ["ZEUS-API4-019", "ZEUS-UI-027"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-F06",
+      "sourceLabel": "تحویل نهایی به مشتری",
+      "indexedSubItems": ["دریافت", "تأیید", "اعتراض", "امتیازدهی"],
+      "meaning": "Customer receives/reviews/accepts OR requests bounded revision OR disputes and optional rating; each branch state/owner/QC checked, confirmation modal preserves approved no-unused-note contract.",
+      "phases": ["Z4", "Z5"],
+      "codeReferences": [
+        "apps/web/src/app/(customer)/orders/[id]/page.tsx",
+        "apps/api/src/orders/domain/order-dispute.service.ts",
+        "apps/api/src/feedback/feedback.controller.ts"
+      ],
+      "modelReferences": [],
+      "requirements": [
+        "ZEUS-API4-011",
+        "ZEUS-API4-012",
+        "ZEUS-API4-013",
+        "ZEUS-API4-014"
+      ],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    },
+    {
+      "id": "D2-F07",
+      "sourceLabel": "پشتیبانی",
+      "indexedSubItems": ["رسیدگی و حل تیکت‌ها"],
+      "meaning": "Support handles tickets before/during/after delivery as needed; diagram sequence does not restrict support to the end or confer refund/settlement authority.",
+      "phases": ["Z5"],
+      "codeReferences": [
+        "apps/api/src/tickets/tickets.service.ts",
+        "apps/api/src/tickets/tickets.support.controller.ts"
+      ],
+      "modelReferences": [],
+      "requirements": ["API15", "API16", "API17"],
+      "productAccepted": false,
+      "review": "target-meaning-reviewed",
+      "subItemLiteralClaim": "Indexed subitems include reviewer decompositions, not a claim that every term was literally printed in the image."
+    }
+  ],
+  "edges": [
+    {
+      "id": "D2-E01",
+      "from": "D2-R01",
+      "to": "GROUP-PUBLIC",
+      "direction": "forward",
+      "style": "solid-blue",
+      "visualInterpretation": "clear-group-entry",
+      "criterionRefs": ["A01", "A04", "A05"],
+      "contract": "نقش مشتری از عمومی وارد می‌شود؛ ورود مهمان مجوز داده سفارش نمی‌دهد.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "نقش مشتری از عمومی وارد می‌شود؛ ورود مهمان مجوز داده سفارش نمی‌دهد."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E02",
+      "from": "GROUP-PUBLIC",
+      "to": "GROUP-CORE",
+      "direction": "forward",
+      "style": "solid-blue",
+      "visualInterpretation": "layer-boundary-not-specific-handler",
+      "criterionRefs": ["B01", "B02", "A09"],
+      "contract": "لایه UI از API معتبر، نه دسترسی مستقیم DB؛ ورود/فرم/خدمت هم‌دامنه.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "لایه UI از API معتبر، نه دسترسی مستقیم DB؛ ورود/فرم/خدمت هم‌دامنه."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E03",
+      "from": "D2-R02",
+      "to": "D2-N02",
+      "direction": "forward",
+      "style": "solid-green",
+      "visualInterpretation": "clear-role-panel",
+      "criterionRefs": ["C01"],
+      "contract": "RequireRole و Guard/assignment؛ صف عمومی برای مجری فرض نشود.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "RequireRole و Guard/assignment؛ صف عمومی برای مجری فرض نشود."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E04",
+      "from": "D2-R03",
+      "to": "D2-N03",
+      "direction": "forward",
+      "style": "solid-orange",
+      "visualInterpretation": "clear-role-panel",
+      "criterionRefs": ["D01"],
+      "contract": "پشتیبان با Scope تیکت، بدون نیابت ضمنی.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": ["پشتیبان با Scope تیکت، بدون نیابت ضمنی."],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E05",
+      "from": "D2-R04",
+      "to": "D2-N04",
+      "direction": "forward",
+      "style": "solid-purple",
+      "visualInterpretation": "clear-role-panel",
+      "criterionRefs": ["E01", "A09"],
+      "contract": "نقش admin تجمیع تصویری است؛ سه Scope واقعی محفوظ.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": ["نقش admin تجمیع تصویری است؛ سه Scope واقعی محفوظ."],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E06",
+      "from": "D2-N01",
+      "to": "GROUP-CORE",
+      "direction": "forward",
+      "style": "solid-blue",
+      "visualInterpretation": "layer-boundary-not-specific-handler",
+      "criterionRefs": ["B05", "G01"],
+      "contract": "read/write مشتری با ownership و response allowlist.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": ["read/write مشتری با ownership و response allowlist."],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E07",
+      "from": "D2-N02",
+      "to": "GROUP-CORE",
+      "direction": "forward",
+      "style": "solid-green",
+      "visualInterpretation": "layer-boundary-not-specific-handler",
+      "criterionRefs": ["C02", "C06", "C07"],
+      "contract": "دستور اجرا/فایل/پیام باید assignment و version را دوباره کنترل کند.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "دستور اجرا/فایل/پیام باید assignment و version را دوباره کنترل کند."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E08",
+      "from": "D2-N03",
+      "to": "GROUP-CORE",
+      "direction": "forward",
+      "style": "solid-orange",
+      "visualInterpretation": "layer-boundary-not-specific-handler",
+      "criterionRefs": ["D02", "D06"],
+      "contract": "عمل تیکت و internal/public تفکیک؛ رنگ مسیر مجوز همه هسته نیست.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "عمل تیکت و internal/public تفکیک؛ رنگ مسیر مجوز همه هسته نیست."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E09",
+      "from": "D2-N04",
+      "to": "GROUP-CORE",
+      "direction": "forward",
+      "style": "solid-purple",
+      "visualInterpretation": "layer-boundary-not-specific-handler",
+      "criterionRefs": ["E05", "G08"],
+      "contract": "Ops/Finance/Super به فرمان/داده حوزه خود؛ DEC13 باز.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": ["Ops/Finance/Super به فرمان/داده حوزه خود؛ DEC13 باز."],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E10",
+      "from": "D2-C01",
+      "to": "D2-C03",
+      "direction": "forward",
+      "style": "solid-blue",
+      "visualInterpretation": "clear-core-connector",
+      "criterionRefs": ["A06", "A07", "A09"],
+      "contract": "هویت/OTP دروازه مجوز است؛ خدمات عمومی بی‌دلیل نیازمند login نشوند.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "هویت/OTP دروازه مجوز است؛ خدمات عمومی بی‌دلیل نیازمند login نشوند."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E11",
+      "from": "D2-C02",
+      "to": "D2-C03",
+      "direction": "forward",
+      "style": "solid-blue",
+      "visualInterpretation": "clear-core-connector",
+      "criterionRefs": ["A09", "E06"],
+      "contract": "نقش/Scope تعیین مدیریت خدمات؛ catalog عمومی با مدیریت متفاوت.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "نقش/Scope تعیین مدیریت خدمات؛ catalog عمومی با مدیریت متفاوت."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E12",
+      "from": "D2-C03",
+      "to": "D2-C05",
+      "direction": "bidirectional",
+      "style": "solid-blue",
+      "visualInterpretation": "clear-core-connector",
+      "criterionRefs": ["B03", "E06"],
+      "contract": "خدمت/فرم/قیمت snapshot؛ تغییر کاتالوگ سفارش قدیمی را بازنویسی نکند.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "خدمت/فرم/قیمت snapshot؛ تغییر کاتالوگ سفارش قدیمی را بازنویسی نکند."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E13",
+      "from": "D2-C04",
+      "to": "D2-C05",
+      "direction": "bidirectional",
+      "style": "solid-blue",
+      "visualInterpretation": "clear-core-connector",
+      "criterionRefs": ["F01", "F02", "F03", "F04"],
+      "contract": "قیمت سرور/نسخه/واحد/Quote؛ frontend مرجع مبلغ نیست.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": ["قیمت سرور/نسخه/واحد/Quote؛ frontend مرجع مبلغ نیست."],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E14",
+      "from": "D2-C06",
+      "to": "D2-C05",
+      "direction": "bidirectional",
+      "style": "solid-blue",
+      "visualInterpretation": "clear-core-connector",
+      "criterionRefs": ["B08", "G05", "G06"],
+      "contract": "فایل به سفارش/نسخه/visibility/QC مربوط؛ نه لینک عمومی خام.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "فایل به سفارش/نسخه/visibility/QC مربوط؛ نه لینک عمومی خام."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E15",
+      "from": "D2-C07",
+      "to": "D2-C05",
+      "direction": "relation-direction-pending",
+      "style": "solid-blue",
+      "visualInterpretation": "connector-direction-needs-review",
+      "criterionRefs": ["C06", "ZEUS-V4-083"],
+      "contract": "رابطه سفارش/مکاتبه مشخص است؛ جهت هر فرمان/گیرنده از قرارداد واقعی تعیین، نه از یک پیکان اختیار مالی ساخته شود.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": false,
+      "meaning": {
+        "targetFlows": [
+          "scoped order -> its thread/read model",
+          "authorized message append -> thread linked to the same order, never arbitrary status/financial command"
+        ],
+        "authority": "Order owner/active assignment/explicit admin command; internal/public visibility stays separate.",
+        "sourceFiles": [
+          "apps/api/src/orders/domain/order-messaging.service.ts",
+          "apps/api/src/orders/orders.controller.ts",
+          "apps/api/src/executor/executor.controller.ts"
+        ]
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E16",
+      "from": "D2-C05",
+      "to": "D2-C08",
+      "direction": "relation-direction-pending",
+      "style": "solid-blue",
+      "visualInterpretation": "connector-direction-needs-review",
+      "criterionRefs": ["D01", "D06"],
+      "contract": "ارتباط تیکت/سفارش با public handler و مالکیت؛ برداشتن تیکت اختیار سفارش ایجاد نکند.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": false,
+      "meaning": {
+        "targetFlows": [
+          "customer ticket creation -> validated owned order reference",
+          "support ticket view -> minimum permitted order context; no transfer of order mutation/finance rights"
+        ],
+        "authority": "Ticket visibility and order ownership are independently enforced; picking a ticket grants no refund/release capability.",
+        "sourceFiles": [
+          "apps/api/src/tickets/tickets.controller.ts",
+          "apps/api/src/tickets/tickets.support.controller.ts",
+          "apps/api/src/tickets/tickets.service.ts"
+        ]
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E17",
+      "from": "D2-C05",
+      "to": "D2-C09",
+      "direction": "forward",
+      "style": "solid-blue",
+      "visualInterpretation": "clear-core-connector",
+      "criterionRefs": ["G02", "G03", "G04"],
+      "contract": "پرداخت/امانی فقط با فرمان معتبر، Ledger متوازن و idempotency.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "پرداخت/امانی فقط با فرمان معتبر، Ledger متوازن و idempotency."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E18",
+      "from": "D2-C10",
+      "to": "D2-C07",
+      "direction": "forward",
+      "style": "dashed-teal",
+      "visualInterpretation": "visible-cross-service-link-not-write-authority",
+      "criterionRefs": ["H04", "C06"],
+      "contract": "اعلان/مکاتبه ارتباط دارد؛ نمایش پیکان مجوز افزودن پیام یا داده محرمانه به کانال عمومی نیست.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "اعلان/مکاتبه ارتباط دارد؛ نمایش پیکان مجوز افزودن پیام یا داده محرمانه به کانال عمومی نیست."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E19",
+      "from": "D2-C11",
+      "to": "D2-C08",
+      "direction": "forward",
+      "style": "dashed-teal",
+      "visualInterpretation": "visible-cross-service-link-not-write-authority",
+      "criterionRefs": ["E07", "D07"],
+      "contract": "تحلیل تیکت/SLA با projection مجاز؛ ماژول گزارشگر از نمودار اختیار تغییر تیکت نمی‌گیرد.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "تحلیل تیکت/SLA با projection مجاز؛ ماژول گزارشگر از نمودار اختیار تغییر تیکت نمی‌گیرد."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E20",
+      "from": "D2-C12",
+      "to": "GROUP-CORE",
+      "direction": "relation-direction-pending",
+      "style": "dashed-teal",
+      "visualInterpretation": "grouped-ai-readiness-overlay",
+      "criterionRefs": ["H06", "H07", "H08"],
+      "contract": "آمادگی AI لایه پیشنهادی است؛ جهت/گیرنده/ابزار هر قابلیت جدا، بدون command مالی خودکار یا Provider زنده.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": false,
+      "meaning": {
+        "targetFlows": [
+          "allowlisted minimized core data -> optional future suggestion adapter",
+          "suggestion -> authorized human review only, not executable system command"
+        ],
+        "authority": "DEC10/16: provider/AI live deferred, no autonomous money/access/block/dispute decision.",
+        "sourceFiles": [
+          "apps/api/src/users/settings.service.ts",
+          "apps/api/src/common/guards/roles.guard.ts"
+        ]
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E21",
+      "from": "D2-C05",
+      "to": "GROUP-DATA",
+      "direction": "bidirectional",
+      "style": "dashed-gold",
+      "visualInterpretation": "grouped-data-bus-not-per-table-crud",
+      "criterionRefs": ["T04", "T05", "ZEUS-V4-091"],
+      "contract": "باس به گروه داده؛ فیلد/FK/تراکنش و read/write هر جدول مستقل، نه مجوز CRUD مستقیم از UI.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "باس به گروه داده؛ فیلد/FK/تراکنش و read/write هر جدول مستقل، نه مجوز CRUD مستقیم از UI."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E22",
+      "from": "GROUP-DATA",
+      "to": "GROUP-OUTPUTS",
+      "direction": "forward",
+      "style": "solid-red",
+      "visualInterpretation": "grouped-output-bus-not-per-table-dispatch",
+      "criterionRefs": ["G10", "H01", "H02", "H03", "H04", "H05"],
+      "contract": "باس خروجی شش‌گانه؛ Outbox/Adapter و دانلود/گزارش با Scope؛ همه جدول‌ها مستقیم به همه Providerها dispatch نمی‌شوند.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "باس خروجی شش‌گانه؛ Outbox/Adapter و دانلود/گزارش با Scope؛ همه جدول‌ها مستقیم به همه Providerها dispatch نمی‌شوند."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E23",
+      "from": "D2-F01",
+      "to": "D2-F02",
+      "direction": "forward",
+      "style": "dashed-black",
+      "visualInterpretation": "numbered-workflow-sequence",
+      "criterionRefs": ["A04", "A05", "B01"],
+      "contract": "ترتیب مفهومیِ گام‌های تصویر است، نه تمام گذارهای ماشین وضعیت؛ Quote/QC/اختلاف حذف نشوند، پشتیبانی فقط پس از تحویل محدود نشود.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "ترتیب مفهومیِ گام‌های تصویر است، نه تمام گذارهای ماشین وضعیت؛ Quote/QC/اختلاف حذف نشوند، پشتیبانی فقط پس از تحویل محدود نشود."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E24",
+      "from": "D2-F02",
+      "to": "D2-F03",
+      "direction": "forward",
+      "style": "dashed-black",
+      "visualInterpretation": "numbered-workflow-sequence",
+      "criterionRefs": ["B01", "G02"],
+      "contract": "ترتیب مفهومیِ گام‌های تصویر است، نه تمام گذارهای ماشین وضعیت؛ Quote/QC/اختلاف حذف نشوند، پشتیبانی فقط پس از تحویل محدود نشود.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "ترتیب مفهومیِ گام‌های تصویر است، نه تمام گذارهای ماشین وضعیت؛ Quote/QC/اختلاف حذف نشوند، پشتیبانی فقط پس از تحویل محدود نشود."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E25",
+      "from": "D2-F03",
+      "to": "D2-F04",
+      "direction": "forward",
+      "style": "dashed-black",
+      "visualInterpretation": "numbered-workflow-sequence",
+      "criterionRefs": ["E05"],
+      "contract": "ترتیب مفهومیِ گام‌های تصویر است، نه تمام گذارهای ماشین وضعیت؛ Quote/QC/اختلاف حذف نشوند، پشتیبانی فقط پس از تحویل محدود نشود.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "ترتیب مفهومیِ گام‌های تصویر است، نه تمام گذارهای ماشین وضعیت؛ Quote/QC/اختلاف حذف نشوند، پشتیبانی فقط پس از تحویل محدود نشود."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E26",
+      "from": "D2-F04",
+      "to": "D2-F05",
+      "direction": "forward",
+      "style": "dashed-black",
+      "visualInterpretation": "numbered-workflow-sequence",
+      "criterionRefs": ["C04", "C07"],
+      "contract": "ترتیب مفهومیِ گام‌های تصویر است، نه تمام گذارهای ماشین وضعیت؛ Quote/QC/اختلاف حذف نشوند، پشتیبانی فقط پس از تحویل محدود نشود.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "ترتیب مفهومیِ گام‌های تصویر است، نه تمام گذارهای ماشین وضعیت؛ Quote/QC/اختلاف حذف نشوند، پشتیبانی فقط پس از تحویل محدود نشود."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E27",
+      "from": "D2-F05",
+      "to": "D2-F06",
+      "direction": "forward",
+      "style": "dashed-black",
+      "visualInterpretation": "numbered-workflow-sequence",
+      "criterionRefs": ["B08", "B09", "B10", "B11"],
+      "contract": "ترتیب مفهومیِ گام‌های تصویر است، نه تمام گذارهای ماشین وضعیت؛ Quote/QC/اختلاف حذف نشوند، پشتیبانی فقط پس از تحویل محدود نشود.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "ترتیب مفهومیِ گام‌های تصویر است، نه تمام گذارهای ماشین وضعیت؛ Quote/QC/اختلاف حذف نشوند، پشتیبانی فقط پس از تحویل محدود نشود."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-E28",
+      "from": "D2-F06",
+      "to": "D2-F07",
+      "direction": "forward",
+      "style": "dashed-black",
+      "visualInterpretation": "numbered-workflow-sequence",
+      "criterionRefs": ["D01", "D04"],
+      "contract": "ترتیب مفهومیِ گام‌های تصویر است، نه تمام گذارهای ماشین وضعیت؛ Quote/QC/اختلاف حذف نشوند، پشتیبانی فقط پس از تحویل محدود نشود.",
+      "acceptance": "pending-edge-semantics-and-permission-tests",
+      "review": "target-meaning-reviewed-runtime-tests-pending",
+      "visualDirectionClaim": true,
+      "meaning": {
+        "targetFlows": [
+          "ترتیب مفهومیِ گام‌های تصویر است، نه تمام گذارهای ماشین وضعیت؛ Quote/QC/اختلاف حذف نشوند، پشتیبانی فقط پس از تحویل محدود نشود."
+        ],
+        "authority": "Conceptual data/service relation, never a grant of endpoint/DB write authority.",
+        "sourceFiles": []
+      },
+      "authority": "Conceptual flow only; individual command guard/owner/state/QC/transaction/Audit needed. No grouped data/output or AI arrow is a permission grant.",
+      "productAccepted": false
+    }
+  ],
+  "roleActions": [
+    {
+      "id": "D2-R01-catalog",
+      "sourceRole": "D2-R01",
+      "sourceSubItemIndex": 0,
+      "sourceText": "مشاهده خدمات",
+      "action": "catalog",
+      "criterionRefs": ["A02", "A03"],
+      "testPlan": "فقط خدمت منتشرشده؛ قیمت توافقی/خدمت بی‌پکیج و CTA مجاز.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R01-order",
+      "sourceRole": "D2-R01",
+      "sourceSubItemIndex": 1,
+      "sourceText": "ثبت سفارش",
+      "action": "order",
+      "criterionRefs": ["B01", "B02", "B03"],
+      "testPlan": "draft/submit/retry و Quote/پرداخت قطعی مطابق DEC02.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R01-upload-input",
+      "sourceRole": "D2-R01",
+      "sourceSubItemIndex": 2,
+      "sourceText": "آپلود فایل",
+      "action": "upload-input",
+      "criterionRefs": ["G05", "G06"],
+      "testPlan": "مالکیت/size/MIME/signature/قرنطینه، نه فایل عمومی.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R01-track",
+      "sourceRole": "D2-R01",
+      "sourceSubItemIndex": 3,
+      "sourceText": "پیگیری وضعیت",
+      "action": "track",
+      "criterionRefs": ["B04", "B05"],
+      "testPlan": "فقط مالک/سازمان مجاز؛ وضعیت واقعی/مهلت نامعلوم و تاریخچه عمومی.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R01-download",
+      "sourceRole": "D2-R01",
+      "sourceSubItemIndex": 4,
+      "sourceText": "دریافت خروجی",
+      "action": "download",
+      "criterionRefs": ["B08", "ZEUS-UI-021"],
+      "testPlan": "نسخه صحیح، قبل QC و فایل مجری دیگر منفی.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R01-dispute",
+      "sourceRole": "D2-R01",
+      "sourceSubItemIndex": 5,
+      "sourceText": "ثبت اعتراض",
+      "action": "dispute",
+      "criterionRefs": ["B10", "ZEUS-ADD-S06"],
+      "testPlan": "شرح اجباری، state مجاز، بدون Refund خودکار با ثبت شکایت.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R01-review",
+      "sourceRole": "D2-R01",
+      "sourceSubItemIndex": 6,
+      "sourceText": "امتیازدهی",
+      "action": "review",
+      "criterionRefs": ["B11"],
+      "testPlan": "opt-in/بازبینی/یکتایی/rating معتبر و عدم هویت داخلی.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R01-wallet",
+      "sourceRole": "D2-R01",
+      "sourceSubItemIndex": 7,
+      "sourceText": "کیف پول",
+      "action": "wallet",
+      "criterionRefs": ["G01", "ZEUS-V4-067", "ZEUS-V4-068"],
+      "testPlan": "Ledger/موجودی و شارژ/پرداخت تازه‌مصوب؛ دو درخواست هم‌زمان.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R01-support-ticket",
+      "sourceRole": "D2-R01",
+      "sourceSubItemIndex": 8,
+      "sourceText": "تیکت پشتیبانی",
+      "action": "support-ticket",
+      "criterionRefs": ["D01", "D02", "D08"],
+      "testPlan": "تیکت/پیوست خود، internal پنهان، rating تیکت جدا از سفارش.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R02-assigned-queue",
+      "sourceRole": "D2-R02",
+      "sourceSubItemIndex": 0,
+      "sourceText": "مشاهده سفارش‌ها",
+      "action": "assigned-queue",
+      "criterionRefs": ["C01"],
+      "testPlan": "assignment خود و آرشیو؛ لیست عمومی تمام سفارش‌ها ممنوع.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R02-accept",
+      "sourceRole": "D2-R02",
+      "sourceSubItemIndex": 1,
+      "sourceText": "قبول/رد سفارش",
+      "action": "accept",
+      "criterionRefs": ["C02"],
+      "testPlan": "پذیرش/نسخه/ارجاع معتبر و رقابت reassign.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R02-reject",
+      "sourceRole": "D2-R02",
+      "sourceSubItemIndex": 1,
+      "sourceText": "قبول/رد سفارش",
+      "action": "reject",
+      "criterionRefs": ["C03"],
+      "testPlan": "دلیل و بازارجاع معتبر، بدون لغو/Refund سفارش.",
+      "note": "قبول و رد دو زیرعمل مستقل‌اند؛ موفقیت accept، رد کار را کامل نمی‌کند.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R02-execute",
+      "sourceRole": "D2-R02",
+      "sourceSubItemIndex": 2,
+      "sourceText": "مدیریت پروژه",
+      "action": "execute",
+      "criterionRefs": ["C04"],
+      "testPlan": "پذیرش پیش از start و انتقال معتبر، دو کلیک/نسخه کهنه.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R02-checklist",
+      "sourceRole": "D2-R02",
+      "sourceSubItemIndex": 3,
+      "sourceText": "چک‌لیست انجام کار",
+      "action": "checklist",
+      "criterionRefs": ["C05"],
+      "testPlan": "checklist متعلق و کامل؛ server gate تحویل.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R02-messages",
+      "sourceRole": "D2-R02",
+      "sourceSubItemIndex": 4,
+      "sourceText": "مکاتبه",
+      "action": "messages",
+      "criterionRefs": ["C06"],
+      "testPlan": "پنج نوع مکاتبه و recipient/visibility/dedup، نه تغییر مستقیم مهلت.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R02-upload-output",
+      "sourceRole": "D2-R02",
+      "sourceSubItemIndex": 5,
+      "sourceText": "آپلود خروجی",
+      "action": "upload-output",
+      "criterionRefs": ["C07"],
+      "testPlan": "فایل/دور اصلاح/QC/چک‌لیست، پیش‌از-QC به مشتری نرسد.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R02-income",
+      "sourceRole": "D2-R02",
+      "sourceSubItemIndex": 6,
+      "sourceText": "درآمد و تسویه",
+      "action": "income",
+      "criterionRefs": ["C08"],
+      "testPlan": "درآمد خود از Ledger، دوره/موجودی واقعی و عدم داده مالی مشتری.",
+      "note": "درآمد و برداشت دو زیرعمل؛ performance شخصی شاهد Income UI نیست.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R02-withdraw",
+      "sourceRole": "D2-R02",
+      "sourceSubItemIndex": 6,
+      "sourceText": "درآمد و تسویه",
+      "action": "withdraw",
+      "criterionRefs": ["G07", "ZEUS-UI-046"],
+      "testPlan": "خود مجری/شبا/موجودی و یک تصمیم برداشت با Audit.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R03-ticket-queue",
+      "sourceRole": "D2-R03",
+      "sourceSubItemIndex": 0,
+      "sourceText": "مشاهده تیکت‌ها",
+      "action": "ticket-queue",
+      "criterionRefs": ["D01", "D03"],
+      "testPlan": "فیلتر/claim/assignment فقط Support مجاز، نه کل PII.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R03-reply",
+      "sourceRole": "D2-R03",
+      "sourceSubItemIndex": 1,
+      "sourceText": "پاسخ‌گویی",
+      "action": "reply",
+      "criterionRefs": ["D02", "D04"],
+      "testPlan": "reply عمومی در برابر internal؛ close/resolve معتبر.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R03-sla",
+      "sourceRole": "D2-R03",
+      "sourceSubItemIndex": 2,
+      "sourceText": "SLA",
+      "action": "sla",
+      "criterionRefs": ["D07", "ZEUS-V4-039", "ZEUS-V4-040"],
+      "testPlan": "تقویم/پاسخ اول/حل/بازگشایی و یک escalation منطقی.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R03-canned-reply",
+      "sourceRole": "D2-R03",
+      "sourceSubItemIndex": 3,
+      "sourceText": "پاسخ‌های آماده",
+      "action": "canned-reply",
+      "criterionRefs": ["D05"],
+      "testPlan": "انتخاب متن و حفظ ویرایش، مدیریت قالب فقط در صورت مجوز.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R03-internal-note",
+      "sourceRole": "D2-R03",
+      "sourceSubItemIndex": 4,
+      "sourceText": "یادداشت داخلی",
+      "action": "internal-note",
+      "criterionRefs": ["D06"],
+      "testPlan": "نه UI و نه payload مشتری internal را دریافت نکند.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R04-users",
+      "sourceRole": "D2-R04",
+      "sourceSubItemIndex": 0,
+      "sourceText": "مدیریت کاربران",
+      "action": "users",
+      "criterionRefs": ["E02", "E03", "ZEUS-UI-048"],
+      "testPlan": "فقط Super/Scope مصوب؛ session revoke و عدم token/hash/OTP.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R04-orders",
+      "sourceRole": "D2-R04",
+      "sourceSubItemIndex": 1,
+      "sourceText": "سفارش‌ها",
+      "action": "orders",
+      "criterionRefs": ["E05", "ZEUS-UI-034", "ZEUS-UI-035"],
+      "testPlan": "Ops/Super طبق DEC13؛ triage/quote/assign معتبر نه setter status.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R04-staff",
+      "sourceRole": "D2-R04",
+      "sourceSubItemIndex": 2,
+      "sourceText": "مجریان",
+      "action": "staff",
+      "criterionRefs": ["E04", "ZEUS-UI-038"],
+      "testPlan": "HR/ظرفیت/مهارت/KPI فقط Scope مجاز، دوره درست.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R04-finance",
+      "sourceRole": "D2-R04",
+      "sourceSubItemIndex": 3,
+      "sourceText": "مالی",
+      "action": "finance",
+      "criterionRefs": ["G08", "ZEUS-UI-043", "ZEUS-UI-044"],
+      "testPlan": "Finance/Super؛ Ledger متوازن/read-only، note و idempotency.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R04-reports",
+      "sourceRole": "D2-R04",
+      "sourceSubItemIndex": 4,
+      "sourceText": "گزارش‌ها",
+      "action": "reports",
+      "criterionRefs": ["E07", "G09", "G10"],
+      "testPlan": "گزارش هم‌فیلتر با Scope عملیاتی/مالی جدا، RTL و export امن.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R04-settings",
+      "sourceRole": "D2-R04",
+      "sourceSubItemIndex": 5,
+      "sourceText": "تنظیمات",
+      "action": "settings",
+      "criterionRefs": ["E08"],
+      "testPlan": "Super، مقدار typed و Audit redacted؛ نه secret خام.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    },
+    {
+      "id": "D2-R04-ai-controls",
+      "sourceRole": "D2-R04",
+      "sourceSubItemIndex": 6,
+      "sourceText": "کنترل قابلیت‌های AI",
+      "action": "ai-controls",
+      "criterionRefs": ["H06", "H07", "H08", "ZEUS-V4-098"],
+      "testPlan": "kill-switch/تأیید انسانی؛ بدون فعال‌سازی Provider یا ساخت موتور از flag.",
+      "note": "نگاشت عمل منبع است؛ وجود صفحه یا API جای پذیرش مجوز/رفتار را نمی‌گیرد.",
+      "acceptance": "pending-role-command-and-visibility-tests",
+      "review": "meaning-preserved-test-contract-retained",
+      "productAccepted": false
+    }
+  ],
+  "literalDeviations": [
+    "Roles enum/scope/capability consolidation is not a separate Roles table",
+    "Order requirements JSON/snapshots/milestones not a generic cart OrderItems claim",
+    "Embedded OTP/delivery do not require duplicate empty canonical pages",
+    "Seven conceptual workflow stages preserve all twenty domain states",
+    "Three ambiguous arrowheads E15/E16/E20 receive target flow interpretations, no fabricated pixel direction",
+    "Diagram color legend identifies concepts, does not replace approved unified site palette/two themes"
+  ],
+  "control": "All 51 indexed nodes,135 indexed subitems,30 role actions and28 connector groups have target dispositions; image layout/title/legend are explanatory, not extra product permissions. This accepts semantic planning review only, not feature/runtime/visual parity or live integration."
+}

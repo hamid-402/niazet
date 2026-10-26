@@ -1,4 +1,12 @@
-import { IsIn, IsOptional, IsString, Matches } from 'class-validator';
+import {
+  IsIn,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export type OtpPurpose = 'register' | 'login' | 'password_reset';
 
@@ -9,6 +17,14 @@ export class RequestOtpDto {
 
   @IsIn(['register', 'login'])
   purpose!: OtpPurpose;
+
+  @IsOptional() @IsString() @MinLength(2) @MaxLength(100) fullName?: string;
+  @IsOptional()
+  @IsString()
+  @MinLength(10)
+  @MaxLength(64)
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/)
+  password?: string;
 }
 
 export class VerifyOtpDto {
@@ -25,5 +41,15 @@ export class VerifyOtpDto {
 
   @IsOptional()
   @IsString()
+  @MinLength(2)
+  @MaxLength(100)
   fullName?: string;
+
+  @IsOptional() @IsUUID() registrationAttemptId?: string;
+  @IsOptional()
+  @IsString()
+  @MinLength(10)
+  @MaxLength(64)
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/)
+  password?: string;
 }

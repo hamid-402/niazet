@@ -57,6 +57,19 @@ jobs:
       - name: API unit tests
         run: npm test -- --runInBand
         working-directory: apps/api
+      - name: Zeus exact approval and historical evidence regression
+        run: >-
+          node --test
+          scripts/acceptance/invoice-approval.test.mjs
+          scripts/acceptance/zeus-parser-approval.test.mjs
+          scripts/acceptance/zeus-pricing-approval.test.mjs
+          scripts/acceptance/zeus-reconciliation-approval.test.mjs
+          scripts/acceptance/zeus-z1-packet-approval.test.mjs
+          scripts/acceptance/zeus-z1-contract-approval.test.mjs
+          scripts/acceptance/zeus-z1-dependency-review.test.mjs
+          scripts/acceptance/zeus-wallet-ui-approval.test.mjs
+          scripts/acceptance/zeus-z1-data-approval.test.mjs
+          scripts/acceptance/zeus-z1-ci.test.mjs
       - name: Critical unit coverage contract
         run: npm run phase8:unit-coverage-contract
         working-directory: apps/api
@@ -141,6 +154,8 @@ jobs:
       - name: Complete role and workflow E2E
         run: npm run test:e2e:roles
         working-directory: apps/api
+      - name: Zeus wallet, auth, API boundaries and populated upgrade rehearsal
+        run: node scripts/acceptance/zeus-z1-ci.mjs
       - name: Isolated load and concurrency smoke
         run: npm run phase8:load-smoke -- --output=../../.artifacts/performance/load-smoke.json
         working-directory: apps/api

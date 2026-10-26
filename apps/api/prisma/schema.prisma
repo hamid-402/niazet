@@ -408,10 +408,14 @@ model User {
   ledgerAccount        LedgerAccount?
   ledgerEntriesCreated LedgerEntry[]  @relation("LedgerCreatedBy")
 
-  paymentsAsCustomer Payment[]    @relation("PaymentCustomer")
-  refundsDecided     Refund[]     @relation("RefundDecidedBy")
-  withdrawalsDecided Withdrawal[] @relation("WithdrawalDecidedBy")
-  invoices           Invoice[]    @relation("InvoiceCustomer")
+  paymentsAsCustomer     Payment[]             @relation("PaymentCustomer")
+  walletFundingIntents   WalletFundingIntent[]
+  loginState             UserLoginState?
+  publicReviews          PublicServiceReview[] @relation("PublicReviewCustomer")
+  moderatedPublicReviews PublicServiceReview[] @relation("PublicReviewModerator")
+  refundsDecided         Refund[]              @relation("RefundDecidedBy")
+  withdrawalsDecided     Withdrawal[]          @relation("WithdrawalDecidedBy")
+  invoices               Invoice[]             @relation("InvoiceCustomer")
 
   disputesRaised   Dispute[] @relation("DisputeRaisedBy")
   disputesResolved Dispute[] @relation("DisputeResolvedBy")
@@ -755,6 +759,7 @@ model ServiceLine {
   formFields           ServiceFormField[]
   acceptanceCriteria   ServiceAcceptanceCriteria[]
   qcChecklistTemplates QcChecklistTemplate[]
+  contractPolicies     ServiceContractPolicy[]
   orders               Order[]
 
   @@map("service_lines")
@@ -892,8 +897,11 @@ model Order {
   invoices           Invoice[]
   disputes           Dispute[]
   feedback           Feedback[]
+  contractSnapshot   OrderContractSnapshot?
+  publicReview       PublicServiceReview?
 
   @@index([customerId])
+  @@index([customerId, status])
   @@index([organizationId, createdAt])
   @@index([status])
   @@index([status, createdAt])
@@ -1211,6 +1219,9 @@ model Ticket {
   resolvedAt DateTime? @map("resolved_at")
   closedAt   DateTime? @map("closed_at")
 
+  customerRating  Int?      @map("customer_rating")
+  customerRatedAt DateTime? @map("customer_rated_at")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -1218,9 +1229,10 @@ model Ticket {
   order      Order? @relation(fields: [orderId], references: [id])
   assignedTo User?  @relation("TicketAssignee", fields: [assignedToUserId], references: [id])
 
-  messages    TicketMessage[]
-  escalations TicketEscalation[]
-  slaEvents   TicketSlaEvent[]
+  messages       TicketMessage[]
+  escalations    TicketEscalation[]
+  slaEvents      TicketSlaEvent[]
+  policySnapshot TicketSlaPolicySnapshot?
 
   @@index([customerId])
   @@index([status])
@@ -1372,6 +1384,101 @@ model Payment {
   @@index([orderId])
   @@index([status, createdAt])
   @@map("payments")
+}
+
+// Z1 additive table: standalone wallet funding is not a fictitious order.
+// No historic balances are inferred or migrated into new ledger entries.
+model WalletFundingIntent {
+  id             String        @id @default(uuid())
+  userId         String        @map("user_id")
+  amount         Int
+  currency       String        @default("IRT")
+  gateway        String
+  gatewayRef     String?       @map("gateway_ref")
+  status         PaymentStatus @default(pending)
+  idempotencyKey String        @unique @map("idempotency_key")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  verifiedAt     DateTime?     @map("verified_at")
+  user           User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([userId, createdAt])
+  @@map("wallet_funding_intents")
+}
+
+// Additive compatibility extensions. Absence means unknown, never zero or
+// a fabricated historic deadline/login/rate. Existing scalar queries are intact.
+model UserLoginState {
+  userId                String    @id @map("user_id")
+  lastSuccessfulLoginAt DateTime? @map("last_successful_login_at")
+  phoneVerifiedAt       DateTime? @map("phone_verified_at")
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@map("user_login_states")
+}
+
+model ServiceContractPolicy {
+  id             String      @id @default(uuid())
+  serviceId      String      @map("service_id")
+  version        Int
+  normalRateBps  Int         @default(0) @map("normal_rate_bps")
+  urgentRateBps  Int         @default(3000) @map("urgent_rate_bps")
+  sameDayRateBps Int         @default(8000) @map("same_day_rate_bps")
+  sortOrder      Int         @default(0) @map("sort_order")
+  createdAt      DateTime    @default(now()) @map("created_at")
+  serviceLine    ServiceLine @relation(fields: [serviceId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@unique([serviceId, version])
+  @@map("service_contract_policies")
+}
+
+model OrderContractSnapshot {
+  orderId           String    @id @map("order_id")
+  basePrice         Int?      @map("base_price")
+  surchargeRateBps  Int?      @map("surcharge_rate_bps")
+  surchargeAmount   Int?      @map("surcharge_amount")
+  deadlineNormal    DateTime? @map("deadline_normal")
+  deadlineEffective DateTime? @map("deadline_effective")
+  internalNote      String?   @map("internal_note")
+  policySnapshot    Json?     @map("policy_snapshot")
+  capturedAt        DateTime  @default(now()) @map("captured_at")
+  order             Order     @relation(fields: [orderId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@map("order_contract_snapshots")
+}
+
+model TicketSlaPolicySnapshot {
+  ticketId                     String    @id @map("ticket_id")
+  policyVersion                Int       @map("policy_version")
+  firstResponseBusinessMinutes Int       @map("first_response_business_minutes")
+  timezone                     String    @default("Asia/Tehran")
+  calendar                     Json
+  firstResponseDeadline        DateTime? @map("first_response_deadline")
+  firstMeaningfulReplyAt       DateTime? @map("first_meaningful_reply_at")
+  capturedAt                   DateTime  @default(now()) @map("captured_at")
+  ticket                       Ticket    @relation(fields: [ticketId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@map("ticket_sla_policy_snapshots")
+}
+
+model PublicServiceReview {
+  id               String    @id @default(uuid())
+  orderId          String    @unique @map("order_id")
+  customerId       String    @map("customer_id")
+  rating           Int
+  comment          String?
+  publicComment    String?   @map("public_comment")
+  version          Int       @default(1)
+  publicConsent    Boolean   @default(false) @map("public_consent")
+  moderationStatus String    @default("pending") @map("moderation_status")
+  reviewedByUserId String?   @map("reviewed_by_user_id")
+  publishedAt      DateTime? @map("published_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  order            Order     @relation(fields: [orderId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  customer         User      @relation("PublicReviewCustomer", fields: [customerId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  reviewedBy       User?     @relation("PublicReviewModerator", fields: [reviewedByUserId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@index([moderationStatus, publishedAt])
+  @@map("public_service_reviews")
 }
 
 model EscrowHold {

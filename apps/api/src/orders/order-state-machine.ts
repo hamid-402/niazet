@@ -4,9 +4,9 @@ import { OrderStatus, OrderStatusSource } from '@prisma/client';
  * جدول گذار وضعیت سفارش — دقیقاً مطابق
  * docs/specs/addendum-state-machine-ledger.md بخش ۱.۳.
  *
- * `disputed -> *` عمداً از این جدول عمومی حذف شده چون طبق بند ۱.۴ الحاقیه
- * فقط باید از طریق endpoint اختصاصی resolve-dispute انجام شود، نه از مسیر
- * عمومی تغییر وضعیت.
+ * یال‌های `disputed -> *` برای نمایش قرارداد حفظ شده‌اند؛ OrderWorkflowService
+ * اجرای آن‌ها را فقط با فرمان داخلی resolve-dispute و عامل admin می‌پذیرد،
+ * نه از مسیر عمومی تغییر وضعیت.
  */
 export const ORDER_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   draft: [OrderStatus.submitted, OrderStatus.cancelled],
@@ -146,9 +146,12 @@ export function isTransitionAllowedForSource(
   );
 }
 
-/** لغو از هر وضعیت غیرنهایی مجاز است (بند ۱.۴ الحاقیه). */
+/** DEC12: only explicit D4 cancellation edges; dispute has its own command. */
 export function isCancellable(status: OrderStatus): boolean {
-  return status !== OrderStatus.cancelled && status !== OrderStatus.closed;
+  return (
+    status !== OrderStatus.disputed &&
+    isTransitionAllowed(status, OrderStatus.cancelled)
+  );
 }
 
 export const FINAL_ORDER_STATUSES: OrderStatus[] = [

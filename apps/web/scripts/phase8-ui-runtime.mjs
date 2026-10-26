@@ -907,6 +907,8 @@ try {
     FILE_SCAN_DRIVER: 'mock',
     SMS_DRIVER: 'mock',
     EMAIL_DRIVER: 'mock',
+    // Explicit isolated fixture; never inherit the developer's local switch.
+    ZEUS_WALLET_ENABLED: 'true',
   };
   runPrisma(['migrate', 'deploy'], 'Isolated migration deploy', isolatedEnvironment, [sourceUrl, isolatedUrl.toString()]);
   runPrisma(['db', 'seed'], 'Isolated database seed', isolatedEnvironment, [sourceUrl, isolatedUrl.toString()]);
@@ -1079,6 +1081,15 @@ try {
 
   await verifyCustomerReviewUi(pages.get('customer'), webOrigin);
   await verifyCustomerOrderDetailUi(pages.get('customer'), webOrigin);
+
+  // Closed popovers remove invisible links; prove all actions still work.
+  const actionMenuCheck = spawnSync(process.execPath, [resolve(webRoot, 'scripts/zeus-action-menu-runtime.mjs')], {
+    cwd: webRoot,
+    env: { ...process.env, ZEUS_UI_BASE_URL: webOrigin, ZEUS_BROWSER_EXECUTABLE: executablePath },
+    encoding: 'utf8', windowsHide: true, timeout: 120000,
+  });
+  assert.equal(actionMenuCheck.status, 0, `Action-menu preservation failed: ${actionMenuCheck.stdout}\n${actionMenuCheck.stderr}`);
+  report.actionMenu = 'passed-eight-ui-fixture-states-no-db-writes';
 
   if (updateBaseline) {
     let snapshots = report.snapshots;

@@ -1,0 +1,2687 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-25",
+  "phase": "Z1",
+  "package": "Z1-B1 / OPS-003 fresh audit and local dependency triage",
+  "phaseAccepted": false,
+  "productAccepted": false,
+  "sourceSnapshotDate": "2026-10-25",
+  "previousZ0Acceptance": {
+    "fingerprint": "6cc97083bdab8cfb2ade8e5593e59c70c72c2da342bef6046049a543ef830c61",
+    "pinnedInputCount": 177,
+    "changedPinnedInputs": [],
+    "currentCandidateRecertified": false,
+    "meaning": "Historical Z0 certificate retained. New Z1 tests expand the dynamically discovered test set; strict Z0 --check correctly rejects the new candidate. Pinned Z0 inputs can remain unchanged without asserting fresh whole-candidate acceptance."
+  },
+  "freshRegistryAudit": {
+    "status": "completed-after-owner-disclosure-permission",
+    "reason": "Initial managed rejection respected; owner subsequently approved metadata-only disclosure. Four audit reports completed with exit 1 for findings, no error; no install/fix performed."
+  },
+  "sourceInputs": {
+    "docs/zeus/z1-security-snapshot.json": "0d6f81558edad6878cadb1aebdb4f49011f4ba6b934825582dc9f41a2e215bf6",
+    "apps/api/package.json": "09c73d8559eba358488665800627b5f21d4c171d4a4681bcb58e3cc60dfc5861",
+    "apps/api/package-lock.json": "109a27e51f95c5c1f304c33318b3dd010f16e0ad9c3b5ef08fc82bc3f50530f8",
+    "apps/web/package.json": "bf94bf499c062968c47495aea1ba53d8d591510493ba1dd4db9ffc6c70db7b28",
+    "apps/web/package-lock.json": "7d4f93aaa2870fc8769b7db1cb355bfc3753de4621f33d91b12652014ada9bb0",
+    "apps/api/src/main.ts": "da4d33d349ee2d848906c546aca1438ec798130e53cbf81757481d09334f280d",
+    "apps/api/src/files/files.controller.ts": "0f561eae94d58502250011613454f3479204f4ed09d09848101439f9f5eb3a64",
+    "apps/api/src/notifications/email.service.ts": "619fb02c1f16da256d3dc672f4926c86f58a8b24efeaf555a91ec6f1e8a7f0c2",
+    "apps/api/src/notifications/live-providers.ts": "6ade8e09449bd706566ef994c1441490bad7cb02abf6ac4b1fae9c902dca40cc",
+    "apps/api/src/common/guards/rate-limit.guard.ts": "962a3b18a5fe25dd01931b4640075a3deb7f5115bcea4e3b6d12c193ab6e6e67",
+    "apps/web/next.config.ts": "593ee3ee63c0b60a0dc0f7684370b339b1430355446bbef0892c4ba71962a446",
+    "apps/web/src/components/brand-mark.tsx": "ea3dd85483fdb88cebcc99be7b8ecfc260000cd155778a693fa90a465e9e694f",
+    "apps/api/src/account/account.controller.ts": "85260f0ce3d705065ffbd3679c5ab336331b624c94362e75c321465f18876407",
+    "apps/api/src/account/account.module.ts": "4cae8235c8620e5307437d0636d09f86ee6e97e4df75c4055e8b8c74424a4e6f",
+    "apps/api/src/account/account.service.ts": "bb768e11f0d70ee1ed1d8ecc7df9e0fc900d98639bf27977e02cf0fa9eb062fa",
+    "apps/api/src/account/dto/account.dto.ts": "309b9dc0594f7400b61baa888aacbf5a837dc8bfebf0d81e1d28821a928b6fc3",
+    "apps/api/src/app.controller.ts": "136c744116d766405c267000402b501c5e1f9d7a483668ba55626df1cc7b8d30",
+    "apps/api/src/app.module.ts": "9d0d3c111235dae07907318fa8d0a54df2f3e5d87250b10fc0729765570e2904",
+    "apps/api/src/audit/audit.module.ts": "3a5bde11a1dcf5345f400ffdb1f7bc9c45d7d6ffd56152a306fed4c5b2ef79c5",
+    "apps/api/src/audit/audit.service.ts": "62a12b25897fa2e0e7b496727e0acaf1e262fbe3487525f2351cabd9b3983312",
+    "apps/api/src/auth/auth-session.service.spec.ts": "875491b8527ec965a6e671864df82450b5df842d9a86a8c9c33916cde4feef57",
+    "apps/api/src/auth/auth-session.service.ts": "5245d9239ffe53c1a05c30ae6e7438ebaa533087c3f6554386853226b3c0c65a",
+    "apps/api/src/auth/auth-token.service.ts": "d845d274d5a3e1a6e2ea941f5036cb487f474212f164a4a2c5c6b82f7846a7f6",
+    "apps/api/src/auth/auth.controller.ts": "e28ace8255ab6cca4aa00fd62718bf14dd9c805c5dc7754df973ee3fa46ce927",
+    "apps/api/src/auth/auth.module.ts": "d9f3c8e7650baedc30836078cf3e1b5f8782e78ba9a434fcd20ab7f53f258688",
+    "apps/api/src/auth/auth.service.ts": "a11e2166cf30571d8f03be823558315bdd227a0088f2dda95f866b3876f74dd7",
+    "apps/api/src/auth/dto/login.dto.ts": "59b73c54578449f8d5054402e3ae376b116c0ea6c918d83b8c096768e6eb359b",
+    "apps/api/src/auth/dto/otp.dto.ts": "57279f262e9fddbe0c81f31cbfce1422e35ed4a7807e47254cdf2618bd6c6b6e",
+    "apps/api/src/auth/dto/password-reset.dto.ts": "8c0bd835d3f90c01dd0466b5aa3941bf9fe8ff6693525073ab9b1a1071de8ab5",
+    "apps/api/src/auth/dto/register.dto.ts": "dae88b26736236e9182bc063102ff5e6ee34202f1b921e7c341257de6db41646",
+    "apps/api/src/auth/refresh-token.spec.ts": "2f1b85e911a6e6c7ab5818bdf9de1237fc2b19806ebe9987cd49c97259cdc2ef",
+    "apps/api/src/auth/refresh-token.ts": "5ffd8918eba9c210f7e2b5636353c037fa692c2128851bee7a5183a7cc0b8841",
+    "apps/api/src/auth/strategies/jwt.strategy.ts": "2715b92f4fe1e2cc67d3c17acab357b68e83788cf6ce10267e306e95a8ee2ad0",
+    "apps/api/src/catalog/catalog.admin.controller.ts": "c781f94370e74f406ea3515ce0e3d7a780e8dbe7b00be9224b5b2e4fb51353b3",
+    "apps/api/src/catalog/catalog.controller.ts": "9f109b636ec7374e2d1d118d01bb6878ad26843db184c503852600deaa6861d5",
+    "apps/api/src/catalog/catalog.module.ts": "dc50fb5a1184657a420c086db2ee77939bd08b62a9a14ce45d5946e27d13b291",
+    "apps/api/src/catalog/catalog.service.spec.ts": "f71b9eea719ed376b2d090ac122cef161f8d4b08d92b5049a086dc94ce9dc536",
+    "apps/api/src/catalog/catalog.service.ts": "164849e84b15ee262f7bc205dc8b89c8e20296828428f936058f5318c6b63103",
+    "apps/api/src/catalog/dto/service.dto.ts": "121f265a038cc5d106fd2be01f151018aeea0b189493342611432ba589c4eb2e",
+    "apps/api/src/common/decorators/admin-scopes.decorator.ts": "ba2a73634ee86f9bcb4ab0a7910ee34b04e4459b00228b746162400d195e27bb",
+    "apps/api/src/common/decorators/current-user.decorator.ts": "59c75a090d0903c6b407a20fc487393dc1237600852d6d065fca38d09d8a96fa",
+    "apps/api/src/common/decorators/public.decorator.ts": "477b2c32c0476e238156e21b48f8d406cc3c1adaa68b694ca45dd5b7a991e578",
+    "apps/api/src/common/decorators/rate-limit.decorator.ts": "be42037b1533944b06520bbe35c8218bc2f0e69157b3b751fa31fdfa1db9e4d5",
+    "apps/api/src/common/decorators/roles.decorator.ts": "3f5ddbf1e49d2a10607d6ed33e7ffd33a385ca6516a8f23a79e5bdb41d456fc8",
+    "apps/api/src/common/dto/pagination.dto.ts": "4b6c025008ba7621d55fc94be19bbe8540de030ef9464ee51488e4b97ec25c30",
+    "apps/api/src/common/filters/http-exception.filter.ts": "4405ec5dbda48f42aaeb647bfd184ee3c130b8af0073325069c88986b64a0804",
+    "apps/api/src/common/guards/access-policy.spec.ts": "00ccd3889eb92ab504b2bc9e60062acf05aa07b49bc036de917b29932e48d1b5",
+    "apps/api/src/common/guards/admin-scope.guard.ts": "b4c640d99d51d050653c3d846ef207dd5bf5459342d7bd6c2bbc7c661056519a",
+    "apps/api/src/common/guards/jwt-auth.guard.ts": "d127b1e7e67f285e6a6225230a071e252c720eba2bb8718e424918b2e130ac6a",
+    "apps/api/src/common/guards/roles.guard.ts": "d102c37bf2e89d0412b723a695387927911260e774c94cc920d8fb2ff982dadf",
+    "apps/api/src/common/http/api-contract.ts": "fa541e77c5b7b1e956380763174e45a26ba5f07a7f1e9c44b99c00e1c3324c79",
+    "apps/api/src/common/middleware/correlation-id.middleware.ts": "136b0ec81e280783a9e28b43e076bd5f772d9acaa489fec023d185370cfe6f72",
+    "apps/api/src/common/provider-http.ts": "2b1cf67eeb7fbcb8a80447a3ae32c9a727c868104ea1832c6a2e0d633d639a97",
+    "apps/api/src/common/selects/safe-user.select.ts": "e759b61a7a148e15a3551dfb4bf07e3229a227232ed333e1ac83747ded572183",
+    "apps/api/src/common/types/authenticated-user.ts": "e79019ec6ee764bcccab36e037e687145aaf4f27717b53376dd46cbc552c4d56",
+    "apps/api/src/common/utils/business-hours.spec.ts": "e096421007fdb2238d30573f7730d86a064557d7e8aee737b88ca3fa8e71ea35",
+    "apps/api/src/common/utils/business-hours.ts": "5af48ab66b70e66a035fdcbf88a62ac869f1d011d9815b5ad5c1e6b09de21a1f",
+    "apps/api/src/common/utils/code-generator.ts": "fff1005942cad1043d1006a64c9871b39a7c51b2e042f344aa856101ce7eaffa",
+    "apps/api/src/common/utils/tehran-time.spec.ts": "92ba43b27bc2d8fee81c24d007f206cab9cb9b9c922799183a9bdbd6515303da",
+    "apps/api/src/common/utils/tehran-time.ts": "b39fef0d5ee9894e771d5e949891a21457cc9244c0cfa4c470fa146c0ccb536f",
+    "apps/api/src/config/provider-environment.ts": "1da040fa666129b469e7347b49f3315738c53edfe19d33b2e0a9696350478a7d",
+    "apps/api/src/config/validate-env.ts": "b439e9d5915bb757c1fd4e2e5dd512844034f98ab7e5b3672836feec93cbc5b7",
+    "apps/api/src/executor/dto/executor.dto.ts": "4830188f4710fdf1b484b9e55616c943c7c0a579d74e5324c7be3aeb7151b1b9",
+    "apps/api/src/executor/executor.controller.ts": "5cdb7b62cdfcbc98e21a518f03e10725b01b2d93bd9a1be8b2c11f6be66462bf",
+    "apps/api/src/executor/executor.module.ts": "a455465e50944528200f848b250f7926067ad52b71bdda229ef39eb0743f9b73",
+    "apps/api/src/executor/executor.service.spec.ts": "7430901f32f4bcc5fb6edbf54c7bbd4579369e75c8b12c7a0c5125e352bd1ffc",
+    "apps/api/src/executor/executor.service.ts": "dc9e2e447d10409c9a9f39ab40a8ca5edbc6fff2294fa9d1110e1752d13fd3f2",
+    "apps/api/src/executor/onboarding-policy.spec.ts": "dbfb1e0d80848d290215733f8a458c09a183be052f001cb03f7d3e85257a2301",
+    "apps/api/src/executor/onboarding-policy.ts": "0b7e8c8759cb893fbd98ed5ed4ad2e6b4da2a22cbffe321c228a2f09671fd408",
+    "apps/api/src/executor/onboarding.controller.ts": "7628da293a59969269df73696dcb2b6db0fa2acf3a567c25ebd7c69a04a8a270",
+    "apps/api/src/executor/onboarding.service.ts": "c0538a9c0e202eabeae3ad45bf35205bc07dc84e38d426bc4360949ce7dd3697",
+    "apps/api/src/executor/performance-metrics.spec.ts": "141aec3f7d0d6c956469d356c1e02716354ae3b436cfdc5a05845a922ef77406",
+    "apps/api/src/executor/performance-metrics.ts": "2503d4acb7e370152905769f1bc64d12adbaf491b32cf555707e8f9db2ba63d4",
+    "apps/api/src/executor/staff-risk.spec.ts": "2a64a95a8778de82fa4dc265d68103e6e22ac401dfa44ebe0d64ce31a3cd1380",
+    "apps/api/src/executor/staff-risk.ts": "e752ffb084abb9a79dc4e96f1e430a842446f6b789667bf3e41938589ad74ae1",
+    "apps/api/src/executor/staff.admin.controller.ts": "8bd31220a37970e6dd9a8aa2cef1259b212f67d7e08a7cb5c09ab08a5576683a",
+    "apps/api/src/feedback/dto/feedback.dto.ts": "e3b1b4622ce7a161584c5f32e5846887f8ee309ab17986197cfbaaefe27c5bd2",
+    "apps/api/src/feedback/feedback.controller.ts": "7f8cf11abb20c131d9577524e5477d39f4cbb38cc16783c368ea26a714701d3d",
+    "apps/api/src/feedback/feedback.module.ts": "ac3edf13c322477f47543411090c677af17f4d6b6efaa515b2e2e593f2aa0f66",
+    "apps/api/src/feedback/feedback.service.spec.ts": "b6a3d2963d5f1fc3d19d376e918a45652b6aef056843adcb002dfaf311991990",
+    "apps/api/src/feedback/feedback.service.ts": "e15470e805bd46b23bd95de271d239b04b825c3f468c63f55f22803bbc48ba6e",
+    "apps/api/src/files/antivirus.service.ts": "9c14165ed9fe2807bdb1245e9fd54b4aeada2feb06f8d54a3b43371e2b434c34",
+    "apps/api/src/files/antivirus.spec.ts": "58e5fa0feeb83f961101adec452d32389f2442dac9a653ad2382aa65d34b5780",
+    "apps/api/src/files/executor-file-access.spec.ts": "7165758e7934f43b6a1f3bf14449eacf50241392537fcb6c1b01fd64c65a47fe",
+    "apps/api/src/files/file-cleanup-storage.spec.ts": "b8381e2526c297a9b4598cb2569d4ca4322aa24d914e4c740014b0b365c55711",
+    "apps/api/src/files/file-cleanup-storage.ts": "2dba5b2a381cc96ddd56dbf66a8f4994ce8b4d289033af2ba62b4e314030e3df",
+    "apps/api/src/files/file-cleanup.service.ts": "1cafa681feda770ec483eade928cfaa5150d28b5a8d436b189cf8bdc448ef360",
+    "apps/api/src/files/file-signature.spec.ts": "6cea662bcf17ef2ed7d9dc2e6324eebc8151d28757a7319f61ed8bafbe96e393",
+    "apps/api/src/files/file-signature.ts": "49db7b5a0d4f31381bd2c6ea6dd53950e7a107551d3faac618b5b7d43b02380c",
+    "apps/api/src/files/files.module.ts": "865da5320fcab77e2de9ad244c2110ad18abee1d08c36cc6deb37af9fc14a6a2",
+    "apps/api/src/files/files.service.ts": "4de2eb14a64e9b85982678ac0720ae79605e154171b1fdf31ad4e7c9715ac6cd",
+    "apps/api/src/files/object-storage.service.ts": "9d44587744de0c27f3c23ed6f6ae7ac403ffb696b74de20562115ed248453ad7",
+    "apps/api/src/files/object-storage.spec.ts": "0b776728562194d509e0555d42528cf048656fb00a2ebd992b438ac30475d2bb",
+    "apps/api/src/finance/bidi-js.d.ts": "3971b794b55114c129e5c4d0bc274e0ab884d9c9d2605cafd4ae07b8b76e94f3",
+    "apps/api/src/finance/customer-finance-overview.service.spec.ts": "ad4f1428a716acfec1486684e29ccd34f5f3c539411daa0df875586d65394a03",
+    "apps/api/src/finance/customer-finance-overview.service.ts": "b570f0c3990647576297d637b5782a0395290ca0f5e10dde8798bc1cdb72526d",
+    "apps/api/src/finance/customer-finance.controller.ts": "5bf2e56f4a1c8408bb56e87c03f4af43e112643f558de2007aad86ca43411ce4",
+    "apps/api/src/finance/dto/finance.dto.ts": "9a01d02d420bc9adb59de7d79f5eaf37f5e6e7aaa6b7c089e3a8cd24e70c939f",
+    "apps/api/src/finance/escrow-balance.spec.ts": "3111d9aa8ccabe3230b892c4267bf0ba1a6ce738135d4fa2322c232f2b26337a",
+    "apps/api/src/finance/escrow.service.ts": "53e431026d1d55b5bcc53e35937cc8e8892530abc76a8882af0cfce3fd577502",
+    "apps/api/src/finance/finance-reconciliation.service.ts": "88b39e82e9da63012e3a1f7ca2eb7732742b4e6bf9361a28505a4748759cec0b",
+    "apps/api/src/finance/finance-reporting.service.ts": "6c5d138dec4ae996df27eaeeae356d710259e5cfedf320ef246325bf9863df60",
+    "apps/api/src/finance/finance.admin.controller.ts": "7fa6585f4237435f9c5542133a0cf508d92427b9facd819f18d6207af8a2dd6a",
+    "apps/api/src/finance/finance.module.ts": "a794a7d20c05888ea6eb18abcc14ba6dd18d14120916812f6a60e537c940c6f9",
+    "apps/api/src/finance/idempotency.service.spec.ts": "28fa972b93eef8d8ba0aa9198f590df815be1c9f92076d06f3e6b0a1bb4cb8fd",
+    "apps/api/src/finance/idempotency.service.ts": "d151a0bfe5fab825872f2f32b32bbdc2d865b8eadd20ca99d6904c8cff3e4aac",
+    "apps/api/src/finance/invoice-pdf.renderer.spec.ts": "6460c9c84dc7be02f61480a376ffebf4b9e140fbcc57b48932979f5b66e1af41",
+    "apps/api/src/finance/invoice-pdf.renderer.ts": "d5eb9e339fdf15121b5ae34e3a941ed86f746c9114693add3d5bf29c036da734",
+    "apps/api/src/finance/invoices.service.spec.ts": "0abb0dd3ea1a5d4703e73ca04f886d78f37f05f842e4ecc8388205f1e5413553",
+    "apps/api/src/finance/invoices.service.ts": "d8cf510ef06d75c31b4b6e7f1d46da67e0ac7c0a5ab449393f9368a16d5730e6",
+    "apps/api/src/finance/ledger.service.spec.ts": "5c562d3de5e8402cb79e9af03210523d67b1b17f826154f5c5aab2bd15298005",
+    "apps/api/src/finance/ledger.service.ts": "edfc644db9355d835558d7de9fd413095fcdde38a7c5748d754af83adce9cba0",
+    "apps/api/src/finance/live-providers.spec.ts": "0d098d0025ea75e1762dbc6c8cfbccae67f8f7af444428fee6b0b508aff5adfa",
+    "apps/api/src/finance/payment-gateway.ts": "078be618453e61ccd295a1b84e7b96e777f86f283d9134520b944dbc2fcfd484",
+    "apps/api/src/finance/payments.service.ts": "0e7715eee002a8605b7ac4477503b8ec175f4314573c3fcfca81eadcbae29524",
+    "apps/api/src/finance/wallet.service.ts": "b5bcfed28fc596f7aa85a2f89b043761ba47b70a97c4b3a8cf9d3f58457bf8f6",
+    "apps/api/src/finance/withdrawals.service.spec.ts": "145779d4c48978f76c89bedbe0322651ac2726d6cc7f3341d80eb93ef96db87d",
+    "apps/api/src/finance/withdrawals.service.ts": "c660daab00d0d484cd6a4e52c59b51ba940269325bab88344e8075d1dd966481",
+    "apps/api/src/finance/zarinpal.gateway.ts": "e06e015c18bcc341b14b610445776576a19576a143cd55035b44212138c04eb6",
+    "apps/api/src/health/health.controller.ts": "da70ff6e25b448094f9db61e0341b8ce8fcddcd9cc70c09ff2b3ea2acdca35b2",
+    "apps/api/src/health/health.module.ts": "b90c42a217b04e3c649fc28f1b65ad5a1107ddf31827f7ef77b6671338172d3c",
+    "apps/api/src/health/health.service.ts": "f02299a9ae1b85eaf118f8182c73369a8b99d89cf5e9b88cfba865417d9238f1",
+    "apps/api/src/health/health.spec.ts": "1e4a23933d14f849aca28acc1b900d76173258a5b8dbbc446129292296090b90",
+    "apps/api/src/health/health.types.ts": "b13605de7f9cdfbb436cb1193ced734a9b984dc060412d3e70440938087f8095",
+    "apps/api/src/jobs/data-cleanup.service.spec.ts": "0b3f896b0d663e707a2fdbe15f1ca7d2da82a5db57a73c87a7deb19c3f13d13b",
+    "apps/api/src/jobs/data-cleanup.service.ts": "99631913f2bb2e4d2167f61438892e75270dbd0c0e8ebe24798761d649df053e",
+    "apps/api/src/jobs/job-runner.service.ts": "d9dc396029cfd6682949e7abd89f2e13cb9f32a3177b889c8ff912413f811748",
+    "apps/api/src/jobs/job.types.ts": "02f1a076378a15a14163b69c29383ce36dd14103a0619d79ffba074e2fcd8eb0",
+    "apps/api/src/jobs/jobs.admin.controller.ts": "56af7a27418890a370babbbe0a0166cdf2e5fb20e577827d31d38eae7bf4a5fb",
+    "apps/api/src/jobs/jobs.module.ts": "1a978dd3cbbda9243f287283f9a0c0f95136e0ffdeff9ca2c6501ffc7638325e",
+    "apps/api/src/jobs/jobs.service.ts": "624b618a82f0a84894d7e58c3fafb15b871702ea751b0d43274a79d77e4c7cc3",
+    "apps/api/src/jobs/jobs.spec.ts": "3fc4e29ca6c8848a92aeb2bae3d464294c0aa1297f633262ce8d3ded6203c6f2",
+    "apps/api/src/jobs/outbox-worker.service.ts": "8747d939bf35f8a0f1813d1703fc214408876eb7211a6ad4be17c89d53a0c787",
+    "apps/api/src/notifications/dto/notification-preference.dto.ts": "374658c5a806ec50a90bfa7ee4240fbde387b6b9e2d5e6743e86651b60f0646f",
+    "apps/api/src/notifications/notifications.controller.ts": "c14198f14340cc70806b052c4b703ed88889d257457aeadd49dcf28fd332f209",
+    "apps/api/src/notifications/notifications.module.ts": "c15f14d94bc9d719f022e8f484125bb647d886920872a337ab2a392a36f8a420",
+    "apps/api/src/notifications/notifications.service.ts": "1fad9a57c1a80c86f5c62977d8176a02123742143687e0a1aff148667f42404e",
+    "apps/api/src/notifications/sms.service.ts": "e3245d55ba758e670dc5b2355708364b40cf4c5e18ed35b144018f8f95b1a323",
+    "apps/api/src/observability/metrics-registry.service.ts": "e9b3c316245fcc9e02f7d98c0d29022829b5fec45d23a2f953e7931f3997ebd6",
+    "apps/api/src/observability/observability-alert.service.ts": "c1665b63e24a248bf2b1ceece01a8461330f520836730812fe9fb36747e9b57e",
+    "apps/api/src/observability/observability-token.guard.ts": "f1dc3d80f6d78b436dd431d47bdb86c2fde47da36f03c01dc1c5ccf10aef64db",
+    "apps/api/src/observability/observability.controller.ts": "26162a7efbd194c98146ccd7de86e121257992a58857bb22932897c7279ce40d",
+    "apps/api/src/observability/observability.module.ts": "4146ea34e16febdf3051a4c514f1ff19bc81048c7e77299fddba96036c178425",
+    "apps/api/src/observability/observability.spec.ts": "dddac561bfe2dec28e0e4749ef1d6fb011f4ca30bd096c31b11f4510f725042c",
+    "apps/api/src/observability/redaction.ts": "48f1eea9d652790d5a2504cd75278f90e80b94449c51505d881cf1141d390fd7",
+    "apps/api/src/observability/request-context.service.ts": "3271f1e33bfafdc4e2bfbf4ab9d4fba76f97201b61b81ac9db8a7b0ec1952189",
+    "apps/api/src/observability/request-telemetry.middleware.ts": "3759c0e773d4b3f8e313fda7b518ac43b89034ef91cdea5d583ed1f999c2f12a",
+    "apps/api/src/observability/structured-logger.service.ts": "220364ddcda3a5af65bfca2116544a9f22c487551b41e1b26f5c82a650d75835",
+    "apps/api/src/observability/trace-context.ts": "8603de4410a63041deda2f86aa111043e72bcf489234af954851633a339c2db7",
+    "apps/api/src/orders/domain/order-assignment.service.ts": "c87dc5fa9127cd6e5c3ff42c20a8d5cd7295ce9f0e11bf51b0722a0e95919b1c",
+    "apps/api/src/orders/domain/order-dispute.service.ts": "0efc52e67d2b416eb2a2dd7f3556c8a637eb676f3cc8a4ff1440cfb0433012a4",
+    "apps/api/src/orders/domain/order-messaging.service.ts": "cecb1704e46200493df5ea61b8af73b7686cff030f0e6ec18410e9c287d890f2",
+    "apps/api/src/orders/domain/order-query.service.spec.ts": "4773f7e0d9f93f8010978111043f3b5cd6397d9ef1802d5bbd7abab2cab566a6",
+    "apps/api/src/orders/domain/order-query.service.ts": "0135f011c64d0a6a298fdcbac160c06c80251c8b9068a90e416d803466f42397",
+    "apps/api/src/orders/domain/order-reports.ts": "15b3cf84f72d57ed4e0c80096f270979b908e6cec0cb6aff0d1c6c02a5842822",
+    "apps/api/src/orders/domain/order-workflow.service.ts": "d458f9f5ab95474feafc89df44ded81e002d348d7fc5a28aa86821875da5ca53",
+    "apps/api/src/orders/dto/order.dto.ts": "3836862fbbddb7344551b4d197d2e73660c5ca2d4118cf0a1dc02e4724db93e7",
+    "apps/api/src/orders/order-state-machine.spec.ts": "2cd1d62cfff702f2d8386d562ee6dd8dd1295ed8fd874785f10923892fd50331",
+    "apps/api/src/orders/order-state-machine.ts": "36268072c280d36fb6ef0ab526e4861142bbb87578a92d9015dad89b4fec99d8",
+    "apps/api/src/orders/order-suggestions.controller.ts": "62ed9a1bc6aa6eaaceeab60e551fcd53bf631bd618e32dc7aeccd71b33e326f1",
+    "apps/api/src/orders/order-suggestions.service.ts": "7d48a55dda498befe49d15214babd62ff0c9f443131457042ae2825e660729f3",
+    "apps/api/src/orders/orders.admin.controller.ts": "46d6e3201a6554981a5e0c06b1d5c763376429ece5f79c522f893042689e9715",
+    "apps/api/src/orders/orders.controller.ts": "fd3672236e4f56cb0bddfbfd2b9e9bf70f08a5438fb7f1652b7156ca13cd731b",
+    "apps/api/src/orders/orders.module.ts": "1e898ddb082ca8e2c83d05af4681bc1f9997f126bc80ba57b5b031be3ea15a60",
+    "apps/api/src/orders/orders.service.ts": "16130dd85df5a3fc8cf6dab8662ecbcf47a1592a68f5b9d5e01426ecb10575aa",
+    "apps/api/src/orders/service-form.spec.ts": "8db6086391ba38c187100fb4e687d1a320cd0ef7bbfa3792df2a406d5b9e87aa",
+    "apps/api/src/orders/service-form.ts": "508b9329ddc54311de305d371b69a8103066558886884149c0d3a0a38c6c0422",
+    "apps/api/src/orders/suggestion-metrics.spec.ts": "079e95ea0bb0a82528a92a01d1b8a7da11e64ba57db10c4b7df66faf7c53938b",
+    "apps/api/src/orders/suggestion-metrics.ts": "04fb3c962492345d1fe076324c050976bba8afe1d55a06748b2483a932cecde5",
+    "apps/api/src/organizations/organization-policy.spec.ts": "1d23ced592bdec68e33c5c3538d2752f132e931443ae76c376b62d3782f86c8a",
+    "apps/api/src/organizations/organization-policy.ts": "9db7e7712b1486bbd95764020fa2b236d97266d70113f1973551caea4be64201",
+    "apps/api/src/organizations/organization.dto.ts": "e6a3ce82482b764a12a732a9c89dd78354f75b72dc0fd7413aa472d162de507d",
+    "apps/api/src/organizations/organizations.controller.ts": "bbdd9fcba209c088f3f19f2e10625d6eb6affbd673223a0ba771f5b3b74f99e7",
+    "apps/api/src/organizations/organizations.module.ts": "e17dcf142b053f9422816ed6829ec6c5d0f90e40a1ca8cf50a097121abd17560",
+    "apps/api/src/organizations/organizations.service.ts": "4e4a3ad054338d04a1bfbbf9db384ec6a43dfde1f39faa8c6124198e9f69a971",
+    "apps/api/src/pricing/dto/calculate-price.dto.ts": "b4d8d9e18e4a7c7cd648f3cb273c863d0eb71e01999ecce269211b166b65c3db",
+    "apps/api/src/pricing/pricing-calculation.spec.ts": "9d6a8488d5b1daad29e2376f54869d0170f7de2930f9b44a503e536762965c98",
+    "apps/api/src/pricing/pricing-calculation.ts": "d8576f12c8f97515ebfd53a5a773e9c702da91f85103daffc5791032d9ae6a48",
+    "apps/api/src/pricing/pricing.controller.ts": "3f8247c08aeb1f3625cb04529f57a8894ae7818aa2ddec53586ae6f94b0ce72a",
+    "apps/api/src/pricing/pricing.http.spec.ts": "47bc3f691e56e19e1abf21a49c5c8efce822c676d42479e5af9382cc6d5b3592",
+    "apps/api/src/pricing/pricing.module.ts": "8c6b764af4d61b9303f5a1a4f4363eefc9f8b055907f698d51c959a70c8a86c5",
+    "apps/api/src/pricing/pricing.service.spec.ts": "f98d521145cbc5ebd4363e6666a5158aec5e16e75436e9de11eb68a3a9e3701a",
+    "apps/api/src/pricing/pricing.service.ts": "c3ede71366baf5310b2382108890e5c1e6dca55483d9d82069ae60546dada799",
+    "apps/api/src/prisma/prisma.module.ts": "9223a0889abb0669020e94a9b8c1e68274cdc05533c1f79d84fe516450e94ebd",
+    "apps/api/src/prisma/prisma.service.ts": "32489edc36d11a02236c264aa235399e7cbe3e46ec114b10221bd500cf7ce276",
+    "apps/api/src/qc/dto/qc.dto.ts": "aa599665452bbfd5e37994e2849219ab11dcda4f5708f124f9e8d17ae26459ca",
+    "apps/api/src/qc/qc.controller.ts": "a4c814f8d5ac2cbd81fc842cc069b15476350e6b7801eadbc4fc9745d1e2ce96",
+    "apps/api/src/qc/qc.module.ts": "b29957e3cc1c7e434cebd71caf30164d0fa3cb2c3698fb0a3d2dc864e4cda147",
+    "apps/api/src/qc/qc.service.ts": "a7b761dc702f6ad17994be71f650b582dfebf1d31289198ee3e991d601a1c1b1",
+    "apps/api/src/reporting/bi-metrics.spec.ts": "8842a6825137710a132244291e3172a2a976430adf8ccbc0f4723a3aff384416",
+    "apps/api/src/reporting/bi-metrics.ts": "f9a1adf1a4fd2d22b1c26d9726f52a38e57c59e48c832401472edf750a546b4c",
+    "apps/api/src/reporting/bi.service.ts": "ce2cba178cc0ca1484dff36c33580adc1a1166fb3bdc4da331bd38dfc6ef36a6",
+    "apps/api/src/reporting/dto/report-query.dto.ts": "b4eff2e21dd1cc01825f8e78bc41a1fa853172be4c6495ab84c7e8f8d160c217",
+    "apps/api/src/reporting/reporting-csv.spec.ts": "d92b3736f2730eff7c42ae7963040b7037ee968ebdc7c1f2b6110c55994fd345",
+    "apps/api/src/reporting/reporting-csv.ts": "fdad3e9730369ce983cd3c8cba55a9f20f18c1331f6fe18a4a897d1e5b07c373",
+    "apps/api/src/reporting/reporting-metrics.spec.ts": "7e7bde58c947a9f4229c40fa57b902c27ef61e8cccbf6cbd14f058e17a857688",
+    "apps/api/src/reporting/reporting-metrics.ts": "96289293d50b6a1a6ad09c7b2e32ff5234df2a9f1a4c2e1c4f75489f686aae2c",
+    "apps/api/src/reporting/reporting.controller.ts": "ab8e7ed781e177b456ca7330f50f0413e1e9f7fa40d651ce54f7fda7ce969420",
+    "apps/api/src/reporting/reporting.module.ts": "5e70e38e4f0b6e57cad990b7a5b01eee5ad62ee4f84204b08d2ce284154025aa",
+    "apps/api/src/reporting/reporting.service.ts": "43c78fe02ed00aff82ebb0321b03ffd1b93d41b31c2c9943a0f86f7cf36bd1c7",
+    "apps/api/src/tickets/dto/ticket.dto.ts": "422e3a4bfef6a569396388570c9dc981049a9ef9c88f3ab3bbedf75dfab22806",
+    "apps/api/src/tickets/tickets.controller.ts": "89564be4aac12b142b725e82d5025ba6fe8b8ce007ab7a6c458e9e3ee0299673",
+    "apps/api/src/tickets/tickets.module.ts": "9c829acf47d52310d586567c19f3fc48686291964318a6714e28fbc924e78a8f",
+    "apps/api/src/tickets/tickets.service.spec.ts": "25ea08ba915a66d7165dd4578a2959fc1dba62c8160da6521a77d89fb10ade1c",
+    "apps/api/src/tickets/tickets.service.ts": "a537f779a29f18d8652baa8f6846cfc750b41efdafc9901139da79f092a733dd",
+    "apps/api/src/tickets/tickets.support.controller.ts": "86248b0a6ab39a0ba84cb4552c900b134d3d81cde3e46f9e24a7c97f535a90d8",
+    "apps/api/src/users/dto/user.dto.ts": "d95b79b068e85674af3d799e7598eb0ddb48be5754d4d7a7e3fbf5f57b77dab4",
+    "apps/api/src/users/settings.controller.ts": "99a5ee793920e3f5a16d3df7f473878b231d2ab7ee66356c41335276d493996e",
+    "apps/api/src/users/settings.service.ts": "61f40c7ae8f0e70c7b17fadc1dd6a65ef516985f7dd02de8280cca5fbedf1f11",
+    "apps/api/src/users/users.admin.controller.ts": "28a845db462f6194b40b2422565d101880e8e2ec2fe7a9ff2c571ab97477c60d",
+    "apps/api/src/users/users.module.ts": "377ad73915386cf938122377fc98104b2d8bc351eef554376a8b149fa64d872c",
+    "apps/api/src/users/users.service.ts": "e0f3de0032219030eec1f5efec7542394eb9be6a1cfffac4453ef91b6c5cbb73",
+    "apps/web/src/app/(admin)/admin/admins/page.tsx": "c65ee42850719ec80c3199fd725414675c2d2c697c446a7e63e66012676fd5ca",
+    "apps/web/src/app/(admin)/admin/ai-controls/page.tsx": "d9f7a8fb17a4640feda4c4bd6d87ef25f8ac91e685d8a53655121783d9b850f2",
+    "apps/web/src/app/(admin)/admin/audit/page.tsx": "5834a01b6ad0f5bf7510a40c7145a317d2daa8e5fbba6df131da3354904f8562",
+    "apps/web/src/app/(admin)/admin/feedback/page.tsx": "660b0d324f4fe8f7d9f37d5cf5e43c001c78ee99b9d910fe2c32fe36cd159d41",
+    "apps/web/src/app/(admin)/admin/finance/escrow/page.tsx": "c7f021ffcb055649c894dfebb10516381e8053e01cdec82fbdd42ebbf2eacabb",
+    "apps/web/src/app/(admin)/admin/finance/invoices/page.tsx": "42fcce0b0dfb8fff6aefd90f91cb055ad941fdc08adfe00dca81775d66c0378e",
+    "apps/web/src/app/(admin)/admin/finance/ledger/page.tsx": "233b915bd06b26115bfe54d2a3bfb4ece1b437168ea385824c2c0bd7a059ebc9",
+    "apps/web/src/app/(admin)/admin/finance/page.tsx": "8617c1419b6d94fcbfe84f7f7cec0598f8d453f82d7d4c9b1dc1729b461f079a",
+    "apps/web/src/app/(admin)/admin/finance/payments/page.tsx": "e3914683de8886cf9611e90922f1d9389283ecb264944873805b3db294209b35",
+    "apps/web/src/app/(admin)/admin/finance/refunds/page.tsx": "ca821940c661e7230d3ebae1f8a3a237d8c179465a0a82fa899db4f7e6b44da1",
+    "apps/web/src/app/(admin)/admin/finance/withdrawals/page.tsx": "54eccb3573c7eb0216dd4d94a0ac6d6568cd2d3e1a5cfd055fed0ca3ef5d395c",
+    "apps/web/src/app/(admin)/admin/orders/[id]/page.tsx": "76502352f15d65448903c2831d86377029716a257f87403b8b1aa4c9dca89355",
+    "apps/web/src/app/(admin)/admin/orders/page.tsx": "f703c7f2eac029f5595f405abb4b38ec4b0f28cb80f09645233531322dabaa12",
+    "apps/web/src/app/(admin)/admin/organizations/page.tsx": "e7d6c1b08724ab0aca8c43cdbd86014ebebfd02185a599e51743287164f66e6c",
+    "apps/web/src/app/(admin)/admin/page.tsx": "f5c757221419b60c631541336b83ffb342b4553ed1c1863227375513b3d87b58",
+    "apps/web/src/app/(admin)/admin/qc/[id]/page.tsx": "00996bc538469f022275ec060fcf58fe532b807d5fcfb042c45cab997d30757b",
+    "apps/web/src/app/(admin)/admin/qc/page.tsx": "f775a0d33e581864a97bf62c4e639827a88695276d763ec44f59bd5b2134d2b6",
+    "apps/web/src/app/(admin)/admin/reports/bi/page.tsx": "c818a295386f7c26d1a2b1488793bcf1236792bde493472e0587798dc55f662b",
+    "apps/web/src/app/(admin)/admin/reports/finance/page.tsx": "4f49d60dd7c532153e8956f20ed091b4ccb93b2ea2e6c6060e44ff885becc583",
+    "apps/web/src/app/(admin)/admin/reports/operations/page.tsx": "f73efea0024297316ad5b2e0631db83f03f424cd5da44fd0deff88d17ac3898c",
+    "apps/web/src/app/(admin)/admin/security/page.tsx": "d4e151391f7775042a1bfdc75f6f3a3b8204e089c407819c824fadef11da728e",
+    "apps/web/src/app/(admin)/admin/services/page.tsx": "bd98f4c0b2072f994b3793afdd6d1b1ef9554e8b94dfa3f6b38f5d4a87089334",
+    "apps/web/src/app/(admin)/admin/settings/page.tsx": "c2b29c562c795d4d9ee1ddc730b3407a2087510b0cfcc318664c4a77c3bfddfd",
+    "apps/web/src/app/(admin)/admin/staff/[id]/onboarding/page.tsx": "f08f01d0c549d4da8eb7fe128abb30a33b5080c47e693ab3cb629c6398f0a7f9",
+    "apps/web/src/app/(admin)/admin/staff/[id]/page.tsx": "85c78d5cee8f1e6f77a1ac5dbf1be443304202a367d8a3f5e53198a7fb12bf55",
+    "apps/web/src/app/(admin)/admin/staff/page.tsx": "678ed8568a8d9de855d47b29aafce67f297b2217fafda1ad83cb0bc2eff396a7",
+    "apps/web/src/app/(admin)/admin/users/page.tsx": "17a57110c6cef1b65688c9f7878d3a40c853569a9ef6c59fea7214f22c4b664f",
+    "apps/web/src/app/(admin)/layout.tsx": "2b8dbde15ae6e553f13fe6ad17feba76d2eb420a054488402537d7cb77a605ec",
+    "apps/web/src/app/(customer)/dashboard/page.tsx": "a199f37139b5f746d8e90f4564c6efeaeeed3b55f4480ac709a64f028832eabf",
+    "apps/web/src/app/(customer)/layout.tsx": "2ec0716dd67c6036aaa0df4089f0f36b8d0a822efc4d4f5d99b33bcda9c8dc5c",
+    "apps/web/src/app/(customer)/orders/[id]/page.tsx": "1fdcd4f47bb38a7b056c9430d3a31073fea10541f8f1b5b35c3586dc26fcf354",
+    "apps/web/src/app/(customer)/orders/new/page.tsx": "62931f983f6dd513828523617f0892300756932dbc8d77fcb7a8843cc1222e18",
+    "apps/web/src/app/(customer)/orders/page.tsx": "172da15509ba3671235a4d726db60000cabf3acea554f5a9385a17de5ff3b484",
+    "apps/web/src/app/(customer)/organizations/[id]/page.tsx": "441e533158d82393c33e86f12da9a1e45365f3a42292a5071b32933d0c1837ac",
+    "apps/web/src/app/(customer)/organizations/page.tsx": "88e1c8b25039cf2167ed696ff8b5cccb858ca5cb3e94a5cc6e9647d1310aedb8",
+    "apps/web/src/app/(customer)/tickets/[id]/page.tsx": "f58bafa2e2f8bf83642e0cc73f0598e659e7ea0c66387509dbad54202a360a31",
+    "apps/web/src/app/(customer)/tickets/new/page.tsx": "e8322610ae2c8c362eb9623781ef4d2d2fc41da949f7d6dff1c4c0f2ffebd206",
+    "apps/web/src/app/(customer)/tickets/page.tsx": "4a46f16f38a6e1630c0d276939a1706a4e6f3ebf55da3f2f0acf60168374e653",
+    "apps/web/src/app/(customer)/wallet/page.tsx": "f803d434474049ad437ccee184a063e7b5ca5312ef36d1d2d57e6567f44b14a1",
+    "apps/web/src/app/(executor)/executor/orders/[id]/page.tsx": "694bf29e96a3eae32acfb1613de596148b077347ccdd696119dc54dcc5a5b8b6",
+    "apps/web/src/app/(executor)/executor/orders/page.tsx": "0c44a2e7cd5ff79baec4fcf3f0e2b4e0585e7c05d01f1cf687762286bb87630a",
+    "apps/web/src/app/(executor)/executor/page.tsx": "977e89f85c85243762dcfdabd89f39ba549cdc045648f56bb8213cf00ab92d54",
+    "apps/web/src/app/(executor)/executor/performance/page.tsx": "d929c53825e88dba317ebdb07577a2f5a080a4f7fbaaf49f4f0e0caa248f035f",
+    "apps/web/src/app/(executor)/layout.tsx": "86dd7588b9baeb1a2dd826929b513b53475a680ef7575e7d29d8dc4ef8370a45",
+    "apps/web/src/app/(support)/layout.tsx": "3cf842d3b563dcf4bafdc510550d2bb21f7532f2b352d2b338001add9435ff98",
+    "apps/web/src/app/(support)/support/page.tsx": "c650e4cb79319d604184b3d58868277bb0d9191fc5d80d55b5d6c5e37f3fc64a",
+    "apps/web/src/app/(support)/support/performance/page.tsx": "4829c9d97a039906fab566c74010bcf0ae743e9be5132876d53e637541f57ac2",
+    "apps/web/src/app/(support)/support/tickets/[id]/page.tsx": "19deadabdc61d7f0ab725df466a743b004821839f1cb0bea49e923a3cf0d3530",
+    "apps/web/src/app/(support)/support/tickets/page.tsx": "ec6940194ac6ca38485e2f50dd87aefd163806e21d29a1d18cf26d0532a7f401",
+    "apps/web/src/app/account/profile/page.tsx": "f4a055ee2a5ac215d5cc3b930a42510e2c7295145c206e6435de30702b98394a",
+    "apps/web/src/app/account/security/page.tsx": "504eba6ac20c706290617a9838cce98b05946ee05fd75a1a31cda6bcf6859622",
+    "apps/web/src/app/api/backend/[...path]/route.ts": "f1314038d8a03f47f7fb09af59e1403168df273df987f3854447b8ca150ba7c3",
+    "apps/web/src/app/api/development/demo-accounts/route.ts": "ba2656bcda19127908b296f726559d3aa9ca84aba05111399825f6fd806db43c",
+    "apps/web/src/app/error.tsx": "38ef56baddcd6966e4754baad8b697e67ba1e91d208027b8d79dbec7bb91fddc",
+    "apps/web/src/app/forgot-password/layout.tsx": "60f272c12e0331ce98ebbce9ca6518ec2589807c764d3c18c941d3f049fdabcd",
+    "apps/web/src/app/forgot-password/page.tsx": "efdb33502ab8fa0dd7e50e0e7d793057691345e5d25e4e80191f62654bcb7522",
+    "apps/web/src/app/global-error.tsx": "4cc1c3b7b8cf4cd1677ba862002cb258d9dcc154c903e20a274a4b9f212df282",
+    "apps/web/src/app/globals.css": "7d68c518936f6e9e9f2e080e02223ab20cd1490547a7e2c73a719f58d47f6db3",
+    "apps/web/src/app/layout.tsx": "ded0996530be1324c8d84f52bf94da00c765573d0212052a3df6636cb6017b95",
+    "apps/web/src/app/login/layout.tsx": "77fb1dc496437baef60b9bf57071b3af85de4f30bc707fb5f2a9d7779e7ef0e4",
+    "apps/web/src/app/login/page.tsx": "21e5db6959de03b9e485b9cee7761c2627fb91b80273ca6349c89574fe2bfe7a",
+    "apps/web/src/app/not-found.tsx": "d10c4b88d64298c974033c6e56423fedba9d2bc5c0f1ad12ba6131d91d80851c",
+    "apps/web/src/app/page.tsx": "0cc2d2de1c4f7d08ffbd603b65f3ef9b9d7df82d3d690c21097888a9f2366f27",
+    "apps/web/src/app/premium.css": "0a8799edc2be82cffcf79bd297b30b1dd9b8b61605de63dedab6165b81e30970",
+    "apps/web/src/app/register/layout.tsx": "7e847cad273ee0854a81879056616cf1a966f3621689cc3d1215cb08d32e2c88",
+    "apps/web/src/app/register/page.tsx": "5a52be0da3721c4f79038da974f6bfd5644bbb7c40a63be95656218587c8527b",
+    "apps/web/src/app/robots.ts": "a3c5516b239e7bc1111bb84207255ee7a4761ccd90e8cc2955845c5bb4f89902",
+    "apps/web/src/app/services/[slug]/page.tsx": "5cf0e6b727c997ac24171856af71f4eb4cbadfd73d191c760170defa24776349",
+    "apps/web/src/app/services/page.tsx": "197dbe31bc8efc07e0b16c781adfc42ceec95cfde9a282f628e35540a9bc56f4",
+    "apps/web/src/app/sitemap.ts": "2fcd49bb0753eacc121f4dfa25e88549c8ea103480cdc713fcec55303215aa04",
+    "apps/web/src/app/status/layout.tsx": "ebd349ce9e48f8d2479b05e503646aa87fe0ece94b89837d80c77321bb244da6",
+    "apps/web/src/app/status/page.tsx": "1e28810020d2fecf9e284f564cd902d65c3563ce74a295370e5bbd179fb0a02c",
+    "apps/web/src/components/app-shell.tsx": "2e5490c5c7ada1690ee3f853660c97efe7b383b289ba9ed5785b4c9fbb93c014",
+    "apps/web/src/components/brand-mark.module.css": "3ec94b9ffcee248a40338d5bedf042bc44c718b77a38d0b98f594566c3d7013c",
+    "apps/web/src/components/confirmation-modal.tsx": "4491a3317771503a57c363e098a20601afa80aa63040a9f273eebf76c222cd3c",
+    "apps/web/src/components/geometric-section-divider.tsx": "6b53efc213dfeb0cacea0f3408200d4880c7a68c42d46276e4bdc9acc3999529",
+    "apps/web/src/components/guest-only.tsx": "522855feae85a111dc66d5e422bc105d2a764e59e6cca2939fa6714f6629bba2",
+    "apps/web/src/components/list-controls.tsx": "7bc449e0f03e92b02a371571bd38a962cb9c244ad108cf7c1ab84ba3780d97e3",
+    "apps/web/src/components/managed-service-flow.tsx": "31c1e4ac2a4651130867467c64df72de36f673d285cf84e659cd51516f3d7e69",
+    "apps/web/src/components/mobile-drawer.tsx": "bfb6b734f86d8f26adc600374a10560c7ae093eac2d79d8fd3b138633c65e40b",
+    "apps/web/src/components/network-status.tsx": "3f3cf74edcceafb3311f47b62ef800186b44afd853fc8550de9940720ebdfe79",
+    "apps/web/src/components/notification-center.tsx": "0bd023246569166ee62827e62f73f8f02c3f770ee1d59d51a0d146ab33e623fa",
+    "apps/web/src/components/orbit-customer-surface.module.css": "13016efb522f1a7126e8604cd832b1b3106df833b65ecf612318d93ae8def7ae",
+    "apps/web/src/components/orbit-customer-surface.tsx": "eb352ea368c05f1253d9f8e2bfc6a63a11e8382b4f57a3bfe8af1e6378448eba",
+    "apps/web/src/components/orbit-finance-surface.tsx": "d3c4e11dc74e5d88fdeebde2e600542ec6251ea921dabe3d3f70efebf12d5774",
+    "apps/web/src/components/orbit-governance-surface.module.css": "3a8625b0a5acd29ae2ed50263664eb76c69b48bc199dbe9be9c4022695c1efde",
+    "apps/web/src/components/orbit-governance-surface.tsx": "2ace202c14ff94f451a216ab2440c1d993ced8a5abc54ae49a7dc69c2f693fab",
+    "apps/web/src/components/orbit-hero.module.css": "dc1fa052ca4cb6483a04d0759a3d9594b40fc9587de0b407d902a8d270b607c9",
+    "apps/web/src/components/orbit-hero.tsx": "0bfcb71aee290274341f0f60d31b7cc50c3bf1cde4d83297fc2ada33469b865d",
+    "apps/web/src/components/orbit-journey.tsx": "eb522fdcffce156d70dd7aa4c59fc71e5c01158f5fe3964295f7cb25bc42c83f",
+    "apps/web/src/components/orbit-motion.tsx": "e0a4c234cdc7c224bd231c2666e79aa5066ba9d1410629566d001b7eb59e71ac",
+    "apps/web/src/components/orbit-ops-surface.module.css": "cb55a2cab02649f4f6027353d87f92c886e3ed554406b383b87481e90639e0b5",
+    "apps/web/src/components/orbit-ops-surface.tsx": "93c0de0689323257b7a4a74138309a79b5ce3331508d7380b2eb5168839a2d16",
+    "apps/web/src/components/orbit-public-nav.module.css": "de70d46ed9db26a1d0e19340a88dc6d04760b1a2754f21255ad7c7092e066875",
+    "apps/web/src/components/orbit-public-surface.module.css": "f6e3ce988ef5527694a5dc71ce5a2b60142b088edcadb1c7131a7a989b9de096",
+    "apps/web/src/components/orbit-public-surface.tsx": "a64fc16fc0a7eef51a5ac618ae017e5557cbcd24d2c59e80a61392d9f628bb0a",
+    "apps/web/src/components/orbit-section.tsx": "5968dd076f714250cbf46d8c0fefe842621b5efb9de50756fb34765a9ac639ce",
+    "apps/web/src/components/orbit-sections.module.css": "4c17ebb0d85a159fe93580edbfd2ba8288a35617b825ca97e61996b6ab719876",
+    "apps/web/src/components/orbit-service-explorer.module.css": "77939a26106f33bd249bd2304cc01e70a2a1e0a3324de1d4438bb0f0265ce29e",
+    "apps/web/src/components/orbit-service-explorer.tsx": "293605417bf082caea51e6529f0a81d53d20935a6c21b8d403e82e2a3faedda8",
+    "apps/web/src/components/orbit-staff-surface.module.css": "521b8e3b3c24f000d875226df0886e1473135b9906bb8a6d92c2ede916c4751f",
+    "apps/web/src/components/orbit-staff-surface.tsx": "da93a820aadd79bb7aae337c1025b75b8a1e9cd6961dec720e867745bc1560cb",
+    "apps/web/src/components/order-suggestions.tsx": "616fb9c2ddf87d6561548fdfb3a372175bc2a475c275196b790519b55140eeba",
+    "apps/web/src/components/order-timeline.tsx": "3cfff217caaa35864484640b210335671be51036408f5fd0ac993c89c697435d",
+    "apps/web/src/components/organization-workspace.tsx": "6fc66c3511b86d19a96d87187a9b855f491281313248b389339435e9eaaf9c19",
+    "apps/web/src/components/password-input.tsx": "44fbb7020a8bbca80f24e192c88772eb83074370962ab9eb227b355caa6d7014",
+    "apps/web/src/components/price-estimate-contract.ts": "42ef915c1ef2576ab4061330f260eef6c69b5f7add17acb41176ceb784398b5b",
+    "apps/web/src/components/price-estimate.tsx": "047fb1b33515946c2078ff8d1213a365e5672393f2601e843d0f711458e4353e",
+    "apps/web/src/components/public-faq-cta.tsx": "015c0c1ee508216b2bf296ce668fc422d01400a10737d008fea0901e6be9567b",
+    "apps/web/src/components/public-nav.tsx": "090bf6217ca584e1af2fd1de01b422306175d6abd67de95f243f96f86ada3d35",
+    "apps/web/src/components/public-structured-data.tsx": "8149a89d6a9ed1edda026a1d7fed4d9b559810c1027554ad3fac5dc0c6b817bd",
+    "apps/web/src/components/require-role.tsx": "8d740cbec3a17b26510a5b0247323ce420bf9efd50c5749e16707a1b2baf84a5",
+    "apps/web/src/components/route-transition.tsx": "a7a93794fe0ddabd0c4286848d775f4785d6f2988755e58538db2f6ec1b192aa",
+    "apps/web/src/components/secure-file.tsx": "4597b9027a6a4784b33d94763b9fb9d5999dac9390d4503a803d1b7a6019c166",
+    "apps/web/src/components/service-assurance.tsx": "5d77e04f4f70db4688f26616b990f8dbe5044fd0e880c53be7ace4dbbca7de78",
+    "apps/web/src/components/service-catalog.tsx": "958ffed518b5c46085e424dbefe8b8bb8d076b8e8c466d036de4542375285f07",
+    "apps/web/src/components/service-order-cta.tsx": "77eb08b65bfd7128fc94032cb4d415d94d0171ccb5151a2e72a2502800124dd7",
+    "apps/web/src/components/service-output-samples.tsx": "638fb257be43dc5fbc773d4ec04492af4121739691d50d335caf18c9adfba7dc",
+    "apps/web/src/components/service-process-stepper.tsx": "7fe85c276d747cb39c00bcf9ef6ec82d393f1554f6f9c3c4844b42b25cad863a",
+    "apps/web/src/components/service-use-cases.tsx": "09de3ecf1197a96220bccb7790ec0cbafa6b8b76e237ac61c7b101879785f554",
+    "apps/web/src/components/status-badge.tsx": "5e23f6f6e379394411b84250a9e11b69bc6650596e538a308fa842ae0ef191c2",
+    "apps/web/src/components/theme-provider.tsx": "44836d2b350df4e9f2c0af621faeb592fb4f06a62f2e2f1adaaab1c1bce16a30",
+    "apps/web/src/components/theme-switcher.tsx": "fcf9017f78d246d7a92a98fc1c7fd393de20981493df690f82ffe2f36a79afd0",
+    "apps/web/src/components/ui.tsx": "60893014b3da5ed5c6f67f0eaea579535d5a88702c42af7b5aaea2161b943e34",
+    "apps/web/src/lib/api.ts": "d4d7bab596a158c7bed8bb73f0a96b5118a0de54eb27e2b820cd16e4f448a6de",
+    "apps/web/src/lib/auth-context.tsx": "6cb0718d8c2a31239cae451b66e3884babeb4cfc9bf66709093b000de1c5dbe4",
+    "apps/web/src/lib/customer-order-view.ts": "db4957d5c5675a9b2826da507736b56a07adce280d5b4dcc3926f44512bb1f37",
+    "apps/web/src/lib/finance-labels.ts": "61cb533441db6a90bad266385d975fb7153fe858fb4dba558332b4faf86a8208",
+    "apps/web/src/lib/format.ts": "48b7183e163e15f3b827175e581f97e3f26d24d3c1c9d50e33d363322d31e8d9",
+    "apps/web/src/lib/product-copy.ts": "5ce5c5ea8fc1763307337efb2f00cbf4ab1b00c13be0122fe13fad83c1a4ef48",
+    "apps/web/src/lib/role-paths.ts": "4aa24aca05dfceb3f157ad3c3f79941caee844a4d4ddc8f852701a4ad3f4cc3a",
+    "apps/web/src/lib/server-api.ts": "10f8db6b18f4ac55e5bdadf7d7fa002289f35476073a4cc8938dedb3eb04c529",
+    "apps/web/src/lib/site.ts": "4a6ac42e3e72b288f540f3b2fcab490f93a70b97a437e54ea8881c5a2c022bfd",
+    "apps/web/src/lib/themes.ts": "f53005c5784e5351d8ca7a1d038ede51fe94b6841124057d385e86deec672590",
+    "apps/web/src/lib/types.ts": "b6559bbd8a986639eb68bbf3404369a3089e3ff7d7c93ab9925825fd7b1cee1a",
+    "apps/api/node_modules/express/lib/application.js": "93933d053fb70337594e0826536acfe0e9787007e199878dbd357b99f026e5c7",
+    "apps/api/node_modules/@nestjs/platform-express/adapters/express-adapter.js": "5040c8c57689d3c74491661abdd58df71328af9db83d4a8582ed251ec478e58b"
+  },
+  "graphMeaning": "Location-specific lock dependency/optional/peer graph; shortest chain is illustrative, not all paths or exploit proof. Missing optional/platform/peer edges are explicit, not silently resolved.",
+  "graphSummaries": {
+    "api": {
+      "lockedLocations": 874,
+      "edges": 1881,
+      "unresolvedEdges": [
+        {
+          "from": "node_modules/@jest/core",
+          "name": "node-notifier",
+          "requested": "^8.0.1 || ^9.0.0 || ^10.0.0",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/@jest/reporters",
+          "name": "node-notifier",
+          "requested": "^8.0.1 || ^9.0.0 || ^10.0.0",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/@nestjs/cli",
+          "name": "@swc/cli",
+          "requested": "^0.1.62 || ^0.3.0 || ^0.4.0 || ^0.5.0 || ^0.6.0 || ^0.7.0 || ^0.8.0",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/@nestjs/cli",
+          "name": "@swc/core",
+          "requested": "^1.3.62",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/@nestjs/core",
+          "name": "@nestjs/microservices",
+          "requested": "^11.0.0",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/@nestjs/core",
+          "name": "@nestjs/websockets",
+          "requested": "^11.0.0",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/@nestjs/serve-static",
+          "name": "@fastify/static",
+          "requested": "^8.0.4 || ^9.0.0",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/@nestjs/serve-static",
+          "name": "fastify",
+          "requested": "^5.2.1",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/@nestjs/swagger",
+          "name": "@fastify/static",
+          "requested": "^8.0.0 || ^9.0.0 || ^10.0.0",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/@nestjs/testing",
+          "name": "@nestjs/microservices",
+          "requested": "^11.0.0",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/c12",
+          "name": "magicast",
+          "requested": "^0.3.5",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/dedent",
+          "name": "babel-plugin-macros",
+          "requested": "^3.1.0",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/jest",
+          "name": "node-notifier",
+          "requested": "^8.0.1 || ^9.0.0 || ^10.0.0",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/jest-cli",
+          "name": "node-notifier",
+          "requested": "^8.0.1 || ^9.0.0 || ^10.0.0",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/jest-config",
+          "name": "esbuild-register",
+          "requested": ">=3.4.0",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/ts-loader",
+          "name": "loader-utils",
+          "requested": "*",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/ts-node",
+          "name": "@swc/core",
+          "requested": ">=1.2.50",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/ts-node",
+          "name": "@swc/wasm",
+          "requested": ">=1.2.50",
+          "kind": "peerDependencies",
+          "to": null
+        }
+      ],
+      "snapshotAll": {
+        "info": 0,
+        "low": 0,
+        "moderate": 2,
+        "high": 8,
+        "critical": 2,
+        "total": 12
+      },
+      "snapshotProduction": {
+        "info": 0,
+        "low": 0,
+        "moderate": 2,
+        "high": 4,
+        "critical": 1,
+        "total": 7
+      }
+    },
+    "web": {
+      "lockedLocations": 446,
+      "edges": 953,
+      "unresolvedEdges": [
+        {
+          "from": "node_modules/eslint-import-resolver-typescript",
+          "name": "eslint-plugin-import-x",
+          "requested": "*",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/next",
+          "name": "@opentelemetry/api",
+          "requested": "^1.1.0",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/next",
+          "name": "@playwright/test",
+          "requested": "^1.51.1",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/next",
+          "name": "babel-plugin-react-compiler",
+          "requested": "*",
+          "kind": "peerDependencies",
+          "to": null
+        },
+        {
+          "from": "node_modules/next",
+          "name": "sass",
+          "requested": "^1.3.0",
+          "kind": "peerDependencies",
+          "to": null
+        }
+      ],
+      "snapshotAll": {
+        "info": 0,
+        "low": 0,
+        "moderate": 1,
+        "high": 6,
+        "critical": 1,
+        "total": 8
+      },
+      "snapshotProduction": {
+        "info": 0,
+        "low": 0,
+        "moderate": 1,
+        "high": 2,
+        "critical": 1,
+        "total": 4
+      }
+    }
+  },
+  "verifiedPrimaryAdvisories": [
+    {
+      "url": "https://github.com/jshttp/proxy-addr/security/advisories/GHSA-jqcg-44mw-7w3h",
+      "reviewed": "2026-10-25",
+      "patchedVersion": "2.0.8",
+      "condition": "Misconfigured IPv4-mapped IPv6 trust subnet; not proof of this deployment."
+    },
+    {
+      "url": "https://github.com/expressjs/body-parser/security/advisories/GHSA-27r3-jxmh-p828",
+      "reviewed": "2026-10-25",
+      "patchedVersion": "2.4.0 (2.x); 1.20.9 (1.x)",
+      "condition": "Default inflation, compressed frame followed by trailing bytes; parser before routing."
+    },
+    {
+      "url": "https://github.com/expressjs/multer/security/advisories/GHSA-q7qp-rjg7-q26m",
+      "reviewed": "2026-10-25",
+      "patchedVersion": "2.5.0",
+      "condition": "Pending asynchronous fileFilter after teardown; current project callback is synchronous, other multer issues remain open."
+    },
+    {
+      "url": "https://github.com/vercel/next.js/security/advisories/GHSA-vcvr-r3jv-pc5j",
+      "reviewed": "2026-10-25",
+      "patchedVersion": "16.3.6 (this advisory only)",
+      "condition": "Attacker-controlled SVG values to Node next/og ImageResponse; no application call found, other framework issues remain open."
+    }
+  ],
+  "findings": [
+    {
+      "app": "api",
+      "package": "@nestjs/platform-express",
+      "auditPackageSeverity": "high",
+      "productionSeverity": "high",
+      "priority": "P0-parent-propagation",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "Audit parent warning propagates multer; Nest adapter is active. Do not count parent and leaf as two independent CVEs.",
+      "patchPlan": "Resolve adapter-pinned multer without blanket parent upgrade; preserve existing route/auth/finance behavior.",
+      "requiredTests": [
+        "all multer checks",
+        "API suite/build/typecheck and parent compatibility"
+      ],
+      "direct": true,
+      "propagatedVia": ["multer"],
+      "advisories": [],
+      "locations": [
+        {
+          "location": "node_modules/@nestjs/platform-express",
+          "version": "11.1.28",
+          "integrity": "sha512-hU+9Sz4m+onHrR5AmelI59QKmY/Re546bPnygnpqqeQdHDiJpBgjWbL4t6Jr73CBpS60cpyng7WzjgphNB9iwA==",
+          "declaredDev": false,
+          "productionSnapshotLocation": true,
+          "shortestAllChain": ["", "node_modules/@nestjs/platform-express"],
+          "shortestProductionChain": [
+            "",
+            "node_modules/@nestjs/platform-express"
+          ],
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    },
+    {
+      "app": "api",
+      "package": "@nestjs/swagger",
+      "auditPackageSeverity": "moderate",
+      "productionSeverity": "moderate",
+      "priority": "P1-parent-propagation",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "Parent warning propagates nested js-yaml. Docs disabled in production unless ENABLE_SWAGGER=true; current deployments not attested. Generation of trusted OpenAPI differs from parsing attacker YAML.",
+      "patchPlan": "Prefer scoped compatible leaf/parent fix; suggested major upgrade is not automatic authority.",
+      "requiredTests": [
+        "OpenAPI generation, docs gate, schema references",
+        "API suite/build and exact dependency diff"
+      ],
+      "direct": true,
+      "propagatedVia": ["js-yaml"],
+      "advisories": [],
+      "locations": [
+        {
+          "location": "node_modules/@nestjs/swagger",
+          "version": "11.4.7",
+          "integrity": "sha512-QyDYnmfP4IRucgmtQxMqzgRBdWtjFoDp8eFvvgf92+3wdLCL+Q0xOFO1948j/ntW/Wi7qT2dyck6ka8ADzPWQQ==",
+          "declaredDev": false,
+          "productionSnapshotLocation": true,
+          "shortestAllChain": ["", "node_modules/@nestjs/swagger"],
+          "shortestProductionChain": ["", "node_modules/@nestjs/swagger"],
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    },
+    {
+      "app": "api",
+      "package": "baseline-browser-mapping",
+      "auditPackageSeverity": "moderate",
+      "productionSeverity": null,
+      "priority": "P1-toolchain",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "baseline-browser-mapping is reported in tooling/development for this app; malicious config/template/query/source input can still affect build/CI. No attacker-controlled runtime path established, not dismissed as harmless.",
+      "patchPlan": "Trace all incoming versions/owners and maintainer fixes before minimal patch. Keep dev audit separate from production.",
+      "requiredTests": [
+        "untrusted config/template/parser boundaries in isolated process",
+        "lint/typecheck/build/test and lock reproducibility"
+      ],
+      "direct": false,
+      "propagatedVia": [],
+      "advisories": [
+        {
+          "source": 1193686,
+          "name": "baseline-browser-mapping",
+          "dependency": "baseline-browser-mapping",
+          "title": "baseline-browser-mapping process termination on invalid input causes denial of service",
+          "url": "https://github.com/advisories/GHSA-w5vr-8v7q-w6rv",
+          "severity": "moderate",
+          "cwe": ["CWE-705"],
+          "cvss": { "score": 0, "vectorString": null },
+          "range": ">=2.0.0 <2.11.0"
+        }
+      ],
+      "locations": [
+        {
+          "location": "node_modules/baseline-browser-mapping",
+          "version": "2.10.42",
+          "integrity": "sha512-c/jurFrDLyui7o1J86yLkRu4LMsTYcBohveus7/I2Hzdn9KIP2bdJPTue/lR1KH46enoPbD77GKeSYNdyPoD3Q==",
+          "declaredDev": true,
+          "productionSnapshotLocation": false,
+          "shortestAllChain": [
+            "",
+            "node_modules/@nestjs/cli",
+            "node_modules/@nestjs/cli/node_modules/webpack",
+            "node_modules/browserslist",
+            "node_modules/baseline-browser-mapping"
+          ],
+          "shortestProductionChain": null,
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    },
+    {
+      "app": "api",
+      "package": "body-parser",
+      "auditPackageSeverity": "high",
+      "productionSeverity": "high",
+      "priority": "P0-first-scoped-patch",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "Nest registers express.json/urlencoded with defaults before controller guards; compressed-body parser is a plausible pre-auth entry. No crash payload was sent to any server.",
+      "patchPlan": "Pin a compatible fixed 2.x dependency, first candidate 2.4.0 per maintainer; verify dependency metadata/integrity and fresh audit before adoption. No broad Nest upgrade.",
+      "requiredTests": [
+        "compressed JSON/form valid and malformed/trailing data in disposable process",
+        "body limits, unsupported encoding and ordinary JSON",
+        "login/OTP, multipart, rate-limit and financial regression"
+      ],
+      "direct": false,
+      "propagatedVia": [],
+      "advisories": [
+        {
+          "source": 1243074,
+          "name": "body-parser",
+          "dependency": "body-parser",
+          "title": "body-parser vulnerable to Denial of Service via trailing bytes after a compressed request body",
+          "url": "https://github.com/advisories/GHSA-27r3-jxmh-p828",
+          "severity": "high",
+          "cwe": ["CWE-248"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=2.0.0 <2.4.0"
+        }
+      ],
+      "locations": [
+        {
+          "location": "node_modules/body-parser",
+          "version": "2.3.0",
+          "integrity": "sha512-2cGmJupaNgg+QUwVLAucDuWuoMZ6EX9iHDRswZ5lsNYEmwPaRknMPCLZz07yTzVq/83p4o/wzbDZbBrTvGGTIw==",
+          "declaredDev": false,
+          "productionSnapshotLocation": true,
+          "shortestAllChain": [
+            "",
+            "node_modules/@nestjs/platform-express",
+            "node_modules/express",
+            "node_modules/body-parser"
+          ],
+          "shortestProductionChain": [
+            "",
+            "node_modules/@nestjs/platform-express",
+            "node_modules/express",
+            "node_modules/body-parser"
+          ],
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    },
+    {
+      "app": "api",
+      "package": "brace-expansion",
+      "auditPackageSeverity": "high",
+      "productionSeverity": null,
+      "priority": "P1-toolchain",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "brace-expansion is reported in tooling/development for this app; malicious config/template/query/source input can still affect build/CI. No attacker-controlled runtime path established, not dismissed as harmless.",
+      "patchPlan": "Trace all incoming versions/owners and maintainer fixes before minimal patch. Keep dev audit separate from production.",
+      "requiredTests": [
+        "untrusted config/template/parser boundaries in isolated process",
+        "lint/typecheck/build/test and lock reproducibility"
+      ],
+      "direct": false,
+      "propagatedVia": [],
+      "advisories": [
+        {
+          "source": 1130588,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+          "url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-770"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<1.1.17"
+        },
+        {
+          "source": 1130589,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+          "url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-770"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=2.0.0 <2.1.3"
+        },
+        {
+          "source": 1130591,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+          "url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-770"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=4.0.0 <5.0.8"
+        },
+        {
+          "source": 1130734,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+          "url": "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-770"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=4.0.0 <5.0.9"
+        },
+        {
+          "source": 1130736,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+          "url": "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-770"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=2.0.0 <2.1.4"
+        },
+        {
+          "source": 1130737,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+          "url": "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-770"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<1.1.18"
+        },
+        {
+          "source": 1240100,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: Quadratic-time expansion of the `{a},b}` rewrite causes CPU denial of service",
+          "url": "https://github.com/advisories/GHSA-q2hr-2g5m-vwhr",
+          "severity": "moderate",
+          "cwe": ["CWE-400", "CWE-407"],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+          },
+          "range": "<1.1.21"
+        },
+        {
+          "source": 1240101,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: Quadratic-time expansion of the `{a},b}` rewrite causes CPU denial of service",
+          "url": "https://github.com/advisories/GHSA-q2hr-2g5m-vwhr",
+          "severity": "moderate",
+          "cwe": ["CWE-400", "CWE-407"],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+          },
+          "range": ">=2.0.0 <2.1.7"
+        },
+        {
+          "source": 1240103,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: Quadratic-time expansion of the `{a},b}` rewrite causes CPU denial of service",
+          "url": "https://github.com/advisories/GHSA-q2hr-2g5m-vwhr",
+          "severity": "moderate",
+          "cwe": ["CWE-400", "CWE-407"],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+          },
+          "range": ">=4.0.0 <5.0.12"
+        },
+        {
+          "source": 1240104,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via uncontrolled recursion on nested brace groups causing stack exhaustion",
+          "url": "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-674"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<1.1.20"
+        },
+        {
+          "source": 1240105,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via uncontrolled recursion on nested brace groups causing stack exhaustion",
+          "url": "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-674"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=2.0.0 <2.1.6"
+        },
+        {
+          "source": 1240107,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via uncontrolled recursion on nested brace groups causing stack exhaustion",
+          "url": "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-674"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=4.0.0 <5.0.11"
+        },
+        {
+          "source": 1240108,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via uncontrolled recursion in parseCommaParts causing stack exhaustion",
+          "url": "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-674"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<1.1.19"
+        },
+        {
+          "source": 1240109,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via uncontrolled recursion in parseCommaParts causing stack exhaustion",
+          "url": "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-674"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=2.0.0 <2.1.5"
+        },
+        {
+          "source": 1240111,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via uncontrolled recursion in parseCommaParts causing stack exhaustion",
+          "url": "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-674"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=4.0.0 <5.0.10"
+        }
+      ],
+      "locations": [
+        {
+          "location": "node_modules/@jest/reporters/node_modules/brace-expansion",
+          "version": "2.1.2",
+          "integrity": "sha512-w5JZcKgdhDOgOwm8H+KgbosopHMuGcl6qbulwjtz3SM7I7P3yW1eAjzMPLrIE+NQ9vjgANKHWeMHnrT0OXW1oA==",
+          "declaredDev": true,
+          "productionSnapshotLocation": false,
+          "shortestAllChain": [
+            "",
+            "node_modules/jest",
+            "node_modules/@jest/core",
+            "node_modules/@jest/reporters",
+            "node_modules/@jest/reporters/node_modules/glob",
+            "node_modules/@jest/reporters/node_modules/minimatch",
+            "node_modules/@jest/reporters/node_modules/brace-expansion"
+          ],
+          "shortestProductionChain": null,
+          "graphReachabilityIsExploitProof": false
+        },
+        {
+          "location": "node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion",
+          "version": "5.0.7",
+          "integrity": "sha512-7oFy703dxfY3/NLxC1fh2SUCQ0H9rmAY+5EpDVfXjUTTs+HEwR2nYaqLv+GWcTsumwxPfiz6CzCNkwXwBUwqCA==",
+          "declaredDev": true,
+          "productionSnapshotLocation": false,
+          "shortestAllChain": [
+            "",
+            "node_modules/typescript-eslint",
+            "node_modules/@typescript-eslint/typescript-estree",
+            "node_modules/@typescript-eslint/typescript-estree/node_modules/minimatch",
+            "node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion"
+          ],
+          "shortestProductionChain": null,
+          "graphReachabilityIsExploitProof": false
+        },
+        {
+          "location": "node_modules/brace-expansion",
+          "version": "1.1.16",
+          "integrity": "sha512-IDw48K2/2kRkg9LdJxurvq3lV3aBgq0REY89duEqFRthjlPdXHKMj7EnQOXVckxzgisinf3nHfrcE2FufFLXMw==",
+          "declaredDev": true,
+          "productionSnapshotLocation": false,
+          "shortestAllChain": [
+            "",
+            "node_modules/@eslint/eslintrc",
+            "node_modules/minimatch",
+            "node_modules/brace-expansion"
+          ],
+          "shortestProductionChain": null,
+          "graphReachabilityIsExploitProof": false
+        },
+        {
+          "location": "node_modules/glob/node_modules/brace-expansion",
+          "version": "5.0.7",
+          "integrity": "sha512-7oFy703dxfY3/NLxC1fh2SUCQ0H9rmAY+5EpDVfXjUTTs+HEwR2nYaqLv+GWcTsumwxPfiz6CzCNkwXwBUwqCA==",
+          "declaredDev": true,
+          "productionSnapshotLocation": false,
+          "shortestAllChain": [
+            "",
+            "node_modules/@nestjs/cli",
+            "node_modules/glob",
+            "node_modules/glob/node_modules/minimatch",
+            "node_modules/glob/node_modules/brace-expansion"
+          ],
+          "shortestProductionChain": null,
+          "graphReachabilityIsExploitProof": false
+        },
+        {
+          "location": "node_modules/jest-config/node_modules/brace-expansion",
+          "version": "2.1.2",
+          "integrity": "sha512-w5JZcKgdhDOgOwm8H+KgbosopHMuGcl6qbulwjtz3SM7I7P3yW1eAjzMPLrIE+NQ9vjgANKHWeMHnrT0OXW1oA==",
+          "declaredDev": true,
+          "productionSnapshotLocation": false,
+          "shortestAllChain": [
+            "",
+            "node_modules/jest",
+            "node_modules/@jest/core",
+            "node_modules/jest-config",
+            "node_modules/jest-config/node_modules/glob",
+            "node_modules/jest-config/node_modules/minimatch",
+            "node_modules/jest-config/node_modules/brace-expansion"
+          ],
+          "shortestProductionChain": null,
+          "graphReachabilityIsExploitProof": false
+        },
+        {
+          "location": "node_modules/jest-runtime/node_modules/brace-expansion",
+          "version": "2.1.2",
+          "integrity": "sha512-w5JZcKgdhDOgOwm8H+KgbosopHMuGcl6qbulwjtz3SM7I7P3yW1eAjzMPLrIE+NQ9vjgANKHWeMHnrT0OXW1oA==",
+          "declaredDev": true,
+          "productionSnapshotLocation": false,
+          "shortestAllChain": [
+            "",
+            "node_modules/jest",
+            "node_modules/@jest/core",
+            "node_modules/jest-runtime",
+            "node_modules/jest-runtime/node_modules/glob",
+            "node_modules/jest-runtime/node_modules/minimatch",
+            "node_modules/jest-runtime/node_modules/brace-expansion"
+          ],
+          "shortestProductionChain": null,
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    },
+    {
+      "app": "api",
+      "package": "browserslist",
+      "auditPackageSeverity": "high",
+      "productionSeverity": null,
+      "priority": "P1-toolchain",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "browserslist is reported in tooling/development for this app; malicious config/template/query/source input can still affect build/CI. No attacker-controlled runtime path established, not dismissed as harmless.",
+      "patchPlan": "Trace all incoming versions/owners and maintainer fixes before minimal patch. Keep dev audit separate from production.",
+      "requiredTests": [
+        "untrusted config/template/parser boundaries in isolated process",
+        "lint/typecheck/build/test and lock reproducibility"
+      ],
+      "direct": false,
+      "propagatedVia": [],
+      "advisories": [
+        {
+          "source": 1153171,
+          "name": "browserslist",
+          "dependency": "browserslist",
+          "title": "Browserslist: Unbounded memory growth (no cache eviction) via distinct query results, leading to eventual OOM",
+          "url": "https://github.com/advisories/GHSA-c83g-rgw3-j3cx",
+          "severity": "high",
+          "cwe": ["CWE-770"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<=4.28.6"
+        },
+        {
+          "source": 1153172,
+          "name": "browserslist",
+          "dependency": "browserslist",
+          "title": "Browserslist: Uncaught crash / prototype write via untrusted browserslist-stats.json custom stats (normalizeStats)",
+          "url": "https://github.com/advisories/GHSA-73wf-gq98-2v4g",
+          "severity": "high",
+          "cwe": ["CWE-248", "CWE-1321"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<=4.28.6"
+        }
+      ],
+      "locations": [
+        {
+          "location": "node_modules/browserslist",
+          "version": "4.28.5",
+          "integrity": "sha512-Cu2E6QejHWzuDMTkuwgpABFgDfZrXLQq5V13YOACZx4mFAG4IwGTbTfHPMr4WtxlHoXSM8FIuRwYYCz5XiabaQ==",
+          "declaredDev": true,
+          "productionSnapshotLocation": false,
+          "shortestAllChain": [
+            "",
+            "node_modules/@nestjs/cli",
+            "node_modules/@nestjs/cli/node_modules/webpack",
+            "node_modules/browserslist"
+          ],
+          "shortestProductionChain": null,
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    },
+    {
+      "app": "api",
+      "package": "fast-uri",
+      "auditPackageSeverity": "high",
+      "productionSeverity": null,
+      "priority": "P1-toolchain",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "fast-uri is reported in tooling/development for this app; malicious config/template/query/source input can still affect build/CI. No attacker-controlled runtime path established, not dismissed as harmless.",
+      "patchPlan": "Trace all incoming versions/owners and maintainer fixes before minimal patch. Keep dev audit separate from production.",
+      "requiredTests": [
+        "untrusted config/template/parser boundaries in isolated process",
+        "lint/typecheck/build/test and lock reproducibility"
+      ],
+      "direct": false,
+      "propagatedVia": [],
+      "advisories": [
+        {
+          "source": 1124064,
+          "name": "fast-uri",
+          "dependency": "fast-uri",
+          "title": "fast-uri vulnerable to host confusion via literal backslash authority delimiter",
+          "url": "https://github.com/advisories/GHSA-v2hh-gcrm-f6hx",
+          "severity": "high",
+          "cwe": ["CWE-436"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N"
+          },
+          "range": ">=3.0.0 <=3.1.3"
+        },
+        {
+          "source": 1130720,
+          "name": "fast-uri",
+          "dependency": "fast-uri",
+          "title": "fast-uri vulnerable to host confusion via backslash authority introducer",
+          "url": "https://github.com/advisories/GHSA-7p8r-x3mc-p8w7",
+          "severity": "high",
+          "cwe": ["CWE-436"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N"
+          },
+          "range": ">=3.0.0 <3.1.5"
+        },
+        {
+          "source": 1158521,
+          "name": "fast-uri",
+          "dependency": "fast-uri",
+          "title": "fast-uri vulnerable to host confusion via skipped IDN canonicalization on scheme-relative references",
+          "url": "https://github.com/advisories/GHSA-5jgf-p345-68v8",
+          "severity": "high",
+          "cwe": ["CWE-436"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N"
+          },
+          "range": ">=3.1.3 <3.1.6"
+        },
+        {
+          "source": 1158524,
+          "name": "fast-uri",
+          "dependency": "fast-uri",
+          "title": "fast-uri vulnerable to server-side request forgery via malformed IPv6 normalization",
+          "url": "https://github.com/advisories/GHSA-f65p-4m7j-42xc",
+          "severity": "high",
+          "cwe": ["CWE-20", "CWE-918"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N"
+          },
+          "range": ">=3.0.0 <3.1.6"
+        },
+        {
+          "source": 1158527,
+          "name": "fast-uri",
+          "dependency": "fast-uri",
+          "title": "fast-uri vulnerable to server-side request forgery via repeated hostname percent-decoding",
+          "url": "https://github.com/advisories/GHSA-fph4-wmhf-6fwf",
+          "severity": "high",
+          "cwe": ["CWE-174", "CWE-918"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N"
+          },
+          "range": ">=3.1.2 <3.1.6"
+        },
+        {
+          "source": 1158530,
+          "name": "fast-uri",
+          "dependency": "fast-uri",
+          "title": "fast-uri vulnerable to host confusion via percent-encoded scheme normalization",
+          "url": "https://github.com/advisories/GHSA-jqff-g426-hqxp",
+          "severity": "high",
+          "cwe": ["CWE-177"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N"
+          },
+          "range": ">=3.0.0 <3.1.6"
+        },
+        {
+          "source": 1239943,
+          "name": "fast-uri",
+          "dependency": "fast-uri",
+          "title": "fast-uri vulnerable to authority injection via an unvalidated port in serialize",
+          "url": "https://github.com/advisories/GHSA-qw65-cvwx-89v3",
+          "severity": "high",
+          "cwe": ["CWE-116"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N"
+          },
+          "range": ">=3.0.0 <3.1.7"
+        },
+        {
+          "source": 1240091,
+          "name": "fast-uri",
+          "dependency": "fast-uri",
+          "title": "fast-uri vulnerable to inconsistent host case normalization via percent-encoded octets",
+          "url": "https://github.com/advisories/GHSA-hrr3-gc8f-f4qj",
+          "severity": "moderate",
+          "cwe": ["CWE-178"],
+          "cvss": {
+            "score": 4.8,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N"
+          },
+          "range": ">=3.0.0 <3.1.8"
+        },
+        {
+          "source": 1243098,
+          "name": "fast-uri",
+          "dependency": "fast-uri",
+          "title": "fast-uri vulnerable to URI scheme spoofing via percent-encoded scheme decoding",
+          "url": "https://github.com/advisories/GHSA-w74x-v6f9-j3xg",
+          "severity": "moderate",
+          "cwe": ["CWE-172", "CWE-180"],
+          "cvss": {
+            "score": 6.1,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N"
+          },
+          "range": ">=3.0.0 <3.1.9"
+        },
+        {
+          "source": 1243101,
+          "name": "fast-uri",
+          "dependency": "fast-uri",
+          "title": "fast-uri vulnerable to improper path equivalence in relative reference normalization",
+          "url": "https://github.com/advisories/GHSA-xhq7-xmqj-769h",
+          "severity": "low",
+          "cwe": ["CWE-41"],
+          "cvss": {
+            "score": 3.7,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N"
+          },
+          "range": ">=3.0.0 <3.1.9"
+        },
+        {
+          "source": 1243104,
+          "name": "fast-uri",
+          "dependency": "fast-uri",
+          "title": "fast-uri vulnerable to host confusion via unchecked WHATWG host canonicalization",
+          "url": "https://github.com/advisories/GHSA-wjr9-j795-jxcr",
+          "severity": "moderate",
+          "cwe": ["CWE-20", "CWE-436"],
+          "cvss": {
+            "score": 4.8,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N"
+          },
+          "range": ">=3.1.3 <3.1.9"
+        },
+        {
+          "source": 1243107,
+          "name": "fast-uri",
+          "dependency": "fast-uri",
+          "title": "fast-uri vulnerable to scheme injection via an unescaped first-segment colon in suffix references",
+          "url": "https://github.com/advisories/GHSA-333x-w4r6-6crp",
+          "severity": "low",
+          "cwe": ["CWE-41", "CWE-116"],
+          "cvss": {
+            "score": 3.7,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N"
+          },
+          "range": ">=3.0.0 <3.1.9"
+        }
+      ],
+      "locations": [
+        {
+          "location": "node_modules/fast-uri",
+          "version": "3.1.3",
+          "integrity": "sha512-i70LwGWUduXqzicKXWshooq+sWL1K3WUU5rKZNG/0i3a1OSoX3HqhH5WbWwTmqWfor4urUakGPiRQcleRZTwOg==",
+          "declaredDev": true,
+          "productionSnapshotLocation": false,
+          "shortestAllChain": [
+            "",
+            "node_modules/@nestjs/cli",
+            "node_modules/@angular-devkit/core",
+            "node_modules/@angular-devkit/core/node_modules/ajv",
+            "node_modules/fast-uri"
+          ],
+          "shortestProductionChain": null,
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    },
+    {
+      "app": "api",
+      "package": "handlebars",
+      "auditPackageSeverity": "critical",
+      "productionSeverity": null,
+      "priority": "P1-toolchain",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "handlebars is reported in tooling/development for this app; malicious config/template/query/source input can still affect build/CI. No attacker-controlled runtime path established, not dismissed as harmless.",
+      "patchPlan": "Trace all incoming versions/owners and maintainer fixes before minimal patch. Keep dev audit separate from production.",
+      "requiredTests": [
+        "untrusted config/template/parser boundaries in isolated process",
+        "lint/typecheck/build/test and lock reproducibility"
+      ],
+      "direct": false,
+      "propagatedVia": [],
+      "advisories": [
+        {
+          "source": 1241676,
+          "name": "handlebars",
+          "dependency": "handlebars",
+          "title": "Handlebars: JavaScript Injection via Unsafe Inline Embedding of Precompiled Templates",
+          "url": "https://github.com/advisories/GHSA-xw65-4hp5-5hc7",
+          "severity": "moderate",
+          "cwe": ["CWE-116"],
+          "cvss": {
+            "score": 4.7,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:C/C:L/I:L/A:N"
+          },
+          "range": ">=4.0.0 <=4.7.9"
+        },
+        {
+          "source": 1241677,
+          "name": "handlebars",
+          "dependency": "handlebars",
+          "title": "Handlebars: JavaScript Injection via AST Type Confusion in compile (bypass of CVE-2026-33937)",
+          "url": "https://github.com/advisories/GHSA-8r5x-fm3f-whwj",
+          "severity": "critical",
+          "cwe": ["CWE-94", "CWE-843"],
+          "cvss": {
+            "score": 9.8,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+          },
+          "range": ">=4.0.0 <=4.7.9"
+        },
+        {
+          "source": 1242173,
+          "name": "handlebars",
+          "dependency": "handlebars",
+          "title": "Handlebars: JavaScript Injection via Own Property Check Bypass",
+          "url": "https://github.com/advisories/GHSA-p8wg-vrv2-v86f",
+          "severity": "critical",
+          "cwe": ["CWE-184", "CWE-1289"],
+          "cvss": { "score": 0, "vectorString": null },
+          "range": ">=3.0.0 <=4.7.9"
+        }
+      ],
+      "locations": [
+        {
+          "location": "node_modules/handlebars",
+          "version": "4.7.9",
+          "integrity": "sha512-4E71E0rpOaQuJR2A3xDZ+GM1HyWYv1clR58tC8emQNeQe3RH7MAzSbat+V0wG78LQBo6m6bzSG/L4pBuCsgnUQ==",
+          "declaredDev": true,
+          "productionSnapshotLocation": false,
+          "shortestAllChain": [
+            "",
+            "node_modules/ts-jest",
+            "node_modules/handlebars"
+          ],
+          "shortestProductionChain": null,
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    },
+    {
+      "app": "api",
+      "package": "js-yaml",
+      "auditPackageSeverity": "high",
+      "productionSeverity": "moderate",
+      "priority": "P1-documentation-and-tooling",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "Distinct production nested 5.3.0 under Swagger and dev 3.x/4.x copies. Swagger generates trusted schema; no application YAML import endpoint identified. That does not prove every transitive entry unreachable.",
+      "patchPlan": "Resolve each major-line advisory independently; do not override all js-yaml majors to one version.",
+      "requiredTests": [
+        "Swagger JSON/YAML generation/validation",
+        "dev config parsers/build/tests",
+        "nested and hoisted resolution after patch"
+      ],
+      "direct": false,
+      "propagatedVia": [],
+      "advisories": [
+        {
+          "source": 1138114,
+          "name": "js-yaml",
+          "dependency": "js-yaml",
+          "title": "JS-YAML: Quadratic CPU consumption in !!omap resolution (3.x and 4.x) — CVE-2026-59870 fix not backported",
+          "url": "https://github.com/advisories/GHSA-5p4m-2wfm-xmqj",
+          "severity": "high",
+          "cwe": ["CWE-407"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=3.0.0 <3.15.1"
+        },
+        {
+          "source": 1138115,
+          "name": "js-yaml",
+          "dependency": "js-yaml",
+          "title": "JS-YAML: Quadratic CPU consumption in !!omap resolution (3.x and 4.x) — CVE-2026-59870 fix not backported",
+          "url": "https://github.com/advisories/GHSA-5p4m-2wfm-xmqj",
+          "severity": "high",
+          "cwe": ["CWE-407"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=4.0.0 <4.3.1"
+        },
+        {
+          "source": 1193726,
+          "name": "js-yaml",
+          "dependency": "js-yaml",
+          "title": "js-yaml: maxTotalMergeKeys does not limit CPU use for empty merge sources",
+          "url": "https://github.com/advisories/GHSA-2883-xcg3-v3hh",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-407"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=3.0.0 <3.15.2"
+        },
+        {
+          "source": 1193727,
+          "name": "js-yaml",
+          "dependency": "js-yaml",
+          "title": "js-yaml: maxTotalMergeKeys does not limit CPU use for empty merge sources",
+          "url": "https://github.com/advisories/GHSA-2883-xcg3-v3hh",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-407"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=4.0.0 <4.3.2"
+        },
+        {
+          "source": 1239991,
+          "name": "js-yaml",
+          "dependency": "js-yaml",
+          "title": "js-yaml: maxTotalMergeKeys does not limit CPU use for empty merge sources",
+          "url": "https://github.com/advisories/GHSA-r3ph-w7gj-g6xm",
+          "severity": "moderate",
+          "cwe": ["CWE-400", "CWE-407"],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+          },
+          "range": ">=5.0.0 <=5.4.0"
+        }
+      ],
+      "locations": [
+        {
+          "location": "node_modules/@istanbuljs/load-nyc-config/node_modules/js-yaml",
+          "version": "3.15.0",
+          "integrity": "sha512-ttBQIIQPDeLjpPOohtUdXuXUVoA2uIB6fEH9HyJ7234s5mBJ5wTx20njxplLZQgLaOfpmPQA7X2t5AX6tIPbog==",
+          "declaredDev": true,
+          "productionSnapshotLocation": false,
+          "shortestAllChain": [
+            "",
+            "node_modules/ts-jest",
+            "node_modules/@jest/transform",
+            "node_modules/babel-plugin-istanbul",
+            "node_modules/@istanbuljs/load-nyc-config",
+            "node_modules/@istanbuljs/load-nyc-config/node_modules/js-yaml"
+          ],
+          "shortestProductionChain": null,
+          "graphReachabilityIsExploitProof": false
+        },
+        {
+          "location": "node_modules/@nestjs/swagger/node_modules/js-yaml",
+          "version": "5.3.0",
+          "integrity": "sha512-muutsYr+e2+d3rTgUGslq5rxbBlUy3cJ61IsHag2QNDQV+7zXWjkUpmALIajhrlLlrgRUiymj6U3zUr/TMK84Q==",
+          "declaredDev": false,
+          "productionSnapshotLocation": true,
+          "shortestAllChain": [
+            "",
+            "node_modules/@nestjs/swagger",
+            "node_modules/@nestjs/swagger/node_modules/js-yaml"
+          ],
+          "shortestProductionChain": [
+            "",
+            "node_modules/@nestjs/swagger",
+            "node_modules/@nestjs/swagger/node_modules/js-yaml"
+          ],
+          "graphReachabilityIsExploitProof": false
+        },
+        {
+          "location": "node_modules/js-yaml",
+          "version": "4.3.0",
+          "integrity": "sha512-1td788aAnnZ5qs7V2QIRl1owjtYpbKt749Y3xauqQgwIIGF/xXWz1wMTEBx5O3LK3lXLVuqXPdPxj2BoFHaW9Q==",
+          "declaredDev": true,
+          "productionSnapshotLocation": false,
+          "shortestAllChain": [
+            "",
+            "node_modules/@eslint/eslintrc",
+            "node_modules/js-yaml"
+          ],
+          "shortestProductionChain": null,
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    },
+    {
+      "app": "api",
+      "package": "multer",
+      "auditPackageSeverity": "high",
+      "productionSeverity": "high",
+      "priority": "P0-upload-parser",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "Authenticated upload uses FileInterceptor, single file and size limit, synchronous MIME callback, no disk storage configured there. Async-filter-specific advisory is conditional; other parser/abort advisories remain open.",
+      "patchPlan": "Review 2.5.0+ against all snapshot advisories and fresh metadata; Nest pins 2.2.0, so direct-only update can leave a vulnerable nested copy.",
+      "requiredTests": [
+        "multipart field names, abort/resource cleanup, size/MIME",
+        "storage/scan/grant behavior",
+        "authenticated upload and parallel malformed streams in isolated process"
+      ],
+      "direct": true,
+      "propagatedVia": [],
+      "advisories": [
+        {
+          "source": 1193790,
+          "name": "multer",
+          "dependency": "multer",
+          "title": "multer vulnerable to Denial of Service via crafted multipart field names",
+          "url": "https://github.com/advisories/GHSA-wc9g-mqfw-jrwm",
+          "severity": "high",
+          "cwe": ["CWE-248"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<2.3.0"
+        },
+        {
+          "source": 1193791,
+          "name": "multer",
+          "dependency": "multer",
+          "title": "multer vulnerable to Denial of Service via file descriptor leak on aborted uploads",
+          "url": "https://github.com/advisories/GHSA-qfvm-cv95-jqjf",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-459"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "=2.2.0"
+        },
+        {
+          "source": 1193792,
+          "name": "multer",
+          "dependency": "multer",
+          "title": "multer vulnerable to file size limit bypass via async fileFilter race condition",
+          "url": "https://github.com/advisories/GHSA-qvfw-j98x-7q72",
+          "severity": "low",
+          "cwe": ["CWE-362"],
+          "cvss": {
+            "score": 3.7,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N"
+          },
+          "range": "<2.3.0"
+        },
+        {
+          "source": 1193793,
+          "name": "multer",
+          "dependency": "multer",
+          "title": "multer vulnerable to Denial of Service via oversized array index in field names",
+          "url": "https://github.com/advisories/GHSA-535w-7cp7-47q4",
+          "severity": "high",
+          "cwe": ["CWE-400"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<2.3.0"
+        },
+        {
+          "source": 1239935,
+          "name": "multer",
+          "dependency": "multer",
+          "title": "multer vulnerable to Denial of Service via orphaned disk writes on aborted uploads",
+          "url": "https://github.com/advisories/GHSA-3pph-fpjx-jg34",
+          "severity": "moderate",
+          "cwe": ["CWE-400", "CWE-459"],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+          },
+          "range": ">=2.2.0 <2.4.0"
+        },
+        {
+          "source": 1243083,
+          "name": "multer",
+          "dependency": "multer",
+          "title": "multer vulnerable to Denial of Service via a pending asynchronous fileFilter after request teardown",
+          "url": "https://github.com/advisories/GHSA-q7qp-rjg7-q26m",
+          "severity": "high",
+          "cwe": ["CWE-248", "CWE-404"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=2.0.0 <2.5.0"
+        }
+      ],
+      "locations": [
+        {
+          "location": "node_modules/multer",
+          "version": "2.2.0",
+          "integrity": "sha512-6rdyFg2kLrMh9Jee7/BMPuV9lEAd7lLW2YUpF9/YxR7njyoUwwQ0ZPh3TaIY50Sw6vlyD2HW3wGOkTS4P79xrQ==",
+          "declaredDev": false,
+          "productionSnapshotLocation": true,
+          "shortestAllChain": ["", "node_modules/multer"],
+          "shortestProductionChain": ["", "node_modules/multer"],
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    },
+    {
+      "app": "api",
+      "package": "nodemailer",
+      "auditPackageSeverity": "high",
+      "productionSeverity": "high",
+      "priority": "P1-before-live-email",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "SMTP adapter imports library and accepts recipient input; mock is default in source, actual secret/config values were not inspected. Live acceptance deferred, not a package fix. disableFileAccess/disableUrlAccess/timeouts do not prove all parser issues absent.",
+      "patchPlan": "Determine current compatible fixed release from maintainer advisories/metadata; no version selected from fixAvailable alone.",
+      "requiredTests": [
+        "structured recipient/header parsing, timeouts/TLS",
+        "attachments/URL/file disabled",
+        "mock notifications/outbox; no SMTP live calls"
+      ],
+      "direct": true,
+      "propagatedVia": [],
+      "advisories": [
+        {
+          "source": 1239931,
+          "name": "nodemailer",
+          "dependency": "nodemailer",
+          "title": "Nodemailer: Process-global DNS cache reuses TLS `servername` across transports, enabling cross-tenant SMTP credential disclosure",
+          "url": "https://github.com/advisories/GHSA-6vj9-mwq6-2f5v",
+          "severity": "moderate",
+          "cwe": ["CWE-295"],
+          "cvss": {
+            "score": 5.9,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:L/A:N"
+          },
+          "range": ">=5.0.0 <10.0.2"
+        },
+        {
+          "source": 1240033,
+          "name": "nodemailer",
+          "dependency": "nodemailer",
+          "title": "Nodemailer: Nested structured recipient arrays bypass the parser depth limit and cause stack exhaustion DoS",
+          "url": "https://github.com/advisories/GHSA-8vvx-rff5-p5rq",
+          "severity": "moderate",
+          "cwe": ["CWE-674"],
+          "cvss": {
+            "score": 5.9,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<10.0.2"
+        },
+        {
+          "source": 1240113,
+          "name": "nodemailer",
+          "dependency": "nodemailer",
+          "title": "Nodemailer: Quoted local-part can produce malformed envelope recipient through RFC 5322 comment parsing",
+          "url": "https://github.com/advisories/GHSA-g57g-f23g-4646",
+          "severity": "moderate",
+          "cwe": ["CWE-20", "CWE-436"],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N"
+          },
+          "range": ">=9.1.0 <10.0.9"
+        },
+        {
+          "source": 1240114,
+          "name": "nodemailer",
+          "dependency": "nodemailer",
+          "title": "Nodemailer: Quadratic backtracking in the addressparser free-text fallback allows remote denial of service",
+          "url": "https://github.com/advisories/GHSA-v53p-9fqp-m79j",
+          "severity": "high",
+          "cwe": ["CWE-407", "CWE-1333"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<=10.0.5"
+        },
+        {
+          "source": 1241277,
+          "name": "nodemailer",
+          "dependency": "nodemailer",
+          "title": "Nodemailer addressparser: O(n^2) on comment-joined addresses enables a remote DoS (reachable via mailparser)",
+          "url": "https://github.com/advisories/GHSA-prgh-xp8r-p3m5",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-407"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=9.1.0 <=10.0.4"
+        },
+        {
+          "source": 1242826,
+          "name": "nodemailer",
+          "dependency": "nodemailer",
+          "title": "Nodemailer: Quadratic (O(n^2)) DKIM header unfolding lets a large folded header cause remote denial of service during signing",
+          "url": "https://github.com/advisories/GHSA-39m8-27wv-hr27",
+          "severity": "moderate",
+          "cwe": ["CWE-400", "CWE-407"],
+          "cvss": {
+            "score": 6.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=3.0.0 <=10.0.9"
+        },
+        {
+          "source": 1243091,
+          "name": "nodemailer",
+          "dependency": "nodemailer",
+          "title": "Nodemailer: A nested comment ends early in addressparser, releasing the rest of the comment as a recipient",
+          "url": "https://github.com/advisories/GHSA-8c8m-p3m8-cjg8",
+          "severity": "moderate",
+          "cwe": ["CWE-20", "CWE-436"],
+          "cvss": {
+            "score": 6.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:N"
+          },
+          "range": ">=3.0.0 <10.1.4"
+        },
+        {
+          "source": 1243092,
+          "name": "nodemailer",
+          "dependency": "nodemailer",
+          "title": "Nodemailer: A \";\" inside a quoted string or comment ends an address group early in addressparser, turning display text into a recipient",
+          "url": "https://github.com/advisories/GHSA-m943-m63m-w62w",
+          "severity": "moderate",
+          "cwe": ["CWE-20", "CWE-436"],
+          "cvss": {
+            "score": 6.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:N"
+          },
+          "range": ">=3.0.0 <10.1.4"
+        },
+        {
+          "source": 1243093,
+          "name": "nodemailer",
+          "dependency": "nodemailer",
+          "title": "Nodemailer: A \">\" inside a quoted local part ends an angle-addr early in addressparser, delivering to a domain the header does not name",
+          "url": "https://github.com/advisories/GHSA-85x2-q946-cp5h",
+          "severity": "moderate",
+          "cwe": ["CWE-20", "CWE-436"],
+          "cvss": {
+            "score": 6.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:N"
+          },
+          "range": ">=3.0.0 <10.1.4"
+        }
+      ],
+      "locations": [
+        {
+          "location": "node_modules/nodemailer",
+          "version": "10.0.0",
+          "integrity": "sha512-wdv+hXBg0iIPIOf108FaZyTxqjQpCvQeAJt9pHHTooPy/y3vQtI9eiImM9AIVKR3e/0FeMA1oueNfBjFJcaK+Q==",
+          "declaredDev": false,
+          "productionSnapshotLocation": true,
+          "shortestAllChain": ["", "node_modules/nodemailer"],
+          "shortestProductionChain": ["", "node_modules/nodemailer"],
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    },
+    {
+      "app": "api",
+      "package": "proxy-addr",
+      "auditPackageSeverity": "critical",
+      "productionSeverity": "critical",
+      "priority": "P0-conditional-config",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "Installed Express defaults trust proxy=false; no trust-proxy setting found in application sources. Incorrect IPv4-mapped IPv6 trust prefix is a maintainer precondition, not proven deployed configuration. req.ip drives rate limits/Audit.",
+      "patchPlan": "Candidate 2.0.8 per maintainer; keep trust policy unchanged and verify real reverse-proxy topology separately.",
+      "requiredTests": [
+        "untrusted forwarded-for ignored",
+        "plain IPv4 and mapped IPv6 trust cases",
+        "rate-limit/Audit identity and proxy topology"
+      ],
+      "direct": false,
+      "propagatedVia": [],
+      "advisories": [
+        {
+          "source": 1241210,
+          "name": "proxy-addr",
+          "dependency": "proxy-addr",
+          "title": "proxy-addr vulnerable to IP spoofing via IPv4-mapped IPv6 trust subnet",
+          "url": "https://github.com/advisories/GHSA-jqcg-44mw-7w3h",
+          "severity": "critical",
+          "cwe": ["CWE-290", "CWE-348", "CWE-697"],
+          "cvss": {
+            "score": 9.1,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N"
+          },
+          "range": ">=1.1.0 <2.0.8"
+        }
+      ],
+      "locations": [
+        {
+          "location": "node_modules/proxy-addr",
+          "version": "2.0.7",
+          "integrity": "sha512-llQsMLSUDUPT44jdrU/O37qlnifitDP+ZwrmmZcoSKyLKvtZxpyV0n2/bD/N4tBAAZ/gJEdZU7KMraoK1+XYAg==",
+          "declaredDev": false,
+          "productionSnapshotLocation": true,
+          "shortestAllChain": [
+            "",
+            "node_modules/@nestjs/platform-express",
+            "node_modules/express",
+            "node_modules/proxy-addr"
+          ],
+          "shortestProductionChain": [
+            "",
+            "node_modules/@nestjs/platform-express",
+            "node_modules/express",
+            "node_modules/proxy-addr"
+          ],
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    },
+    {
+      "app": "web",
+      "package": "baseline-browser-mapping",
+      "auditPackageSeverity": "moderate",
+      "productionSeverity": "moderate",
+      "priority": "P1-toolchain",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "baseline-browser-mapping is reported in tooling/development for this app; malicious config/template/query/source input can still affect build/CI. No attacker-controlled runtime path established, not dismissed as harmless.",
+      "patchPlan": "Trace all incoming versions/owners and maintainer fixes before minimal patch. Keep dev audit separate from production.",
+      "requiredTests": [
+        "untrusted config/template/parser boundaries in isolated process",
+        "lint/typecheck/build/test and lock reproducibility"
+      ],
+      "direct": false,
+      "propagatedVia": [],
+      "advisories": [
+        {
+          "source": 1193686,
+          "name": "baseline-browser-mapping",
+          "dependency": "baseline-browser-mapping",
+          "title": "baseline-browser-mapping process termination on invalid input causes denial of service",
+          "url": "https://github.com/advisories/GHSA-w5vr-8v7q-w6rv",
+          "severity": "moderate",
+          "cwe": ["CWE-705"],
+          "cvss": { "score": 0, "vectorString": null },
+          "range": ">=2.0.0 <2.11.0"
+        }
+      ],
+      "locations": [
+        {
+          "location": "node_modules/baseline-browser-mapping",
+          "version": "2.10.42",
+          "integrity": "sha512-c/jurFrDLyui7o1J86yLkRu4LMsTYcBohveus7/I2Hzdn9KIP2bdJPTue/lR1KH46enoPbD77GKeSYNdyPoD3Q==",
+          "declaredDev": false,
+          "productionSnapshotLocation": true,
+          "shortestAllChain": [
+            "",
+            "node_modules/next",
+            "node_modules/baseline-browser-mapping"
+          ],
+          "shortestProductionChain": [
+            "",
+            "node_modules/next",
+            "node_modules/baseline-browser-mapping"
+          ],
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    },
+    {
+      "app": "web",
+      "package": "brace-expansion",
+      "auditPackageSeverity": "high",
+      "productionSeverity": null,
+      "priority": "P1-toolchain",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "brace-expansion is reported in tooling/development for this app; malicious config/template/query/source input can still affect build/CI. No attacker-controlled runtime path established, not dismissed as harmless.",
+      "patchPlan": "Trace all incoming versions/owners and maintainer fixes before minimal patch. Keep dev audit separate from production.",
+      "requiredTests": [
+        "untrusted config/template/parser boundaries in isolated process",
+        "lint/typecheck/build/test and lock reproducibility"
+      ],
+      "direct": false,
+      "propagatedVia": [],
+      "advisories": [
+        {
+          "source": 1130588,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+          "url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-770"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<1.1.17"
+        },
+        {
+          "source": 1130591,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+          "url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-770"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=4.0.0 <5.0.8"
+        },
+        {
+          "source": 1130734,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+          "url": "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-770"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=4.0.0 <5.0.9"
+        },
+        {
+          "source": 1130737,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+          "url": "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-770"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<1.1.18"
+        },
+        {
+          "source": 1240100,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: Quadratic-time expansion of the `{a},b}` rewrite causes CPU denial of service",
+          "url": "https://github.com/advisories/GHSA-q2hr-2g5m-vwhr",
+          "severity": "moderate",
+          "cwe": ["CWE-400", "CWE-407"],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+          },
+          "range": "<1.1.21"
+        },
+        {
+          "source": 1240103,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: Quadratic-time expansion of the `{a},b}` rewrite causes CPU denial of service",
+          "url": "https://github.com/advisories/GHSA-q2hr-2g5m-vwhr",
+          "severity": "moderate",
+          "cwe": ["CWE-400", "CWE-407"],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+          },
+          "range": ">=4.0.0 <5.0.12"
+        },
+        {
+          "source": 1240104,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via uncontrolled recursion on nested brace groups causing stack exhaustion",
+          "url": "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-674"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<1.1.20"
+        },
+        {
+          "source": 1240107,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via uncontrolled recursion on nested brace groups causing stack exhaustion",
+          "url": "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-674"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=4.0.0 <5.0.11"
+        },
+        {
+          "source": 1240108,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via uncontrolled recursion in parseCommaParts causing stack exhaustion",
+          "url": "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-674"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<1.1.19"
+        },
+        {
+          "source": 1240111,
+          "name": "brace-expansion",
+          "dependency": "brace-expansion",
+          "title": "brace-expansion: DoS via uncontrolled recursion in parseCommaParts causing stack exhaustion",
+          "url": "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-674"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=4.0.0 <5.0.10"
+        }
+      ],
+      "locations": [
+        {
+          "location": "node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion",
+          "version": "5.0.7",
+          "integrity": "sha512-7oFy703dxfY3/NLxC1fh2SUCQ0H9rmAY+5EpDVfXjUTTs+HEwR2nYaqLv+GWcTsumwxPfiz6CzCNkwXwBUwqCA==",
+          "declaredDev": true,
+          "productionSnapshotLocation": false,
+          "shortestAllChain": [
+            "",
+            "node_modules/eslint-config-next",
+            "node_modules/typescript-eslint",
+            "node_modules/@typescript-eslint/typescript-estree",
+            "node_modules/@typescript-eslint/typescript-estree/node_modules/minimatch",
+            "node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion"
+          ],
+          "shortestProductionChain": null,
+          "graphReachabilityIsExploitProof": false
+        },
+        {
+          "location": "node_modules/brace-expansion",
+          "version": "1.1.16",
+          "integrity": "sha512-IDw48K2/2kRkg9LdJxurvq3lV3aBgq0REY89duEqFRthjlPdXHKMj7EnQOXVckxzgisinf3nHfrcE2FufFLXMw==",
+          "declaredDev": true,
+          "productionSnapshotLocation": false,
+          "shortestAllChain": [
+            "",
+            "node_modules/eslint",
+            "node_modules/minimatch",
+            "node_modules/brace-expansion"
+          ],
+          "shortestProductionChain": null,
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    },
+    {
+      "app": "web",
+      "package": "browserslist",
+      "auditPackageSeverity": "high",
+      "productionSeverity": null,
+      "priority": "P1-toolchain",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "browserslist is reported in tooling/development for this app; malicious config/template/query/source input can still affect build/CI. No attacker-controlled runtime path established, not dismissed as harmless.",
+      "patchPlan": "Trace all incoming versions/owners and maintainer fixes before minimal patch. Keep dev audit separate from production.",
+      "requiredTests": [
+        "untrusted config/template/parser boundaries in isolated process",
+        "lint/typecheck/build/test and lock reproducibility"
+      ],
+      "direct": false,
+      "propagatedVia": [],
+      "advisories": [
+        {
+          "source": 1153171,
+          "name": "browserslist",
+          "dependency": "browserslist",
+          "title": "Browserslist: Unbounded memory growth (no cache eviction) via distinct query results, leading to eventual OOM",
+          "url": "https://github.com/advisories/GHSA-c83g-rgw3-j3cx",
+          "severity": "high",
+          "cwe": ["CWE-770"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<=4.28.6"
+        },
+        {
+          "source": 1153172,
+          "name": "browserslist",
+          "dependency": "browserslist",
+          "title": "Browserslist: Uncaught crash / prototype write via untrusted browserslist-stats.json custom stats (normalizeStats)",
+          "url": "https://github.com/advisories/GHSA-73wf-gq98-2v4g",
+          "severity": "high",
+          "cwe": ["CWE-248", "CWE-1321"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<=4.28.6"
+        }
+      ],
+      "locations": [
+        {
+          "location": "node_modules/browserslist",
+          "version": "4.28.5",
+          "integrity": "sha512-Cu2E6QejHWzuDMTkuwgpABFgDfZrXLQq5V13YOACZx4mFAG4IwGTbTfHPMr4WtxlHoXSM8FIuRwYYCz5XiabaQ==",
+          "declaredDev": true,
+          "productionSnapshotLocation": false,
+          "shortestAllChain": [
+            "",
+            "node_modules/eslint-config-next",
+            "node_modules/eslint-plugin-react-hooks",
+            "node_modules/@babel/core",
+            "node_modules/@babel/helper-compilation-targets",
+            "node_modules/browserslist"
+          ],
+          "shortestProductionChain": null,
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    },
+    {
+      "app": "web",
+      "package": "js-yaml",
+      "auditPackageSeverity": "high",
+      "productionSeverity": null,
+      "priority": "P1-toolchain",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "js-yaml is reported in tooling/development for this app; malicious config/template/query/source input can still affect build/CI. No attacker-controlled runtime path established, not dismissed as harmless.",
+      "patchPlan": "Trace all incoming versions/owners and maintainer fixes before minimal patch. Keep dev audit separate from production.",
+      "requiredTests": [
+        "untrusted config/template/parser boundaries in isolated process",
+        "lint/typecheck/build/test and lock reproducibility"
+      ],
+      "direct": false,
+      "propagatedVia": [],
+      "advisories": [
+        {
+          "source": 1138115,
+          "name": "js-yaml",
+          "dependency": "js-yaml",
+          "title": "JS-YAML: Quadratic CPU consumption in !!omap resolution (3.x and 4.x) — CVE-2026-59870 fix not backported",
+          "url": "https://github.com/advisories/GHSA-5p4m-2wfm-xmqj",
+          "severity": "high",
+          "cwe": ["CWE-407"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=4.0.0 <4.3.1"
+        },
+        {
+          "source": 1193727,
+          "name": "js-yaml",
+          "dependency": "js-yaml",
+          "title": "js-yaml: maxTotalMergeKeys does not limit CPU use for empty merge sources",
+          "url": "https://github.com/advisories/GHSA-2883-xcg3-v3hh",
+          "severity": "high",
+          "cwe": ["CWE-400", "CWE-407"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=4.0.0 <4.3.2"
+        }
+      ],
+      "locations": [
+        {
+          "location": "node_modules/js-yaml",
+          "version": "4.3.0",
+          "integrity": "sha512-1td788aAnnZ5qs7V2QIRl1owjtYpbKt749Y3xauqQgwIIGF/xXWz1wMTEBx5O3LK3lXLVuqXPdPxj2BoFHaW9Q==",
+          "declaredDev": true,
+          "productionSnapshotLocation": false,
+          "shortestAllChain": [
+            "",
+            "node_modules/eslint",
+            "node_modules/@eslint/eslintrc",
+            "node_modules/js-yaml"
+          ],
+          "shortestProductionChain": null,
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    },
+    {
+      "app": "web",
+      "package": "next",
+      "auditPackageSeverity": "critical",
+      "productionSeverity": "critical",
+      "priority": "P0-framework",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "Next 16.3.4; source has ISR service pages and backend proxy. No next/og ImageResponse, use cache/use server or draftMode usage found in source search. Absence of those call sites is not clearance of all eleven framework advisories, built-in routes or dev-server exposure.",
+      "patchPlan": "Review all Next advisories plus matching eslint/env/SWC metadata; 16.3.6 fixes only one listed advisory, not the entire snapshot. No approved target version yet.",
+      "requiredTests": [
+        "SSR/ISR cross-user cache isolation and API proxy/cookies",
+        "image optimizer and dev-only exposure",
+        "login/refresh/roles, Web build/UI/accessibility/performance"
+      ],
+      "direct": true,
+      "propagatedVia": [],
+      "advisories": [
+        {
+          "source": 1240609,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js: Remote Code Execution in next/og ImageResponse",
+          "url": "https://github.com/advisories/GHSA-vcvr-r3jv-pc5j",
+          "severity": "critical",
+          "cwe": ["CWE-1395"],
+          "cvss": { "score": 0, "vectorString": null },
+          "range": ">=16.2.0 <16.3.6"
+        },
+        {
+          "source": 1241489,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js: Pending `use cache` fill can leak Draft Mode content into regular responses and persisted pages",
+          "url": "https://github.com/advisories/GHSA-3w37-wq28-93x7",
+          "severity": "moderate",
+          "cwe": ["CWE-524"],
+          "cvss": {
+            "score": 4.2,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N"
+          },
+          "range": ">=16.3.0 <16.3.8"
+        },
+        {
+          "source": 1241490,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js has cache poisoning of SSG and ISR pages in self-hosted applications",
+          "url": "https://github.com/advisories/GHSA-4jqv-mc3x-m676",
+          "severity": "moderate",
+          "cwe": ["CWE-524"],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+          },
+          "range": ">=16.0.0 <16.3.8"
+        },
+        {
+          "source": 1241492,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js has information disclosure in development server's Model Context Protocol endpoint",
+          "url": "https://github.com/advisories/GHSA-39w2-rjm5-chcv",
+          "severity": "low",
+          "cwe": ["CWE-346"],
+          "cvss": {
+            "score": 5.4,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N"
+          },
+          "range": ">=16.0.0 <16.3.8"
+        },
+        {
+          "source": 1241493,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js has information disclosure in App Router metadata image routes via dynamicParams bypass",
+          "url": "https://github.com/advisories/GHSA-f87g-xv8r-7p7x",
+          "severity": "moderate",
+          "cwe": ["CWE-346"],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N"
+          },
+          "range": ">=16.0.0 <16.3.8"
+        },
+        {
+          "source": 1241495,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js has cache poisoning in SSG/ISR rendering that leads to cross-user content substitution and persistent denial of service",
+          "url": "https://github.com/advisories/GHSA-mcj8-r9mp-w47p",
+          "severity": "moderate",
+          "cwe": ["CWE-524"],
+          "cvss": {
+            "score": 4.8,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:L"
+          },
+          "range": ">=16.0.0 <16.3.8"
+        },
+        {
+          "source": 1241496,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js has Server-Side Request Forgery in Image Optimization",
+          "url": "https://github.com/advisories/GHSA-cjq9-62q9-8jv4",
+          "severity": "high",
+          "cwe": ["CWE-918"],
+          "cvss": {
+            "score": 6.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:N"
+          },
+          "range": ">=16.0.0 <16.3.8"
+        },
+        {
+          "source": 1242816,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js: Unauthenticated Remote Code Execution in Image Optimization API when SVG files are used",
+          "url": "https://github.com/advisories/GHSA-2464-fhr4-w9xw",
+          "severity": "critical",
+          "cwe": ["CWE-1395"],
+          "cvss": { "score": 0, "vectorString": null },
+          "range": ">=16.0.0 <=16.4.0"
+        },
+        {
+          "source": 1242818,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js: Denial of Service in App Router using Server Actions",
+          "url": "https://github.com/advisories/GHSA-p3m5-59mp-jv5r",
+          "severity": "high",
+          "cwe": ["CWE-770"],
+          "cvss": { "score": 0, "vectorString": null },
+          "range": ">=16.0.0 <=16.4.0"
+        },
+        {
+          "source": 1242825,
+          "name": "next",
+          "dependency": "next",
+          "title": "next.js cache leak across root param values in nested 'use cache' functions",
+          "url": "https://github.com/advisories/GHSA-h694-7cp9-m8p3",
+          "severity": "moderate",
+          "cwe": ["CWE-524"],
+          "cvss": { "score": 0, "vectorString": null },
+          "range": ">=16.3.0 <16.3.8"
+        },
+        {
+          "source": 1242859,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js: Unauthenticated Remote Code Execution in `use cache` functions returning typed arrays",
+          "url": "https://github.com/advisories/GHSA-673q-mjm6-r5xr",
+          "severity": "critical",
+          "cwe": ["CWE-502"],
+          "cvss": { "score": 0, "vectorString": null },
+          "range": ">=16.0.0 <=16.4.0"
+        }
+      ],
+      "locations": [
+        {
+          "location": "node_modules/next",
+          "version": "16.3.4",
+          "integrity": "sha512-/Ztf6CeRH+ejEXUrYtqI4gkS66eFIHuSwqi60RgcpWKodxFZx2/dqVCMKBwILfAHXQ+F1b1vAudgj3mnxqtoIA==",
+          "declaredDev": false,
+          "productionSnapshotLocation": true,
+          "shortestAllChain": ["", "node_modules/next"],
+          "shortestProductionChain": ["", "node_modules/next"],
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    },
+    {
+      "app": "web",
+      "package": "sharp",
+      "auditPackageSeverity": "high",
+      "productionSeverity": "high",
+      "priority": "P0-image-decoder",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "Optional Next image dependency is lock-installed. Brand uses next/image and PNG; no user SVG import pipeline found in source search. Built-in image routing/defaults and decoder exposure still need controlled verification.",
+      "patchPlan": "Compatible fixed decoder + platform optional packages and clean isolated build; no patch selected solely from audit suggestion.",
+      "requiredTests": [
+        "valid/invalid PNG/SVG inputs in isolated process",
+        "image optimizer allowlist/size",
+        "logo rendering in both themes and supported platforms"
+      ],
+      "direct": false,
+      "propagatedVia": [],
+      "advisories": [
+        {
+          "source": 1241331,
+          "name": "sharp",
+          "dependency": "sharp",
+          "title": "sharp : Vulnerability in librsvg dependency CVE-2026-96889",
+          "url": "https://github.com/advisories/GHSA-wq5f-xc86-pv6w",
+          "severity": "high",
+          "cwe": ["CWE-416", "CWE-1395"],
+          "cvss": { "score": 0, "vectorString": null },
+          "range": "<0.35.5"
+        }
+      ],
+      "locations": [
+        {
+          "location": "node_modules/sharp",
+          "version": "0.35.4",
+          "integrity": "sha512-n++8XWcj+jCOr2IOl7h8LbKnGBDY4aPbmprMONBNFdn0ImXqpGVv5zliDs0V9HbmbCQLpbuo2ej9rAoOQTvMDA==",
+          "declaredDev": false,
+          "productionSnapshotLocation": true,
+          "shortestAllChain": ["", "node_modules/next", "node_modules/sharp"],
+          "shortestProductionChain": [
+            "",
+            "node_modules/next",
+            "node_modules/sharp"
+          ],
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    },
+    {
+      "app": "web",
+      "package": "source-map-js",
+      "auditPackageSeverity": "high",
+      "productionSeverity": "high",
+      "priority": "P1-runtime-transitive",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "Reported production transitive parser; package presence does not establish attacker-controlled source-map ingestion. Input producers and build/runtime paths still need full trace.",
+      "patchPlan": "Trace Next/PostCSS owner and fixed compatible release before any override.",
+      "requiredTests": [
+        "source-map parser boundary and bounded malformed input",
+        "CSS/build/SSR and bundle regression"
+      ],
+      "direct": false,
+      "propagatedVia": [],
+      "advisories": [
+        {
+          "source": 1241209,
+          "name": "source-map-js",
+          "dependency": "source-map-js",
+          "title": "source-map-js allows event-loop denial of service through indexed source-map section offsets",
+          "url": "https://github.com/advisories/GHSA-68fv-2mgg-jv7q",
+          "severity": "high",
+          "cwe": ["CWE-1284"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=1.0.0 <1.2.2"
+        }
+      ],
+      "locations": [
+        {
+          "location": "node_modules/source-map-js",
+          "version": "1.2.1",
+          "integrity": "sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==",
+          "declaredDev": false,
+          "productionSnapshotLocation": true,
+          "shortestAllChain": [
+            "",
+            "node_modules/next",
+            "node_modules/postcss",
+            "node_modules/source-map-js"
+          ],
+          "shortestProductionChain": [
+            "",
+            "node_modules/next",
+            "node_modules/postcss",
+            "node_modules/source-map-js"
+          ],
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    },
+    {
+      "app": "web",
+      "package": "zod",
+      "auditPackageSeverity": "high",
+      "productionSeverity": null,
+      "priority": "P1-toolchain",
+      "sourceDate": "2026-10-25",
+      "status": "open-not-patched",
+      "runtimeExploitProven": false,
+      "reachabilityAssessment": "zod is reported in tooling/development for this app; malicious config/template/query/source input can still affect build/CI. No attacker-controlled runtime path established, not dismissed as harmless.",
+      "patchPlan": "Trace all incoming versions/owners and maintainer fixes before minimal patch. Keep dev audit separate from production.",
+      "requiredTests": [
+        "untrusted config/template/parser boundaries in isolated process",
+        "lint/typecheck/build/test and lock reproducibility"
+      ],
+      "direct": false,
+      "propagatedVia": [],
+      "advisories": [
+        {
+          "source": 1243066,
+          "name": "zod",
+          "dependency": "zod",
+          "title": "Zod can exhaust memory while validating oversized constrained collections",
+          "url": "https://github.com/advisories/GHSA-mrhx-c7xc-m3w5",
+          "severity": "high",
+          "cwe": ["CWE-770"],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<4.6.6"
+        }
+      ],
+      "locations": [
+        {
+          "location": "node_modules/zod",
+          "version": "4.4.3",
+          "integrity": "sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==",
+          "declaredDev": true,
+          "productionSnapshotLocation": false,
+          "shortestAllChain": [
+            "",
+            "node_modules/eslint-config-next",
+            "node_modules/eslint-plugin-react-hooks",
+            "node_modules/zod"
+          ],
+          "shortestProductionChain": null,
+          "graphReachabilityIsExploitProof": false
+        }
+      ],
+      "owner": "ZEUS-OPS-003/004/005 · Z1"
+    }
+  ],
+  "limitations": [
+    "Fresh audit completed; no install/fix. Target package tarball integrity and reproducible resolution are not yet accepted.",
+    "Four primary advisory texts reviewed; other advisories are fresh registry records, not independently reviewed upstream texts.",
+    "Static source search and lock graph are not full runtime/HTTP/deployment reachability.",
+    "No application/DB/provider/network exploit test, no real credentials or env files read.",
+    "No package/lock/source/guard changes or new exception; all findings remain open."
+  ],
+  "nextProtectedScope": {
+    "requiresOwnerApproval": true,
+    "proposed": "body-parser 2.4.0 and only its strictly necessary compatible dependency resolution. Current qs override 6.16.0 is below the new declared ^6.16.1; do not silently force an incompatible version or broadly update unrelated dependencies.",
+    "upstreamPackageMetadata": {
+      "url": "https://raw.githubusercontent.com/expressjs/body-parser/v2.4.0/package.json",
+      "release": "https://github.com/expressjs/body-parser/releases/tag/v2.4.0",
+      "license": "MIT",
+      "node": ">=18",
+      "changedDeclaredRanges": {
+        "content-type": "^2.0.0 → ^2.1.0",
+        "iconv-lite": "^0.7.2 → ^0.7.3",
+        "qs": "^6.15.2 → ^6.16.1"
+      },
+      "tarballIntegrityVerified": false
+    },
+    "filesToReview": [
+      "apps/api/package.json",
+      "apps/api/package-lock.json",
+      "scripts/orbit-invoice-approval.mjs",
+      "scripts/orbit-preservation-contract.mjs",
+      "new exact dependency approval module/tests if needed"
+    ],
+    "constraints": "No arbitrary upgrade or folder exemption; fixed baseline and invoice/pricing/reconciliation checks retained. Existing dependencies unchanged except individually approved version/integrity/dependency delta; protected runtime/auth/money/schema untouched."
+  }
+}

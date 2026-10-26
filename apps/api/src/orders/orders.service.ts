@@ -15,6 +15,7 @@ import {
   UserRole,
 } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { ConfigService } from '@nestjs/config';
 import { PaymentsService } from '../finance/payments.service';
 import { EscrowService } from '../finance/escrow.service';
 import { IdempotencyService } from '../finance/idempotency.service';
@@ -60,6 +61,7 @@ export class OrdersService {
     private readonly messaging: OrderMessagingService,
     private readonly disputes: OrderDisputeService,
     private readonly queries: OrderQueryService,
+    private readonly config: ConfigService = new ConfigService(),
   ) {}
 
   // ---------------------------------------------------------------------
@@ -1340,37 +1342,93 @@ export class OrdersService {
   // ---------------------------------------------------------------------
 
   async confirm(customerId: string, orderId: string, idempotencyKey: string) {
+    return this.confirmDelivery(customerId, orderId, idempotencyKey, false);
+  }
+
+  async confirmAutomatically(orderId: string, idempotencyKey: string) {
+    return this.confirmDelivery(null, orderId, idempotencyKey, true);
+  }
+
+  private async confirmDelivery(
+    customerId: string | null,
+    orderId: string,
+    idempotencyKey: string,
+    automatic: boolean,
+  ) {
     return this.idempotency.execute({
       key: idempotencyKey,
-      scope: `order.confirm:${orderId}:${customerId}`,
-      request: { orderId, customerId },
+      scope: automatic
+        ? `order.auto-confirm:${orderId}`
+        : `order.confirm:${orderId}:${customerId}`,
+      request: {
+        orderId,
+        customerId,
+        ...(automatic ? { automatic: true } : {}),
+      },
       work: async (tx) => {
         const order = await tx.order.findFirst({
-          where: { id: orderId, customerId },
+          where: { id: orderId, ...(customerId ? { customerId } : {}) },
         });
         if (!order) throw new NotFoundException('سفارش یافت نشد.');
         if (order.status !== OrderStatus.delivered) {
           throw new BadRequestException('سفارش هنوز تحویل داده نشده است.');
         }
+        if (await tx.dispute.count({ where: { orderId, status: 'open' } }))
+          throw new BadRequestException(
+            'سفارش دارای اختلاف باز قابل تأیید و تسویه نیست.',
+          );
+        if (automatic) {
+          const days = Number(this.config.get('AUTO_CONFIRM_DAYS') ?? 7);
+          if (
+            !Number.isSafeInteger(days) ||
+            days < 1 ||
+            !order.deliveredAt ||
+            order.deliveredAt.getTime() > Date.now() - days * 86400000
+          )
+            throw new BadRequestException(
+              'مهلت معتبر تأیید خودکار هنوز نرسیده است.',
+            );
+        }
         await this.transition(
           orderId,
           OrderStatus.confirmed,
-          OrderStatusSource.customer,
-          customerId,
-          'تأیید تحویل توسط مشتری',
+          automatic ? OrderStatusSource.system : OrderStatusSource.customer,
+          automatic ? null : customerId,
+          automatic
+            ? 'تأیید خودکار سیستمی پس از پایان مهلت و بدون اختلاف باز'
+            : 'تأیید تحویل توسط مشتری',
           { confirmedAt: new Date() },
           tx,
         );
-        const settlement = await this.escrow.releaseInTransaction(
-          {
+        const holds = await tx.escrowHold.findMany({
+          where: {
             orderId,
-            decidedByUserId: customerId,
-            decidedByRole: UserRole.customer,
-            note: 'تأیید تحویل توسط مشتری، آزادسازی خودکار حساب امانی',
-            idempotencyKey,
+            status: {
+              in: ['held', 'partially_released', 'partially_refunded'],
+            },
           },
-          tx,
-        );
+          orderBy: { id: 'asc' },
+        });
+        let releasedTotal = 0;
+        for (const hold of holds) {
+          if (hold.amount - hold.releasedAmount - hold.refundedAmount <= 0)
+            continue;
+          const settlement = await this.escrow.releaseInTransaction(
+            {
+              orderId,
+              escrowHoldId: hold.id,
+              decidedByUserId: automatic ? null : customerId,
+              decidedByRole: automatic ? null : UserRole.customer,
+              note: automatic
+                ? 'تأیید سیستمی پس از انقضای مهلت، آزادسازی حساب امانی'
+                : 'تأیید تحویل توسط مشتری، آزادسازی خودکار حساب امانی',
+              idempotencyKey: `${idempotencyKey}:${hold.id}`,
+            },
+            tx,
+          );
+          releasedTotal +=
+            settlement.executorAmount + settlement.commissionAmount;
+        }
         const closed = await this.transition(
           orderId,
           OrderStatus.closed,
@@ -1381,13 +1439,17 @@ export class OrdersService {
           tx,
           {
             type: 'escrow_release',
-            amount: settlement.executorAmount + settlement.commissionAmount,
+            amount: releasedTotal,
           },
         );
         await tx.outboxEvent.create({
           data: {
             eventType: 'order.confirmed_and_settled',
-            payload: { orderId, customerId },
+            payload: {
+              orderId,
+              customerId: order.customerId,
+              ...(automatic ? { automaticallyConfirmed: true } : {}),
+            },
           },
         });
         return closed;
@@ -1551,6 +1613,9 @@ export class OrdersService {
     dto: ResolveDisputeDto,
     idempotencyKey: string,
   ) {
+    dto = { ...dto, note: dto.note?.trim() };
+    if (!dto.note)
+      throw new BadRequestException('علت واقعی حل اختلاف الزامی است.');
     return this.idempotency.execute({
       key: idempotencyKey,
       scope: `order.resolve-dispute:${orderId}`,
@@ -1586,7 +1651,7 @@ export class OrdersService {
             );
             break;
           case 'refund_full': {
-            const refund = await this.escrow.refundInTransaction(
+            const refund = await this.escrow.refundAllInTransaction(
               {
                 orderId,
                 reason: 'dispute_refund_full',
@@ -1596,7 +1661,7 @@ export class OrdersService {
               },
               tx,
             );
-            financialAmount = refund.refund.amount;
+            financialAmount = refund.amount;
             resultOrder = await this.transition(
               orderId,
               OrderStatus.cancelled,
@@ -1615,7 +1680,7 @@ export class OrdersService {
               throw new BadRequestException(
                 'برای بازپرداخت جزئی مبلغ الزامی است.',
               );
-            const refund = await this.escrow.refundInTransaction(
+            const refund = await this.escrow.refundAllInTransaction(
               {
                 orderId,
                 amount: dto.amount,
@@ -1626,7 +1691,7 @@ export class OrdersService {
               },
               tx,
             );
-            financialAmount = refund.refund.amount;
+            financialAmount = refund.amount;
             resultOrder = await this.transition(
               orderId,
               OrderStatus.closed,
@@ -1641,9 +1706,10 @@ export class OrdersService {
             break;
           }
           case 'release_to_executor': {
-            const release = await this.escrow.releaseInTransaction(
+            const release = await this.escrow.releaseAllInTransaction(
               {
                 orderId,
+                allowDisputeResolution: true,
                 decidedByUserId: adminId,
                 note: dto.note,
                 idempotencyKey,
@@ -1735,6 +1801,8 @@ export class OrdersService {
     reason: string,
     idempotencyKey: string,
   ) {
+    reason = reason?.trim();
+    if (!reason) throw new BadRequestException('علت واقعی لغو الزامی است.');
     return this.idempotency.execute({
       key: idempotencyKey,
       scope: `order.cancel:${orderId}`,
@@ -1754,7 +1822,7 @@ export class OrdersService {
           OrderStatus.in_progress,
         ];
         if (financialStatuses.includes(order.status)) {
-          const escrow = await tx.escrowHold.findFirst({
+          const escrows = await tx.escrowHold.findMany({
             where: {
               orderId,
               status: {
@@ -1763,9 +1831,19 @@ export class OrdersService {
             },
             orderBy: { heldAt: 'desc' },
           });
-          if (escrow) {
-            const remaining =
-              escrow.amount - escrow.releasedAmount - escrow.refundedAmount;
+          if (escrows.length) {
+            const remaining = escrows.reduce(
+              (sum, escrow) =>
+                sum +
+                escrow.amount -
+                escrow.releasedAmount -
+                escrow.refundedAmount,
+              0,
+            );
+            const originalAmount = escrows.reduce(
+              (sum, escrow) => sum + escrow.amount,
+              0,
+            );
             const refundPolicy = await tx.systemSetting.findUnique({
               where: { key: 'finance.cancel_in_progress_refund_rate' },
             });
@@ -1782,10 +1860,10 @@ export class OrdersService {
               order.status === OrderStatus.in_progress ? configuredRate : 1;
             refundAmount = Math.min(
               remaining,
-              Math.round(escrow.amount * rate),
+              Math.round(originalAmount * rate),
             );
             if (refundAmount > 0) {
-              await this.escrow.refundInTransaction(
+              await this.escrow.refundAllInTransaction(
                 {
                   orderId,
                   amount: refundAmount,

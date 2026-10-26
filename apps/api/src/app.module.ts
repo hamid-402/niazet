@@ -8,6 +8,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { CatalogModule } from './catalog/catalog.module';
+import { PricingModule } from './pricing/pricing.module';
 import { OrdersModule } from './orders/orders.module';
 import { ExecutorModule } from './executor/executor.module';
 import { QcModule } from './qc/qc.module';
@@ -41,6 +42,7 @@ import { OrganizationsModule } from './organizations/organizations.module';
     AuthModule,
     UsersModule,
     CatalogModule,
+    PricingModule,
     OrdersModule,
     ExecutorModule,
     QcModule,

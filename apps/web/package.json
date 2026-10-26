@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "lucide-react": "^1.23.0",
-    "next": "16.3.4",
+    "next": "16.4.3",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
@@ -52,9 +52,20 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.3.4",
+    "eslint-config-next": "16.4.3",
     "playwright": "^1.61.1",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "sharp": "0.35.5",
+    "source-map-js": "1.2.2",
+    "js-yaml@>=4 <5": "4.3.2",
+    "brace-expansion@>=1 <2": "1.1.21",
+    "brace-expansion@>=2 <3": "2.1.7",
+    "brace-expansion@>=4 <6": "5.0.12",
+    "browserslist": "4.28.7",
+    "baseline-browser-mapping": "2.11.0",
+    "zod": "4.6.6"
   }
 }

@@ -21,6 +21,7 @@ import { formatDate, formatNumber, formatToman } from "@/lib/format";
 import { customerNextAction, OrderTimeline } from "@/components/order-timeline";
 import { OrbitCustomerSurface } from "@/components/orbit-customer-surface";
 import { ConfirmationModal } from "@/components/confirmation-modal";
+import { WalletOrderPayment } from "@/components/wallet-actions";
 import styles from "@/components/orbit-customer-surface.module.css";
 
 const TABS = [
@@ -207,6 +208,7 @@ export default function CustomerOrderDetailPage({
               `/customer/orders/${id}/payments/${encodeURIComponent(returnedPaymentId)}/verify`, { method: 'POST' },
             ))}>بررسی نتیجه پرداخت بانکی</Button>
           )}
+          {order.status === 'pending_payment' && <WalletOrderPayment orderId={id} amount={order.finalPrice} milestones={order.milestones} onPaid={load} />}
           {order.status === "delivered" && (
             <>
               <Button

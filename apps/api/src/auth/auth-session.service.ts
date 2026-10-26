@@ -29,16 +29,23 @@ export class AuthSessionService {
 
   async issue(user: User, context: SessionContext = {}) {
     const refresh = createRefreshToken();
-    await this.prisma.session.create({
-      data: {
-        id: refresh.sessionId,
-        userId: user.id,
-        familyId: randomUUID(),
-        refreshTokenHash: refresh.tokenHash,
-        userAgent: context.userAgent,
-        ipAddress: context.ipAddress,
-        expiresAt: this.tokens.refreshExpiry(),
-      },
+    await this.prisma.$transaction(async (tx) => {
+      await tx.session.create({
+        data: {
+          id: refresh.sessionId,
+          userId: user.id,
+          familyId: randomUUID(),
+          refreshTokenHash: refresh.tokenHash,
+          userAgent: context.userAgent,
+          ipAddress: context.ipAddress,
+          expiresAt: this.tokens.refreshExpiry(),
+        },
+      });
+      await tx.userLoginState.upsert({
+        where: { userId: user.id },
+        create: { userId: user.id, lastSuccessfulLoginAt: new Date() },
+        update: { lastSuccessfulLoginAt: new Date() },
+      });
     });
     return {
       accessToken: await this.tokens.signAccessToken(user, refresh.sessionId),
@@ -47,7 +54,21 @@ export class AuthSessionService {
     };
   }
 
-  async logout(userId: string, refreshToken?: string) {
+  async logout(
+    userId: string,
+    refreshToken?: string,
+    currentSessionId?: string,
+  ) {
+    if (currentSessionId) {
+      const current = await this.prisma.session.findFirst({
+        where: { id: currentSessionId, userId, revokedAt: null },
+      });
+      if (current)
+        await this.prisma.session.updateMany({
+          where: { familyId: current.familyId, userId, revokedAt: null },
+          data: { revokedAt: new Date() },
+        });
+    }
     const parsed = refreshToken ? parseRefreshToken(refreshToken) : null;
     if (parsed && refreshToken) {
       const session = await this.prisma.session.findUnique({

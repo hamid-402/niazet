@@ -4,6 +4,7 @@ import { hasReviewedLicense } from './dependency-license-policy.mjs';
 
 test('accepts only the owner-approved Nodemailer release and license', () => {
   assert.equal(hasReviewedLicense('nodemailer@10.0.0', 'MIT-0'), true);
+  assert.equal(hasReviewedLicense('nodemailer@10.2.1', 'MIT-0'), true);
 });
 for (const [identity, license] of [
   ['nodemailer@10.0.1', 'MIT-0'],

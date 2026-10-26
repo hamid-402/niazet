@@ -14,6 +14,7 @@ import {
 } from "@/components/ui";
 import { SecureFileLink, SecureFileUpload } from "@/components/secure-file";
 import { OrbitCustomerSurface } from "@/components/orbit-customer-surface";
+import { PriceEstimate } from "@/components/price-estimate";
 import styles from "@/components/orbit-customer-surface.module.css";
 import type {
   OrderDetail,
@@ -572,6 +573,7 @@ function NewOrderForm() {
               </div>
             )}
           </Card>
+          <PriceEstimate serviceSlug={selectedService?.slug} packageId={packageId} urgency={urgency} />
           {error && <ErrorBanner message={error} />}
           <div className="flex flex-col-reverse gap-3 sm:flex-row">
             <Button
@@ -691,6 +693,7 @@ function NewOrderForm() {
               </Field>
             </div>
           </Card>
+          <PriceEstimate serviceSlug={selectedService?.slug} packageId={packageId} urgency={urgency} />
           {selectedService && dynamicFields.length > 0 && (
             <Card className={styles.composerCard}>
               <h2 className="mb-1 text-base font-extrabold text-fg">

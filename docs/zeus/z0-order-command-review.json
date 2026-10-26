@@ -1,0 +1,3476 @@
+{
+  "schemaVersion": 1,
+  "reviewedOn": "2026-10-24",
+  "phaseAccepted": false,
+  "purpose": "Source-backed contracts for 31 scoped order/executor/QC/manual-job writes and 12 scheduled jobs; current behavior and open gaps, not full Z0 or runtime/financial acceptance.",
+  "facts": {
+    "schemaVersion": 1,
+    "kind": "static-command-contract-evidence",
+    "phaseAccepted": false,
+    "databaseQueried": false,
+    "commands": [
+      {
+        "id": "Z0-CMD-01",
+        "signature": "POST /v1/customer/orders/:id/cancel",
+        "file": "apps/api/src/orders/orders.controller.ts",
+        "handler": "cancel",
+        "service": "cancelByCustomer",
+        "dto": "CancelOrderDto",
+        "route": {
+          "method": "POST",
+          "path": "/v1/customer/orders/:id/cancel",
+          "file": "apps/api/src/orders/orders.controller.ts",
+          "line": 161,
+          "className": "OrdersController",
+          "handler": "cancel",
+          "classDecorators": [
+            "@Controller('v1/customer/orders')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.customer)"
+          ],
+          "methodDecorators": ["@Post(':id/cancel')"],
+          "methodHash": "df43180ad8218b93c79271d04207c46d57f65cae66955c7e469f60f26a3e2d99"
+        },
+        "controllerMethod": {
+          "line": 161,
+          "hash": "df43180ad8218b93c79271d04207c46d57f65cae66955c7e469f60f26a3e2d99",
+          "delegatedArguments": ["user.id", "id", "dto.reason"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 397,
+          "hash": "fbd312628470b4dcad1833156ddf8324d335b8a9ee80b5be1e716ed33d627fca"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/orders/dto/order.dto.ts",
+          "name": "CancelOrderDto",
+          "line": 271,
+          "hash": "0e21e549f59b1f081ed868b3beb2f3a3490632775329a1c6c4903c1a0b013990",
+          "fields": [
+            {
+              "name": "reason",
+              "decorators": ["@IsString()"]
+            }
+          ]
+        },
+        "transitionCalls": [
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 413,
+            "owner": "cancelByCustomer",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.cancelled",
+              "OrderStatusSource.customer",
+              "customerId",
+              "reason",
+              "{ cancelledAt: new Date() }"
+            ],
+            "disputeFlag": "omitted"
+          }
+        ],
+        "sourceDocRefs": ["D4 §1.3/1.4", "D3 §16.4/19", "DEC12/13/16"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-02",
+        "signature": "POST /v1/admin/orders/:id/cancel",
+        "file": "apps/api/src/orders/orders.admin.controller.ts",
+        "handler": "cancel",
+        "service": "cancelByAdmin",
+        "dto": "CancelOrderDto",
+        "route": {
+          "method": "POST",
+          "path": "/v1/admin/orders/:id/cancel",
+          "file": "apps/api/src/orders/orders.admin.controller.ts",
+          "line": 156,
+          "className": "OrdersAdminController",
+          "handler": "cancel",
+          "classDecorators": [
+            "@Controller('v1/admin/orders')",
+            "@UseGuards(RolesGuard, AdminScopeGuard)",
+            "@Roles(UserRole.admin)"
+          ],
+          "methodDecorators": [
+            "@Post(':id/cancel')",
+            "@AdminScopes(AdminScope.ops_admin)"
+          ],
+          "methodHash": "330a501ff2e0f622e2d122d3a26c7a5dfcb7799ebd061d92f02432ae10587d12"
+        },
+        "controllerMethod": {
+          "line": 156,
+          "hash": "330a501ff2e0f622e2d122d3a26c7a5dfcb7799ebd061d92f02432ae10587d12",
+          "delegatedArguments": [
+            "user.id",
+            "id",
+            "dto.reason",
+            "idempotencyKey ?? ''"
+          ]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 1732,
+          "hash": "80e37af522b90250b53d18b3bca48116ccf3a910c28e5bf9dbb122201b2ae9d4"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/orders/dto/order.dto.ts",
+          "name": "CancelOrderDto",
+          "line": 271,
+          "hash": "0e21e549f59b1f081ed868b3beb2f3a3490632775329a1c6c4903c1a0b013990",
+          "fields": [
+            {
+              "name": "reason",
+              "decorators": ["@IsString()"]
+            }
+          ]
+        },
+        "transitionCalls": [
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 1802,
+            "owner": "cancelByAdmin",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.cancelled",
+              "OrderStatusSource.admin",
+              "adminId",
+              "reason",
+              "{ cancelledAt: new Date() }",
+              "tx",
+              "refundAmount\n            ? { type: 'escrow_refund', amount: refundAmount }\n            : { type: 'none' }"
+            ],
+            "disputeFlag": "omitted"
+          }
+        ],
+        "sourceDocRefs": ["D4 §1.3/1.4", "D3 §16.4/19", "DEC12/13/16"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-03",
+        "signature": "POST /v1/customer/orders/:id/dispute",
+        "file": "apps/api/src/orders/orders.controller.ts",
+        "handler": "dispute",
+        "service": "raiseDispute",
+        "dto": "DisputeOrderDto",
+        "route": {
+          "method": "POST",
+          "path": "/v1/customer/orders/:id/dispute",
+          "file": "apps/api/src/orders/orders.controller.ts",
+          "line": 152,
+          "className": "OrdersController",
+          "handler": "dispute",
+          "classDecorators": [
+            "@Controller('v1/customer/orders')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.customer)"
+          ],
+          "methodDecorators": ["@Post(':id/dispute')"],
+          "methodHash": "22e7f4e811a4253fcd01bf0cc55372908c228b4cf7849c5005be7b5016b5702e"
+        },
+        "controllerMethod": {
+          "line": 152,
+          "hash": "22e7f4e811a4253fcd01bf0cc55372908c228b4cf7849c5005be7b5016b5702e",
+          "delegatedArguments": ["user.id", "user.role", "id", "dto"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 1487,
+          "hash": "150ada8f6a1daf8d07308e39e21103f828209f2ac8a56e2b2f40ab8d2ccbfc59"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/orders/dto/order.dto.ts",
+          "name": "DisputeOrderDto",
+          "line": 239,
+          "hash": "4a99b9af8f33c8cbffadab25c73ec987005d0730060d9f004030cac953b32900",
+          "fields": [
+            {
+              "name": "reason",
+              "decorators": ["@IsString()"]
+            },
+            {
+              "name": "note",
+              "decorators": ["@IsString()"]
+            }
+          ]
+        },
+        "transitionCalls": [
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 1513,
+            "owner": "raiseDispute",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.disputed",
+              "actorRole === UserRole.customer\n            ? OrderStatusSource.customer\n            : OrderStatusSource.admin",
+              "actorUserId",
+              "dto.note",
+              "{}",
+              "tx"
+            ],
+            "disputeFlag": "omitted"
+          }
+        ],
+        "sourceDocRefs": ["D4 §1.3/1.4", "D3 §16.4/19", "DEC12/13/16"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-04",
+        "signature": "POST /v1/admin/orders/:id/resolve-dispute",
+        "file": "apps/api/src/orders/orders.admin.controller.ts",
+        "handler": "resolveDispute",
+        "service": "resolveDispute",
+        "dto": "ResolveDisputeDto",
+        "route": {
+          "method": "POST",
+          "path": "/v1/admin/orders/:id/resolve-dispute",
+          "file": "apps/api/src/orders/orders.admin.controller.ts",
+          "line": 145,
+          "className": "OrdersAdminController",
+          "handler": "resolveDispute",
+          "classDecorators": [
+            "@Controller('v1/admin/orders')",
+            "@UseGuards(RolesGuard, AdminScopeGuard)",
+            "@Roles(UserRole.admin)"
+          ],
+          "methodDecorators": [
+            "@Post(':id/resolve-dispute')",
+            "@AdminScopes(AdminScope.ops_admin, AdminScope.finance_admin)"
+          ],
+          "methodHash": "88685041097236122e904f1a8964e352deac7027b6848a415bdfe018a3ce649c"
+        },
+        "controllerMethod": {
+          "line": 145,
+          "hash": "88685041097236122e904f1a8964e352deac7027b6848a415bdfe018a3ce649c",
+          "delegatedArguments": ["user.id", "id", "dto", "idempotencyKey ?? ''"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 1548,
+          "hash": "11b4e7f4154f04772efb45bd66a187d9f4e43252ae4e4caccdb2cd5c5b63813a"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/orders/dto/order.dto.ts",
+          "name": "ResolveDisputeDto",
+          "line": 247,
+          "hash": "a6e0ce1b6a9fcdaf42b12497c870322a224bbf0cfeebf34c0ce205917a7702c1",
+          "fields": [
+            {
+              "name": "resolutionType",
+              "decorators": [
+                "@IsIn([\n    'rework',\n    'refund_full',\n    'refund_partial',\n    'release_to_executor',\n    'close',\n  ])"
+              ]
+            },
+            {
+              "name": "amount",
+              "decorators": ["@IsOptional()", "@IsInt()", "@Min(0)"]
+            },
+            {
+              "name": "note",
+              "decorators": ["@IsString()"]
+            }
+          ]
+        },
+        "transitionCalls": [
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 1576,
+            "owner": "resolveDispute",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.in_progress",
+              "OrderStatusSource.admin",
+              "adminId",
+              "dto.note",
+              "{}",
+              "tx",
+              "effect('none')",
+              "true"
+            ],
+            "disputeFlag": "true"
+          },
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 1600,
+            "owner": "resolveDispute",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.cancelled",
+              "OrderStatusSource.admin",
+              "adminId",
+              "dto.note",
+              "{ cancelledAt: new Date() }",
+              "tx",
+              "effect('escrow_refund', financialAmount)",
+              "true"
+            ],
+            "disputeFlag": "true"
+          },
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 1630,
+            "owner": "resolveDispute",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.closed",
+              "OrderStatusSource.admin",
+              "adminId",
+              "dto.note",
+              "{ closedAt: new Date() }",
+              "tx",
+              "effect('escrow_refund_partial', financialAmount)",
+              "true"
+            ],
+            "disputeFlag": "true"
+          },
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 1654,
+            "owner": "resolveDispute",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.confirmed",
+              "OrderStatusSource.admin",
+              "adminId",
+              "dto.note",
+              "{ confirmedAt: new Date() }",
+              "tx",
+              "effect('escrow_release', financialAmount)",
+              "true"
+            ],
+            "disputeFlag": "true"
+          },
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 1665,
+            "owner": "resolveDispute",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.closed",
+              "OrderStatusSource.system",
+              "null",
+              "'بستن سفارش پس از حل اختلاف'",
+              "{ closedAt: new Date() }",
+              "tx"
+            ],
+            "disputeFlag": "omitted"
+          },
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 1678,
+            "owner": "resolveDispute",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.closed",
+              "OrderStatusSource.admin",
+              "adminId",
+              "dto.note",
+              "{ closedAt: new Date() }",
+              "tx",
+              "effect('none')",
+              "true"
+            ],
+            "disputeFlag": "true"
+          }
+        ],
+        "sourceDocRefs": ["D4 §1.3/1.4", "D3 §16.4/19", "DEC12/13/16"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-05",
+        "signature": "POST /v1/customer/orders/:id/confirm",
+        "file": "apps/api/src/orders/orders.controller.ts",
+        "handler": "confirm",
+        "service": "confirm",
+        "dto": null,
+        "route": {
+          "method": "POST",
+          "path": "/v1/customer/orders/:id/confirm",
+          "file": "apps/api/src/orders/orders.controller.ts",
+          "line": 134,
+          "className": "OrdersController",
+          "handler": "confirm",
+          "classDecorators": [
+            "@Controller('v1/customer/orders')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.customer)"
+          ],
+          "methodDecorators": ["@Post(':id/confirm')"],
+          "methodHash": "c60441eea1b2a4a6e2a4558610e10da5a30ac83ce1838d048d4318c791415743"
+        },
+        "controllerMethod": {
+          "line": 134,
+          "hash": "c60441eea1b2a4a6e2a4558610e10da5a30ac83ce1838d048d4318c791415743",
+          "delegatedArguments": ["user.id", "id", "idempotencyKey ?? ''"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 1342,
+          "hash": "55c8b77046649dd9bef611ef86cf5c5784d7caa9d3194e3b4d8963ca5084be80"
+        },
+        "dtoContract": null,
+        "transitionCalls": [
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 1355,
+            "owner": "confirm",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.confirmed",
+              "OrderStatusSource.customer",
+              "customerId",
+              "'تأیید تحویل توسط مشتری'",
+              "{ confirmedAt: new Date() }",
+              "tx"
+            ],
+            "disputeFlag": "omitted"
+          },
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 1374,
+            "owner": "confirm",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.closed",
+              "OrderStatusSource.system",
+              "null",
+              "'بستن خودکار پس از تأیید و تسویه'",
+              "{ closedAt: new Date() }",
+              "tx",
+              "{\n            type: 'escrow_release',\n            amount: settlement.executorAmount + settlement.commissionAmount,\n          }"
+            ],
+            "disputeFlag": "omitted"
+          }
+        ],
+        "sourceDocRefs": ["D4 §1.3/1.4", "D3 §16.4/19", "DEC12/13/16"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-06",
+        "signature": "POST /v1/customer/orders/:id/revision",
+        "file": "apps/api/src/orders/orders.controller.ts",
+        "handler": "requestRevision",
+        "service": "requestRevision",
+        "dto": "RevisionRequestDto",
+        "route": {
+          "method": "POST",
+          "path": "/v1/customer/orders/:id/revision",
+          "file": "apps/api/src/orders/orders.controller.ts",
+          "line": 143,
+          "className": "OrdersController",
+          "handler": "requestRevision",
+          "classDecorators": [
+            "@Controller('v1/customer/orders')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.customer)"
+          ],
+          "methodDecorators": ["@Post(':id/revision')"],
+          "methodHash": "2427fd4ab7253f7c293ee54f59b0914e9667a3585d6c4023920342fff6c44c67"
+        },
+        "controllerMethod": {
+          "line": 143,
+          "hash": "2427fd4ab7253f7c293ee54f59b0914e9667a3585d6c4023920342fff6c44c67",
+          "delegatedArguments": ["user.id", "id", "dto"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 1398,
+          "hash": "0ee4700929de4e81dd9ff38ee607b77c5204996b3e68d2e5f9abdd86101644a0"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/orders/dto/order.dto.ts",
+          "name": "RevisionRequestDto",
+          "line": 226,
+          "hash": "97f542e290b6c0c1c66dfbfd36de92b036dca948ed933bb9f38b9099627a18b0",
+          "fields": [
+            {
+              "name": "reason",
+              "decorators": ["@IsString()", "@MinLength(3)"]
+            },
+            {
+              "name": "unmetCriteriaIds",
+              "decorators": [
+                "@IsOptional()",
+                "@IsArray()",
+                "@ArrayMinSize(1)",
+                "@ArrayUnique()",
+                "@IsString({ each: true })"
+              ]
+            }
+          ]
+        },
+        "transitionCalls": [
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 1439,
+            "owner": "requestRevision",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.revision_requested",
+              "OrderStatusSource.customer",
+              "customerId",
+              "dto.reason",
+              "{ revisionsUsed: { increment: 1 } }",
+              "tx"
+            ],
+            "disputeFlag": "omitted"
+          },
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 1448,
+            "owner": "requestRevision",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.in_progress",
+              "OrderStatusSource.system",
+              "null",
+              "'بازگشت خودکار برای اصلاح'",
+              "{}",
+              "tx"
+            ],
+            "disputeFlag": "omitted"
+          }
+        ],
+        "sourceDocRefs": ["D4 §1.3/1.4", "D3 §16.4/19", "DEC12/13/16"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-07",
+        "signature": "POST /v1/customer/orders/:id/submit",
+        "file": "apps/api/src/orders/orders.controller.ts",
+        "handler": "submit",
+        "service": "submit",
+        "dto": null,
+        "route": {
+          "method": "POST",
+          "path": "/v1/customer/orders/:id/submit",
+          "file": "apps/api/src/orders/orders.controller.ts",
+          "line": 73,
+          "className": "OrdersController",
+          "handler": "submit",
+          "classDecorators": [
+            "@Controller('v1/customer/orders')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.customer)"
+          ],
+          "methodDecorators": ["@Post(':id/submit')"],
+          "methodHash": "e3ec893b0dd5b2122e0e191188654cf633da558a95a4ba55b20a416368194e8c"
+        },
+        "controllerMethod": {
+          "line": 73,
+          "hash": "e3ec893b0dd5b2122e0e191188654cf633da558a95a4ba55b20a416368194e8c",
+          "delegatedArguments": ["user.id", "id", "idempotencyKey ?? ''"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 334,
+          "hash": "4e52bd1c55d535caac6af0ee0ef9d2d58e8673cefd7f80f14bcd002df3840c8f"
+        },
+        "dtoContract": null,
+        "transitionCalls": [
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 367,
+            "owner": "submit",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.submitted",
+              "OrderStatusSource.customer",
+              "customerId",
+              "undefined",
+              "{ submittedAt: new Date() }",
+              "tx"
+            ],
+            "disputeFlag": "omitted"
+          },
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 376,
+            "owner": "submit",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.pending_triage",
+              "OrderStatusSource.system",
+              "null",
+              "'ثبت خودکار در صف تریاژ'",
+              "{}",
+              "tx"
+            ],
+            "disputeFlag": "omitted"
+          }
+        ],
+        "sourceDocRefs": ["D3 §7.2/14.1", "D4 §1.3", "DEC02"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-08",
+        "signature": "POST /v1/admin/orders/:id/triage",
+        "file": "apps/api/src/orders/orders.admin.controller.ts",
+        "handler": "triage",
+        "service": "triage",
+        "dto": "TriageDecisionDto",
+        "route": {
+          "method": "POST",
+          "path": "/v1/admin/orders/:id/triage",
+          "file": "apps/api/src/orders/orders.admin.controller.ts",
+          "line": 105,
+          "className": "OrdersAdminController",
+          "handler": "triage",
+          "classDecorators": [
+            "@Controller('v1/admin/orders')",
+            "@UseGuards(RolesGuard, AdminScopeGuard)",
+            "@Roles(UserRole.admin)"
+          ],
+          "methodDecorators": [
+            "@Post(':id/triage')",
+            "@AdminScopes(AdminScope.ops_admin)"
+          ],
+          "methodHash": "ca9ff8826d435f72dcf9e7ef3e908b9613258480f14333868fd71985c9c76985"
+        },
+        "controllerMethod": {
+          "line": 105,
+          "hash": "ca9ff8826d435f72dcf9e7ef3e908b9613258480f14333868fd71985c9c76985",
+          "delegatedArguments": ["user.id", "id", "dto"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 427,
+          "hash": "57d5d9bf2a7d879eee9204623d87f7e20803ead296e12208a6c9897b4dfb8a4e"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/orders/dto/order.dto.ts",
+          "name": "TriageDecisionDto",
+          "line": 95,
+          "hash": "39fc93f063746f12ca92632d1e2a4051b4cbb1cee76c35dc380d47838e0eda29",
+          "fields": [
+            {
+              "name": "decision",
+              "decorators": [
+                "@IsIn([\n    'send_to_quote',\n    'auto_quote',\n    'need_more_info',\n    'assign_direct',\n    'reject',\n  ])"
+              ]
+            },
+            {
+              "name": "note",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            },
+            {
+              "name": "finalPrice",
+              "decorators": ["@IsOptional()", "@IsInt()", "@Min(0)"]
+            }
+          ]
+        },
+        "transitionCalls": [
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 434,
+            "owner": "triage",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.triaging",
+              "OrderStatusSource.admin",
+              "adminId",
+              "dto.note"
+            ],
+            "disputeFlag": "omitted"
+          },
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 447,
+            "owner": "triage",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.cancelled",
+              "OrderStatusSource.admin",
+              "adminId",
+              "dto.note",
+              "{\n            cancelledAt: new Date(),\n          }"
+            ],
+            "disputeFlag": "omitted"
+          },
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 474,
+            "owner": "triage",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.quoted",
+              "OrderStatusSource.admin",
+              "adminId",
+              "dto.note",
+              "{\n            finalPrice: dto.finalPrice,\n            quotedAt: new Date(),\n          }"
+            ],
+            "disputeFlag": "omitted"
+          },
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 487,
+            "owner": "triage",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.pending_quote",
+              "OrderStatusSource.admin",
+              "adminId",
+              "dto.note"
+            ],
+            "disputeFlag": "omitted"
+          }
+        ],
+        "sourceDocRefs": ["D3 §10.3", "D5 §12.3", "DEC02/16"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-09",
+        "signature": "POST /v1/admin/orders/:id/quote",
+        "file": "apps/api/src/orders/orders.admin.controller.ts",
+        "handler": "quote",
+        "service": "quote",
+        "dto": "QuoteOrderDto",
+        "route": {
+          "method": "POST",
+          "path": "/v1/admin/orders/:id/quote",
+          "file": "apps/api/src/orders/orders.admin.controller.ts",
+          "line": 115,
+          "className": "OrdersAdminController",
+          "handler": "quote",
+          "classDecorators": [
+            "@Controller('v1/admin/orders')",
+            "@UseGuards(RolesGuard, AdminScopeGuard)",
+            "@Roles(UserRole.admin)"
+          ],
+          "methodDecorators": [
+            "@Post(':id/quote')",
+            "@AdminScopes(AdminScope.ops_admin)"
+          ],
+          "methodHash": "1129b8c40f21df269ed71dadf3be9baede956dd0637408b25f6010a9bb3828c5"
+        },
+        "controllerMethod": {
+          "line": 115,
+          "hash": "1129b8c40f21df269ed71dadf3be9baede956dd0637408b25f6010a9bb3828c5",
+          "delegatedArguments": ["user.id", "id", "dto"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 497,
+          "hash": "0f1a7ec930b19a313c152242c22ebd427a2aacf837f9d035102ad0b8a0259c36"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/orders/dto/order.dto.ts",
+          "name": "QuoteOrderDto",
+          "line": 120,
+          "hash": "2163cb86ebd8a2a018c7ddee86cfea4a420f45291e2ebc4bc003b475bf162820",
+          "fields": [
+            {
+              "name": "finalPrice",
+              "decorators": ["@IsInt()", "@Min(1000)"]
+            },
+            {
+              "name": "note",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            }
+          ]
+        },
+        "transitionCalls": [
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 506,
+            "owner": "quote",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.quoted",
+              "OrderStatusSource.admin",
+              "adminId",
+              "dto.note",
+              "{ finalPrice: dto.finalPrice, quotedAt: new Date() }"
+            ],
+            "disputeFlag": "omitted"
+          }
+        ],
+        "sourceDocRefs": ["D3 §10.3/13.1", "D4 §1.3", "DEC02"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-10",
+        "signature": "POST /v1/customer/orders/:id/accept-quote",
+        "file": "apps/api/src/orders/orders.controller.ts",
+        "handler": "acceptQuote",
+        "service": "acceptQuote",
+        "dto": null,
+        "route": {
+          "method": "POST",
+          "path": "/v1/customer/orders/:id/accept-quote",
+          "file": "apps/api/src/orders/orders.controller.ts",
+          "line": 82,
+          "className": "OrdersController",
+          "handler": "acceptQuote",
+          "classDecorators": [
+            "@Controller('v1/customer/orders')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.customer)"
+          ],
+          "methodDecorators": ["@Post(':id/accept-quote')"],
+          "methodHash": "77bdb4b545ff9efa71030a9c17788409bb30bde6d9b84b7bfbab929f33271b1c"
+        },
+        "controllerMethod": {
+          "line": 82,
+          "hash": "77bdb4b545ff9efa71030a9c17788409bb30bde6d9b84b7bfbab929f33271b1c",
+          "delegatedArguments": ["user.id", "id"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 525,
+          "hash": "517cac753e9eb84acec64475e7f3331885704ba762db2aaaf111d267690ac63d"
+        },
+        "dtoContract": null,
+        "transitionCalls": [
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 530,
+            "owner": "acceptQuote",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.pending_payment",
+              "OrderStatusSource.customer",
+              "customerId"
+            ],
+            "disputeFlag": "omitted"
+          }
+        ],
+        "sourceDocRefs": ["D3 §7.2/14.2", "D4 §1.3", "DEC02"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-11",
+        "signature": "POST /v1/admin/orders/:id/assign",
+        "file": "apps/api/src/orders/orders.admin.controller.ts",
+        "handler": "assign",
+        "service": "assign",
+        "dto": "AssignOrderDto",
+        "route": {
+          "method": "POST",
+          "path": "/v1/admin/orders/:id/assign",
+          "file": "apps/api/src/orders/orders.admin.controller.ts",
+          "line": 125,
+          "className": "OrdersAdminController",
+          "handler": "assign",
+          "classDecorators": [
+            "@Controller('v1/admin/orders')",
+            "@UseGuards(RolesGuard, AdminScopeGuard)",
+            "@Roles(UserRole.admin)"
+          ],
+          "methodDecorators": [
+            "@Post(':id/assign')",
+            "@AdminScopes(AdminScope.ops_admin)"
+          ],
+          "methodHash": "a3c47e20dc092db85a24796e280073a3ac2d113bcca0ff5feb7b3661cd716f57"
+        },
+        "controllerMethod": {
+          "line": 125,
+          "hash": "a3c47e20dc092db85a24796e280073a3ac2d113bcca0ff5feb7b3661cd716f57",
+          "delegatedArguments": ["user.id", "id", "dto"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 538,
+          "hash": "2acfee923c8d03976e2bc614776a5a363981599555f089c9ad1b56b8069c57b0"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/orders/dto/order.dto.ts",
+          "name": "AssignOrderDto",
+          "line": 130,
+          "hash": "f894c2c0318e00ccea1710ea277807724ad3d1bacb785394a805a8257db98a4b",
+          "fields": [
+            {
+              "name": "executorProfileId",
+              "decorators": ["@IsString()"]
+            },
+            {
+              "name": "teamId",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            },
+            {
+              "name": "assignmentRole",
+              "decorators": [
+                "@IsOptional()",
+                "@IsIn(['pursuit_owner', 'team_lead', 'contributor', 'qc_reviewer'])"
+              ]
+            },
+            {
+              "name": "note",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            }
+          ]
+        },
+        "transitionCalls": [
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 574,
+            "owner": "assign",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.assigned",
+              "OrderStatusSource.admin",
+              "adminId",
+              "dto.note",
+              "{ assignedAt: new Date() }",
+              "tx"
+            ],
+            "disputeFlag": "omitted"
+          }
+        ],
+        "sourceDocRefs": ["D3 §10.4/4.2", "D4 §1.3/1.5", "DEC13"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-12",
+        "signature": "POST /v1/admin/orders/:id/reassign",
+        "file": "apps/api/src/orders/orders.admin.controller.ts",
+        "handler": "reassign",
+        "service": "reassign",
+        "dto": "AssignOrderDto",
+        "route": {
+          "method": "POST",
+          "path": "/v1/admin/orders/:id/reassign",
+          "file": "apps/api/src/orders/orders.admin.controller.ts",
+          "line": 135,
+          "className": "OrdersAdminController",
+          "handler": "reassign",
+          "classDecorators": [
+            "@Controller('v1/admin/orders')",
+            "@UseGuards(RolesGuard, AdminScopeGuard)",
+            "@Roles(UserRole.admin)"
+          ],
+          "methodDecorators": [
+            "@Post(':id/reassign')",
+            "@AdminScopes(AdminScope.ops_admin)"
+          ],
+          "methodHash": "7d47a80fba9ebb837ab9879ff1aa925303862d88a0b05661253157fbf1bccf55"
+        },
+        "controllerMethod": {
+          "line": 135,
+          "hash": "7d47a80fba9ebb837ab9879ff1aa925303862d88a0b05661253157fbf1bccf55",
+          "delegatedArguments": ["user.id", "id", "dto"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 620,
+          "hash": "38a258cc22a298f6cf964cc151927439732f8945c59dc4b54672ba04a2aa4d8c"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/orders/dto/order.dto.ts",
+          "name": "AssignOrderDto",
+          "line": 130,
+          "hash": "f894c2c0318e00ccea1710ea277807724ad3d1bacb785394a805a8257db98a4b",
+          "fields": [
+            {
+              "name": "executorProfileId",
+              "decorators": ["@IsString()"]
+            },
+            {
+              "name": "teamId",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            },
+            {
+              "name": "assignmentRole",
+              "decorators": [
+                "@IsOptional()",
+                "@IsIn(['pursuit_owner', 'team_lead', 'contributor', 'qc_reviewer'])"
+              ]
+            },
+            {
+              "name": "note",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            }
+          ]
+        },
+        "transitionCalls": [],
+        "sourceDocRefs": ["D3 §10.4/11", "DEC13"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-13",
+        "signature": "POST /v1/customer/orders/:id/pay",
+        "file": "apps/api/src/orders/orders.controller.ts",
+        "handler": "pay",
+        "service": "initiatePayment",
+        "dto": "PaymentIntentDto",
+        "route": {
+          "method": "POST",
+          "path": "/v1/customer/orders/:id/pay",
+          "file": "apps/api/src/orders/orders.controller.ts",
+          "line": 87,
+          "className": "OrdersController",
+          "handler": "pay",
+          "classDecorators": [
+            "@Controller('v1/customer/orders')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.customer)"
+          ],
+          "methodDecorators": [
+            "@Post(':id/pay')",
+            "@RateLimit({ name: 'payment-initiate', limit: 10, windowMs: 60 * 1000 })"
+          ],
+          "methodHash": "efee36911d28ea137e0c5f98dc64f1f8fd21160da50cae2d442c785a07e57882"
+        },
+        "controllerMethod": {
+          "line": 87,
+          "hash": "efee36911d28ea137e0c5f98dc64f1f8fd21160da50cae2d442c785a07e57882",
+          "delegatedArguments": [
+            "user.id",
+            "id",
+            "idempotencyKey ?? ''",
+            "dto.milestoneId"
+          ]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 742,
+          "hash": "66829155cdaaca72169f25ffe56a99c8ad21f82c6e7a748e449c8c2ea65efc15"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/orders/dto/order.dto.ts",
+          "name": "PaymentIntentDto",
+          "line": 148,
+          "hash": "bd0036b3d514cc6ad49fe21113017e64a943dabc67a668a8f2be4d59c2f0c911",
+          "fields": [
+            {
+              "name": "milestoneId",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            }
+          ]
+        },
+        "transitionCalls": [],
+        "sourceDocRefs": ["D3 §12.2", "D4 §2.5", "DEC02/06"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-14",
+        "signature": "POST /v1/customer/orders/:id/payments/:paymentId/verify",
+        "file": "apps/api/src/orders/orders.controller.ts",
+        "handler": "verifyPayment",
+        "service": "verifyPayment",
+        "dto": null,
+        "route": {
+          "method": "POST",
+          "path": "/v1/customer/orders/:id/payments/:paymentId/verify",
+          "file": "apps/api/src/orders/orders.controller.ts",
+          "line": 118,
+          "className": "OrdersController",
+          "handler": "verifyPayment",
+          "classDecorators": [
+            "@Controller('v1/customer/orders')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.customer)"
+          ],
+          "methodDecorators": [
+            "@Post(':id/payments/:paymentId/verify')",
+            "@RateLimit({ name: 'payment-verify', limit: 15, windowMs: 60 * 1000 })"
+          ],
+          "methodHash": "de60d1aae3f66f25b7536996089f1c28f6073a96e50ef3d42d7c66977e37020a"
+        },
+        "controllerMethod": {
+          "line": 118,
+          "hash": "de60d1aae3f66f25b7536996089f1c28f6073a96e50ef3d42d7c66977e37020a",
+          "delegatedArguments": [
+            "user.id",
+            "id",
+            "paymentId",
+            "idempotencyKey ?? ''"
+          ]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 958,
+          "hash": "c4afb061b409d2b7b9767e17f6ba7e871c83437a2fca5e69d1abe3f20b3f4614"
+        },
+        "dtoContract": null,
+        "transitionCalls": [],
+        "sourceDocRefs": ["D3 §12.2/14.2", "D4 §1.3/2.5"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-15",
+        "signature": "POST /v1/customer/orders/:id/milestones/:milestoneId/approve",
+        "file": "apps/api/src/orders/orders.controller.ts",
+        "handler": "approveMilestone",
+        "service": "approveMilestone",
+        "dto": null,
+        "route": {
+          "method": "POST",
+          "path": "/v1/customer/orders/:id/milestones/:milestoneId/approve",
+          "file": "apps/api/src/orders/orders.controller.ts",
+          "line": 103,
+          "className": "OrdersController",
+          "handler": "approveMilestone",
+          "classDecorators": [
+            "@Controller('v1/customer/orders')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.customer)"
+          ],
+          "methodDecorators": ["@Post(':id/milestones/:milestoneId/approve')"],
+          "methodHash": "4c9eea4d98a994d63072ddec743ef8d39e8af950d0ce214944aeec4f8f44cab3"
+        },
+        "controllerMethod": {
+          "line": 103,
+          "hash": "4c9eea4d98a994d63072ddec743ef8d39e8af950d0ce214944aeec4f8f44cab3",
+          "delegatedArguments": [
+            "user.id",
+            "id",
+            "milestoneId",
+            "idempotencyKey ?? ''"
+          ]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 896,
+          "hash": "b2c3a4f284505639893e23d390fca109a6f56bd16c7228961711013b13adb5bd"
+        },
+        "dtoContract": null,
+        "transitionCalls": [],
+        "sourceDocRefs": ["D3 §14.3/12.4", "D4 §2.5/2.6"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-16",
+        "signature": "POST /v1/customer/orders",
+        "file": "apps/api/src/orders/orders.controller.ts",
+        "handler": "create",
+        "service": "createDraft",
+        "dto": "CreateOrderDto",
+        "route": {
+          "method": "POST",
+          "path": "/v1/customer/orders",
+          "file": "apps/api/src/orders/orders.controller.ts",
+          "line": 50,
+          "className": "OrdersController",
+          "handler": "create",
+          "classDecorators": [
+            "@Controller('v1/customer/orders')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.customer)"
+          ],
+          "methodDecorators": ["@Post()"],
+          "methodHash": "ab1e5ce5d186bbb3ef0d83bac199ace4cc86f99708b433958eb2477ff57f0e6d"
+        },
+        "controllerMethod": {
+          "line": 50,
+          "hash": "ab1e5ce5d186bbb3ef0d83bac199ace4cc86f99708b433958eb2477ff57f0e6d",
+          "delegatedArguments": ["user.id", "dto", "idempotencyKey ?? ''"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 145,
+          "hash": "1edd23b6a259dfdcf14e3e8fcf3a472ac019a923ecbc4614df80430c4e60119e"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/orders/dto/order.dto.ts",
+          "name": "CreateOrderDto",
+          "line": 19,
+          "hash": "b191b907e993ce436296dbafce959916ea13e7efbe34628bd03a84016c665290",
+          "fields": [
+            {
+              "name": "serviceId",
+              "decorators": ["@IsString()"]
+            },
+            {
+              "name": "packageId",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            },
+            {
+              "name": "title",
+              "decorators": ["@IsString()"]
+            },
+            {
+              "name": "urgency",
+              "decorators": [
+                "@IsOptional()",
+                "@IsIn(['low', 'normal', 'high', 'urgent'])"
+              ]
+            },
+            {
+              "name": "briefDescription",
+              "decorators": ["@IsString()"]
+            },
+            {
+              "name": "formResponses",
+              "decorators": ["@IsOptional()", "@IsObject()"]
+            },
+            {
+              "name": "budgetHint",
+              "decorators": ["@IsOptional()", "@IsInt()", "@Min(0)"]
+            },
+            {
+              "name": "acceptanceCriteria",
+              "decorators": [
+                "@IsOptional()",
+                "@IsArray()",
+                "@IsString({ each: true })"
+              ]
+            }
+          ]
+        },
+        "transitionCalls": [],
+        "sourceDocRefs": ["D3 §7.2/13.2", "D5 §9.2", "DEC02"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-17",
+        "signature": "PATCH /v1/customer/orders/:id/draft",
+        "file": "apps/api/src/orders/orders.controller.ts",
+        "handler": "updateDraft",
+        "service": "updateDraft",
+        "dto": "UpdateOrderDraftDto",
+        "route": {
+          "method": "PATCH",
+          "path": "/v1/customer/orders/:id/draft",
+          "file": "apps/api/src/orders/orders.controller.ts",
+          "line": 59,
+          "className": "OrdersController",
+          "handler": "updateDraft",
+          "classDecorators": [
+            "@Controller('v1/customer/orders')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.customer)"
+          ],
+          "methodDecorators": ["@Patch(':id/draft')"],
+          "methodHash": "a51c4b1097e9c7a28b0d2a9693d3f0dd8a94e1873e2d8df6ae5c97b140eb7a07"
+        },
+        "controllerMethod": {
+          "line": 59,
+          "hash": "a51c4b1097e9c7a28b0d2a9693d3f0dd8a94e1873e2d8df6ae5c97b140eb7a07",
+          "delegatedArguments": ["user.id", "id", "dto"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 223,
+          "hash": "bf7871334fdd4bb6eba19a9a825c1ad2f4b183d001cd5436a1c33c7b7aae424f"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/orders/dto/order.dto.ts",
+          "name": "UpdateOrderDraftDto",
+          "line": 59,
+          "hash": "5d5a4d923db44f8804164db70e05b6241b6f7ee20a8b82ef56b8e739679a8e71",
+          "fields": [
+            {
+              "name": "packageId",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            },
+            {
+              "name": "title",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            },
+            {
+              "name": "urgency",
+              "decorators": [
+                "@IsOptional()",
+                "@IsIn(['low', 'normal', 'high', 'urgent'])"
+              ]
+            },
+            {
+              "name": "briefDescription",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            },
+            {
+              "name": "formResponses",
+              "decorators": ["@IsOptional()", "@IsObject()"]
+            },
+            {
+              "name": "budgetHint",
+              "decorators": ["@IsOptional()", "@IsInt()", "@Min(0)"]
+            },
+            {
+              "name": "acceptanceCriteria",
+              "decorators": [
+                "@IsOptional()",
+                "@IsArray()",
+                "@IsString({ each: true })"
+              ]
+            },
+            {
+              "name": "version",
+              "decorators": ["@IsInt()", "@Min(0)"]
+            }
+          ]
+        },
+        "transitionCalls": [],
+        "sourceDocRefs": ["D3 §7.2/13.2", "D5 §9.2"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-18",
+        "signature": "POST /v1/customer/orders/:id/messages",
+        "file": "apps/api/src/orders/orders.controller.ts",
+        "handler": "addMessage",
+        "service": "addCustomerMessage",
+        "dto": "OrderMessageDto",
+        "route": {
+          "method": "POST",
+          "path": "/v1/customer/orders/:id/messages",
+          "file": "apps/api/src/orders/orders.controller.ts",
+          "line": 170,
+          "className": "OrdersController",
+          "handler": "addMessage",
+          "classDecorators": [
+            "@Controller('v1/customer/orders')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.customer)"
+          ],
+          "methodDecorators": ["@Post(':id/messages')"],
+          "methodHash": "2615cefcdaa5344b71490182a4e89121211320056c7fcf78eef226ef69ae6b2d"
+        },
+        "controllerMethod": {
+          "line": 170,
+          "hash": "2615cefcdaa5344b71490182a4e89121211320056c7fcf78eef226ef69ae6b2d",
+          "delegatedArguments": [
+            "id",
+            "user.id",
+            "dto.body",
+            "dto.attachmentFileId"
+          ]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 1873,
+          "hash": "fc19df469795d759b835ecb621ad4f40bfd26d8898294aafa375e76390158d2d"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/orders/dto/order.dto.ts",
+          "name": "OrderMessageDto",
+          "line": 276,
+          "hash": "c8ce91eedb750b3f9ed097fe3354bb53acb4edbbaf9bc4a33ec6c977ccb3eabb",
+          "fields": [
+            {
+              "name": "body",
+              "decorators": ["@IsString()"]
+            },
+            {
+              "name": "attachmentFileId",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            },
+            {
+              "name": "visibility",
+              "decorators": [
+                "@IsOptional()",
+                "@IsIn(['customer_visible', 'internal_only'])"
+              ]
+            }
+          ]
+        },
+        "transitionCalls": [],
+        "sourceDocRefs": ["D3 §15.1/15.2/19", "D5 §9.5"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-19",
+        "signature": "POST /v1/admin/orders/:id/milestones",
+        "file": "apps/api/src/orders/orders.admin.controller.ts",
+        "handler": "configureMilestones",
+        "service": "configureMilestones",
+        "dto": "ConfigureMilestonesDto",
+        "route": {
+          "method": "POST",
+          "path": "/v1/admin/orders/:id/milestones",
+          "file": "apps/api/src/orders/orders.admin.controller.ts",
+          "line": 57,
+          "className": "OrdersAdminController",
+          "handler": "configureMilestones",
+          "classDecorators": [
+            "@Controller('v1/admin/orders')",
+            "@UseGuards(RolesGuard, AdminScopeGuard)",
+            "@Roles(UserRole.admin)"
+          ],
+          "methodDecorators": [
+            "@Post(':id/milestones')",
+            "@AdminScopes(AdminScope.ops_admin)"
+          ],
+          "methodHash": "1361a3119eb42a9faf3e46dc0a27cd2cbf87f0738728b04712cfa48965d9e0af"
+        },
+        "controllerMethod": {
+          "line": 57,
+          "hash": "1361a3119eb42a9faf3e46dc0a27cd2cbf87f0738728b04712cfa48965d9e0af",
+          "delegatedArguments": ["user.id", "id", "dto"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 782,
+          "hash": "75627a887a28d82b56dfd32dbc9882edb4f9f5fb70f0d7c53733b11e014ea4f4"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/orders/dto/order.dto.ts",
+          "name": "ConfigureMilestonesDto",
+          "line": 172,
+          "hash": "c87547c364cef8cca66a0b67561d379e25484a0730161bf99dd451b14e02ddff",
+          "fields": [
+            {
+              "name": "milestones",
+              "decorators": [
+                "@IsArray()",
+                "@ArrayMinSize(2)",
+                "@ValidateNested({ each: true })",
+                "@Type(() => MilestoneInputDto)"
+              ]
+            }
+          ]
+        },
+        "transitionCalls": [],
+        "sourceDocRefs": ["D3 §14.3/12.4"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-20",
+        "signature": "POST /v1/admin/orders/:id/reports",
+        "file": "apps/api/src/orders/orders.admin.controller.ts",
+        "handler": "addManagementReport",
+        "service": "addManagementReport",
+        "dto": "CreateManagementReportDto",
+        "route": {
+          "method": "POST",
+          "path": "/v1/admin/orders/:id/reports",
+          "file": "apps/api/src/orders/orders.admin.controller.ts",
+          "line": 67,
+          "className": "OrdersAdminController",
+          "handler": "addManagementReport",
+          "classDecorators": [
+            "@Controller('v1/admin/orders')",
+            "@UseGuards(RolesGuard, AdminScopeGuard)",
+            "@Roles(UserRole.admin)"
+          ],
+          "methodDecorators": [
+            "@Post(':id/reports')",
+            "@AdminScopes(AdminScope.ops_admin)"
+          ],
+          "methodHash": "c815dbbb00e66121ad00fed3ca461e909761b3678f0a99114f075b4205578201"
+        },
+        "controllerMethod": {
+          "line": 67,
+          "hash": "c815dbbb00e66121ad00fed3ca461e909761b3678f0a99114f075b4205578201",
+          "delegatedArguments": ["user.id", "id", "dto"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 1055,
+          "hash": "f5716d7e0b4f9d326b534534e5bdb6409fe393be93d5f96cff68d196bec24c4a"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/orders/dto/order.dto.ts",
+          "name": "CreateManagementReportDto",
+          "line": 201,
+          "hash": "2f6b54568a9f2327b2eaac2fe46eb97f295d2b66d4161310f16aab98955f28d1",
+          "fields": [
+            {
+              "name": "summary",
+              "decorators": ["@IsString()", "@MinLength(3)"]
+            },
+            {
+              "name": "fileId",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            },
+            {
+              "name": "visibleToCustomer",
+              "decorators": ["@IsBoolean()"]
+            }
+          ]
+        },
+        "transitionCalls": [],
+        "sourceDocRefs": ["D3 §15.3/19", "D5 §12.3"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-21",
+        "signature": "POST /v1/admin/orders/:id/messages",
+        "file": "apps/api/src/orders/orders.admin.controller.ts",
+        "handler": "addMessage",
+        "service": "addAdminMessage",
+        "dto": "OrderMessageDto",
+        "route": {
+          "method": "POST",
+          "path": "/v1/admin/orders/:id/messages",
+          "file": "apps/api/src/orders/orders.admin.controller.ts",
+          "line": 172,
+          "className": "OrdersAdminController",
+          "handler": "addMessage",
+          "classDecorators": [
+            "@Controller('v1/admin/orders')",
+            "@UseGuards(RolesGuard, AdminScopeGuard)",
+            "@Roles(UserRole.admin)"
+          ],
+          "methodDecorators": [
+            "@Post(':id/messages')",
+            "@AdminScopes(AdminScope.ops_admin)"
+          ],
+          "methodHash": "9c5503e5f1045ae9dd6056864ae3ea006fecacb126191ed770ef0ee102dea266"
+        },
+        "controllerMethod": {
+          "line": 172,
+          "hash": "9c5503e5f1045ae9dd6056864ae3ea006fecacb126191ed770ef0ee102dea266",
+          "delegatedArguments": [
+            "id",
+            "user.id",
+            "dto.body",
+            "dto.visibility ?? MessageVisibility.internal_only",
+            "dto.attachmentFileId"
+          ]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 1890,
+          "hash": "eb74864aaeee8d1920873d52e452ac0d181162a9cc35a52d199d2694d85d12af"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/orders/dto/order.dto.ts",
+          "name": "OrderMessageDto",
+          "line": 276,
+          "hash": "c8ce91eedb750b3f9ed097fe3354bb53acb4edbbaf9bc4a33ec6c977ccb3eabb",
+          "fields": [
+            {
+              "name": "body",
+              "decorators": ["@IsString()"]
+            },
+            {
+              "name": "attachmentFileId",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            },
+            {
+              "name": "visibility",
+              "decorators": [
+                "@IsOptional()",
+                "@IsIn(['customer_visible', 'internal_only'])"
+              ]
+            }
+          ]
+        },
+        "transitionCalls": [],
+        "sourceDocRefs": ["D3 §15.1/15.2/19"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-22",
+        "signature": "POST /v1/executor/orders/:id/start",
+        "file": "apps/api/src/executor/executor.controller.ts",
+        "handler": "start",
+        "service": "executorStart",
+        "dto": null,
+        "route": {
+          "method": "POST",
+          "path": "/v1/executor/orders/:id/start",
+          "file": "apps/api/src/executor/executor.controller.ts",
+          "line": 64,
+          "className": "ExecutorController",
+          "handler": "start",
+          "classDecorators": [
+            "@Controller('v1/executor')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.executor)"
+          ],
+          "methodDecorators": ["@Post('orders/:id/start')"],
+          "methodHash": "e22daa90a5baaa499dad4294fc65ce2f452ba22fb93869a3e0ad69e86975805c"
+        },
+        "controllerMethod": {
+          "line": 64,
+          "hash": "e22daa90a5baaa499dad4294fc65ce2f452ba22fb93869a3e0ad69e86975805c",
+          "delegatedArguments": ["user.id", "id"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 988,
+          "hash": "1f51ff265ec50ddd09a1270bda244f73b1d53b3df496a65afbeca9d30c0e44c9"
+        },
+        "dtoContract": null,
+        "transitionCalls": [
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 1004,
+            "owner": "executorStart",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.in_progress",
+              "OrderStatusSource.executor",
+              "executorUserId"
+            ],
+            "disputeFlag": "omitted"
+          }
+        ],
+        "sourceDocRefs": ["D3 §8/14.2", "D4 §1.3"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-23",
+        "signature": "POST /v1/executor/orders/:id/accept",
+        "file": "apps/api/src/executor/executor.controller.ts",
+        "handler": "accept",
+        "receiver": "executor",
+        "serviceFile": "apps/api/src/executor/executor.service.ts",
+        "service": "acceptOrder",
+        "dto": null,
+        "route": {
+          "method": "POST",
+          "path": "/v1/executor/orders/:id/accept",
+          "file": "apps/api/src/executor/executor.controller.ts",
+          "line": 69,
+          "className": "ExecutorController",
+          "handler": "accept",
+          "classDecorators": [
+            "@Controller('v1/executor')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.executor)"
+          ],
+          "methodDecorators": ["@Post('orders/:id/accept')"],
+          "methodHash": "185b68fe912b34cbfbb9aa83dc8217bf819853c6ef47353d1a8aa1e20cc1c082"
+        },
+        "controllerMethod": {
+          "line": 69,
+          "hash": "185b68fe912b34cbfbb9aa83dc8217bf819853c6ef47353d1a8aa1e20cc1c082",
+          "delegatedArguments": ["user.id", "id"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/executor/executor.service.ts",
+          "line": 1118,
+          "hash": "2a879d76886330fcbff4b750727eb481c9fdf907f66dbc3eabac24b71990273e"
+        },
+        "dtoContract": null,
+        "transitionCalls": [],
+        "sourceDocRefs": ["D3 §8/10.4", "D5 §10"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-24",
+        "signature": "PATCH /v1/executor/orders/:id/checklist/:itemId",
+        "file": "apps/api/src/executor/executor.controller.ts",
+        "handler": "updateChecklist",
+        "receiver": "executor",
+        "serviceFile": "apps/api/src/executor/executor.service.ts",
+        "service": "updateChecklistItem",
+        "dto": "UpdateExecutionChecklistDto",
+        "dtoFile": "apps/api/src/executor/dto/executor.dto.ts",
+        "route": {
+          "method": "PATCH",
+          "path": "/v1/executor/orders/:id/checklist/:itemId",
+          "file": "apps/api/src/executor/executor.controller.ts",
+          "line": 74,
+          "className": "ExecutorController",
+          "handler": "updateChecklist",
+          "classDecorators": [
+            "@Controller('v1/executor')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.executor)"
+          ],
+          "methodDecorators": ["@Patch('orders/:id/checklist/:itemId')"],
+          "methodHash": "db3dfbb400c6240b5c9ec2eddf881c6ff6b9f28cb712418fb5ba67096f1bffbb"
+        },
+        "controllerMethod": {
+          "line": 74,
+          "hash": "db3dfbb400c6240b5c9ec2eddf881c6ff6b9f28cb712418fb5ba67096f1bffbb",
+          "delegatedArguments": ["user.id", "id", "itemId", "dto.completed"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/executor/executor.service.ts",
+          "line": 1172,
+          "hash": "d98df9ef2dcccc596354a36d092ddf140dafb015879fab8bb911f2c076ffcf3f"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/executor/dto/executor.dto.ts",
+          "name": "UpdateExecutionChecklistDto",
+          "line": 205,
+          "hash": "08121d10d476df367466dba5fa6af3816b5559d0eb83ed1cc599d80f7b0206f5",
+          "fields": [
+            {
+              "name": "completed",
+              "decorators": ["@IsBoolean()"]
+            }
+          ]
+        },
+        "transitionCalls": [],
+        "sourceDocRefs": ["D3 §8/16.1", "D5 §10"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-25",
+        "signature": "POST /v1/executor/orders/:id/progress-report",
+        "file": "apps/api/src/executor/executor.controller.ts",
+        "handler": "progressReport",
+        "service": "progressReport",
+        "dto": "ProgressReportDto",
+        "route": {
+          "method": "POST",
+          "path": "/v1/executor/orders/:id/progress-report",
+          "file": "apps/api/src/executor/executor.controller.ts",
+          "line": 89,
+          "className": "ExecutorController",
+          "handler": "progressReport",
+          "classDecorators": [
+            "@Controller('v1/executor')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.executor)"
+          ],
+          "methodDecorators": ["@Post('orders/:id/progress-report')"],
+          "methodHash": "3f024717c955d4f39d8fbc2bc53078bb526e6f5ec21f398dee964c73184e3f82"
+        },
+        "controllerMethod": {
+          "line": 89,
+          "hash": "3f024717c955d4f39d8fbc2bc53078bb526e6f5ec21f398dee964c73184e3f82",
+          "delegatedArguments": ["user.id", "id", "dto"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 1012,
+          "hash": "d6a936cd0819b5a3e78834cfef92723a9baad3e415840c8e9513b1acba1c67da"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/orders/dto/order.dto.ts",
+          "name": "ProgressReportDto",
+          "line": 186,
+          "hash": "777d5b3eeb0ce1cc2c3bb0d8cbe1c57dde9165becd41426b315c716d6abe9937",
+          "fields": [
+            {
+              "name": "summary",
+              "decorators": ["@IsString()"]
+            },
+            {
+              "name": "progressPercent",
+              "decorators": [
+                "@IsOptional()",
+                "@IsInt()",
+                "@Min(0)",
+                "@Max(100)"
+              ]
+            },
+            {
+              "name": "fileId",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            }
+          ]
+        },
+        "transitionCalls": [],
+        "sourceDocRefs": ["D3 §15.3", "D5 §10"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-26",
+        "signature": "POST /v1/executor/orders/:id/deliver",
+        "file": "apps/api/src/executor/executor.controller.ts",
+        "handler": "deliver",
+        "service": "deliver",
+        "dto": "DeliverOrderDto",
+        "route": {
+          "method": "POST",
+          "path": "/v1/executor/orders/:id/deliver",
+          "file": "apps/api/src/executor/executor.controller.ts",
+          "line": 98,
+          "className": "ExecutorController",
+          "handler": "deliver",
+          "classDecorators": [
+            "@Controller('v1/executor')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.executor)"
+          ],
+          "methodDecorators": ["@Post('orders/:id/deliver')"],
+          "methodHash": "fa99801851d7302cc47d2b55205bbc579db615a86e97e437bef135646c8870bf"
+        },
+        "controllerMethod": {
+          "line": 98,
+          "hash": "fa99801851d7302cc47d2b55205bbc579db615a86e97e437bef135646c8870bf",
+          "delegatedArguments": ["user.id", "id", "dto"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 1085,
+          "hash": "c15bbaf953bdeaaaa67b44bd6caaa2d6e782e87379187c29945369f64979b2d1"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/orders/dto/order.dto.ts",
+          "name": "DeliverOrderDto",
+          "line": 214,
+          "hash": "0cdcd887d3d3b2dcad6737f92a90e7855f9049dc5a35b355682105f986de679d",
+          "fields": [
+            {
+              "name": "summary",
+              "decorators": ["@IsString()", "@MinLength(3)"]
+            },
+            {
+              "name": "fileIds",
+              "decorators": [
+                "@IsArray()",
+                "@ArrayMinSize(1)",
+                "@ArrayUnique()",
+                "@IsString({ each: true })"
+              ]
+            }
+          ]
+        },
+        "transitionCalls": [
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 1143,
+            "owner": "deliver",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.submitted_for_qc",
+              "OrderStatusSource.executor",
+              "executorUserId",
+              "'ثبت خروجی و ارسال برای کنترل کیفیت'",
+              "{}",
+              "tx"
+            ],
+            "disputeFlag": "omitted"
+          },
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 1152,
+            "owner": "deliver",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.qc_in_review",
+              "OrderStatusSource.system",
+              "null",
+              "'ارسال خودکار به صف QC'",
+              "{}",
+              "tx"
+            ],
+            "disputeFlag": "omitted"
+          },
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 1167,
+            "owner": "deliver",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.ready_for_customer_review",
+              "OrderStatusSource.system",
+              "null",
+              "'این خدمت نیازمند QC نیست'",
+              "{}",
+              "tx"
+            ],
+            "disputeFlag": "omitted"
+          },
+          {
+            "file": "apps/api/src/orders/orders.service.ts",
+            "line": 1176,
+            "owner": "deliver",
+            "callee": "this.transition",
+            "arguments": [
+              "orderId",
+              "OrderStatus.delivered",
+              "OrderStatusSource.system",
+              "null",
+              "'نمایش خروجی به مشتری'",
+              "{ deliveredAt: new Date() }",
+              "tx"
+            ],
+            "disputeFlag": "omitted"
+          }
+        ],
+        "sourceDocRefs": ["D3 §16.1/16.2", "D4 §1.3"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-27",
+        "signature": "POST /v1/executor/orders/:id/milestones/:milestoneId/deliver",
+        "file": "apps/api/src/executor/executor.controller.ts",
+        "handler": "deliverMilestone",
+        "service": "deliverMilestone",
+        "dto": "DeliverMilestoneDto",
+        "route": {
+          "method": "POST",
+          "path": "/v1/executor/orders/:id/milestones/:milestoneId/deliver",
+          "file": "apps/api/src/executor/executor.controller.ts",
+          "line": 107,
+          "className": "ExecutorController",
+          "handler": "deliverMilestone",
+          "classDecorators": [
+            "@Controller('v1/executor')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.executor)"
+          ],
+          "methodDecorators": [
+            "@Post('orders/:id/milestones/:milestoneId/deliver')"
+          ],
+          "methodHash": "1f74c51ba45dcfc10e91c3a4833374c50ff9ded5078b4665a3ec35dfa36e0bca"
+        },
+        "controllerMethod": {
+          "line": 107,
+          "hash": "1f74c51ba45dcfc10e91c3a4833374c50ff9ded5078b4665a3ec35dfa36e0bca",
+          "delegatedArguments": ["user.id", "id", "milestoneId", "dto"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 846,
+          "hash": "fb24e6a8fb12f483a9ee227d5803607daf0b94f1c47989bd204300bfaed7b179"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/orders/dto/order.dto.ts",
+          "name": "DeliverMilestoneDto",
+          "line": 180,
+          "hash": "27edff33194f22170320557ff2504fa5696f4c1add23d21e3da05caeab8a1701",
+          "fields": [
+            {
+              "name": "summary",
+              "decorators": ["@IsString()", "@MinLength(3)"]
+            }
+          ]
+        },
+        "transitionCalls": [],
+        "sourceDocRefs": ["D3 §14.3/16.2", "D4 §2.5/2.6"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-28",
+        "signature": "POST /v1/admin/qc/:id/approve",
+        "file": "apps/api/src/qc/qc.controller.ts",
+        "handler": "approve",
+        "receiver": "qc",
+        "serviceFile": "apps/api/src/qc/qc.service.ts",
+        "service": "approve",
+        "dto": "SubmitQcReviewDto",
+        "dtoFile": "apps/api/src/qc/dto/qc.dto.ts",
+        "nestedDtos": ["QcReviewItemDto"],
+        "route": {
+          "method": "POST",
+          "path": "/v1/admin/qc/:id/approve",
+          "file": "apps/api/src/qc/qc.controller.ts",
+          "line": 29,
+          "className": "QcController",
+          "handler": "approve",
+          "classDecorators": [
+            "@Controller('v1/admin/qc')",
+            "@UseGuards(RolesGuard, AdminScopeGuard)",
+            "@Roles(UserRole.admin)",
+            "@AdminScopes(AdminScope.ops_admin)"
+          ],
+          "methodDecorators": ["@Post(':id/approve')"],
+          "methodHash": "72597c460d66153cd9545c0461acb710d374467750a34cdc98074f5255379c87"
+        },
+        "controllerMethod": {
+          "line": 29,
+          "hash": "72597c460d66153cd9545c0461acb710d374467750a34cdc98074f5255379c87",
+          "delegatedArguments": ["id", "user.id", "dto"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/qc/qc.service.ts",
+          "line": 63,
+          "hash": "40d86396fe395386062108e7fbca012439cc1a79f2f01b4298afa2fffb255e79"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/qc/dto/qc.dto.ts",
+          "name": "SubmitQcReviewDto",
+          "line": 23,
+          "hash": "80770693917e9bcafa1b5501520e17de0f396c40aad942b190a38148c99c6226",
+          "fields": [
+            {
+              "name": "comment",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            },
+            {
+              "name": "items",
+              "decorators": [
+                "@IsArray()",
+                "@ArrayMinSize(1)",
+                "@ValidateNested({ each: true })",
+                "@Type(() => QcReviewItemDto)"
+              ]
+            }
+          ]
+        },
+        "nestedDtoContracts": [
+          {
+            "file": "apps/api/src/qc/dto/qc.dto.ts",
+            "name": "QcReviewItemDto",
+            "line": 11,
+            "hash": "fcb3aac4adbde37aee4ebbe2930eddabef6c743a6c1f414406d50059dbc304ab",
+            "fields": [
+              {
+                "name": "checklistItemId",
+                "decorators": ["@IsString()"]
+              },
+              {
+                "name": "passed",
+                "decorators": ["@IsBoolean()"]
+              },
+              {
+                "name": "note",
+                "decorators": ["@IsOptional()", "@IsString()"]
+              }
+            ]
+          }
+        ],
+        "transitionCalls": [],
+        "sourceDocRefs": ["D3 §10.5/16.1", "D4 §1.3"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-29",
+        "signature": "POST /v1/admin/qc/:id/request-rework",
+        "file": "apps/api/src/qc/qc.controller.ts",
+        "handler": "requestRework",
+        "receiver": "qc",
+        "serviceFile": "apps/api/src/qc/qc.service.ts",
+        "service": "requestRework",
+        "dto": "SubmitQcReviewDto",
+        "dtoFile": "apps/api/src/qc/dto/qc.dto.ts",
+        "nestedDtos": ["QcReviewItemDto"],
+        "route": {
+          "method": "POST",
+          "path": "/v1/admin/qc/:id/request-rework",
+          "file": "apps/api/src/qc/qc.controller.ts",
+          "line": 38,
+          "className": "QcController",
+          "handler": "requestRework",
+          "classDecorators": [
+            "@Controller('v1/admin/qc')",
+            "@UseGuards(RolesGuard, AdminScopeGuard)",
+            "@Roles(UserRole.admin)",
+            "@AdminScopes(AdminScope.ops_admin)"
+          ],
+          "methodDecorators": ["@Post(':id/request-rework')"],
+          "methodHash": "e03950f55b9ac2031e58a412ca6a843dd1a420a46cbff1d5393182abe17b28ba"
+        },
+        "controllerMethod": {
+          "line": 38,
+          "hash": "e03950f55b9ac2031e58a412ca6a843dd1a420a46cbff1d5393182abe17b28ba",
+          "delegatedArguments": ["id", "user.id", "dto"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/qc/qc.service.ts",
+          "line": 67,
+          "hash": "68cf29c41723585d4f31145ccd2f87b35d07b41b17f06f13ff9c60f3bb753a4e"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/qc/dto/qc.dto.ts",
+          "name": "SubmitQcReviewDto",
+          "line": 23,
+          "hash": "80770693917e9bcafa1b5501520e17de0f396c40aad942b190a38148c99c6226",
+          "fields": [
+            {
+              "name": "comment",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            },
+            {
+              "name": "items",
+              "decorators": [
+                "@IsArray()",
+                "@ArrayMinSize(1)",
+                "@ValidateNested({ each: true })",
+                "@Type(() => QcReviewItemDto)"
+              ]
+            }
+          ]
+        },
+        "nestedDtoContracts": [
+          {
+            "file": "apps/api/src/qc/dto/qc.dto.ts",
+            "name": "QcReviewItemDto",
+            "line": 11,
+            "hash": "fcb3aac4adbde37aee4ebbe2930eddabef6c743a6c1f414406d50059dbc304ab",
+            "fields": [
+              {
+                "name": "checklistItemId",
+                "decorators": ["@IsString()"]
+              },
+              {
+                "name": "passed",
+                "decorators": ["@IsBoolean()"]
+              },
+              {
+                "name": "note",
+                "decorators": ["@IsOptional()", "@IsString()"]
+              }
+            ]
+          }
+        ],
+        "transitionCalls": [],
+        "sourceDocRefs": ["D3 §10.5/16.1", "D4 §1.3"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-30",
+        "signature": "POST /v1/admin/qc/:id/reject",
+        "file": "apps/api/src/qc/qc.controller.ts",
+        "handler": "reject",
+        "receiver": "qc",
+        "serviceFile": "apps/api/src/qc/qc.service.ts",
+        "service": "reject",
+        "dto": "SubmitQcReviewDto",
+        "dtoFile": "apps/api/src/qc/dto/qc.dto.ts",
+        "nestedDtos": ["QcReviewItemDto"],
+        "route": {
+          "method": "POST",
+          "path": "/v1/admin/qc/:id/reject",
+          "file": "apps/api/src/qc/qc.controller.ts",
+          "line": 47,
+          "className": "QcController",
+          "handler": "reject",
+          "classDecorators": [
+            "@Controller('v1/admin/qc')",
+            "@UseGuards(RolesGuard, AdminScopeGuard)",
+            "@Roles(UserRole.admin)",
+            "@AdminScopes(AdminScope.ops_admin)"
+          ],
+          "methodDecorators": ["@Post(':id/reject')"],
+          "methodHash": "3682580058ddc8d6199074657c773faf3db870237d17da1082686fecb991226f"
+        },
+        "controllerMethod": {
+          "line": 47,
+          "hash": "3682580058ddc8d6199074657c773faf3db870237d17da1082686fecb991226f",
+          "delegatedArguments": ["id", "user.id", "dto"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/qc/qc.service.ts",
+          "line": 75,
+          "hash": "772d997fbfddf27fcc9dd0fa192fe94106652fa5a0c480690c8ab2e505fe755f"
+        },
+        "dtoContract": {
+          "file": "apps/api/src/qc/dto/qc.dto.ts",
+          "name": "SubmitQcReviewDto",
+          "line": 23,
+          "hash": "80770693917e9bcafa1b5501520e17de0f396c40aad942b190a38148c99c6226",
+          "fields": [
+            {
+              "name": "comment",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            },
+            {
+              "name": "items",
+              "decorators": [
+                "@IsArray()",
+                "@ArrayMinSize(1)",
+                "@ValidateNested({ each: true })",
+                "@Type(() => QcReviewItemDto)"
+              ]
+            }
+          ]
+        },
+        "nestedDtoContracts": [
+          {
+            "file": "apps/api/src/qc/dto/qc.dto.ts",
+            "name": "QcReviewItemDto",
+            "line": 11,
+            "hash": "fcb3aac4adbde37aee4ebbe2930eddabef6c743a6c1f414406d50059dbc304ab",
+            "fields": [
+              {
+                "name": "checklistItemId",
+                "decorators": ["@IsString()"]
+              },
+              {
+                "name": "passed",
+                "decorators": ["@IsBoolean()"]
+              },
+              {
+                "name": "note",
+                "decorators": ["@IsOptional()", "@IsString()"]
+              }
+            ]
+          }
+        ],
+        "transitionCalls": [],
+        "sourceDocRefs": ["D3 §10.5/16.1", "D4 §1.3"],
+        "runtimeAcceptance": false
+      },
+      {
+        "id": "Z0-CMD-31",
+        "signature": "POST /v1/admin/jobs/:name/run",
+        "file": "apps/api/src/jobs/jobs.admin.controller.ts",
+        "handler": "run",
+        "receiver": "jobs",
+        "serviceFile": "apps/api/src/jobs/jobs.service.ts",
+        "service": "run",
+        "dto": null,
+        "route": {
+          "method": "POST",
+          "path": "/v1/admin/jobs/:name/run",
+          "file": "apps/api/src/jobs/jobs.admin.controller.ts",
+          "line": 29,
+          "className": "JobsAdminController",
+          "handler": "run",
+          "classDecorators": [
+            "@Controller('v1/admin/jobs')",
+            "@UseGuards(RolesGuard, AdminScopeGuard)",
+            "@Roles(UserRole.admin)",
+            "@AdminScopes(AdminScope.super_admin)"
+          ],
+          "methodDecorators": ["@Post(':name/run')"],
+          "methodHash": "20166b7dc9f74ae9f67b56faea88e0a66a2271a16e4ff152cd3e282c205dcc21"
+        },
+        "controllerMethod": {
+          "line": 29,
+          "hash": "20166b7dc9f74ae9f67b56faea88e0a66a2271a16e4ff152cd3e282c205dcc21",
+          "delegatedArguments": ["name as JobName"]
+        },
+        "serviceMethod": {
+          "file": "apps/api/src/jobs/jobs.service.ts",
+          "line": 226,
+          "hash": "e30fccd8d2db4997852b58567cde271a55b1b4fecf1ea0c3d668a6044a1103af"
+        },
+        "dtoContract": null,
+        "transitionCalls": [],
+        "sourceDocRefs": ["D3 §23/19", "D4 §1.5/2.5"],
+        "runtimeAcceptance": false
+      }
+    ],
+    "scheduledJobs": [
+      {
+        "name": "payment_verify_recheck",
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "line": 96,
+        "hash": "bd45b1faeba122854419e273d61d1b2f1cdd24f3f310a2e12d78d545023ab95b",
+        "intervalExpression": "5 * MINUTE",
+        "runExpression": "(now) => this.recheckPayments(now)"
+      },
+      {
+        "name": "release_eligible_escrows",
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "line": 101,
+        "hash": "9ffe701b01a1b5a99ab9fdff8c8306979f0b19bfdfa83232065ad6fcc4e5f602",
+        "intervalExpression": "15 * MINUTE",
+        "runExpression": "(now) => this.releaseEligibleEscrows(now)"
+      },
+      {
+        "name": "escalate_overdue_tickets",
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "line": 106,
+        "hash": "fbe0cdff6698ad1b1949c998afdf1d872f8bb4314be9a95defc9943d33a11d64",
+        "intervalExpression": "10 * MINUTE",
+        "runExpression": "async () => ({ processed: await this.tickets.flagOverdueTickets() })"
+      },
+      {
+        "name": "recalculate_staff_performance",
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "line": 111,
+        "hash": "8df8e9dc81bc15742a45d6d5df019c2dad23de41ba77c7d1d520037cdcc67cd7",
+        "intervalExpression": "24 * HOUR",
+        "runExpression": "(now) => this.recalculateStaffPerformance(now)"
+      },
+      {
+        "name": "detect_staff_risks",
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "line": 116,
+        "hash": "9adcbd9490d5d6a0eb29050457535ecef3aca5a62280edf610f4529d9934b6b6",
+        "intervalExpression": "HOUR",
+        "runExpression": "(now) => this.detectStaffRisks(now)"
+      },
+      {
+        "name": "recalculate_executor_scores",
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "line": 121,
+        "hash": "53cabf811f06ea47685ab3de1c6e9d324cc2497976913d3dfc27245e12d529a4",
+        "intervalExpression": "24 * HOUR",
+        "runExpression": "() => this.recalculateExecutorScores()"
+      },
+      {
+        "name": "send_outbox_notifications",
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "line": 126,
+        "hash": "d2c4554ea1166bc60b45d90eb4ba680ad0b5bded56666f47c6e7f8fd9b579bdd",
+        "intervalExpression": "MINUTE",
+        "runExpression": "async (now) => {\n        const result = await this.outbox.processBatch(now);\n        const dispatched = await this.dispatchNotificationChannels();\n        return {\n          processed: result.sent + dispatched,\n          details: { ...result, dispatched },\n        };\n      }"
+      },
+      {
+        "name": "file_antivirus_scan",
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "line": 138,
+        "hash": "b1d5c23addb8eddb517d5b98b47862bc34550c58394c589fc68a9e3f742ed851",
+        "intervalExpression": "2 * MINUTE",
+        "runExpression": "() => this.scanPendingFiles()"
+      },
+      {
+        "name": "expire_signed_urls",
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "line": 143,
+        "hash": "5a5d4d7841aabfe61a1d60ff155f77d255f5ebbde03102acc4047e36fa846ccd",
+        "intervalExpression": "5 * MINUTE",
+        "runExpression": "(now) => this.expireSignedUrls(now)"
+      },
+      {
+        "name": "cleanup_expired_records",
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "line": 148,
+        "hash": "3e8a3de54df471f6d864c06fa4d68189ef7537a0654f84c893e94bcfcfe313a5",
+        "intervalExpression": "this.intervalMinutes('DATA_CLEANUP_INTERVAL_MINUTES', 360) * MINUTE",
+        "runExpression": "(now) => this.dataCleanup.cleanup(now)"
+      },
+      {
+        "name": "cleanup_storage_files",
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "line": 154,
+        "hash": "111c0a280a50f1e6e9e5b305eac892e512462d15081d221b735605fcde7f7c52",
+        "intervalExpression": "this.intervalMinutes('FILE_CLEANUP_INTERVAL_MINUTES', 60) * MINUTE",
+        "runExpression": "(now) => this.cleanupStorageFiles(now)"
+      },
+      {
+        "name": "generate_periodic_reports",
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "line": 160,
+        "hash": "b2639aa867fe178f7c2d8fea6979639010725020990739a1618838feb9090f97",
+        "intervalExpression": "24 * HOUR",
+        "runExpression": "(now) => this.generatePeriodicReports(now)"
+      }
+    ],
+    "allowedJobNames": [
+      "payment_verify_recheck",
+      "release_eligible_escrows",
+      "escalate_overdue_tickets",
+      "recalculate_staff_performance",
+      "detect_staff_risks",
+      "recalculate_executor_scores",
+      "send_outbox_notifications",
+      "file_antivirus_scan",
+      "expire_signed_urls",
+      "cleanup_expired_records",
+      "cleanup_storage_files",
+      "generate_periodic_reports"
+    ],
+    "downstreamMethods": [
+      {
+        "file": "apps/api/src/finance/payments.service.ts",
+        "name": "initiatePayment",
+        "line": 36,
+        "hash": "8c8a0e1c6b64754cd2c96de0c3f04ce679d56ece65cdcf9c5eb811df4d121263"
+      },
+      {
+        "file": "apps/api/src/finance/payments.service.ts",
+        "name": "verifyAndSettlePayment",
+        "line": 104,
+        "hash": "e8bf8e808140814de064e92c2c452128366bb4f5ff687a4a3210f73abaceefdd"
+      },
+      {
+        "file": "apps/api/src/finance/payments.service.ts",
+        "name": "verifyAndSettleInTransaction",
+        "line": 122,
+        "hash": "34f4a467a2cc39b711944f4d65292a457fbeb35f9b82e9fbff62126d7b8dfe3e"
+      },
+      {
+        "file": "apps/api/src/orders/domain/order-assignment.service.ts",
+        "name": "loadEligibleExecutor",
+        "line": 10,
+        "hash": "41f9e419e856cf4bd9be2841809a6a44d69f78dbd0818776095524b1818f64fc"
+      },
+      {
+        "file": "apps/api/src/orders/domain/order-messaging.service.ts",
+        "name": "create",
+        "line": 9,
+        "hash": "3beeda154f25e65da4b8d0377680ba0f00423b0e7049fc32fbc1fec29bfc5c65"
+      },
+      {
+        "file": "apps/api/src/orders/domain/order-reports.ts",
+        "name": "createVersionedOrderReport",
+        "line": 3,
+        "hash": "208d62471d30bf464dac97d8964ec268b6cfef3b8107ef9fea346ecd0c5ad17f"
+      },
+      {
+        "file": "apps/api/src/orders/orders.service.ts",
+        "name": "applyQcApproval",
+        "line": 1213,
+        "hash": "c4ce9f0c1b86ddf1636c3ff51ff3146c4b8df014d52ea89012ec29c7fb8df189"
+      },
+      {
+        "file": "apps/api/src/orders/orders.service.ts",
+        "name": "applyQcRejection",
+        "line": 1258,
+        "hash": "f453bceb32400c7676e2ffb5bd23d9ba972f2bf435f257c4146173a7113c1422"
+      },
+      {
+        "file": "apps/api/src/orders/orders.service.ts",
+        "name": "assertExecutorOwnsOrder",
+        "line": 108,
+        "hash": "a236c70452fbabcdfbd47f1ffb982aa231f7986f5006435777b4442cdb7c44d5"
+      },
+      {
+        "file": "apps/api/src/orders/orders.service.ts",
+        "name": "assertExecutorFileIds",
+        "line": 1317,
+        "hash": "f1251fe119fde70a06e10a22ab895e07797a661a473aacb5bd226a893ba762d6"
+      },
+      {
+        "file": "apps/api/src/qc/qc.service.ts",
+        "name": "decide",
+        "line": 79,
+        "hash": "c408525aca1ae27efd1059f99d7774b7faafb0b6784e6e6fac4e07905daeba7f"
+      },
+      {
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "name": "onModuleInit",
+        "line": 50,
+        "hash": "5b064f1ad8263bbdb956e9f1873246f051895c7bb13a6fa78f0664a1385a270d"
+      },
+      {
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "name": "recheckPayments",
+        "line": 234,
+        "hash": "2430c6bdf3bf01bcb88f1098b4e184abe7f38303e63551b6fa350263f405b1c1"
+      },
+      {
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "name": "releaseEligibleEscrows",
+        "line": 259,
+        "hash": "f8953ee5c960668d854a715d5a3c1a47ce4041ad73e64552d4e32d1bf4b66f7c"
+      },
+      {
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "name": "recalculateStaffPerformance",
+        "line": 288,
+        "hash": "7d280404fae72c5e20b3ea3b82f51491c17ca3e9b79100a68b9534b917c01cee"
+      },
+      {
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "name": "detectStaffRisks",
+        "line": 312,
+        "hash": "76efe989eea0fc6a3f5c82dc7d853396ad4064779d4b40a202bd1ea486643dce"
+      },
+      {
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "name": "recalculateExecutorScores",
+        "line": 301,
+        "hash": "10194b4c9fe498cfc8b9876bad5b2c9334845aaa198f7c6adc446a4a67922518"
+      },
+      {
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "name": "dispatchNotificationChannels",
+        "line": 168,
+        "hash": "0a59553e069bb04ee505f576922e99e6c6371fda75a1823bc9e44e170617c306"
+      },
+      {
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "name": "scanPendingFiles",
+        "line": 325,
+        "hash": "80a586a9cd8882a08ffb0c66f6ccd41d6a2b4f2a9c91c00ba7f009e9ee39e308"
+      },
+      {
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "name": "expireSignedUrls",
+        "line": 360,
+        "hash": "b81946a9499c8597284f56db7872c7f6b8dc2b0c29bd2c599e9d9c9d8d32fd7b"
+      },
+      {
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "name": "cleanupStorageFiles",
+        "line": 368,
+        "hash": "b0d8655ff529cacdbb3bef5be5e313066831abb1de08b127deb6e36b8fd6131d"
+      },
+      {
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "name": "intervalMinutes",
+        "line": 385,
+        "hash": "478deaffb552377a5f44012226af6fd18ba6758ddfee3654191ddc940e0f0f29"
+      },
+      {
+        "file": "apps/api/src/jobs/jobs.service.ts",
+        "name": "generatePeriodicReports",
+        "line": 392,
+        "hash": "3f5bd803362ffa052c7469893c15be21d8d599a079aa978ca83231a7e5547a83"
+      },
+      {
+        "file": "apps/api/src/jobs/job-runner.service.ts",
+        "name": "run",
+        "line": 51,
+        "hash": "f8819b132dd1c0fd95530b30cd1550d003d73b7a9920b27fc768e8f214407ed2"
+      },
+      {
+        "file": "apps/api/src/jobs/job-runner.service.ts",
+        "name": "start",
+        "line": 31,
+        "hash": "d6f610282d3c3a21e19734cd417d78094be3076738b57eb4acd5d41426f7375d"
+      },
+      {
+        "file": "apps/api/src/jobs/job-runner.service.ts",
+        "name": "errorMessage",
+        "line": 102,
+        "hash": "2a536f5c7d90b5b72a88a21238e6e114d8df4a908101d9fa1575dcc4423e6cf1"
+      },
+      {
+        "file": "apps/api/src/jobs/job-runner.service.ts",
+        "name": "createJobRunKey",
+        "line": 8,
+        "hash": "670b5cca9a3434c6cc6194281739099019830a10845fc8cc574dd0ad5f43db70"
+      }
+    ],
+    "inputs": {
+      "apps/api/src/orders/orders.service.ts": "16130dd85df5a3fc8cf6dab8662ecbcf47a1592a68f5b9d5e01426ecb10575aa",
+      "apps/api/src/orders/dto/order.dto.ts": "3836862fbbddb7344551b4d197d2e73660c5ca2d4118cf0a1dc02e4724db93e7",
+      "apps/api/src/orders/order-state-machine.ts": "36268072c280d36fb6ef0ab526e4861142bbb87578a92d9015dad89b4fec99d8",
+      "apps/api/src/jobs/job.types.ts": "02f1a076378a15a14163b69c29383ce36dd14103a0619d79ffba074e2fcd8eb0",
+      "apps/api/prisma/schema.prisma": "bfa97ddb906f4d2bdfb7e02940bd8b07a4bf6f375371b4df47408d87b66e99be",
+      "apps/api/src/orders/orders.controller.ts": "fd3672236e4f56cb0bddfbfd2b9e9bf70f08a5438fb7f1652b7156ca13cd731b",
+      "apps/api/src/orders/orders.admin.controller.ts": "46d6e3201a6554981a5e0c06b1d5c763376429ece5f79c522f893042689e9715",
+      "apps/api/src/executor/executor.controller.ts": "5cdb7b62cdfcbc98e21a518f03e10725b01b2d93bd9a1be8b2c11f6be66462bf",
+      "apps/api/src/executor/executor.service.ts": "dc9e2e447d10409c9a9f39ab40a8ca5edbc6fff2294fa9d1110e1752d13fd3f2",
+      "apps/api/src/executor/dto/executor.dto.ts": "4830188f4710fdf1b484b9e55616c943c7c0a579d74e5324c7be3aeb7151b1b9",
+      "apps/api/src/qc/qc.controller.ts": "a4c814f8d5ac2cbd81fc842cc069b15476350e6b7801eadbc4fc9745d1e2ce96",
+      "apps/api/src/qc/qc.service.ts": "a7b761dc702f6ad17994be71f650b582dfebf1d31289198ee3e991d601a1c1b1",
+      "apps/api/src/qc/dto/qc.dto.ts": "aa599665452bbfd5e37994e2849219ab11dcda4f5708f124f9e8d17ae26459ca",
+      "apps/api/src/jobs/jobs.admin.controller.ts": "56af7a27418890a370babbbe0a0166cdf2e5fb20e577827d31d38eae7bf4a5fb",
+      "apps/api/src/jobs/jobs.service.ts": "624b618a82f0a84894d7e58c3fafb15b871702ea751b0d43274a79d77e4c7cc3",
+      "apps/api/src/orders/domain/order-workflow.service.ts": "d458f9f5ab95474feafc89df44ded81e002d348d7fc5a28aa86821875da5ca53",
+      "apps/api/src/orders/domain/order-dispute.service.ts": "0efc52e67d2b416eb2a2dd7f3556c8a637eb676f3cc8a4ff1440cfb0433012a4",
+      "apps/api/src/orders/domain/order-assignment.service.ts": "c87dc5fa9127cd6e5c3ff42c20a8d5cd7295ce9f0e11bf51b0722a0e95919b1c",
+      "apps/api/src/finance/payments.service.ts": "0e7715eee002a8605b7ac4477503b8ec175f4314573c3fcfca81eadcbae29524",
+      "apps/api/src/finance/idempotency.service.ts": "d151a0bfe5fab825872f2f32b32bbdc2d865b8eadd20ca99d6904c8cff3e4aac",
+      "apps/api/src/finance/escrow.service.ts": "53e431026d1d55b5bcc53e35937cc8e8892530abc76a8882af0cfce3fd577502",
+      "apps/api/src/common/guards/admin-scope.guard.ts": "b4c640d99d51d050653c3d846ef207dd5bf5459342d7bd6c2bbc7c661056519a",
+      "apps/api/src/common/guards/roles.guard.ts": "d102c37bf2e89d0412b723a695387927911260e774c94cc920d8fb2ff982dadf",
+      "apps/api/src/common/guards/jwt-auth.guard.ts": "d127b1e7e67f285e6a6225230a071e252c720eba2bb8718e424918b2e130ac6a",
+      "apps/api/src/main.ts": "da4d33d349ee2d848906c546aca1438ec798130e53cbf81757481d09334f280d",
+      "apps/api/src/app.module.ts": "9d0d3c111235dae07907318fa8d0a54df2f3e5d87250b10fc0729765570e2904",
+      "apps/api/src/orders/domain/order-messaging.service.ts": "cecb1704e46200493df5ea61b8af73b7686cff030f0e6ec18410e9c287d890f2",
+      "apps/api/src/orders/domain/order-reports.ts": "15b3cf84f72d57ed4e0c80096f270979b908e6cec0cb6aff0d1c6c02a5842822",
+      "apps/api/src/jobs/job-runner.service.ts": "d9dc396029cfd6682949e7abd89f2e13cb9f32a3177b889c8ff912413f811748"
+    },
+    "scopedWriteRouteCoverage": {
+      "controllers": [
+        "apps/api/src/orders/orders.controller.ts",
+        "apps/api/src/orders/orders.admin.controller.ts",
+        "apps/api/src/executor/executor.controller.ts",
+        "apps/api/src/qc/qc.controller.ts",
+        "apps/api/src/jobs/jobs.admin.controller.ts"
+      ],
+      "writeRoutes": [
+        "PATCH /v1/customer/orders/:id/draft",
+        "PATCH /v1/executor/orders/:id/checklist/:itemId",
+        "POST /v1/admin/jobs/:name/run",
+        "POST /v1/admin/orders/:id/assign",
+        "POST /v1/admin/orders/:id/cancel",
+        "POST /v1/admin/orders/:id/messages",
+        "POST /v1/admin/orders/:id/milestones",
+        "POST /v1/admin/orders/:id/quote",
+        "POST /v1/admin/orders/:id/reassign",
+        "POST /v1/admin/orders/:id/reports",
+        "POST /v1/admin/orders/:id/resolve-dispute",
+        "POST /v1/admin/orders/:id/triage",
+        "POST /v1/admin/qc/:id/approve",
+        "POST /v1/admin/qc/:id/reject",
+        "POST /v1/admin/qc/:id/request-rework",
+        "POST /v1/customer/orders",
+        "POST /v1/customer/orders/:id/accept-quote",
+        "POST /v1/customer/orders/:id/cancel",
+        "POST /v1/customer/orders/:id/confirm",
+        "POST /v1/customer/orders/:id/dispute",
+        "POST /v1/customer/orders/:id/messages",
+        "POST /v1/customer/orders/:id/milestones/:milestoneId/approve",
+        "POST /v1/customer/orders/:id/pay",
+        "POST /v1/customer/orders/:id/payments/:paymentId/verify",
+        "POST /v1/customer/orders/:id/revision",
+        "POST /v1/customer/orders/:id/submit",
+        "POST /v1/executor/orders/:id/accept",
+        "POST /v1/executor/orders/:id/deliver",
+        "POST /v1/executor/orders/:id/milestones/:milestoneId/deliver",
+        "POST /v1/executor/orders/:id/progress-report",
+        "POST /v1/executor/orders/:id/start"
+      ],
+      "missingRoutes": [],
+      "note": "All write routes of these five scoped controllers are classified; this is not complete Z0, full system coverage or behavioral acceptance."
+    },
+    "scan": {
+      "productionSourceFiles": 164,
+      "sourceSetHash": "fd087c296fe93012b2d479aaadc8e9acbd41f8d27c1e39d25a71764b59c6fafa",
+      "helperCallSites": [],
+      "explicitDisputeFlagCalls": [
+        {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 84,
+          "owner": "transition",
+          "callee": "this.workflow.transition",
+          "arguments": [
+            "orderId",
+            "toStatus",
+            "source",
+            "actorUserId",
+            "note",
+            "extraData",
+            "tx",
+            "financialEffect",
+            "allowDisputeResolution"
+          ],
+          "disputeFlag": "allowDisputeResolution"
+        },
+        {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 1576,
+          "owner": "resolveDispute",
+          "callee": "this.transition",
+          "arguments": [
+            "orderId",
+            "OrderStatus.in_progress",
+            "OrderStatusSource.admin",
+            "adminId",
+            "dto.note",
+            "{}",
+            "tx",
+            "effect('none')",
+            "true"
+          ],
+          "disputeFlag": "true"
+        },
+        {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 1600,
+          "owner": "resolveDispute",
+          "callee": "this.transition",
+          "arguments": [
+            "orderId",
+            "OrderStatus.cancelled",
+            "OrderStatusSource.admin",
+            "adminId",
+            "dto.note",
+            "{ cancelledAt: new Date() }",
+            "tx",
+            "effect('escrow_refund', financialAmount)",
+            "true"
+          ],
+          "disputeFlag": "true"
+        },
+        {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 1630,
+          "owner": "resolveDispute",
+          "callee": "this.transition",
+          "arguments": [
+            "orderId",
+            "OrderStatus.closed",
+            "OrderStatusSource.admin",
+            "adminId",
+            "dto.note",
+            "{ closedAt: new Date() }",
+            "tx",
+            "effect('escrow_refund_partial', financialAmount)",
+            "true"
+          ],
+          "disputeFlag": "true"
+        },
+        {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 1654,
+          "owner": "resolveDispute",
+          "callee": "this.transition",
+          "arguments": [
+            "orderId",
+            "OrderStatus.confirmed",
+            "OrderStatusSource.admin",
+            "adminId",
+            "dto.note",
+            "{ confirmedAt: new Date() }",
+            "tx",
+            "effect('escrow_release', financialAmount)",
+            "true"
+          ],
+          "disputeFlag": "true"
+        },
+        {
+          "file": "apps/api/src/orders/orders.service.ts",
+          "line": 1678,
+          "owner": "resolveDispute",
+          "callee": "this.transition",
+          "arguments": [
+            "orderId",
+            "OrderStatus.closed",
+            "OrderStatusSource.admin",
+            "adminId",
+            "dto.note",
+            "{ closedAt: new Date() }",
+            "tx",
+            "effect('none')",
+            "true"
+          ],
+          "disputeFlag": "true"
+        }
+      ],
+      "directOrderStatusWrites": [
+        {
+          "file": "apps/api/src/finance/payments.service.ts",
+          "owner": "verifyAndSettleInTransaction",
+          "line": 242,
+          "callee": "tx.order.updateMany",
+          "status": "'paid'",
+          "note": "Direct declared status write; not proof of bypass or full spread/dynamic-data analysis"
+        },
+        {
+          "file": "apps/api/src/orders/domain/order-workflow.service.ts",
+          "owner": "transition",
+          "line": 45,
+          "callee": "client.order.updateMany",
+          "status": "toStatus",
+          "note": "Direct declared status write; not proof of bypass or full spread/dynamic-data analysis"
+        }
+      ],
+      "note": "Syntactic call-site inventory, not proof of branch reachability or permission. Omitted flags/defaults and forwarding are shown separately."
+    },
+    "resolveCaseLabels": [
+      "rework",
+      "refund_full",
+      "refund_partial",
+      "release_to_executor",
+      "close"
+    ],
+    "currentCancellation": {
+      "customerStates": [
+        "draft",
+        "submitted",
+        "pending_triage",
+        "triaging",
+        "pending_quote",
+        "quoted",
+        "pending_payment"
+      ],
+      "adminTableCandidates": [
+        "draft",
+        "submitted",
+        "pending_triage",
+        "triaging",
+        "pending_quote",
+        "quoted",
+        "pending_payment",
+        "paid",
+        "assigned",
+        "in_progress",
+        "disputed"
+      ],
+      "adminExplicitlyBlocksDisputed": true,
+      "note": "Table candidates include disputed but command explicitly rejects it; per-command effective states must be reviewed with both conditions."
+    },
+    "limits": "Thirty-one write routes of five scoped controllers and twelve job registrations classified. Job delegates are evidence references, not a complete transitive-call/cleanup/provider audit. Other endpoints, Z0 streams and HTTP/concurrency/ledger gates remain open."
+  },
+  "contracts": [
+    {
+      "id": "Z0-CMD-01",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "customer via RolesGuard; JWT global unchanged",
+      "ownership": "loadOwnedOrder requires matching customerId; missing 404, other owner 403",
+      "preconditions": "Only draft/submitted/pending_triage/triaging/pending_quote/quoted/pending_payment; normal workflow source customer and optimistic version check",
+      "money": "No refund/release call; no post-payment cancellation granted",
+      "replayConcurrency": "No Idempotency-Key for this route; after first cancellation state guard rejects repetition; workflow compare-and-swap/Serializable protects the transition, not a fresh concurrency acceptance",
+      "auditHistory": "Workflow appends actor/source/reason history; no separate AuditService.record in this method; reason is currently string-only",
+      "testsNeeded": [
+        "owner vs another customer/guest/role",
+        "all seven allowed and thirteen denied states",
+        "empty/whitespace reason target contract",
+        "simultaneous requests: one history/no financial mutation"
+      ]
+    },
+    {
+      "id": "Z0-CMD-02",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "admin ops_admin scope; super_admin is admitted by existing AdminScopeGuard. finance_admin alone not listed for cancellation.",
+      "ownership": "Admin command is scope-based, not customer impersonation; real actorUserId retained",
+      "preconditions": "Generic table/source admin validation plus explicit disputed rejection; financial states paid/assigned/in_progress",
+      "money": "paid/assigned rate 1; in_progress configured rate or current default 0.5, bounded 0..1; refund=min(remaining,round(original escrow amount*rate)); no automatic release of any remaining funds",
+      "replayConcurrency": "Required scoped Idempotency-Key; finance IdempotencyService transaction Serializable, request fingerprint, replay/conflict; escrow remaining compare-and-swap",
+      "auditHistory": "Workflow history records effect; order.cancelled audit sensitive, same financial tx; reason currently string-only",
+      "testsNeeded": [
+        "ops/finance/super/guest permission boundaries",
+        "disputed rejected before refund",
+        "full/partial/already distributed escrow, rate bounds",
+        "replay/different-body/concurrency/rollback and residual reconciliation"
+      ]
+    },
+    {
+      "id": "Z0-CMD-03",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "Exposed controller route is customer only; actor enum permits other sources but does not create an admin/support HTTP route",
+      "ownership": "OrderDisputeService.assertCanRaise rejects another customer; order must exist",
+      "preconditions": "Only in_progress/delivered; no existing open dispute; transaction and workflow must both succeed",
+      "money": "No refund/release while opening dispute; escrow held pending human resolution",
+      "replayConcurrency": "No idempotency header on route; Serializable tx, open-dispute check and workflow status/version; duplicate gets conflict/state error rather than financial replay",
+      "auditHistory": "Dispute record, workflow history, sensitive audit and outbox event in transaction; reason/note currently string-only",
+      "testsNeeded": [
+        "customer owner vs nonowner/role",
+        "two permitted vs all other states",
+        "concurrent/repeated open and rollback",
+        "whitespace input and unchanged ledger"
+      ]
+    },
+    {
+      "id": "Z0-CMD-04",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "admin ops_admin or finance_admin scope; super_admin override retained; not executor/support/customer",
+      "ownership": "Real admin actor, disputed order and existing open dispute; no fake customer login",
+      "preconditions": "Dedicated resolve-dispute only; explicit allowDisputeResolution in five branch calls. Current DTO accepts rework/refund_full/refund_partial/release_to_executor/close.",
+      "money": "rework -> in_progress/no money; refund_full -> remaining refund/cancelled; refund_partial -> positive amount<=remaining refund/closed, no automatic remaining release; release_to_executor -> remaining release+commission/confirmed then system closed; extra close -> closed/effect none",
+      "replayConcurrency": "Required idempotency key scoped order.resolve-dispute; request fingerprint and same Serializable tx; escrow balance claim on monetary branches",
+      "auditHistory": "Dispute resolved fields, workflow actor/source/effect, critical audit note and outbox within tx; note currently string-only, close/default branch needs explicit source-policy review",
+      "testsNeeded": [
+        "five resolution cases with remaining escrow before/after",
+        "scope/closed/non-disputed/missing dispute boundaries",
+        "no-note/whitespace/amount<=0 and >remaining target behavior",
+        "same key replay/different body/concurrent resolution and full rollback"
+      ]
+    },
+    {
+      "id": "Z0-CMD-05",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "customer only; real customer actor on delivered->confirmed and system/null actor on confirmed->closed",
+      "ownership": "findFirst by id+customerId; nonowner is not found",
+      "preconditions": "delivered status; escrow release requires live escrow and active assignment; failure rolls back confirmation in same tx",
+      "money": "Release remaining escrow through Ledger with commission; history effect on closing transition; existing approved no-user-note confirmation is preserved",
+      "replayConcurrency": "Required scoped idempotency key for order+customer; all release/history/outbox in tx; workflow version and escrow claim",
+      "auditHistory": "Fixed reason string in workflow and escrow audit; no fake free-text field; outbox order.confirmed_and_settled",
+      "testsNeeded": [
+        "owner/nonowner and delivered-only",
+        "double-click/replay/different key concurrency",
+        "no active executor/no escrow release rollback",
+        "ledger totals + commission + history actor/source"
+      ]
+    },
+    {
+      "id": "Z0-CMD-06",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "customer only; system performs revision_requested->in_progress",
+      "ownership": "findFirst by id+customerId; any unmet criteria must belong to same order",
+      "preconditions": "delivered; revisionsUsed<revisionsAllowed; reason MinLength(3) without trim in current DTO; distinct valid criterion IDs",
+      "money": "No release/refund; increment revisionsUsed once along accepted transition, clear selected criteria and notify current assignee",
+      "replayConcurrency": "No Idempotency-Key header for revision; Serializable tx and state/version claim; repeated request after status changes rejected; not a demonstrated concurrency guarantee",
+      "auditHistory": "Customer-visible revision message, two history transitions, notification and sensitive audit in tx",
+      "testsNeeded": [
+        "owner/state/quota/foreign criterion",
+        "duplicate criteria and whitespace-only reason",
+        "concurrent revision/confirm/dispute: only valid winner, no half writes",
+        "no financial mutations and actor/system history"
+      ]
+    },
+    {
+      "id": "Z0-CMD-07",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "customer",
+      "ownership": "Order lookup by id+customerId; missing/nonowner not found",
+      "preconditions": "draft only; trimmed title>=3, brief>=10 and required form snapshot validation; submitted then pending_triage",
+      "money": "No payment or escrow created; no definitive quote generated",
+      "replayConcurrency": "Required order.submit idempotency, Serializable transaction and workflow status/version claims",
+      "auditHistory": "Two history rows and submission notification inside tx",
+      "testsNeeded": [
+        "invalid/required service fields",
+        "owner/state/double-submit",
+        "mid-transaction failure rolls back form snapshot and both transitions"
+      ]
+    },
+    {
+      "id": "Z0-CMD-08",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "admin ops_admin; existing super_admin override",
+      "ownership": "Scope-based real admin actor, no customer impersonation",
+      "preconditions": "pending_triage first transitions to triaging; triaging accepted; reject/need_more_info/auto_quote/send_to_quote branches; assign_direct falls into default pending_quote",
+      "money": "No money movement; auto_quote takes admin finalPrice >=0, not the new estimate engine",
+      "replayConcurrency": "No route idempotency header; per-transition transactions, not one atomic triage command",
+      "auditHistory": "Per-transition history; info_request customer message; no single command audit enclosing all branches",
+      "testsNeeded": [
+        "all five DTO decisions and intended target",
+        "invalid auto_quote price must not leave partial state",
+        "no assignment before verified payment",
+        "note/amount boundaries and concurrent triage"
+      ]
+    },
+    {
+      "id": "Z0-CMD-09",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "admin ops_admin; existing super_admin override",
+      "ownership": "Scope-based, no ownership substitution",
+      "preconditions": "pending_quote only; finalPrice integer>=1000; transitions to quoted",
+      "money": "Stores finalPrice from authorized admin; no surcharge snapshot/formula engine in this command",
+      "replayConcurrency": "Workflow optimistic claim; no route idempotency; customer notification occurs after transition commit",
+      "auditHistory": "Transition history then notification outside its tx; notification failure/retry must be reviewed",
+      "testsNeeded": [
+        "forbidden states and invalid amounts",
+        "notification failure after committed quote",
+        "same-order concurrent quotes",
+        "old quote accepted vs tariff change"
+      ]
+    },
+    {
+      "id": "Z0-CMD-10",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "customer",
+      "ownership": "loadOwnedOrder compares customerId",
+      "preconditions": "quoted only, then pending_payment with customer source",
+      "money": "Accepts stored quote; does not itself charge or lock a versioned price snapshot",
+      "replayConcurrency": "No idempotency header; repeats after state change rejected by guard; workflow compare-and-swap",
+      "auditHistory": "Customer-source history; no independent payment created",
+      "testsNeeded": [
+        "owner/nonowner/state",
+        "concurrent acceptance vs quote changes",
+        "double click no repeated payment or price mutation"
+      ]
+    },
+    {
+      "id": "Z0-CMD-11",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "admin ops_admin; existing super_admin override",
+      "ownership": "Scope-based assignment; eligible executor loaded under row lock",
+      "preconditions": "paid only; active approved user/profile, capacityPercent<100, team match and category skill when skills exist; external onboarding approved; qc_reviewer cannot be same active executor",
+      "money": "No financial movement or new payment; creates one assignment and public handler",
+      "replayConcurrency": "Serializable tx, executor FOR UPDATE lock, workflow paid->assigned/version; no route Idempotency-Key",
+      "auditHistory": "Assignment/public-handler/history/audit/two notifications in tx",
+      "testsNeeded": [
+        "unpaid or stale state rejected",
+        "inactive/unapproved/no skill/wrong team/full capacity",
+        "executor equals QC reviewer",
+        "last capacity concurrent requests and rollback all projections"
+      ]
+    },
+    {
+      "id": "Z0-CMD-12",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "admin ops_admin; existing super_admin override",
+      "ownership": "Scope-based, preserves real old/new executor actors",
+      "preconditions": "assigned/in_progress/qc_rejected only; reject same profile; new executor eligible; update one selected current assignment",
+      "money": "No release/refund; order state retained, no new paid status",
+      "replayConcurrency": "Serializable tx and executor eligibility row lock; no explicit order version claim for unchanged order status; concurrency acceptance pending",
+      "auditHistory": "Old assignment/public handlers end-dated; new records, internal message, audit and notifications; old reports/files retained",
+      "testsNeeded": [
+        "two simultaneous reassignments",
+        "no-op same profile",
+        "preserve active role histories/public projection",
+        "no unauthorized state or financial mutations"
+      ]
+    },
+    {
+      "id": "Z0-CMD-13",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "customer; payment-initiate rate limit10/minute",
+      "ownership": "Order and selected milestone belong to customer/order",
+      "preconditions": "pending_payment; positive final price or selected unpaid milestone; dependency rechecks milestone",
+      "money": "Payment amount comes from persisted finalPrice/milestone, not body; creates pending/verifying request; no escrow until verify",
+      "replayConcurrency": "Required customer+order idempotency, fingerprint amount/milestone; provider request is inside retried DB transaction; remote idempotency/reconciliation not accepted",
+      "auditHistory": "Payment record plus payment.initiated outbox; gateway live remains deferred",
+      "testsNeeded": [
+        "client amount tampering and foreign milestone",
+        "replay/conflict/concurrent initiations",
+        "cancel/price change during provider call",
+        "provider success then DB rollback/timeout recovery"
+      ]
+    },
+    {
+      "id": "Z0-CMD-14",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "customer; payment-verify rate limit15/minute",
+      "ownership": "Wrapper loads owned order; dependency payment lookup matches paymentId/orderId/customerId",
+      "preconditions": "Gateway name/ref/status verified; succeeded replay returns existing escrow; failed/refunded rejected; late settlement currently lacks terminal-order precheck",
+      "money": "Verified amount posts clearing->escrow and creates held escrow; all milestones paid then pending_payment->paid/invoice; terminal order currently may still receive escrow without changing order status",
+      "replayConcurrency": "Required payment.verify idempotency, Serializable tx, payment-state claim and ledger key payment-settle:<id>; independent order CAS for paid",
+      "auditHistory": "Critical audit/outbox; paid history inserted directly in PaymentsService rather than shared workflow; failure/success notifications require review",
+      "testsNeeded": [
+        "late success after cancel/close",
+        "order amount changed since intent",
+        "gateway failed/pending/succeeded replay",
+        "cross-owner/foreign payment",
+        "provider success plus DB rollback and concurrent verify"
+      ]
+    },
+    {
+      "id": "Z0-CMD-15",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "customer",
+      "ownership": "Order lookup by id+customerId and milestone lookup by id+orderId",
+      "preconditions": "Milestone delivered and not approvedAt; no explicit order-status guard in this method",
+      "money": "Releases milestone amount from its escrow through current assignment/commission; does not close order",
+      "replayConcurrency": "Required milestone.approve idempotency and same transaction; remaining escrow claim in dependency",
+      "auditHistory": "Milestone approved update plus critical milestone audit/escrow audit; fixed note consumed",
+      "testsNeeded": [
+        "disputed/cancelled/closed order freeze policy",
+        "foreign or unpaid milestone",
+        "concurrent confirm vs partial release",
+        "no active assignment/no escrow rollback"
+      ]
+    },
+    {
+      "id": "Z0-CMD-16",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "customer; global JWT unchanged",
+      "ownership": "Authenticated user.id is customerId, never supplied by body",
+      "preconditions": "Active service; active package belonging to service; form snapshot permits incomplete draft; default acceptance criteria if none",
+      "money": "No charge or definitive quote; budgetHint is advisory, packageSnapshot is descriptive",
+      "replayConcurrency": "Required customer-scoped idempotency and same transaction; not a new concurrency acceptance",
+      "auditHistory": "Persisted reference/current format and package/form snapshot; no submit history/financial event",
+      "testsNeeded": [
+        "inactive/foreign package/service",
+        "unknown form fields and incomplete draft",
+        "replay/different body/customer separation",
+        "no order final amount injected from estimate"
+      ]
+    },
+    {
+      "id": "Z0-CMD-17",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "customer",
+      "ownership": "findFirst id+customerId and updateMany includes customerId",
+      "preconditions": "draft only; valid package of same service; required current version; dynamic form snapshot, optional fields only",
+      "money": "No payment or escrow; budget remains hint",
+      "replayConcurrency": "Serializable tx and supplied version compare-and-swap; stale version409; no idempotency header",
+      "auditHistory": "Increment version; criteria replacement only within draft tx; no historical submitted data rewritten",
+      "testsNeeded": [
+        "stale version and concurrent autosave",
+        "owner/service/package boundaries",
+        "null package/cleared criteria/default criteria",
+        "rollback after failed criteria update"
+      ]
+    },
+    {
+      "id": "Z0-CMD-18",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "customer",
+      "ownership": "loadOwnedOrder; attachment from same order and uploader=customer",
+      "preconditions": "Message body string; optional attachment must be clean; visibility forced customer_visible regardless of body visibility field",
+      "money": "No money/state change",
+      "replayConcurrency": "No route idempotency; duplicate message retries not claimed deduplicated",
+      "auditHistory": "OrderMessage row; attachment checked by shared messaging service",
+      "testsNeeded": [
+        "other owner/uploaded file/order/unclean attachment",
+        "visibility cannot request internal note access",
+        "blank body policy and duplicate retry",
+        "customer read projection excludes internal-only messages"
+      ]
+    },
+    {
+      "id": "Z0-CMD-19",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "admin ops_admin; existing super_admin override",
+      "ownership": "Scope-based, real actor, milestones recreated only for chosen order",
+      "preconditions": "quoted/pending_payment; nonzero finalPrice; >=2 milestones; unique sequence; positive amounts summing finalPrice; no succeeded milestone",
+      "money": "Defines plan, no charge/release; current model waits all milestone payments before paid status",
+      "replayConcurrency": "DB transaction, no route idempotency; actual isolation/concurrent configure-vs-payment acceptance remains open",
+      "auditHistory": "Replace unpaid plan only and sensitive audit; paid milestones must never be rewritten",
+      "testsNeeded": [
+        "paid milestone protection",
+        "sum/unique sequence/positive amount",
+        "gateway request in flight vs plan replacement",
+        "version/race/rollback/history preservation"
+      ]
+    },
+    {
+      "id": "Z0-CMD-20",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "admin ops_admin; existing super_admin override",
+      "ownership": "Order exists; optional report file clean and belongs to order",
+      "preconditions": "Summary MinLength(3), visibleToCustomer boolean; report type fixed management",
+      "money": "No money or state change",
+      "replayConcurrency": "Serializable tx; report version=max+1, DB unique protects order/type/version; retry/collision behavior pending",
+      "auditHistory": "Versioned OrderReport and controlled visibility; no independent publish financial operation",
+      "testsNeeded": [
+        "unsafe/foreign file",
+        "visibility/private projection and PII",
+        "parallel reports version uniqueness",
+        "blank-after-trim summary and rollback"
+      ]
+    },
+    {
+      "id": "Z0-CMD-21",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "admin ops_admin; existing super_admin override",
+      "ownership": "Order exists; clean same-order attachment, uploader ownership not required for authorized admin",
+      "preconditions": "Visibility defaults internal_only; optional customer_visible only from declared DTO allowlist",
+      "money": "No money or state change",
+      "replayConcurrency": "No route idempotency; repeated post can create multiple messages",
+      "auditHistory": "OrderMessage with real admin actor and chosen visibility; not an authority to expose all order internals",
+      "testsNeeded": [
+        "scope/role boundaries",
+        "default internal not visible to customer",
+        "foreign/unclean attachment rejected",
+        "blank body and duplicate retry policy"
+      ]
+    },
+    {
+      "id": "Z0-CMD-22",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "executor via RolesGuard; existing capability rules unchanged",
+      "ownership": "active own assignment through assertExecutorOwnsOrder",
+      "preconditions": "acceptedAt required; assigned only; workflow -> in_progress",
+      "money": "No financial effect",
+      "replayConcurrency": "No idempotency header; workflow CAS/version and valid-source rules; assignment read before transition needs race acceptance",
+      "auditHistory": "executor history through workflow",
+      "testsNeeded": [
+        "foreign/unaccepted executor",
+        "assigned start and repeat rejection",
+        "reassignment race"
+      ]
+    },
+    {
+      "id": "Z0-CMD-23",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "executor; getOwnProfile resolves own user",
+      "ownership": "assignment matching own profile/order and unassignedAt:null",
+      "preconditions": "assigned for initial acceptance; if already accepted returns assignment even after state changes",
+      "money": "No financial effect",
+      "replayConcurrency": "transaction default isolation; createMany skipDuplicates but acceptedAt update/audit not CAS; concurrent accept audit needs acceptance",
+      "auditHistory": "order.assignment_accepted audit; no order status history",
+      "testsNeeded": [
+        "foreign/unassigned",
+        "accept seeds criteria once",
+        "parallel accept and late accepted replay"
+      ]
+    },
+    {
+      "id": "Z0-CMD-24",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "executor with own profile",
+      "ownership": "active assignment plus item.id AND assignmentId",
+      "preconditions": "acceptedAt; assigned or in_progress only; boolean DTO",
+      "money": "No financial effect",
+      "replayConcurrency": "transaction default isolation; update item by id after prior checks; reassignment/status race needs real DB test",
+      "auditHistory": "order.execution_checklist_updated audit; no status transition",
+      "testsNeeded": [
+        "foreign item",
+        "closed/unaccepted rejection",
+        "complete and undo",
+        "concurrent reassign/terminal transition"
+      ]
+    },
+    {
+      "id": "Z0-CMD-25",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "executor role",
+      "ownership": "assertExecutorOwnsOrder; optional file belongs to order/uploader and is safe via assertExecutorFileIds",
+      "preconditions": "in_progress; versioned progress report; percent/summary DTO",
+      "money": "No financial effect",
+      "replayConcurrency": "Serializable report tx, ownership/status/file checks outside transaction; no request idempotency header",
+      "auditHistory": "customer-visible versioned report plus notification; no order-state history",
+      "testsNeeded": [
+        "foreign file/order",
+        "bounds and blank summary",
+        "parallel report versions",
+        "reassign/status race"
+      ]
+    },
+    {
+      "id": "Z0-CMD-26",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "executor role",
+      "ownership": "active own assignment; each unique file belongs to order and uploader and is scanStatus clean",
+      "preconditions": "in_progress; accepted; all execution checklist complete; nonempty safe file IDs",
+      "money": "No release/payment; QC/delivery transitions only",
+      "replayConcurrency": "Serializable transaction encloses report/file marking/status steps/review/notification; workflow CAS; duplicate delivery/race requires DB proof",
+      "auditHistory": "executor submitted_for_qc then system qc_in_review; no-template branch system ready/delivered; report and notification",
+      "testsNeeded": [
+        "foreign/infected file",
+        "incomplete checklist",
+        "QC and no-template branches",
+        "failed notification rollback",
+        "concurrent delivery"
+      ]
+    },
+    {
+      "id": "Z0-CMD-27",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "executor role",
+      "ownership": "active own assignment; milestone must belong to order",
+      "preconditions": "payment succeeded and delivery pending; method does not inspect parent status, acceptedAt, checklist or safe output",
+      "money": "No direct money movement; later approveMilestone may release funds separately (GAP06)",
+      "replayConcurrency": "default transaction; update by id after pending read, no delivery CAS/request-idempotency; duplicate event/message race open",
+      "auditHistory": "customer-visible milestone_delivery message + outbox; no parent transition history",
+      "testsNeeded": [
+        "foreign/unpaid/already-delivered",
+        "parent terminal/disputed gate GAP09",
+        "safe-output/QC policy",
+        "parallel delivery"
+      ]
+    },
+    {
+      "id": "Z0-CMD-28",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "admin ops_admin or existing super_admin override",
+      "ownership": "review -> order; compares reviewer against only first active assignment",
+      "preconditions": "shared decide: unresolved review, qc_in_review, safe output present, exact unique checklist and all passed",
+      "money": "No direct settlement; Orders.applyQcApproval -> ready_for_customer_review then system delivered",
+      "replayConcurrency": "Serializable; review CAS result:null; item writes before CAS roll back only in real transaction; no explicit idempotency header",
+      "auditHistory": "qc.passed sensitive audit + customer-visible versioned QC report + workflow/history/notification",
+      "testsNeeded": [
+        "independent vs own executor",
+        "all checklist IDs/pass validation",
+        "CAS loser rollback",
+        "all-active-assignment independence GAP08"
+      ]
+    },
+    {
+      "id": "Z0-CMD-29",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "admin ops_admin or existing super_admin override",
+      "ownership": "same review/order/first-assignment independence check as approve",
+      "preconditions": "decide needs_rework: exact checklist with at least one failed item; qc_in_review and safe output",
+      "money": "No direct settlement; qc_rejected then system in_progress",
+      "replayConcurrency": "Serializable shared decide + result:null CAS; real rollback and concurrent decisions pending",
+      "auditHistory": "qc.needs_rework audit/report; workflow and executor notification",
+      "testsNeeded": [
+        "all-passed rework rejected",
+        "failed item accepted",
+        "duplicate/foreign checklist rejected",
+        "concurrent approve vs rework"
+      ]
+    },
+    {
+      "id": "Z0-CMD-30",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "admin ops_admin or existing super_admin override",
+      "ownership": "same review/order/first-assignment independence check as approve",
+      "preconditions": "decide rejected: at least one failed item; otherwise same validations; both reject/rework return order to in_progress",
+      "money": "No direct refund/release/cancel",
+      "replayConcurrency": "Serializable shared decide + result:null CAS; outcome distinction review result preserved, same order-state path",
+      "auditHistory": "qc.rejected sensitive audit/report + transition history/notification",
+      "testsNeeded": [
+        "reject outcome retained",
+        "already reviewed",
+        "terminal order",
+        "notification failure rollback"
+      ]
+    },
+    {
+      "id": "Z0-CMD-31",
+      "status": "reviewed-current-contract-runtime-acceptance-pending",
+      "actor": "admin super_admin only; no actor identity argument forwarded",
+      "ownership": "explicit JOB_NAMES allowlist, registered runner name; no customer/executor invocation implied",
+      "preconditions": "manual run permitted independently of automatic timers flag; executor runner claims interval bucket",
+      "money": "Depends on selected job: verification/escrow/cleanup/HR may mutate; no live/manual production job invoked by this review",
+      "replayConcurrency": "BackgroundJobRun unique(jobName,runKey) per time bucket, not all-time lease; downstream P2002 misclassification GAP10",
+      "auditHistory": "runner records status/result/error + metrics; no requesting user/note in controller/delegate/run record",
+      "testsNeeded": [
+        "non-super denied",
+        "unknown job rejected",
+        "duplicate bucket",
+        "downstream P2002",
+        "manual actor provenance",
+        "cross-bucket overlap"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "Z0-CMD-GAP-01",
+      "risk": "The extra close resolution is not one of the four explicit D4 resolution actions and closes with effect none. Existing remaining escrow may require separate reconciliation; this does not prove money loss or permission bypass.",
+      "nextStep": "DEC12/16 explicit residual-escrow policy and bounded tests before any close/financial change; preserve current funds and history.",
+      "accepted": false
+    },
+    {
+      "id": "Z0-CMD-GAP-02",
+      "risk": "Cancel/dispute/resolve DTO reason/note are IsString only; Revision reason MinLength(3) is not trimmed. Blank/whitespace reasons can satisfy DTO validation although UI asks for real text.",
+      "nextStep": "Define nonblank trimmed server-side note contract and scoped protected-backend authority before implementation; test on isolated validators/HTTP, never mutate real orders to probe.",
+      "accepted": false
+    },
+    {
+      "id": "Z0-CMD-GAP-03",
+      "risk": "isCancellable has zero production call sites in the scanned 164 TS files. Its seven-state mismatch is latent helper/documentation drift, not evidence of an exposed cancellation bypass.",
+      "nextStep": "Preserve workflow restrictions; reconcile helper/docs only with reviewed scope, and keep complete per-command and concurrency acceptance open.",
+      "accepted": false
+    },
+    {
+      "id": "Z0-CMD-GAP-04",
+      "risk": "Characterization: DTO accepts assign_direct but triage has no such case and falls back to pending_quote. A missing auto_quote price is checked only after pending_triage->triaging; zero auto_quote differs from manual quote minimum. No payment bypass was created or exercised.",
+      "nextStep": "DEC02/16 target triage actions and atomicity; fail clearly for unsupported intent and validate before mutation in a scoped protected implementation, without assignment before verified payment.",
+      "accepted": false
+    },
+    {
+      "id": "Z0-CMD-GAP-05",
+      "risk": "Characterization of exact verifyAndSettleInTransaction with fake tx/gateway: a previously initiated verified payment can create Ledger/held escrow while order is cancelled/closed, with no paid transition/invoice. This is late-payment reconciliation risk, not proof of real funds lost or a live provider exploit.",
+      "nextStep": "Define late-payment quarantine/reconciliation and truthful notification contract before production/live gateway; preserve evidence of externally verified money, no silent drop or unauthorized automatic refund. Financial implementation needs scoped authority and isolated race/replay tests.",
+      "accepted": false
+    },
+    {
+      "id": "Z0-CMD-GAP-06",
+      "risk": "PaymentsService inserts pending_payment->paid status/history directly with its own CAS rather than OrderWorkflowService. Existing safeguards are present; source-wide central-transition claim is not literally true. approveMilestone also has no order-status precheck in its method; dispute/terminal freeze behavior still needs acceptance.",
+      "nextStep": "Review all financial command boundaries, status freeze and shared-validator equivalence. Do not change money or rewrite historic ledger merely to unify code paths.",
+      "accepted": false
+    },
+    {
+      "id": "Z0-CMD-GAP-07",
+      "risk": "Auto-confirm job uses orders.confirm with customerId; exact in-memory job + confirm methods produce source customer/userId and customer-role escrow decision for an unattended action. Final close is system/null. Financial attribution provenance differs from autonomous system history; no real settlement executed.",
+      "nextStep": "Before changing protected confirmation/settlement contracts, approve scoped system actor/history policy preserving cutoff/dispute/replay/ledger invariants and human confirmation behavior. Add real DB race/rollback acceptance.",
+      "accepted": false
+    },
+    {
+      "id": "Z0-CMD-GAP-08",
+      "risk": "QcService.decide rejects reviewer equal to first active executor only (findFirst). Method characterization permits a reviewer distinct from that returned row; multi-assignment independence is not checked. This is not proof of current HTTP privilege exploit or a second active assignment existing.",
+      "nextStep": "Require all active execution participants and reviewer capabilities to be checked before multi-executor acceptance; scoped authorization work plus real role/ownership/race tests, no fifth role.",
+      "accepted": false
+    },
+    {
+      "id": "Z0-CMD-GAP-09",
+      "risk": "deliverMilestone checks active assignment, paid and pending milestone but does not read parent order status, acceptedAt, checklist or safe output/QC. Exact method with fake closed/disputed parent still marks delivery/message/outbox; no financial dependency invoked. Coupling to approval/release is separately open in GAP06.",
+      "nextStep": "Specify terminal/dispute freeze and milestone delivery/QC criteria without discarding existing capability. Protected implementation requires precise scoped authorization and DB concurrency/finance tests.",
+      "accepted": false
+    },
+    {
+      "id": "Z0-CMD-GAP-10",
+      "risk": "JobRunner.run outer catch maps any downstream Prisma P2002 to already_run after a failed record, logging failed and skipped metrics. Exact in-memory method reproduces this, whereas duplicate initial claim correctly skips work. Keys are interval buckets, not cross-bucket execution leases. Manual job run lacks requested actor/note; automatic HR status change needs governance review.",
+      "nextStep": "Separate claim conflict handling from execution errors under scoped authorization; define per-job lock/retry/provenance and HR policy. Preserve job registry and retention protections; accept crash, parallel bucket and error metrics with isolated DB, not live job commands.",
+      "accepted": false
+    }
+  ],
+  "scheduledJobs": [
+    {
+      "name": "payment_verify_recheck",
+      "actor": "System timer; alternatively super_admin manual run; requesting actor not propagated by current run API",
+      "preconditions": "verifying >10min old, oldest25; does not filter parent order status",
+      "effects": "verifyAndSettlePayment with stable worker-payment-recheck-ID; inherits GAP05 late payment reconciliation risk",
+      "replayConcurrency": "retry each later bucket; provider/ledger idempotency acceptance pending",
+      "auditHistory": "payment verifier creates downstream audit/ledger; runner counts failures as skipped",
+      "testsNeeded": ["late payment reconciliation", "provider timeout/replay"],
+      "runtimeAccepted": false
+    },
+    {
+      "name": "release_eligible_escrows",
+      "actor": "System timer; alternatively super_admin manual run; requesting actor not propagated by current run API",
+      "preconditions": "delivered <= AUTO_CONFIRM_DAYS(default7)*24h; no open disputes;25rows",
+      "effects": "orders.confirm(customerId,orderId,stablekey) releases escrow; attributes confirmation to customer (GAP07)",
+      "replayConcurrency": "confirm idempotency + runner bucket; dispute-opening race needs DB test",
+      "auditHistory": "runner record; confirmation history/customer settlement then system close, not autonomous actor provenance",
+      "testsNeeded": [
+        "exact cutoff",
+        "open dispute",
+        "automatic vs human actor",
+        "dispute race and settlement rollback"
+      ],
+      "runtimeAccepted": false
+    },
+    {
+      "name": "escalate_overdue_tickets",
+      "actor": "System timer; alternatively super_admin manual run; requesting actor not propagated by current run API",
+      "preconditions": "tickets.flagOverdueTickets delegate; calendar/DEC04 semantics still pending",
+      "effects": "ticket overdue flags; no direct order money",
+      "replayConcurrency": "delegate rechecks + bucket; SLA/old tickets not silently changed",
+      "auditHistory": "runner counts plus ticket delegate evidence still requires audit",
+      "testsNeeded": ["business calendar", "old tickets", "repeat escalation"],
+      "runtimeAccepted": false
+    },
+    {
+      "name": "recalculate_staff_performance",
+      "actor": "System timer; alternatively super_admin manual run; requesting actor not propagated by current run API",
+      "preconditions": "profiles not blocked; batch uses supplied time",
+      "effects": "executor.recalculatePerformance snapshot updates; definition of unknown metrics pending",
+      "replayConcurrency": "batch failure accounting; no global lease implied",
+      "auditHistory": "runner + existing staff delegate; not acceptance of HR policy",
+      "testsNeeded": [
+        "empty/missing metrics",
+        "duplicate period",
+        "batch partial failure"
+      ],
+      "runtimeAccepted": false
+    },
+    {
+      "name": "detect_staff_risks",
+      "actor": "System timer; alternatively super_admin manual run; requesting actor not propagated by current run API",
+      "preconditions": "profiles not blocked; timed batch",
+      "effects": "executor.refreshRiskAlerts; rule-based, not AI connection",
+      "replayConcurrency": "batch and per-profile delegate; deduplication acceptance pending",
+      "auditHistory": "runner and staff risk records",
+      "testsNeeded": ["threshold edges", "unknown data", "risk alert repeat"],
+      "runtimeAccepted": false
+    },
+    {
+      "name": "recalculate_executor_scores",
+      "actor": "System timer; alternatively super_admin manual run; requesting actor not propagated by current run API",
+      "preconditions": "active profiles riskScore>=70 OR qcPassRate<50",
+      "effects": "updateMany status under_review; existing automatic HR state change, not a report-only badge or AI",
+      "replayConcurrency": "predicate excludes already under_review; human governance DEC16 scope remains open",
+      "auditHistory": "runner count; this method has no per-user actor/note audit",
+      "testsNeeded": [
+        "human-review policy",
+        "threshold boundaries",
+        "no blocked profile rewrite"
+      ],
+      "runtimeAccepted": false
+    },
+    {
+      "name": "send_outbox_notifications",
+      "actor": "System timer; alternatively super_admin manual run; requesting actor not propagated by current run API",
+      "preconditions": "outbox.processBatch then pending email/sms sentAt null attempts<5 take50",
+      "effects": "in-app upsert by outbox/channel; external channels opt-in; dispatch sends before sentAt CAS",
+      "replayConcurrency": "provider idempotency key notification.id; duplicate external send needs provider/crash proof",
+      "auditHistory": "notification attempts/error/sentAt + runner",
+      "testsNeeded": [
+        "opt-out",
+        "send success DB failure",
+        "concurrent send",
+        "real providers deferred"
+      ],
+      "runtimeAccepted": false
+    },
+    {
+      "name": "file_antivirus_scan",
+      "actor": "System timer; alternatively super_admin manual run; requesting actor not propagated by current run API",
+      "preconditions": "pending unpurged files oldest20; quarantine object must exist",
+      "effects": "scan, promote clean to storage then mark clean; nonclean result maps infected; remove clean quarantine file",
+      "replayConcurrency": "storage.exists + put not all-time lock; retries/crash/AV error branch acceptance pending",
+      "auditHistory": "runner and file scanStatus; method no per-file audit claimed",
+      "testsNeeded": [
+        "scanner unavailable",
+        "safe promotion ordering",
+        "crash after put",
+        "no real cleanup invoked"
+      ],
+      "runtimeAccepted": false
+    },
+    {
+      "name": "expire_signed_urls",
+      "actor": "System timer; alternatively super_admin manual run; requesting actor not propagated by current run API",
+      "preconditions": "expiresAt<now and revokedAt null",
+      "effects": "updateMany revokedAt=now; authorization/download checks separate",
+      "replayConcurrency": "predicate is repeat-safe; exact equality boundary test pending",
+      "auditHistory": "runner count; no extra actor record in method",
+      "testsNeeded": [
+        "before/equal/after expiry",
+        "revoked grant",
+        "download race"
+      ],
+      "runtimeAccepted": false
+    },
+    {
+      "name": "cleanup_expired_records",
+      "actor": "System timer; alternatively super_admin manual run; requesting actor not propagated by current run API",
+      "preconditions": "interval configurable positive<=10080min fallback360; policy in DataCleanupService",
+      "effects": "delegates data retention cleanup; full delegate/policy audit still open",
+      "replayConcurrency": "runner bucket not cleanup lease; delegate locking not independently reaccepted",
+      "auditHistory": "runner + delegated cleanup audit not freshly accepted",
+      "testsNeeded": [
+        "retention dry-run",
+        "protected actionable outbox",
+        "partial deletion failure"
+      ],
+      "runtimeAccepted": false
+    },
+    {
+      "name": "cleanup_storage_files",
+      "actor": "System timer; alternatively super_admin manual run; requesting actor not propagated by current run API",
+      "preconditions": "interval configurable fallback60min; FILE_CLEANUP_ENABLED=false skips",
+      "effects": "delegates FileCleanupService; rejected/orphan record/physical counts; no deletion invoked in this review",
+      "replayConcurrency": "runner bucket plus delegated cleanup guards; full transitive cleanup contract open",
+      "auditHistory": "runner details; delegated audit still to accept",
+      "testsNeeded": [
+        "disabled flag",
+        "orphan scope",
+        "live references preserved",
+        "dry-run/failure recovery"
+      ],
+      "runtimeAccepted": false
+    },
+    {
+      "name": "generate_periodic_reports",
+      "actor": "System timer; alternatively super_admin manual run; requesting actor not propagated by current run API",
+      "preconditions": "daily; UTC date string from provided now; reporting.dashboard delegate",
+      "effects": "outbox finance.periodic_report_generated with SHA256 checksum + report payload; not itself PDF/Excel generation",
+      "replayConcurrency": "per-bucket runner; report/event duplication/privacy/retention need acceptance",
+      "auditHistory": "runner and outbox, no requesting user/note",
+      "testsNeeded": [
+        "report access scope",
+        "PII suppression",
+        "duplicate day",
+        "report failure"
+      ],
+      "runtimeAccepted": false
+    }
+  ]
+}

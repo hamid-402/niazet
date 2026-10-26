@@ -13,9 +13,17 @@ import { IdempotencyService } from './idempotency.service';
 import { FinanceReportingService } from './finance-reporting.service';
 import { FinanceReconciliationService } from './finance-reconciliation.service';
 import { CustomerFinanceOverviewService } from './customer-finance-overview.service';
+import { WalletPaymentsService } from './wallet-payments.service';
+import { WalletPaymentsController } from './wallet-payments.controller';
+import { OrderWorkflowModule } from '../orders/domain/order-workflow.module';
 
 @Module({
-  controllers: [CustomerFinanceController, FinanceAdminController],
+  imports: [OrderWorkflowModule],
+  controllers: [
+    CustomerFinanceController,
+    FinanceAdminController,
+    WalletPaymentsController,
+  ],
   providers: [
     LedgerService,
     WalletService,
@@ -29,6 +37,7 @@ import { CustomerFinanceOverviewService } from './customer-finance-overview.serv
     FinanceReportingService,
     FinanceReconciliationService,
     CustomerFinanceOverviewService,
+    WalletPaymentsService,
   ],
   exports: [
     LedgerService,

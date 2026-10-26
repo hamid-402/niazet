@@ -15,6 +15,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { IdempotencyService } from './idempotency.service';
 import { LedgerService } from './ledger.service';
 import { PaymentGatewayService } from './zarinpal.gateway';
+import { OrderWorkflowService } from '../orders/domain/order-workflow.service';
 
 interface InitiatePaymentParams {
   orderId: string;
@@ -31,10 +32,17 @@ export class PaymentsService {
     private readonly ledger: LedgerService,
     private readonly gateway: PaymentGatewayService,
     private readonly idempotency: IdempotencyService,
+    private readonly workflow: OrderWorkflowService = new OrderWorkflowService(
+      prisma,
+    ),
   ) {}
 
   initiatePayment(params: InitiatePaymentParams) {
-    if (params.amount <= 0)
+    if (
+      !Number.isSafeInteger(params.amount) ||
+      params.amount <= 0 ||
+      params.amount > 2_000_000_000
+    )
       throw new BadRequestException('مبلغ پرداخت باید مثبت باشد.');
     return this.idempotency.execute({
       key: params.idempotencyKey,
@@ -44,6 +52,34 @@ export class PaymentsService {
         milestoneId: params.milestoneId ?? null,
       },
       work: async (tx) => {
+        await tx.$queryRaw(
+          Prisma.sql`SELECT id FROM orders WHERE id = ${params.orderId} FOR UPDATE`,
+        );
+        const payableOrder = await tx.order.findFirst({
+          where: { id: params.orderId, customerId: params.customerId },
+          include: { milestones: true },
+        });
+        if (!payableOrder) throw new NotFoundException('سفارش یافت نشد.');
+        if (
+          payableOrder.status !== 'pending_payment' ||
+          payableOrder.currency !== 'IRT' ||
+          (!params.milestoneId && payableOrder.finalPrice !== params.amount)
+        )
+          throw new BadRequestException(
+            'سفارش یا قیمت قطعی آن دیگر قابل پرداخت نیست.',
+          );
+        if (
+          payableOrder.milestones.length &&
+          (!params.milestoneId ||
+            payableOrder.milestones.some(
+              (m) => !Number.isSafeInteger(m.amount) || m.amount < 1,
+            ) ||
+            payableOrder.milestones.reduce((sum, m) => sum + m.amount, 0) !==
+              payableOrder.finalPrice)
+        )
+          throw new ConflictException(
+            'مرحله پرداخت یا جمع مراحل با قیمت قطعی سفارش منطبق نیست.',
+          );
         if (params.milestoneId) {
           const milestone = await tx.orderMilestone.findFirst({
             where: { id: params.milestoneId, orderId: params.orderId },
@@ -144,6 +180,58 @@ export class PaymentsService {
       });
       return { payment, escrow, alreadyProcessed: true };
     }
+    await tx.$queryRaw(
+      Prisma.sql`SELECT id FROM orders WHERE id = ${payment.orderId} FOR UPDATE`,
+    );
+    const payableOrder = await tx.order.findUniqueOrThrow({
+      where: { id: payment.orderId },
+    });
+    const paidMilestone = payment.milestoneId
+      ? await tx.orderMilestone.findUnique({
+          where: { id: payment.milestoneId },
+        })
+      : null;
+    if (
+      payableOrder.status !== 'pending_payment' ||
+      payableOrder.currency !== 'IRT' ||
+      (!payment.milestoneId && payableOrder.finalPrice !== payment.amount) ||
+      (payment.milestoneId && paidMilestone?.amount !== payment.amount) ||
+      paidMilestone?.paymentStatus === PaymentStatus.succeeded
+    ) {
+      // Preserve late money for explicit financial review; never auto-refund,
+      // re-open/finalize an order or credit a second escrow.
+      await tx.payment.update({
+        where: { id: payment.id },
+        data: { failureReason: 'late_payment_requires_financial_review' },
+      });
+      await tx.auditLog.create({
+        data: {
+          actorUserId: params.customerId,
+          actorRole: 'customer',
+          action: 'payment.review_required',
+          entityType: 'payment',
+          entityId: payment.id,
+          after: {
+            orderId: payment.orderId,
+            status: payableOrder.status,
+            reason: 'order_or_milestone_no_longer_payable',
+          },
+          sensitivity: 'critical',
+        },
+      });
+      await tx.outboxEvent.create({
+        data: {
+          eventType: 'payment.review_required',
+          payload: { paymentId: payment.id, orderId: payment.orderId },
+        },
+      });
+      return {
+        payment,
+        escrow: null,
+        requiresFinancialReview: true as const,
+        alreadyProcessed: true,
+      };
+    }
     if (!payment.gatewayRef)
       throw new BadRequestException('این پرداخت هنوز آغاز نشده است.');
     if (
@@ -239,31 +327,20 @@ export class PaymentsService {
       where: { id: payment.orderId },
     });
     if (order.status === 'pending_payment' && unpaidMilestones === 0) {
-      const orderClaim = await tx.order.updateMany({
-        where: {
-          id: order.id,
-          status: 'pending_payment',
-          version: order.version,
-        },
-        data: { status: 'paid', paidAt: new Date(), version: { increment: 1 } },
-      });
-      if (orderClaim.count !== 1) {
-        throw new ConflictException(
-          'سفارش هم‌زمان با تأیید پرداخت تغییر کرده است.',
-        );
-      }
-      await tx.orderStatusHistory.create({
-        data: {
-          orderId: order.id,
-          fromStatus: 'pending_payment',
-          toStatus: 'paid',
-          source: 'system',
-          note: 'پرداخت در درگاه تأیید و وجه وارد حساب امانی شد.',
-          financialEffectType: 'payment_to_escrow',
-          financialEffectAmount: payment.amount,
+      await this.workflow.transition(
+        order.id,
+        'paid',
+        'system',
+        null,
+        'پرداخت در درگاه تأیید و وجه وارد حساب امانی شد.',
+        { paidAt: new Date() },
+        tx,
+        {
+          type: 'payment_to_escrow',
+          amount: payment.amount,
           context: { paymentId: payment.id, escrowId: escrow.id },
         },
-      });
+      );
       const billingProfile = await tx.customerProfile.findUnique({
         where: { userId: payment.customerId },
         select: {

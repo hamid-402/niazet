@@ -12,6 +12,7 @@ import { ConfigService } from '@nestjs/config';
 import {
   AuditSensitivity,
   LedgerAccountType,
+  Prisma,
   User,
   UserRole,
   UserStatus,
@@ -26,6 +27,7 @@ import { RequestOtpDto, VerifyOtpDto } from './dto/otp.dto';
 import { ResetPasswordDto } from './dto/password-reset.dto';
 import { AuthSessionService, SessionContext } from './auth-session.service';
 import { AuthenticatedUser } from '../common/types/authenticated-user';
+import { registrationProof } from './registration-proof';
 
 const OTP_LENGTH = 6;
 const OTP_MAX_ATTEMPTS = 5;
@@ -44,46 +46,81 @@ export class AuthService {
   // ---------------------------------------------------------------------
 
   async register(dto: RegisterDto) {
-    const existing = await this.prisma.user.findUnique({
-      where: { phone: dto.phone },
-    });
-
-    if (existing && existing.status !== UserStatus.pending_verification) {
-      throw new ConflictException('این شماره موبایل قبلاً ثبت شده است.');
-    }
-
-    const passwordHash = dto.password
-      ? await bcrypt.hash(dto.password, 10)
-      : null;
-
-    const user = existing
-      ? await this.prisma.user.update({
-          where: { id: existing.id },
-          data: { fullName: dto.fullName, passwordHash },
-        })
-      : await this.prisma.user.create({
+    const fullName = dto.fullName?.trim();
+    if (!fullName || fullName.length < 2)
+      throw new BadRequestException('نام نمایشی معتبر لازم است.');
+    const code = randomInt(0, 10 ** OTP_LENGTH)
+      .toString()
+      .padStart(OTP_LENGTH, '0');
+    const codeHash = await bcrypt.hash(
+      registrationProof(dto.phone, fullName, dto.password, code),
+      12,
+    );
+    const ttlSeconds = Number(this.config.get('OTP_TTL_SECONDS') ?? 120);
+    const result = await this.prisma.$transaction(async (tx) => {
+      let user = await tx.user.findUnique({ where: { phone: dto.phone } });
+      if (user) {
+        await tx.$queryRaw(
+          Prisma.sql`SELECT id FROM users WHERE id = ${user.id} FOR UPDATE`,
+        );
+        user = await tx.user.findUniqueOrThrow({ where: { id: user.id } });
+        if (
+          user.status !== UserStatus.pending_verification ||
+          user.role !== UserRole.customer
+        )
+          throw new ConflictException(
+            'این شماره برای ثبت‌نام اولیه در دسترس نیست.',
+          );
+        // Anonymous re-registration NEVER rewrites an existing identity/secret.
+      } else
+        user = await tx.user.create({
           data: {
             phone: dto.phone,
-            fullName: dto.fullName,
-            passwordHash,
+            fullName,
+            passwordHash: null,
             role: UserRole.customer,
             status: UserStatus.pending_verification,
           },
         });
-
-    const otp = await this.requestOtp({
-      phone: user.phone,
-      purpose: 'register',
+      await tx.otpCode.updateMany({
+        where: { identifier: dto.phone, purpose: 'register', consumedAt: null },
+        data: { consumedAt: new Date() },
+      });
+      const otp = await tx.otpCode.create({
+        data: {
+          userId: user.id,
+          identifier: dto.phone,
+          purpose: 'register',
+          codeHash,
+          expiresAt: new Date(Date.now() + ttlSeconds * 1000),
+        },
+      });
+      return { userId: user.id, registrationAttemptId: otp.id };
     });
-
+    await this.sms.sendOtp(dto.phone, code);
     return {
-      ...otp,
-      message: 'ثبت‌نام اولیه انجام شد. کد تایید برای شماره موبایل ارسال شد.',
-      userId: user.id,
+      ...result,
+      message: 'کد تایید این درخواست ثبت‌نام ارسال شد.',
+      expiresInSeconds: ttlSeconds,
+      ...((this.config.get('SMS_DRIVER') ?? 'mock') === 'mock' &&
+      this.config.get('NODE_ENV') === 'development'
+        ? { devOtp: code }
+        : {}),
     };
   }
 
   async requestOtp(dto: RequestOtpDto) {
+    if (dto.purpose === 'register') {
+      if (!dto.fullName)
+        throw new BadRequestException(
+          'برای ارسال مجدد ثبت‌نام، اطلاعات همان فرم را ارسال کنید.',
+        );
+      return this.register({
+        phone: dto.phone,
+        fullName: dto.fullName,
+        password: dto.password,
+      });
+    }
     const code = randomInt(0, 10 ** OTP_LENGTH)
       .toString()
       .padStart(OTP_LENGTH, '0');
@@ -139,34 +176,40 @@ export class AuthService {
   }
 
   async verifyOtp(dto: VerifyOtpDto, context: SessionContext = {}) {
+    if (dto.purpose === 'register') {
+      try {
+        return await this.verifyRegistration(dto, context);
+      } catch (error) {
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          (error.code === 'P2034' ||
+            (error.code === 'P2010' &&
+              ['40001', '40P01'].includes(String(error.meta?.code))))
+        )
+          throw new ConflictException(
+            'درخواست تأیید هم‌زمان تغییر کرد؛ وضعیت حساب را بررسی و دوباره تلاش کنید.',
+          );
+        throw error;
+      }
+    }
     const otp = await this.findValidOtp(dto.phone, dto.purpose, dto.code);
 
     const consumed = await this.prisma.otpCode.updateMany({
-      where: { id: otp.id, consumedAt: null },
+      where: {
+        id: otp.id,
+        consumedAt: null,
+        attempts: { lt: OTP_MAX_ATTEMPTS },
+        expiresAt: { gt: new Date() },
+      },
       data: { consumedAt: new Date() },
     });
     if (consumed.count !== 1) {
       throw new BadRequestException('این کد تایید قبلاً استفاده شده است.');
     }
 
-    let user = await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { phone: dto.phone },
     });
-
-    if (dto.purpose === 'register') {
-      if (!user) {
-        throw new BadRequestException(
-          'ابتدا باید فرآیند ثبت‌نام را شروع کنید.',
-        );
-      }
-      if (user.status === UserStatus.pending_verification) {
-        user = await this.prisma.user.update({
-          where: { id: user.id },
-          data: { status: UserStatus.active },
-        });
-        await this.ensureFinancialAccounts(user.id, user.role);
-      }
-    }
 
     if (!user) {
       throw new NotFoundException('حسابی با این شماره موبایل یافت نشد.');
@@ -174,7 +217,114 @@ export class AuthService {
 
     this.assertLoginAllowed(user);
 
+    await this.prisma.userLoginState.upsert({
+      where: { userId: user.id },
+      create: { userId: user.id, phoneVerifiedAt: new Date() },
+      update: { phoneVerifiedAt: new Date() },
+    });
     return this.sessions.issue(user, context);
+  }
+
+  private async verifyRegistration(dto: VerifyOtpDto, context: SessionContext) {
+    const fullName = dto.fullName?.trim();
+    if (!dto.registrationAttemptId || !fullName || fullName.length < 2)
+      throw new BadRequestException(
+        'شناسه و اطلاعات همان درخواست ثبت‌نام لازم است؛ از فرم ثبت‌نام ادامه دهید.',
+      );
+    const result = await this.prisma.$transaction(
+      async (tx) => {
+        const otp = await tx.otpCode.findUnique({
+          where: { id: dto.registrationAttemptId },
+        });
+        const now = new Date();
+        if (
+          !otp ||
+          otp.identifier !== dto.phone ||
+          otp.purpose !== 'register' ||
+          !otp.userId ||
+          otp.consumedAt ||
+          otp.expiresAt <= now ||
+          otp.attempts >= OTP_MAX_ATTEMPTS
+        )
+          return null;
+        const user = await tx.user.findUnique({ where: { id: otp.userId } });
+        if (
+          !user ||
+          user.phone !== dto.phone ||
+          user.role !== UserRole.customer ||
+          user.status !== UserStatus.pending_verification
+        )
+          return null;
+        const valid = await bcrypt.compare(
+          registrationProof(dto.phone, fullName, dto.password, dto.code),
+          otp.codeHash,
+        );
+        if (!valid) {
+          await tx.otpCode.updateMany({
+            where: {
+              id: otp.id,
+              consumedAt: null,
+              attempts: { lt: OTP_MAX_ATTEMPTS },
+            },
+            data: { attempts: { increment: 1 } },
+          });
+          return null; // Commit failed-attempt counter; throw only OUTSIDE tx.
+        }
+        const consumed = await tx.otpCode.updateMany({
+          where: {
+            id: otp.id,
+            consumedAt: null,
+            attempts: { lt: OTP_MAX_ATTEMPTS },
+            expiresAt: { gt: now },
+          },
+          data: { consumedAt: now },
+        });
+        if (consumed.count !== 1) return null;
+        const passwordHash = dto.password
+          ? await bcrypt.hash(dto.password, 12)
+          : null;
+        const activated = await tx.user.updateMany({
+          where: {
+            id: user.id,
+            status: UserStatus.pending_verification,
+            role: UserRole.customer,
+          },
+          data: { status: UserStatus.active, fullName, passwordHash },
+        });
+        if (activated.count !== 1)
+          throw new ConflictException('این حساب هم‌زمان تأیید شده است.');
+        await this.ensureFinancialAccounts(user.id, user.role, tx);
+        await tx.userLoginState.upsert({
+          where: { userId: user.id },
+          create: { userId: user.id, phoneVerifiedAt: now },
+          update: { phoneVerifiedAt: now },
+        });
+        await tx.auditLog.create({
+          data: {
+            actorUserId: user.id,
+            actorRole: UserRole.customer,
+            action: 'auth.registration.verified',
+            entityType: 'user',
+            entityId: user.id,
+            sensitivity: 'critical',
+            after: {
+              phoneOwnershipVerified: true,
+              registrationAttemptId: otp.id,
+            },
+          },
+        });
+        return tx.user.findUniqueOrThrow({ where: { id: user.id } });
+      },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+        timeout: 15000,
+      },
+    );
+    if (!result)
+      throw new BadRequestException(
+        'کد یا اطلاعات این درخواست معتبر نیست، منقضی شده یا قبلاً مصرف شده است.',
+      );
+    return this.sessions.issue(result, context);
   }
 
   async requestPasswordReset(phone: string) {
@@ -275,8 +425,12 @@ export class AuthService {
     const isValid = await bcrypt.compare(code, otp.codeHash);
 
     if (!isValid) {
-      await this.prisma.otpCode.update({
-        where: { id: otp.id },
+      await this.prisma.otpCode.updateMany({
+        where: {
+          id: otp.id,
+          consumedAt: null,
+          attempts: { lt: OTP_MAX_ATTEMPTS },
+        },
         data: { attempts: { increment: 1 } },
       });
       throw new BadRequestException('کد تایید نادرست است.');
@@ -375,7 +529,12 @@ export class AuthService {
     }
   }
 
-  async ensureFinancialAccounts(userId: string, role: UserRole) {
+  async ensureFinancialAccounts(
+    userId: string,
+    role: UserRole,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
     const accountType =
       role === UserRole.executor
         ? LedgerAccountType.executor_wallet
@@ -385,13 +544,21 @@ export class AuthService {
       return;
     }
 
-    await this.prisma.ledgerAccount.upsert({
+    const [wallet, account] = await Promise.all([
+      client.wallet.findUnique({ where: { userId } }),
+      client.ledgerAccount.findUnique({ where: { ownerUserId: userId } }),
+    ]);
+    if (wallet?.balance && !account)
+      throw new ConflictException(
+        'حساب مالی نیاز به بررسی دارد؛ موجودی خودکار بازسازی نمی‌شود.',
+      );
+    await client.ledgerAccount.upsert({
       where: { ownerUserId: userId },
       create: { ownerUserId: userId, accountType },
       update: {},
     });
 
-    await this.prisma.wallet.upsert({
+    await client.wallet.upsert({
       where: { userId },
       create: { userId },
       update: {},

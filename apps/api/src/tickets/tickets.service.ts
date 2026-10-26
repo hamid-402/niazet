@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
 import {
   MessageVisibility,
@@ -10,14 +11,17 @@ import {
   TicketPriority,
   TicketStatus,
   UserRole,
+  Prisma,
 } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { generateReferenceCode } from '../common/utils/code-generator';
+import { contractTransactionError } from '../contracts/transaction-error';
 import {
-  addBusinessHours,
-  slaTargetHoursForPriority,
-} from '../common/utils/business-hours';
+  addSlaBusinessMinutes,
+  isMeaningfulHumanReply,
+  readSlaCalendar,
+} from '../contracts/sla-calendar';
 import { AddTicketMessageDto, CreateTicketDto } from './dto/ticket.dto';
 import { createVersionedOrderReport } from '../orders/domain/order-reports';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
@@ -83,18 +87,14 @@ export class TicketsService {
     const holidaySetting = await this.prisma.systemSetting.findUnique({
       where: { key: 'calendar.iran_holidays' },
     });
-    const holidays = new Set(
-      Array.isArray(holidaySetting?.value)
-        ? holidaySetting.value.filter(
-            (value): value is string => typeof value === 'string',
-          )
-        : [],
+    const policySetting = await this.prisma.systemSetting.findUnique({
+      where: { key: 'support.first_response_calendar' },
+    });
+    const calendar = readSlaCalendar(
+      policySetting?.value,
+      holidaySetting?.value,
     );
-    const slaDueAt = addBusinessHours(
-      new Date(),
-      slaTargetHoursForPriority(priority),
-      holidays,
-    );
+    const slaDueAt = addSlaBusinessMinutes(new Date(), calendar);
 
     const ticket = await this.prisma.ticket.create({
       data: {
@@ -107,6 +107,15 @@ export class TicketsService {
         relatedPublicHandlerCode: dto.relatedPublicHandlerCode,
         slaDueAt,
         status: TicketStatus.open,
+        policySnapshot: {
+          create: {
+            policyVersion: calendar.version,
+            firstResponseBusinessMinutes: calendar.firstResponseBusinessMinutes,
+            timezone: calendar.timezone,
+            calendar: calendar as unknown as Prisma.InputJsonValue,
+            firstResponseDeadline: slaDueAt,
+          },
+        },
         messages: {
           create: {
             senderUserId: customerId,
@@ -129,6 +138,55 @@ export class TicketsService {
     });
   }
 
+  async rate(customerId: string, ticketId: string, rating: number) {
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5)
+      throw new BadRequestException('امتیاز باید بین ۱ تا ۵ باشد.');
+    return this.prisma
+      .$transaction(
+        async (tx) => {
+          const ticket = await tx.ticket.findFirst({
+            where: { id: ticketId, customerId },
+          });
+          if (!ticket) throw new NotFoundException('تیکت یافت نشد.');
+          if (!['closed', 'resolved'].includes(ticket.status))
+            throw new BadRequestException('امتیاز پس از حل تیکت قابل ثبت است.');
+          if (ticket.customerRating !== null) {
+            if (ticket.customerRating !== rating)
+              throw new ConflictException('امتیاز این تیکت قبلاً ثبت شده است.');
+            return { ticketId, rating, ratedAt: ticket.customerRatedAt };
+          }
+          const ratedAt = new Date();
+          const updated = await tx.ticket.updateMany({
+            where: {
+              id: ticketId,
+              customerId,
+              customerRating: null,
+              status: { in: ['closed', 'resolved'] },
+            },
+            data: { customerRating: rating, customerRatedAt: ratedAt },
+          });
+          if (updated.count !== 1)
+            throw new ConflictException(
+              'امتیاز هم‌زمان تغییر کرده است؛ بازخوانی کنید.',
+            );
+          await tx.auditLog.create({
+            data: {
+              actorUserId: customerId,
+              actorRole: 'customer',
+              action: 'ticket.rated',
+              entityType: 'ticket',
+              entityId: ticketId,
+              after: { rating },
+              sensitivity: 'normal',
+            },
+          });
+          return { ticketId, rating, ratedAt };
+        },
+        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+      )
+      .catch(contractTransactionError);
+  }
+
   async findOneForCustomer(customerId: string, id: string) {
     const ticket = await this.prisma.ticket.findUnique({
       where: { id },
@@ -139,6 +197,7 @@ export class TicketsService {
           orderBy: { createdAt: 'asc' },
         },
         order: { select: { code: true, title: true } },
+        policySnapshot: true,
       },
     });
     if (!ticket || ticket.customerId !== customerId) {
@@ -220,6 +279,7 @@ export class TicketsService {
           orderBy: { createdAt: 'asc' },
         },
         escalations: true,
+        policySnapshot: true,
         order: { select: { code: true, title: true, publicHandlers: true } },
         customer: { select: { fullName: true, phone: true } },
         assignedTo: { select: { id: true, fullName: true } },
@@ -298,30 +358,51 @@ export class TicketsService {
       dto.attachmentFileId,
     );
 
-    const message = await this.prisma.ticketMessage.create({
-      data: {
-        ticketId,
-        senderUserId: actor.id,
-        body: dto.body,
-        attachmentFileId: dto.attachmentFileId,
-        visibility,
-      },
-    });
-
-    if (visibility === MessageVisibility.customer_visible) {
-      await this.prisma.ticket.update({
-        where: { id: ticketId },
-        data: { status: TicketStatus.waiting_customer },
-      });
-      await this.notifications.notifyUser(
-        ticket.customerId,
-        'ticket.reply',
-        'پاسخ جدید برای تیکت شما',
-        `پشتیبانی به تیکت ${ticket.code} پاسخ داد.`,
-      );
-    }
-
-    return message;
+    if (!dto.body.trim())
+      throw new BadRequestException('متن پاسخ نباید خالی باشد.');
+    return this.prisma
+      .$transaction(
+        async (tx) => {
+          const current = await tx.ticket.findUniqueOrThrow({
+            where: { id: ticketId },
+          });
+          this.assertSupportCanAct(current, actor);
+          if (current.status === 'closed' || current.status === 'resolved')
+            throw new ConflictException(
+              'تیکت نهایی برای پاسخ تازه باید ابتدا بازگشایی شود.',
+            );
+          const message = await tx.ticketMessage.create({
+            data: {
+              ticketId,
+              senderUserId: actor.id,
+              body: dto.body.trim(),
+              attachmentFileId: dto.attachmentFileId,
+              visibility,
+            },
+          });
+          if (visibility === MessageVisibility.customer_visible) {
+            if (isMeaningfulHumanReply(dto.body))
+              await tx.ticketSlaPolicySnapshot.updateMany({
+                where: { ticketId, firstMeaningfulReplyAt: null },
+                data: { firstMeaningfulReplyAt: new Date() },
+              });
+            await tx.ticket.update({
+              where: { id: ticketId },
+              data: { status: TicketStatus.waiting_customer },
+            });
+            await this.notifications.notifyUser(
+              current.customerId,
+              'ticket.reply',
+              'پاسخ جدید برای تیکت شما',
+              `پشتیبانی به تیکت ${current.code} پاسخ داد.`,
+              tx,
+            );
+          }
+          return message;
+        },
+        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+      )
+      .catch(contractTransactionError);
   }
 
   async escalate(ticketId: string, actor: AuthenticatedUser, reason: string) {
@@ -396,6 +477,10 @@ export class TicketsService {
             assignedToUserId: userId,
             status: { in: activeStatuses },
             slaDueAt: { gt: now, lte: riskWindow },
+            OR: [
+              { policySnapshot: { is: null } },
+              { policySnapshot: { is: { firstMeaningfulReplyAt: null } } },
+            ],
           },
         }),
         this.prisma.ticket.count({
@@ -403,6 +488,10 @@ export class TicketsService {
             assignedToUserId: userId,
             status: { in: activeStatuses },
             slaDueAt: { lt: now },
+            OR: [
+              { policySnapshot: { is: null } },
+              { policySnapshot: { is: { firstMeaningfulReplyAt: null } } },
+            ],
           },
         }),
         this.prisma.ticket.findMany({
@@ -449,6 +538,12 @@ export class TicketsService {
     ticket: { assignedToUserId: string | null },
     actor: AuthenticatedUser,
   ) {
+    if (
+      actor.role === UserRole.admin &&
+      actor.adminScope !== 'ops_admin' &&
+      actor.adminScope !== 'super_admin'
+    )
+      throw new ForbiddenException('دسترسی عملیاتی پشتیبانی لازم است.');
     if (
       actor.role === UserRole.support &&
       ticket.assignedToUserId !== actor.id
@@ -514,6 +609,10 @@ export class TicketsService {
     const overdue = await this.prisma.ticket.findMany({
       where: {
         slaDueAt: { lt: new Date() },
+        OR: [
+          { policySnapshot: { is: null } },
+          { policySnapshot: { is: { firstMeaningfulReplyAt: null } } },
+        ],
         status: {
           notIn: [
             TicketStatus.resolved,

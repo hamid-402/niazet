@@ -20,6 +20,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [code, setCode] = useState('');
   const [devOtp, setDevOtp] = useState('');
+  const [registrationAttemptId, setRegistrationAttemptId] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -29,6 +30,8 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       const result = await register(phone, fullName, password || undefined);
+      if (!result.registrationAttemptId) throw new Error('شناسهٔ امن ثبت‌نام دریافت نشد؛ دوباره تلاش کنید.');
+      setRegistrationAttemptId(result.registrationAttemptId);
       setDevOtp(result.devOtp ?? '');
       setStep('otp');
     } catch (err) {
@@ -43,7 +46,7 @@ export default function RegisterPage() {
     setError('');
     setLoading(true);
     try {
-      const user = await loginWithOtp(phone, code, 'register');
+      const user = await loginWithOtp(phone, code, 'register', { registrationAttemptId, fullName, password: password || undefined });
       router.replace(roleHomePath(user));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'کد تایید نادرست است.');
@@ -130,6 +133,7 @@ export default function RegisterPage() {
             <Button type="submit" disabled={loading} className="w-full">
               {loading ? 'در حال تایید...' : 'تایید و ورود'}
             </Button>
+            <Button type="button" variant="secondary" disabled={loading} onClick={(event) => { event.preventDefault(); setStep('form'); setCode(''); setRegistrationAttemptId(''); setError(''); }}>اصلاح اطلاعات یا دریافت کد تازه</Button>
           </form>
         )}
 

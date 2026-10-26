@@ -14,6 +14,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
 import { AddTicketMessageDto, CreateTicketDto } from './dto/ticket.dto';
+import { RateTicketDto } from '../contracts/review.dto';
 
 @Controller('v1/customer/tickets')
 @UseGuards(RolesGuard)
@@ -46,5 +47,14 @@ export class TicketsController {
     @Body() dto: AddTicketMessageDto,
   ) {
     return this.tickets.addCustomerMessage(user.id, id, dto);
+  }
+
+  @Post(':id/rating')
+  rate(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: RateTicketDto,
+  ) {
+    return this.tickets.rate(user.id, id, dto.rating);
   }
 }

@@ -12,6 +12,13 @@ const EXECUTOR_FILE_SELECT = {
   scanStatus: true,
   createdAt: true,
 } as const;
+const CUSTOMER_HANDLER_SELECT = {
+  id: true,
+  publicHandlerCode: true,
+  displayAlias: true,
+  assignmentRole: true,
+  visibleToCustomer: true,
+} as const;
 
 @Injectable()
 export class OrderQueryService {
@@ -24,7 +31,13 @@ export class OrderQueryService {
     });
     if (!order || order.customerId !== customerId)
       throw new NotFoundException('سفارش یافت نشد.');
-    return order;
+    return {
+      ...order,
+      statusHistory: order.statusHistory.map((entry) => ({
+        ...entry,
+        note: entry.source === 'admin' ? null : entry.note,
+      })),
+    };
   }
 
   listForCustomer(
@@ -38,7 +51,10 @@ export class OrderQueryService {
       },
       include: {
         serviceLine: { select: { title: true } },
-        publicHandlers: true,
+        publicHandlers: {
+          where: { visibleToCustomer: true, activeTo: null },
+          select: CUSTOMER_HANDLER_SELECT,
+        },
       },
       orderBy: { createdAt: 'desc' },
       skip: params.skip,
@@ -276,6 +292,7 @@ export class OrderQueryService {
     const order = await this.prisma.order.findUnique({
       where: { id: orderId },
       include: {
+        contractSnapshot: true,
         customer: { select: { fullName: true, phone: true, email: true } },
         serviceLine: true,
         package: true,
@@ -301,11 +318,35 @@ export class OrderQueryService {
 
   private customerInclude(customerId: string) {
     return {
+      contractSnapshot: {
+        select: {
+          basePrice: true,
+          surchargeRateBps: true,
+          surchargeAmount: true,
+          deadlineNormal: true,
+          deadlineEffective: true,
+          policySnapshot: true,
+          capturedAt: true,
+        },
+      },
       serviceLine: true,
       package: true,
       acceptanceCriteria: true,
-      statusHistory: { orderBy: { createdAt: 'asc' as const } },
-      publicHandlers: { where: { visibleToCustomer: true, activeTo: null } },
+      statusHistory: {
+        orderBy: { createdAt: 'asc' as const },
+        select: {
+          id: true,
+          fromStatus: true,
+          toStatus: true,
+          source: true,
+          note: true,
+          createdAt: true,
+        },
+      },
+      publicHandlers: {
+        where: { visibleToCustomer: true, activeTo: null },
+        select: CUSTOMER_HANDLER_SELECT,
+      },
       milestones: true,
       files: {
         where: {
@@ -319,20 +360,68 @@ export class OrderQueryService {
           ],
           scanStatus: 'clean' as const,
         },
+        select: EXECUTOR_FILE_SELECT,
       },
       reports: {
         where: { visibleToCustomer: true },
-        include: { file: true },
+        select: {
+          id: true,
+          reportType: true,
+          version: true,
+          status: true,
+          summary: true,
+          progressPercent: true,
+          createdAt: true,
+          visibleToCustomer: true,
+          file: { select: EXECUTOR_FILE_SELECT },
+        },
       },
       messages: {
         where: { visibility: MessageVisibility.customer_visible },
-        include: { attachment: true },
+        select: {
+          id: true,
+          messageType: true,
+          body: true,
+          createdAt: true,
+          visibility: true,
+          attachment: { select: EXECUTOR_FILE_SELECT },
+        },
         orderBy: { createdAt: 'asc' as const },
       },
       payments: true,
       escrowHolds: true,
-      tickets: true,
-      feedback: true,
+      tickets: {
+        select: {
+          id: true,
+          code: true,
+          category: true,
+          priority: true,
+          status: true,
+          subject: true,
+          slaDueAt: true,
+          resolvedAt: true,
+          closedAt: true,
+          createdAt: true,
+          updatedAt: true,
+          customerRating: true,
+          customerRatedAt: true,
+        },
+      },
+      feedback: {
+        select: {
+          id: true,
+          code: true,
+          targetType: true,
+          publicHandlerCode: true,
+          rating: true,
+          satisfactionPercent: true,
+          feedbackType: true,
+          comment: true,
+          status: true,
+          resolutionNote: true,
+          createdAt: true,
+        },
+      },
     };
   }
 }

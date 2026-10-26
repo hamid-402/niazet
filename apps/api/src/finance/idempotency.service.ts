@@ -91,12 +91,19 @@ export class IdempotencyService {
       try {
         return await run();
       } catch (error) {
-        if (
-          error instanceof Prisma.PrismaClientKnownRequestError &&
-          error.code === 'P2034' &&
-          attempt < 2
-        ) {
-          continue;
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          // PostgreSQL FOR UPDATE/raw statements expose serialization/deadlock
+          // as P2010 + SQLSTATE, not always Prisma's normalized P2034.
+          const retryable =
+            error.code === 'P2034' ||
+            (error.code === 'P2010' &&
+              ['40001', '40P01'].includes(String(error.meta?.code)));
+          if (retryable) {
+            if (attempt < 2) continue;
+            throw new ConflictException(
+              'تراکنش هم‌زمان تغییر کرد؛ دوباره تلاش کنید.',
+            );
+          }
         }
         if (
           !(error instanceof Prisma.PrismaClientKnownRequestError) ||

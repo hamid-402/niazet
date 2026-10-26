@@ -1,0 +1,2688 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-26",
+  "packet": "ZEUS-EXEC-010",
+  "phase": "Z1",
+  "sourceAccepted": true,
+  "readyForLocalActivation": true,
+  "phaseAccepted": true,
+  "productAccepted": false,
+  "literalD1TechnologyAccepted": false,
+  "acceptedCommit": null,
+  "baseHead": "30555d2a26bb5f9a4e1649160751929b5354d1bc",
+  "baseline": "2c701d7",
+  "localSubtasksAccepted": [
+    "Z1.1",
+    "Z1.2",
+    "Z1.3",
+    "Z1.4",
+    "Z1.5",
+    "Z1.6"
+  ],
+  "scope": {
+    "mainFinancialAcceptanceWrites": false,
+    "accountMerge": false,
+    "liveProviders": false,
+    "aiEngineAccepted": false,
+    "newRegistryAudit": false,
+    "baseline192Rewritten": false,
+    "additiveLocalMigrationAfterAcceptance": true,
+    "declaredFeatureOwners": {
+      "rateFormulaDeadlineAndCapacity": "Z2",
+      "reviewAndPolicyUi": "Z5",
+      "aiRuntime": "Z7, live providers owner-deferred",
+      "productionAndRemoteCi": "Z9"
+    }
+  },
+  "acceptance": {
+    "api": {
+      "lint": "passed",
+      "build": "passed",
+      "suitesPassed": 45,
+      "testsPassed": 339,
+      "preExistingSkipped": 1
+    },
+    "http": {
+      "schemaVersion": 1,
+      "date": "2026-10-26",
+      "status": "passed",
+      "mainDatabaseConnected": false,
+      "liveProvidersUsed": false,
+      "contractRows": [
+        {
+          "id": "API01",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/auth/register",
+              "guest": 400,
+              "negativeRoles": []
+            }
+          ]
+        },
+        {
+          "id": "API02",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/auth/login",
+              "guest": 400,
+              "negativeRoles": []
+            }
+          ]
+        },
+        {
+          "id": "API03",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/auth/otp/request",
+              "guest": 400,
+              "negativeRoles": []
+            }
+          ]
+        },
+        {
+          "id": "API04",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/auth/otp/verify",
+              "guest": 400,
+              "negativeRoles": []
+            }
+          ]
+        },
+        {
+          "id": "API05",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/auth/refresh",
+              "guest": 401,
+              "negativeRoles": []
+            }
+          ]
+        },
+        {
+          "id": "API06",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/customer/orders",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            },
+            {
+              "signature": "GET /v1/executor/orders",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            },
+            {
+              "signature": "GET /v1/admin/orders",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API07",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/customer/orders",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            },
+            {
+              "signature": "POST /v1/customer/orders/:id/submit",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API08",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/customer/orders/:id",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            },
+            {
+              "signature": "GET /v1/executor/orders/:id",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            },
+            {
+              "signature": "GET /v1/admin/orders/:id",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API09",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/admin/orders/:id/triage",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            },
+            {
+              "signature": "POST /v1/admin/orders/:id/quote",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            },
+            {
+              "signature": "POST /v1/admin/orders/:id/assign",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            },
+            {
+              "signature": "POST /v1/admin/orders/:id/cancel",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            },
+            {
+              "signature": "POST /v1/admin/orders/:id/resolve-dispute",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API10",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/executor/orders/:id/deliver",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API11",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/customer/orders/:id/confirm",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API12",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/customer/orders/:orderId/review",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API13",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/pricing/calculate",
+              "guest": 400,
+              "negativeRoles": []
+            }
+          ]
+        },
+        {
+          "id": "API14",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/customer/tickets",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            },
+            {
+              "signature": "GET /v1/support/tickets",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API15",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/customer/tickets",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API16",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/customer/tickets/:id",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            },
+            {
+              "signature": "GET /v1/support/tickets/:id",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API17",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/customer/tickets/:id/messages",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            },
+            {
+              "signature": "POST /v1/support/tickets/:id/reply",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API18",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/support/tickets/:id/close",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API19",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "PATCH /v1/support/tickets/:id/assign",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API20",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/customer/orders/:id/pay",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API21",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/customer/orders/:id/payments/:paymentId/verify",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API22",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/customer/withdrawals",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API23",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/admin/users",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API24",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/admin/users/:id",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API25",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/admin/stats",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API26",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/admin/staff-report",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API27",
+          "status": "boundary-probes-passed",
+          "deferredProvider": true,
+          "proofs": [
+            {
+              "signature": "POST /v1/ai/suggest-price",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API28",
+          "status": "boundary-probes-passed",
+          "deferredProvider": true,
+          "proofs": [
+            {
+              "signature": "POST /v1/ai/triage",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "API29",
+          "status": "boundary-probes-passed",
+          "deferredProvider": true,
+          "proofs": [
+            {
+              "signature": "POST /v1/ai/support-reply",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-001",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/auth/register",
+              "guest": 400,
+              "negativeRoles": []
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-002",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/auth/login",
+              "guest": 400,
+              "negativeRoles": []
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-003",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/auth/logout",
+              "guest": 401,
+              "negativeRoles": []
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-004",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/auth/otp/request",
+              "guest": 400,
+              "negativeRoles": []
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-005",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/auth/otp/verify",
+              "guest": 400,
+              "negativeRoles": []
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-006",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/auth/me",
+              "guest": 401,
+              "negativeRoles": []
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-007",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/customer/dashboard",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-008",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/customer/orders",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-009",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/customer/orders",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-010",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/customer/orders/:id",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-011",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/customer/orders/:id/confirm",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-012",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/customer/orders/:id/revision",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-013",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/customer/orders/:id/dispute",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-014",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/customer/orders/:orderId/feedback",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-015",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/executor/dashboard",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-016",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/executor/orders",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-017",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/executor/orders/:id",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-018",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/executor/orders/:id/progress-report",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-019",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/executor/orders/:id/deliver",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-020",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/executor/performance",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-021",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/support/tickets",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-022",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/support/tickets/:id",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-023",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/support/tickets/:id/reply",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-024",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/support/tickets/:id/escalate",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-025",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/support/tickets/:id/close",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-026",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/admin/orders/dashboard",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-027",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/admin/orders",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-028",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/admin/orders/:id/triage",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-029",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/admin/orders/:id/quote",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-030",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/admin/orders/:id/assign",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-031",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/admin/orders/:id/resolve-dispute",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-032",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/admin/staff",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-033",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/admin/staff/:id",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-034",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/admin/staff/:id/performance",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-035",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "PATCH /v1/admin/staff/:id/status",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-036",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/admin/qc/queue",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-037",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/admin/qc/:id",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-038",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/admin/qc/:id/approve",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-039",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/admin/qc/:id/request-rework",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-040",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/admin/qc/:id/reject",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-041",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/admin/finance/dashboard",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-042",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/admin/finance/payments",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-043",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/admin/finance/escrow",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-044",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/admin/finance/escrow/:orderId/release",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-045",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/admin/finance/escrow/:orderId/refund",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-046",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/admin/finance/ledger",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-047",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/admin/finance/invoices",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-048",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/admin/finance/withdrawals",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-049",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "PATCH /v1/admin/finance/withdrawals/:id/approve",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "ops",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-050",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/services",
+              "guest": 200,
+              "negativeRoles": []
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-051",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/services/:slug",
+              "guest": 200,
+              "negativeRoles": []
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-052",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "GET /v1/admin/services",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-053",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/admin/services",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-054",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "PATCH /v1/admin/services/:id",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ZEUS-API4-055",
+          "status": "boundary-probes-passed",
+          "deferredProvider": false,
+          "proofs": [
+            {
+              "signature": "POST /v1/admin/services/:id/packages",
+              "guest": 401,
+              "negativeRoles": [
+                {
+                  "role": "customer",
+                  "status": 403
+                },
+                {
+                  "role": "executor",
+                  "status": 403
+                },
+                {
+                  "role": "support",
+                  "status": 403
+                },
+                {
+                  "role": "finance",
+                  "status": 403
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "cases": [
+        "all_84_source_rows_bound_to_76_deployed_routes_guest_role_scope_guards",
+        "customer_global_support_staff_read_models_real_counts_no_status_effect",
+        "immutable_quote_snapshot_unknown_values_private_note_versioned_policy",
+        "versioned_new_ticket_calendar_first_human_reply_privacy_rating_idempotency",
+        "reply_outbox_failure_rolls_back_message_status_and_sla_legacy_policy_untouched",
+        "owned_unique_review_consent_moderation_redaction_public_projection_revoke",
+        "concurrent_moderation_single_audit_foreign_owner_isolation_no_unknown_zero_wallet",
+        "future_ai_contract_is_explicitly_disabled_not_fabricated_success"
+      ],
+      "openApiTargetsVerified": 76,
+      "deployedTargets": 76,
+      "migrationCount": 25,
+      "temporaryDatabaseRemoved": true
+    },
+    "upgrade": {
+      "status": "passed",
+      "date": "2026-10-26",
+      "mainDatabaseConnected": false,
+      "migrationCount": 25,
+      "previousTablesPreserved": 70,
+      "preservedColumnSnapshot": "08ca2ed52525a2f72cabbb1d538348fe9dfa6a9f62dd6eda250bfa32a84dd15b",
+      "previousClientReadWriteAfterUpgrade": true,
+      "oldUnknownValuesRemainNull": true,
+      "ratingConstraintRejectedInvalid": true,
+      "temporaryDatabaseRemoved": true,
+      "generatedFixtureRemoved": true,
+      "targetMigrationHash": "bd0bc9ef9cad86153103862498c58c97df199b5b2ce8b28911c6202c1dd8e2dc",
+      "schemaHash": "2691b0f6090d07d8950e1f44ac72900af5d5cb22affd26a65bdb7a704b498ebc",
+      "previousAcceptedSchemaHash": "d0a4db162d32ad79d9815d975d3ba7664fa34da2300c794a7adaa56651d271a5"
+    },
+    "orderBranches": {
+      "passed": 9,
+      "rejectedMutations": 45,
+      "mainDatabaseConnected": false,
+      "temporaryDatabaseRemoved": true
+    },
+    "walletAndAuth": {
+      "groupsPassed": 26,
+      "mainDatabaseConnected": false,
+      "temporaryDatabaseRemoved": true,
+      "realDbJwtSessions": true
+    },
+    "approvalTests": 53,
+    "web": {
+      "lint": "passed",
+      "build": "passed",
+      "structuralContractsPassed": 24,
+      "registrationBrowser": {
+        "status": "passed",
+        "uiFixturesOnly": true,
+        "mainDatabaseTouched": false,
+        "results": [
+          {
+            "theme": "simple-light",
+            "width": 320,
+            "status": "passed",
+            "failClosedOnMissingChallenge": true,
+            "retryAndCorrection": true,
+            "proofPayload": true,
+            "noCredentialPersistence": true,
+            "axeViolations": 0
+          },
+          {
+            "theme": "simple-light",
+            "width": 1280,
+            "status": "passed",
+            "failClosedOnMissingChallenge": true,
+            "retryAndCorrection": true,
+            "proofPayload": true,
+            "noCredentialPersistence": true,
+            "axeViolations": 0
+          },
+          {
+            "theme": "simple-dark",
+            "width": 320,
+            "status": "passed",
+            "failClosedOnMissingChallenge": true,
+            "retryAndCorrection": true,
+            "proofPayload": true,
+            "noCredentialPersistence": true,
+            "axeViolations": 0
+          },
+          {
+            "theme": "simple-dark",
+            "width": 1280,
+            "status": "passed",
+            "failClosedOnMissingChallenge": true,
+            "retryAndCorrection": true,
+            "proofPayload": true,
+            "noCredentialPersistence": true,
+            "axeViolations": 0
+          }
+        ]
+      }
+    },
+    "supplyChain": {
+      "lockedPackages": 1319,
+      "status": "passed",
+      "registryNetworkAudit": false
+    },
+    "preservation": {
+      "files": 490,
+      "pageRoutes": 54,
+      "selfTests": 5,
+      "baselineUnchanged": true
+    }
+  },
+  "fileHashes": {
+    "apps/api/prisma/schema.prisma": "2691b0f6090d07d8950e1f44ac72900af5d5cb22affd26a65bdb7a704b498ebc",
+    "apps/api/prisma/migrations/20261025100000_zeus_wallet_funding/migration.sql": "f8234d7394c7412dc0ed8489557f8c74a3a7b2f2f53c41fd3eb3d04c520c989f",
+    "apps/api/src/auth/auth-session.service.spec.ts": "6ff5327af0a09e6e8a684cb0b58230410ed108ed786133956c3fdbfa84f4aa2a",
+    "apps/api/src/auth/auth-session.service.ts": "52c86c580498e2ca9ba1c5cacf0ed299cca8711993091e7fe5f5e0841a9a0153",
+    "apps/api/src/auth/auth.controller.ts": "e4e7f5fae8cd83c7972a3d075b084ea29c554daac72bd3ca2c14c0cc0f4e04f4",
+    "apps/api/src/finance/finance.module.ts": "a391ec704f1ead6b321ea9cba1749fbab2405ddd5d8e078aa79dd58f1c928ad9",
+    "apps/api/src/finance/idempotency.service.spec.ts": "9c0a4725aba5d1568aaaf9246931e5e2924f9a5e1852d683dc2c2f7752b5181c",
+    "apps/api/src/finance/idempotency.service.ts": "34ba333a686e475dc14e8ad3c12ee69c9d63b218f8116796e6a2a46da5c3d630",
+    "apps/api/src/finance/payment-gateway.ts": "d9272031abe3b0f615213ac22faedda3179a7efba5b498af54176ec6dc9c7c54",
+    "apps/api/src/finance/payments.service.ts": "04bbdad6c221c4bc0812901d38693c5147f3ce1a84de59e52c3bfc4c0d624b54",
+    "apps/api/src/finance/wallet-payments.controller.ts": "54367ab82adb1165553e95f1c3f68e657c53d55ed89668b8643f71c9b7a96b83",
+    "apps/api/src/finance/wallet-payments.service.ts": "de3189c435b900c5a38392cd5f6878c85fba7afc0efcea32b220e93b3022dbbd",
+    "apps/api/src/finance/wallet-payments.service.spec.ts": "459dda6c0c5cea2117f6121fcf3c1fecce075abf0859b39be67e418884bb2bd1",
+    "apps/api/src/orders/domain/order-workflow.service.ts": "bfde217f1ecb96cd29cfb282b92d1cbde28d188f721381a45f047d3946701e5a",
+    "apps/api/src/orders/order-state-machine.ts": "db51ed40eb814d594d03eda56041c8bcfbded61eba2f7a468673c661c3a225c2",
+    "apps/web/src/app/(customer)/wallet/page.tsx": "15c2b4dce0348a5a2be388da8b52f6b2bd551a24901c6fc8351df4e5365d5538",
+    "apps/web/src/app/(customer)/orders/[id]/page.tsx": "fd6dbefe1061eae463865a4c3d4d422d69d801d88ee232690961970d8ea0fd39",
+    "apps/web/src/components/wallet-actions.tsx": "c0194efac13ec63013c551fe8cb47a3e55ad28e47805d7e24c8f66e77ace1b5e",
+    "apps/web/src/components/wallet-contract.ts": "115b654f63f2c653e4d9cb0a0e7666c4a73ccd919e6be70b8f7d539b33d648ce",
+    "apps/web/scripts/zeus-wallet-contract.test.mjs": "578c1aebe55d2f538b0730eef4994fa0685b3f072df736f078e1836569a3e5a5",
+    "apps/web/scripts/zeus-wallet-runtime.mjs": "bc322bbc1b882b98e7ad24b36ccbbef63e92a2f4c01e4a13d016de1f65f5ce62",
+    "apps/api/package.json": "33426f2d525d7274f3ff4467287a2df8fb6a5d061765d78d714a0ed4214c283b",
+    "apps/api/package-lock.json": "6937f66c240d982fa801c2d2eebf0652052926f30936d04d1fe538340b23a2d5",
+    "apps/web/package.json": "a3d53a5b6c13efa109eca30ed9d4f97b22546be4702553dc7aab889789984de0",
+    "apps/web/package-lock.json": "d675f687229056ca4a96af27781a05b0a1d4611d5d022ac284aba24660d85987",
+    "scripts/orbit-z1-domain-approval.mjs": "d521252356401983393653235544f7e9212cfca332c834dc85481241b39608bc",
+    "scripts/orbit-wallet-ui-approval.mjs": "2f84d629014493438107717749f855efd80fb9402c23171cb6eb4edc5e69e4bc",
+    "scripts/orbit-preservation-contract.mjs": "4d2c52d6b07df960f77ae9686ade429293fdee5e81fee452a729372780b8ea5f",
+    "scripts/acceptance/zeus-wallet-upgrade.mjs": "fe0bbaf6ffae47deddbe301426984d6a8ce58225de2f482ff19d3f35c1c3bbcf",
+    "scripts/acceptance/zeus-wallet-postgres.mjs": "217c4021bc9e2e84753a1b58262d257278ec3d67859c4de34c0bda109b8aea1f",
+    "scripts/acceptance/zeus-wallet-ui-approval.test.mjs": "c22ce1dfaa64249e3752612a6bd81a10b42dfa2841b5310ff2e15275347f83de",
+    "scripts/acceptance/zeus-wallet-activation-evidence.mjs": "02d34a736e88b54e864b70e78050f988d2abef15a0fc53fa5ab2c93dd9a00fa0",
+    "scripts/acceptance/zeus-z1-dependency-review.mjs": "77ec94060557300f3f5f0df22bbfd1f3a2f95b5868a09992d2f71ed19af86511",
+    "scripts/acceptance/zeus-z1-dependency-review.test.mjs": "20cfc14957b143f5c926531bf83793a55756a798217f0494f7f69e002b36c0e4",
+    "apps/api/src/orders/orders.service.ts": "76ad7d490602e4e2f75e4fa86495252224a4e8327979157fc0c2ee7b626184c8",
+    "apps/api/src/orders/orders.module.ts": "71710acdd6fbf03fa66eaedd84cb161b8ac83a5bd55d63c8687cab059b662f41",
+    "apps/api/src/orders/domain/order-workflow.module.ts": "99caad77b17974abea64245e26a160f5f803f928443cd1ebcb6e6bb09f147fba",
+    "apps/api/src/orders/domain/order-workflow.service.spec.ts": "80b6b877700014731616dd54c11742e1f4235add9782d4b39fb31e4820f38677",
+    "apps/api/src/finance/escrow.service.ts": "bb695a6cd6b50672a41096080eda84ab1ed1530ee00a16e7ed31278743d93017",
+    "apps/api/src/jobs/jobs.service.ts": "315dc0b2a34a0235323a594b73b96dae50675b975a9767b6259bb23c24bd4750",
+    "apps/api/src/auth/auth.service.ts": "afce9e352c38c83857bf7cda1e8f8dd87abc8d02c8af622712c41151de2ccf4f",
+    "apps/api/src/auth/dto/otp.dto.ts": "c96f3b935f46edf2c12cd48dea4dd55dca81100b5e127de643f47b3b63401935",
+    "apps/api/src/auth/registration-proof.ts": "ea852ca4dbc1c5fee5c28c039e47fa80ec98dec9e90fab921a55ddeb3ab37323",
+    "apps/api/src/auth/registration-proof.spec.ts": "cb333b2822b81018ae721c5feb327401d27cb548d1f5bbbdcc6f9b30116713be",
+    "apps/web/src/lib/auth-context.tsx": "4b8d2ba9194e8c3050f1824d73819b676356576f615877263908e5a06ee3a6d8",
+    "apps/web/src/app/register/page.tsx": "9bbe597ca17620cfab99201a21dc6bb4c9afdf652e06536d843cae7580143e5d",
+    "apps/web/scripts/zeus-registration-runtime.mjs": "42edd62b30dbcddd54ba0031755185afacf7dcb415e5654b0f2ef6ceb04c2718",
+    "scripts/orbit-z1-contract-approval.mjs": "c58919c6bb014c8b635e9e97702ff01bfefb1247459e16154bccb2db6fb8082c",
+    "scripts/acceptance/zeus-z1-contract-approval.test.mjs": "011e145a18ff7b4a0551beb5bd22992974f1a95001434a7aba74dd209bea86ed",
+    "scripts/acceptance/zeus-z1-contract-evidence.mjs": "a5af6bd49720f06c5370ce60e7af8a89e846d79daabebb42f95cb70583786139",
+    "scripts/acceptance/phase8-exception-workflow-e2e.mjs": "0a165c6a8dab8904dd719536a5ce57b6c7425bc3d7d14216440bc3a40ca8727f",
+    "scripts/acceptance/phase8-order-branches.mjs": "915289a7474812bf4ff5cd660a19bb51b5311263e18649114166e657dfdf3bad",
+    "docs/zeus/Z1_ORDER_AUTH_CONTRACTS.md": "d69cb6e4c48e86ac555cdfaaaee0ab594d207894f6311569b4ce519deab712f9",
+    "apps/api/src/feedback/feedback.module.ts": "1d47df00ff43d0168e7532d05b66642e174fad59da36f41ff5981cce67240433",
+    "apps/api/src/contracts/calendar.controller.ts": "bc03d4bdb0e4033969fe3d621259f4df0950c1205326139d31fd25bb22909b40",
+    "apps/api/src/contracts/dashboard.controller.ts": "1db69547819afc56f3638070d60d9be2934b9fb787a29c953faabb93b87b801d",
+    "apps/api/src/contracts/dashboard.service.ts": "9592ebcfed2af36ec62c2851cd780ef56d66f74d91779405b02c36d60d0a0c5d",
+    "apps/api/src/contracts/deferred-ai.controller.ts": "7ab84fb6578c84be125598fee16913e6aadd1a3bf5612a9a05f2f5c8f0fa5e8f",
+    "apps/api/src/contracts/order-snapshot.ts": "0cca103de0dd8f53c8d0fd71af7d2df99ebdb0d50a3b96ea4afff69affbb9bb2",
+    "apps/api/src/contracts/review.dto.ts": "f72731e25b01a33422f862ec8bf33e6ab6489405450b22904eda998637c386ef",
+    "apps/api/src/contracts/reviews.controller.ts": "1af4832c0b72d7ba2a18a6879c3b37d86f8fe76cdecf986e85aaa336a37d0d54",
+    "apps/api/src/contracts/reviews.service.spec.ts": "030f6658cad9f910c528d042f8921f7da3931ef9d214a018640c3db1fe0b5be3",
+    "apps/api/src/contracts/reviews.service.ts": "f90c59d1c7399c0b1808707539b3558da3720bb87ddabcd3ad180d76e35581a8",
+    "apps/api/src/contracts/service-policy.controller.ts": "d55116499cf815082cc4103558325ae0035b44add403504d860b5558fb671971",
+    "apps/api/src/contracts/sla-calendar.spec.ts": "683682daced3a3d3410d9f427063da07007ce002df9d1803e6a171ab7ed54bf1",
+    "apps/api/src/contracts/sla-calendar.ts": "89e210defcc9f6bc3e50b722d1d9ea66b8b938ee6d88b21327b86052bac38ead",
+    "apps/api/src/contracts/support-scope.guard.ts": "b47b9afdcfd708b6f595ca1e9aaa1bf907355c96eaee69a1ee95fb7791388813",
+    "apps/api/src/contracts/transaction-error.ts": "3814bf2be876606f4df388fb2e81e85862308c29f79aceb7c3c0f9ff9bf5b85a",
+    "apps/api/src/catalog/catalog.module.ts": "df5ae8ee9f9e1f039ae9bc21cd36466b9ddc7975800f5456d473a9155cf8788c",
+    "apps/api/src/catalog/catalog.service.ts": "48ab9734741183f7b449bd886c297e472d680a637a4b1f0bdcf9db5b83f20535",
+    "apps/api/src/orders/domain/order-query.service.ts": "3ea47a67fe8adadd48de934efbc55878b427959ecd217f3cff1d46b6ebb06185",
+    "apps/api/src/tickets/tickets.controller.ts": "efbdea3e0b98339ea0f798ba3a42234ed23b947367c3702e7d2f3fba4adfdfe8",
+    "apps/api/src/tickets/tickets.service.ts": "c7b24b5e35e072cdd598f90c5679905b8f9d4273646d45308f9755526b5ba5e0",
+    "apps/api/src/tickets/tickets.module.ts": "8503684ff742e1ff6782cdb5e4348b2b573f419d617b9d436524572dc6bdaec6",
+    "apps/api/src/tickets/tickets.support.controller.ts": "6c31d433264845ce14af49b68adc13f888cc45d38c393e5867ba04c8613f33b6",
+    "apps/api/prisma/migrations/20261026100000_zeus_data_contracts/migration.sql": "bd0bc9ef9cad86153103862498c58c97df199b5b2ce8b28911c6202c1dd8e2dc",
+    "scripts/orbit-z1-data-approval.mjs": "dd660836c7c31101c295f3c35ae238fe9845fb75edee5447dfbab442f044758b",
+    "scripts/acceptance/zeus-z1-contract-inventory.mjs": "adfc06ab5870e3913f83847dad1e84e5c28c461f61462de5196a76ba63c4609d",
+    "scripts/acceptance/zeus-z1-phase-http.mjs": "e54c8cd905718e803ff356b0c79912a4534d39710a40f30b805b41552195f78c",
+    "scripts/acceptance/zeus-z1-data-upgrade.mjs": "6801df78dea464051c846b890f516154c14cdb96f1ccf019c48b79f62fabada0",
+    "scripts/acceptance/zeus-z1-data-approval.test.mjs": "5008e0a0f80d64a661e6bd4cff03358f8b81488e8cedbc227b71f300a0cb28ae",
+    "scripts/acceptance/zeus-z1-phase-gate.mjs": "d13cb5fda64248d341da488c09da77f5e4279d3930f5b75a32eb9fa6ead7ac52",
+    "docs/zeus/Z1_DATA_API_CONTRACTS.md": "9a7a40cff3c56ffbee635c07a6e3f13fe83882085caf5b143bb51a94f7f170b3",
+    "apps/api/src/main.ts": "da4d33d349ee2d848906c546aca1438ec798130e53cbf81757481d09334f280d",
+    "apps/api/src/common/guards/roles.guard.ts": "d102c37bf2e89d0412b723a695387927911260e774c94cc920d8fb2ff982dadf",
+    "apps/api/src/common/guards/admin-scope.guard.ts": "b4c640d99d51d050653c3d846ef207dd5bf5459342d7bd6c2bbc7c661056519a",
+    "apps/api/src/common/guards/jwt-auth.guard.ts": "d127b1e7e67f285e6a6225230a071e252c720eba2bb8718e424918b2e130ac6a",
+    "apps/api/src/common/guards/rate-limit.guard.ts": "962a3b18a5fe25dd01931b4640075a3deb7f5115bcea4e3b6d12c193ab6e6e67"
+  },
+  "localActivation": {
+    "status": "passed",
+    "date": "2026-10-26",
+    "migrationCount": 25,
+    "previousTablesPreserved": 70,
+    "preservedColumnSnapshot": "3feaaf28500f5b7f5647868212490b70bfc17b9203c5207f45e963c479523c93",
+    "mainFinancialAcceptanceWrites": false,
+    "seedOrReset": false,
+    "providers": "mock",
+    "sourceEvidence": "docs/zeus/z1-phase-acceptance.json"
+  },
+  "runtime": {
+    "api": "healthy",
+    "web": "healthy",
+    "apiPort": 3001,
+    "webPort": 3002,
+    "migrationCount": 25,
+    "walletsCheckedReadOnly": 4,
+    "allWalletsConsistent": true,
+    "financialTransactionExecuted": false,
+    "paymentGateway": "mock",
+    "date": "2026-10-26"
+  },
+  "limitations": [
+    "Phase acceptance is data/API foundation, not all source-feature or UI completion",
+    "Three future-ready AI endpoints fail closed 503; no AI engine result is certified",
+    "Unknown old data and unnegotiated rate/deadline snapshots are not fabricated; implementation of applied price/deadline remains Z2",
+    "84 API rows have route/OpenAPI and HTTP boundary evidence; full new-feature and order-flow cases are separately enumerated, not every business permutation",
+    "No fresh registry audit, no new dependency installation; earlier clean audit applies only to unchanged package/locks",
+    "No Git commit/push/remote CI or public production release in this packet"
+  ]
+}

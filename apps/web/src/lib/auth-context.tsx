@@ -19,6 +19,7 @@ interface AuthContextValue {
     phone: string,
     code: string,
     purpose: 'register' | 'login',
+    registration?: { registrationAttemptId: string; fullName: string; password?: string },
   ) => Promise<AuthUser>;
   requestOtp: (
     phone: string,
@@ -28,7 +29,7 @@ interface AuthContextValue {
     phone: string,
     fullName: string,
     password?: string,
-  ) => Promise<{ devOtp?: string; message: string }>;
+  ) => Promise<{ devOtp?: string; message: string; registrationAttemptId: string }>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -95,7 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = useCallback(
     async (phone: string, fullName: string, password?: string) => {
-      return apiFetch<{ devOtp?: string; message: string }>('/auth/register', {
+      return apiFetch<{ devOtp?: string; message: string; registrationAttemptId: string }>('/auth/register', {
         method: 'POST',
         body: { phone, fullName, password },
         auth: false,
@@ -105,13 +106,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const loginWithOtp = useCallback(
-    async (phone: string, code: string, purpose: 'register' | 'login') => {
+    async (phone: string, code: string, purpose: 'register' | 'login', registration?: { registrationAttemptId: string; fullName: string; password?: string }) => {
       const result = await apiFetch<{
         accessToken: string;
         user: AuthUser;
       }>('/auth/otp/verify', {
         method: 'POST',
-        body: { phone, code, purpose },
+        body: { phone, code, purpose, ...(purpose === 'register' ? registration : {}) },
         auth: false,
       });
       setAccessToken(result.accessToken);
