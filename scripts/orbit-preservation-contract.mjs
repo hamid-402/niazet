@@ -11,6 +11,7 @@ import { matchesZ1DomainApproval, verifyZ1DomainApproval } from './orbit-z1-doma
 import { verifyWalletUiApproval, walletUiOriginalRef } from './orbit-wallet-ui-approval.mjs';
 import { matchesZ1ContractApproval, verifyZ1ContractApproval } from './orbit-z1-contract-approval.mjs';
 import { matchesZ1DataApproval, verifyZ1DataApproval } from './orbit-z1-data-approval.mjs';
+import { matchesZ2EngineApproval, verifyZ2EngineApproval, verifyZ2GuardWiring, z2EngineOriginalRef } from './orbit-z2-engine-approval.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 // Fixed pre-redesign checkpoint. Never silently rebase this gate to HEAD.
@@ -54,12 +55,15 @@ try {
   verifyWalletUiApproval(path => git('show', `${walletUiOriginalRef}:${path}`), read);
   verifyZ1ContractApproval((ref, path) => git('show', `${ref}:${path}`), read);
   verifyZ1DataApproval(path => git('show', `${baseline}:${path}`), read);
+  verifyZ2EngineApproval(read);
+  verifyZ2GuardWiring(git('show', `${z2EngineOriginalRef}:scripts/orbit-preservation-contract.mjs`), read('scripts/orbit-preservation-contract.mjs'));
   verifyInvoiceDomain(path => git('show', `${baseline}:${path}`), path => read(path).toString('utf8'));
   verifyPricingApproval(path => git('show', `${baseline}:${path}`), read);
   verifyReconciliationApproval(path => git('show', `${baseline}:${path}`), read);
-const failures = violations(files, (path) => tracked.has(path) && existsSync(new URL(path, new URL('../', import.meta.url))), changed, path => existsSync(new URL(path, new URL('../', import.meta.url))) && (matchesInvoiceApproval(path, read(path)) || matchesPricingApproval(path, read(path)) || matchesReconciliationApproval(path, read(path)) || matchesParserApproval(path, read(path)) || matchesSecurityApproval(path, read(path)) || matchesZ1DomainApproval(path, read(path)) || matchesZ1ContractApproval(path, read(path)) || matchesZ1DataApproval(path, read(path))));
+const failures = violations(files, (path) => tracked.has(path) && existsSync(new URL(path, new URL('../', import.meta.url))), changed, path => existsSync(new URL(path, new URL('../', import.meta.url))) && (matchesInvoiceApproval(path, read(path)) || matchesPricingApproval(path, read(path)) || matchesReconciliationApproval(path, read(path)) || matchesParserApproval(path, read(path)) || matchesSecurityApproval(path, read(path)) || matchesZ1DomainApproval(path, read(path)) || matchesZ1ContractApproval(path, read(path)) || matchesZ1DataApproval(path, read(path)) || matchesZ2EngineApproval(path, read(path))));
   const routes = files.filter((path) => path.startsWith('apps/web/src/app/') && path.endsWith('/page.tsx'));
   assert.deepEqual(failures, [], failures.join('\n'));
+  console.log('Z2-B1: five exact additive engine files accepted; no order/payment/DB activation.');
   console.log(`Orbit preservation passed: ${files.length} baseline files, ${routes.length} page routes retained; only exact owner-approved invoice/pricing/diagnosis/parser/security/Z1 domain packets accepted; original baseline and earlier checks retained; 5 guard self-tests passed (including untracked API). Main DB migration/live activation is NOT accepted by this structural gate.`);
 } catch (error) {
   console.error(error.message);

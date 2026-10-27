@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { verifyZ2EngineApproval, verifyZ2GuardWiring, verifyZ2HistoryWiring, z2EngineOriginalRef } from '../orbit-z2-engine-approval.mjs';
+const root = new URL('../../', import.meta.url);
+const read = path => readFileSync(new URL(path, root));
+const json = path => JSON.parse(read(path));
+const hash = value => createHash('sha256').update(value.toString('utf8').replaceAll('\r\n', '\n')).digest('hex');
+const proof = json('docs/zeus/z2-engine-acceptance.json');
+assert.equal(proof.packet, 'Z2-B1');
+assert.equal(proof.sourceAccepted, true);
+assert.equal(proof.phaseAccepted, false);
+assert.equal(proof.productionAccepted, false);
+assert.equal(proof.scope.databaseChanges, false);
+assert.equal(proof.scope.financialWiring, false);
+assert.equal(proof.scope.liveProviders, false);
+assert.equal(proof.acceptance.api.suitesPassed, 47);
+assert.equal(proof.acceptance.api.testsPassed, 410);
+assert.equal(proof.acceptance.api.preExistingSkipped, 1);
+assert.equal(proof.acceptance.approvalTestsPassed, 60);
+assert.deepEqual(proof.acceptance.hostTimezoneProbes, ['UTC', 'America/Los_Angeles']);
+for (const [path, expected] of Object.entries(proof.fileHashes)) assert.equal(hash(read(path)), expected, 'Z2-B1 input drift: ' + path);
+verifyZ2EngineApproval(read);
+const guard = 'scripts/orbit-preservation-contract.mjs';
+const oldGuard = execFileSync('git', ['show', `${z2EngineOriginalRef}:${guard}`], { cwd: root, windowsHide: true });
+verifyZ2GuardWiring(oldGuard, read(guard));
+const z1 = json('docs/zeus/z1-phase-acceptance.json');
+for (const [path, expected] of Object.entries(z1.fileHashes)) {
+  const restored = path === guard ? oldGuard : path === 'scripts/acceptance/zeus-z1-dependency-review.mjs' ? verifyZ2HistoryWiring(read(path)) : read(path);
+  assert.equal(hash(restored), expected, 'Historical Z1 input not preserved: ' + path);
+}
+console.log(JSON.stringify({ packet: 'Z2-B1', engineSourceAccepted: true, phaseAccepted: false, newEngineTests: 71, inheritedZ1InputsPreserved: Object.keys(z1.fileHashes).length, guardRecoveredByExactInverse: true, databaseChanged: false, financialWiringActivated: false, liveProvidersAccepted: false }));

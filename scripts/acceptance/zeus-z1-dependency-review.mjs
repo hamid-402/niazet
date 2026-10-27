@@ -19,6 +19,7 @@ import {
 import { matchesWalletUiApproval, walletUiPins, walletUiOriginalRef } from '../orbit-wallet-ui-approval.mjs';
 import { matchesZ1ContractApproval, z1ContractPins } from '../orbit-z1-contract-approval.mjs';
 import { matchesZ1DataApproval, z1DataPins } from '../orbit-z1-data-approval.mjs';
+import { matchesZ2EngineApproval } from '../orbit-z2-engine-approval.mjs';
 
 const root = new URL("../../", import.meta.url);
 const read = (path) => readFileSync(new URL(path, root));
@@ -419,7 +420,7 @@ export function checkHistoricalReview() {
   ]) {
     if (!Object.hasOwn(saved.sourceInputs, path))
       assert(
-        matchesZ1DomainApproval(path, read(path)) || matchesWalletUiApproval(path, read(path)) || matchesZ1ContractApproval(path, read(path)) || matchesZ1DataApproval(path, read(path)),
+        matchesZ1DomainApproval(path, read(path)) || matchesWalletUiApproval(path, read(path)) || matchesZ1ContractApproval(path, read(path)) || matchesZ1DataApproval(path, read(path)) || matchesZ2EngineApproval(path, read(path)),
         `Unapproved new historical source: ${path}`,
       );
   }

@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-27",
+  "phase": "Z2",
+  "packet": "Z2-B1",
+  "baseHead": "e961f288e4d4c7487335c282f608b557b52561af",
+  "baseline": "2c701d7",
+  "sourceAccepted": true,
+  "phaseAccepted": false,
+  "productionAccepted": false,
+  "remoteCiAccepted": false,
+  "acceptedPhaseChecklistItems": [],
+  "authority": {
+    "status": "explicit-owner-approval",
+    "scope": "Z2.1-Z2.6, exact pins, additive migration and financial acceptance on isolated DB first; no old money/order rewrite, auth/role changes, automatic refund or live providers"
+  },
+  "scope": {
+    "databaseChanges": false,
+    "financialWiring": false,
+    "liveProviders": false,
+    "newApiRoutes": false,
+    "checkoutConnected": false,
+    "visualChanges": false,
+    "dependencyChanges": false
+  },
+  "acceptance": {
+    "api": {
+      "lint": "passed",
+      "typecheck": "passed",
+      "build": "passed",
+      "suitesPassed": 47,
+      "testsPassed": 410,
+      "preExistingSkipped": 1
+    },
+    "relatedPricingTestsPassed": 125,
+    "newEngineTestsPassed": 71,
+    "previousPricingTestsPassed": 54,
+    "hostTimezoneProbes": [
+      "UTC",
+      "America/Los_Angeles"
+    ],
+    "approvalTestsPassed": 60,
+    "previousHistoricalReviewFailures": {
+      "passed": 57,
+      "failed": 2,
+      "reason": "New exact Z2 sources not yet recognized by historical reconstruction",
+      "resolvedBy": "Exact five-file matcher only; inverse recovers entire previous tool and guard"
+    }
+  },
+  "historicalZ1": {
+    "certificateUnchanged": true,
+    "unchangedInputs": 86,
+    "reconstructedInputs": [
+      "scripts/orbit-preservation-contract.mjs",
+      "scripts/acceptance/zeus-z1-dependency-review.mjs"
+    ],
+    "totalInputsPreserved": 88
+  },
+  "nextPacket": "Z2-B2: additive policy/revision/reservation data and isolated migration rehearsal",
+  "fileHashes": {
+    "apps/api/src/pricing/policy-json.ts": "562fa3cd016dc5a0e028363461545396e0aa008e1034682756ec8d78c964520a",
+    "apps/api/src/pricing/formula-price.ts": "bfc34761c386c2af12b588039e9c39472b56e090b3aa3a6d9c9d468fb0225dce",
+    "apps/api/src/pricing/formula-price.spec.ts": "07de4b2fb09956a11213ec4b67aaa0360a3bd4d828f5629f1c481512f3c64571",
+    "apps/api/src/pricing/delivery-window.ts": "871ddf3781b3413e8b5ad7d2ea3c9410b220864816b357e234eab6b808c20ad7",
+    "apps/api/src/pricing/delivery-window.spec.ts": "42efaa3bf2002723aa439a60b85484591f3591a8fcfc6c90c5022263167123e5",
+    "scripts/orbit-preservation-contract.mjs": "4f71da7e8f628a3f2976887d22320a43877dc7ad5ac715d72c6a44eb9e3a364a",
+    "scripts/orbit-z2-engine-approval.mjs": "58ed7ee3452441ded7d1c82e86a1c4b86a448b2a8b8035a190175a93a4f22eca",
+    "scripts/acceptance/zeus-z2-engine-approval.test.mjs": "100a1120cb6c607dc2c26387b04ef748b1bcfeaa7c8fc6158c15c31d1c47333a",
+    "scripts/acceptance/zeus-z2-engine-gate.mjs": "6e4f189c3cea89231c8fcb1e2abc8ae96e66c12bc7a29aeabd154f332c46c32f",
+    "scripts/acceptance/zeus-z1-dependency-review.mjs": "965eb911df9df2b689ad31dbab3d1784960c7670d38a5a3b79c05398cba2765f",
+    ".github/workflows/ci.yml": "8bc88e5deaf2a7bb350d46985f695ae8b480ba45d43a31f31894eb5cbf3dabe4"
+  }
+}

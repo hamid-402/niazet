@@ -70,6 +70,7 @@ jobs:
           scripts/acceptance/zeus-wallet-ui-approval.test.mjs
           scripts/acceptance/zeus-z1-data-approval.test.mjs
           scripts/acceptance/zeus-z1-ci.test.mjs
+          scripts/acceptance/zeus-z2-engine-approval.test.mjs
       - name: Critical unit coverage contract
         run: npm run phase8:unit-coverage-contract
         working-directory: apps/api
