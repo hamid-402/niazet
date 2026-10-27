@@ -71,6 +71,8 @@ jobs:
           scripts/acceptance/zeus-z1-data-approval.test.mjs
           scripts/acceptance/zeus-z1-ci.test.mjs
           scripts/acceptance/zeus-z2-engine-approval.test.mjs
+          scripts/acceptance/zeus-z2-commercial-approval.test.mjs
+          scripts/acceptance/zeus-z2-activation.test.mjs
       - name: Critical unit coverage contract
         run: npm run phase8:unit-coverage-contract
         working-directory: apps/api
@@ -157,6 +159,8 @@ jobs:
         working-directory: apps/api
       - name: Zeus wallet, auth, API boundaries and populated upgrade rehearsal
         run: node scripts/acceptance/zeus-z1-ci.mjs
+      - name: Zeus Z2 commercial revisions, atomic capacity and financial review
+        run: node scripts/acceptance/zeus-z2-postgres.mjs
       - name: Isolated load and concurrency smoke
         run: npm run phase8:load-smoke -- --output=../../.artifacts/performance/load-smoke.json
         working-directory: apps/api

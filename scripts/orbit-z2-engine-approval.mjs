@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+import { inverseZ2CommercialInput } from './orbit-z2-commercial-approval.mjs';
 
 // Owner approval 2026-10-27: Z2.1–Z2.6, isolated acceptance first.
 // B1 accepts ONLY five additive pure-engine/test files. No financial wiring.
@@ -27,7 +28,7 @@ export function verifyZ2EngineApproval(read) {
 
 /** The historical reviewer may recognize only the five exact new pins. */
 export function verifyZ2HistoryWiring(current) {
-  let source = text(current);
+  let source = text(inverseZ2CommercialInput('scripts/acceptance/zeus-z1-dependency-review.mjs', current));
   for (const addition of [
     "import { matchesZ2EngineApproval } from '../orbit-z2-engine-approval.mjs';\n",
     ' || matchesZ2EngineApproval(path, read(path))',
@@ -41,7 +42,7 @@ export function verifyZ2HistoryWiring(current) {
 
 /** Inverse of this packet's wiring must recover the ENTIRE previous guard. */
 export function verifyZ2GuardWiring(previous, current) {
-  let source = text(current);
+  let source = text(inverseZ2CommercialInput('scripts/orbit-preservation-contract.mjs', current));
   const additions = [
     "import { matchesZ2EngineApproval, verifyZ2EngineApproval, verifyZ2GuardWiring, z2EngineOriginalRef } from './orbit-z2-engine-approval.mjs';\n",
     '  verifyZ2EngineApproval(read);\n',

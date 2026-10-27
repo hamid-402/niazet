@@ -20,9 +20,10 @@ import { matchesWalletUiApproval, walletUiPins, walletUiOriginalRef } from '../o
 import { matchesZ1ContractApproval, z1ContractPins } from '../orbit-z1-contract-approval.mjs';
 import { matchesZ1DataApproval, z1DataPins } from '../orbit-z1-data-approval.mjs';
 import { matchesZ2EngineApproval } from '../orbit-z2-engine-approval.mjs';
+import { inverseZ2CommercialInput, matchesZ2CommercialApproval } from '../orbit-z2-commercial-approval.mjs';
 
 const root = new URL("../../", import.meta.url);
-const read = (path) => readFileSync(new URL(path, root));
+const read = (path) => inverseZ2CommercialInput(path, readFileSync(new URL(path, root)));
 const json = (path) => JSON.parse(read(path).toString("utf8"));
 const sha = (value) => createHash("sha256").update(value).digest("hex");
 const artifact = "docs/zeus/z1-dependency-review.json";
@@ -420,7 +421,7 @@ export function checkHistoricalReview() {
   ]) {
     if (!Object.hasOwn(saved.sourceInputs, path))
       assert(
-        matchesZ1DomainApproval(path, read(path)) || matchesWalletUiApproval(path, read(path)) || matchesZ1ContractApproval(path, read(path)) || matchesZ1DataApproval(path, read(path)) || matchesZ2EngineApproval(path, read(path)),
+        matchesZ1DomainApproval(path, read(path)) || matchesWalletUiApproval(path, read(path)) || matchesZ1ContractApproval(path, read(path)) || matchesZ1DataApproval(path, read(path)) || matchesZ2EngineApproval(path, read(path)) || matchesZ2CommercialApproval(path, read(path)),
         `Unapproved new historical source: ${path}`,
       );
   }

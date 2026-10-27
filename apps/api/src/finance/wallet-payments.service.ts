@@ -18,6 +18,8 @@ import { IdempotencyService } from './idempotency.service';
 import { LedgerService } from './ledger.service';
 import { PaymentGatewayService } from './zarinpal.gateway';
 import { OrderWorkflowService } from '../orders/domain/order-workflow.service';
+import { CommercialService } from '../pricing/commercial.service';
+import { CommercialClock } from '../pricing/commercial-clock';
 
 export const MAX_WALLET_AMOUNT = 2_000_000_000;
 export function assertWalletAmount(amount: number) {
@@ -37,6 +39,12 @@ export class WalletPaymentsService {
     private readonly config: ConfigService,
     private readonly workflow: OrderWorkflowService = new OrderWorkflowService(
       prisma,
+    ),
+    private readonly commercial: CommercialService = new CommercialService(
+      prisma,
+      idempotency,
+      workflow,
+      new CommercialClock(),
     ),
   ) {}
 
@@ -280,6 +288,7 @@ export class WalletPaymentsService {
             'مرحله پرداخت را به‌درستی انتخاب کنید.',
           );
         const amount = milestone?.amount ?? order.finalPrice;
+        await this.commercial.assertPayable(tx, orderId);
         assertWalletAmount(amount);
         // Gateway intent in flight must be resolved before switching payment rail.
         const pending = await tx.payment.count({
@@ -327,6 +336,8 @@ export class WalletPaymentsService {
             idempotencyKey: `wallet-order:${userId}:${orderId}:${this.idempotency.requireKey(key)}`,
           },
         });
+        await this.commercial.bindPayment(tx, orderId, payment.id);
+        await this.commercial.commitPayment(tx, payment.id);
         await this.ledger.postEntry(
           {
             debitAccountId: account.id,

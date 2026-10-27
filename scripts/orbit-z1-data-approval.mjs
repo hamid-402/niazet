@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+import { inverseZ2CommercialInput } from './orbit-z2-commercial-approval.mjs';
 // ZEUS-EXEC-010, owner-approved Z1.1/Z1.3 scope. Exact paths only;
 // does not authorize live providers, financial data repair or baseline rebase.
 export const z1DataPins = {
@@ -97,7 +98,7 @@ export const z1DataPins = {
   }
 };
 const hash = v => createHash('sha256').update(v.toString('utf8').replaceAll('\r\n', '\n')).digest('hex');
-export function matchesZ1DataApproval(path, bytes) { return Object.hasOwn(z1DataPins, path) && hash(bytes) === z1DataPins[path].after; }
+export function matchesZ1DataApproval(path, bytes) { return Object.hasOwn(z1DataPins, path) && hash(inverseZ2CommercialInput(path, bytes)) === z1DataPins[path].after; }
 export function verifyZ1DataApproval(originalRead, currentRead) {
   for (const [path, pin] of Object.entries(z1DataPins)) {
     assert(matchesZ1DataApproval(path, currentRead(path)), 'Z1 data/API pin drift: ' + path);

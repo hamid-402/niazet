@@ -5,11 +5,16 @@ import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { inverseZ2CommercialInput, matchesZ2CommercialApproval } from '../orbit-z2-commercial-approval.mjs';
 const root = fileURLToPath(new URL('../../', import.meta.url)), api = join(root, 'apps/api'), req = createRequire(join(api, 'package.json'));
 const { PrismaClient } = req('@prisma/client');
 const migrationName = '20261026100000_zeus_data_contracts';
 const migrations = join(api, 'prisma/migrations');
-const names = readdirSync(migrations, { withFileTypes: true }).filter(e => e.isDirectory()).map(e => e.name).sort();
+const allNames = readdirSync(migrations, { withFileTypes: true }).filter(e => e.isDirectory()).map(e => e.name).sort();
+const laterMigrations = allNames.filter(name => name > migrationName);
+for (const name of laterMigrations) assert(matchesZ2CommercialApproval(`apps/api/prisma/migrations/${name}/migration.sql`, readFileSync(join(migrations, name, 'migration.sql'))), 'Unapproved later migration in historical rehearsal');
+assert(!laterMigrations.length || !process.argv.includes('--apply-local'), 'Historical Z1 runner cannot apply a later phase to the main DB');
+const names = allNames.filter(name => name <= migrationName);
 assert.equal(names.length, 25); assert.equal(names.at(-1), migrationName);
 const env = Object.fromEntries(readFileSync(join(api, '.env'), 'utf8').split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('#') && l.includes('=')).map(l => { const n = l.indexOf('='); return [l.slice(0, n), l.slice(n + 1).replace(/^(['"])(.*)\1$/, '$2')]; }));
 const main = new URL(env.DATABASE_URL); assert(['localhost', '127.0.0.1', '[::1]'].includes(main.hostname));
@@ -17,7 +22,7 @@ assert.equal(env.NODE_ENV ?? 'development', 'development'); assert.equal(env.PAY
 const output = join(root, '.artifacts/zeus/z1-phase'); mkdirSync(output, { recursive: true });
 const digest = v => createHash('sha256').update(v).digest('hex');
 const normalized = v => v.toString('utf8').replaceAll('\r\n', '\n');
-const read = p => readFileSync(join(root, p));
+const read = p => p === 'apps/api/prisma/schema.prisma' ? inverseZ2CommercialInput(p, readFileSync(join(root, p))) : readFileSync(join(root, p));
 const previous = JSON.parse(read('docs/zeus/z1-contract-acceptance.json'));
 const redact = error => String(error).replace(/postgres(?:ql)?:\/\/[^\s"']+/gi, '<DB URL>');
 function oldSchema() {
@@ -30,6 +35,19 @@ function oldSchema() {
   return old;
 }
 function cli(args, url) {
+  if (laterMigrations.length && args[0] === 'migrate' && args[1] === 'deploy' && !args.includes('--config')) {
+    assert(process.argv.includes('--probe-child'), 'Historical target is only used by the disposable rehearsal child');
+    const parent = resolve(process.env.ZEUS_DATA_OLD_CLIENT, '..');
+    const runtime = resolve(root, '_runtime/apps/api');
+    assert(parent.startsWith(runtime + '\\') || parent.startsWith(runtime + '/'));
+    const target = join(parent, 'accepted-z1-target'); mkdirSync(target, { recursive: true }); mkdirSync(join(target, 'migrations'), { recursive: true });
+    writeFileSync(join(target, 'schema.prisma'), read('apps/api/prisma/schema.prisma'));
+    cpSync(join(migrations, 'migration_lock.toml'), join(target, 'migrations/migration_lock.toml'));
+    for (const name of names) cpSync(join(migrations, name), join(target, 'migrations', name), { recursive: true });
+    const config = join(target, 'prisma.config.ts');
+    writeFileSync(config, "import { defineConfig } from 'prisma/config';\nexport default defineConfig({ schema: " + JSON.stringify(join(target, 'schema.prisma')) + ', migrations: { path: ' + JSON.stringify(join(target, 'migrations')) + ' }, datasource: { url: process.env.DATABASE_URL! } });\n');
+    args = [...args, '--config', config];
+  }
   const r = spawnSync(process.execPath, [join(api, 'node_modules/prisma/build/index.js'), ...args], { cwd: api, env: { ...process.env, DATABASE_URL: url, PRISMA_GENERATE_SKIP_AUTOINSTALL: '1' }, encoding: 'utf8', windowsHide: true, timeout: 60000 });
   assert.equal(r.status, 0, redact(r.stdout + '\n' + r.stderr).slice(-2500));
 }

@@ -216,6 +216,7 @@ enum LedgerAccountType {
   platform_commission
   platform_escrow
   payment_gateway_clearing
+  payment_pending_review
 }
 
 enum LedgerReferenceType {
@@ -761,6 +762,8 @@ model ServiceLine {
   qcChecklistTemplates QcChecklistTemplate[]
   contractPolicies     ServiceContractPolicy[]
   orders               Order[]
+  commercialPolicies   CommercialPolicy[]
+  capacityBuckets      CapacityBucket[]
 
   @@map("service_lines")
 }
@@ -881,24 +884,26 @@ model Order {
   serviceLine ServiceLine     @relation(fields: [serviceId], references: [id])
   package     ServicePackage? @relation("OrderPackage", fields: [packageId], references: [id])
 
-  statusHistory      OrderStatusHistory[]
-  milestones         OrderMilestone[]
-  acceptanceCriteria OrderAcceptanceCriteria[]
-  files              OrderFile[]
-  reports            OrderReport[]
-  messages           OrderMessage[]
-  publicHandlers     OrderPublicHandler[]
-  assignments        OrderAssignment[]
-  qcReviews          QcReview[]
-  tickets            Ticket[]
-  payments           Payment[]
-  escrowHolds        EscrowHold[]
-  refunds            Refund[]
-  invoices           Invoice[]
-  disputes           Dispute[]
-  feedback           Feedback[]
-  contractSnapshot   OrderContractSnapshot?
-  publicReview       PublicServiceReview?
+  statusHistory       OrderStatusHistory[]
+  milestones          OrderMilestone[]
+  acceptanceCriteria  OrderAcceptanceCriteria[]
+  files               OrderFile[]
+  reports             OrderReport[]
+  messages            OrderMessage[]
+  publicHandlers      OrderPublicHandler[]
+  assignments         OrderAssignment[]
+  qcReviews           QcReview[]
+  tickets             Ticket[]
+  payments            Payment[]
+  escrowHolds         EscrowHold[]
+  refunds             Refund[]
+  invoices            Invoice[]
+  disputes            Dispute[]
+  feedback            Feedback[]
+  contractSnapshot    OrderContractSnapshot?
+  publicReview        PublicServiceReview?
+  commercialRevisions CommercialRevision[]
+  commercialState     CommercialState?
 
   @@index([customerId])
   @@index([customerId, status])
@@ -1379,7 +1384,8 @@ model Payment {
   milestone OrderMilestone? @relation(fields: [milestoneId], references: [id])
   customer  User            @relation("PaymentCustomer", fields: [customerId], references: [id])
 
-  escrowHold EscrowHold?
+  escrowHold     EscrowHold?
+  commercialLink CommercialPaymentLink?
 
   @@index([orderId])
   @@index([status, createdAt])
@@ -1407,6 +1413,110 @@ model WalletFundingIntent {
 
 // Additive compatibility extensions. Absence means unknown, never zero or
 // a fabricated historic deadline/login/rate. Existing scalar queries are intact.
+// Z2: additive commercial revisions; no historic order/price backfill.
+model CommercialPolicy {
+  id        String               @id @default(uuid())
+  serviceId String               @map("service_id")
+  version   Int
+  config    Json
+  createdAt DateTime             @default(now()) @map("created_at")
+  service   ServiceLine          @relation(fields: [serviceId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  revisions CommercialRevision[]
+
+  @@unique([serviceId, version])
+  @@map("commercial_policies")
+}
+
+model CommercialRevision {
+  id              String                  @id @default(uuid())
+  orderId         String                  @map("order_id")
+  sequence        Int
+  policyId        String                  @map("policy_id")
+  priority        String
+  basePrice       Int                     @map("base_price")
+  surchargePct    Int                     @map("surcharge_pct")
+  surchargeAmount Int                     @map("surcharge_amount")
+  finalPrice      Int                     @map("final_price")
+  fingerprint     String
+  snapshot        Json
+  issuedAt        DateTime                @default(now()) @map("issued_at")
+  expiresAt       DateTime                @map("expires_at")
+  acceptedAt      DateTime?               @map("accepted_at")
+  invalidatedAt   DateTime?               @map("invalidated_at")
+  deadlineAt      DateTime?               @map("deadline_at")
+  payableUntil    DateTime?               @map("payable_until")
+  order           Order                   @relation(fields: [orderId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  policy          CommercialPolicy        @relation(fields: [policyId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  state           CommercialState?
+  reservation     CapacityReservation?
+  paymentLinks    CommercialPaymentLink[]
+
+  @@unique([orderId, sequence])
+  @@unique([id, orderId])
+  @@map("commercial_revisions")
+}
+
+model CommercialState {
+  orderId    String             @id @map("order_id")
+  revisionId String             @unique @map("revision_id")
+  order      Order              @relation(fields: [orderId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  revision   CommercialRevision @relation(fields: [revisionId, orderId], references: [id, orderId], onDelete: Restrict, onUpdate: NoAction)
+
+  @@unique([revisionId, orderId])
+  @@map("commercial_states")
+}
+
+model CapacityBucket {
+  id          String               @id @default(uuid())
+  serviceId   String               @map("service_id")
+  day         String
+  skill       String
+  limit       Int
+  service     ServiceLine          @relation(fields: [serviceId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  allocations CapacityAllocation[]
+
+  @@unique([serviceId, day, skill])
+  @@map("capacity_buckets")
+}
+
+model CapacityReservation {
+  id          String               @id @default(uuid())
+  revisionId  String               @unique @map("revision_id")
+  status      String               @default("held")
+  createdAt   DateTime             @map("created_at")
+  expiresAt   DateTime             @map("expires_at")
+  committedAt DateTime?            @map("committed_at")
+  revision    CommercialRevision   @relation(fields: [revisionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  allocations CapacityAllocation[]
+
+  @@index([status, expiresAt])
+  @@map("capacity_reservations")
+}
+
+model CapacityAllocation {
+  reservationId String              @map("reservation_id")
+  bucketId      String              @map("bucket_id")
+  reservation   CapacityReservation @relation(fields: [reservationId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  bucket        CapacityBucket      @relation(fields: [bucketId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@id([reservationId, bucketId])
+  @@index([bucketId])
+  @@map("capacity_allocations")
+}
+
+model CommercialPaymentLink {
+  paymentId         String             @id @map("payment_id")
+  revisionId        String             @map("revision_id")
+  financialReviewAt DateTime?          @map("financial_review_at")
+  reviewReason      String?            @map("review_reason")
+  refundRequestedAt DateTime?          @map("refund_requested_at")
+  resolvedAt        DateTime?          @map("resolved_at")
+  payment           Payment            @relation(fields: [paymentId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  revision          CommercialRevision @relation(fields: [revisionId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@map("commercial_payment_links")
+}
+
 model UserLoginState {
   userId                String    @id @map("user_id")
   lastSuccessfulLoginAt DateTime? @map("last_successful_login_at")

@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+import { inverseZ2CommercialInput } from './orbit-z2-commercial-approval.mjs';
 // ZEUS-EXEC-009: owner-approved Z1 contracts only; no baseline rebase,
 // folder waiver, live provider authorization or claim of whole-phase acceptance.
 export const z1ContractPins = {
@@ -71,7 +72,7 @@ export const z1ContractPins = {
 };
 const hash = value => createHash('sha256').update(value.toString('utf8').replaceAll('\r\n', '\n')).digest('hex');
 export function matchesZ1ContractApproval(path, bytes) {
-  return Object.hasOwn(z1ContractPins, path) && hash(bytes) === z1ContractPins[path].after;
+  return Object.hasOwn(z1ContractPins, path) && hash(inverseZ2CommercialInput(path, bytes)) === z1ContractPins[path].after;
 }
 export function verifyZ1ContractApproval(originalRead, currentRead) {
   for (const [path, pin] of Object.entries(z1ContractPins)) {

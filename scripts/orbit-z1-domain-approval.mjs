@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+import { inverseZ2CommercialInput } from './orbit-z2-commercial-approval.mjs';
 // Owner-approved Z1.1-Z1.6, 2026-10-25. These exact files only.
 // Fixed baseline remains 2c701d7. EXEC-008 separately accepted local/mock
 // activation; EXEC-009 pins only accepted order/payment/session refinements.
@@ -69,7 +70,7 @@ export const z1DomainPins = {
 };
 const hash = value => createHash('sha256').update(value.toString('utf8').replaceAll('\r\n', '\n')).digest('hex');
 export function matchesZ1DomainApproval(path, bytes) {
-  return Object.hasOwn(z1DomainPins, path) && hash(bytes) === z1DomainPins[path].after;
+  return Object.hasOwn(z1DomainPins, path) && hash(inverseZ2CommercialInput(path, bytes)) === z1DomainPins[path].after;
 }
 export function verifyZ1DomainApproval(baselineRead, currentRead) {
   for (const [path, pin] of Object.entries(z1DomainPins)) {

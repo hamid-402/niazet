@@ -12,6 +12,7 @@ import { verifyWalletUiApproval, walletUiOriginalRef } from './orbit-wallet-ui-a
 import { matchesZ1ContractApproval, verifyZ1ContractApproval } from './orbit-z1-contract-approval.mjs';
 import { matchesZ1DataApproval, verifyZ1DataApproval } from './orbit-z1-data-approval.mjs';
 import { matchesZ2EngineApproval, verifyZ2EngineApproval, verifyZ2GuardWiring, z2EngineOriginalRef } from './orbit-z2-engine-approval.mjs';
+import { matchesZ2CommercialApproval, verifyZ2CommercialApproval } from './orbit-z2-commercial-approval.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 // Fixed pre-redesign checkpoint. Never silently rebase this gate to HEAD.
@@ -49,6 +50,7 @@ try {
   ])];
   const tracked = new Set(split(git('ls-files', '-z')));
   const read = path => readFileSync(new URL(path, new URL('../', import.meta.url)));
+  verifyZ2CommercialApproval(read);
   verifyParserApproval(read);
   verifySecurityApproval(read);
   verifyZ1DomainApproval(path => git('show', `${baseline}:${path}`), read);
@@ -60,7 +62,7 @@ try {
   verifyInvoiceDomain(path => git('show', `${baseline}:${path}`), path => read(path).toString('utf8'));
   verifyPricingApproval(path => git('show', `${baseline}:${path}`), read);
   verifyReconciliationApproval(path => git('show', `${baseline}:${path}`), read);
-const failures = violations(files, (path) => tracked.has(path) && existsSync(new URL(path, new URL('../', import.meta.url))), changed, path => existsSync(new URL(path, new URL('../', import.meta.url))) && (matchesInvoiceApproval(path, read(path)) || matchesPricingApproval(path, read(path)) || matchesReconciliationApproval(path, read(path)) || matchesParserApproval(path, read(path)) || matchesSecurityApproval(path, read(path)) || matchesZ1DomainApproval(path, read(path)) || matchesZ1ContractApproval(path, read(path)) || matchesZ1DataApproval(path, read(path)) || matchesZ2EngineApproval(path, read(path))));
+const failures = violations(files, (path) => tracked.has(path) && existsSync(new URL(path, new URL('../', import.meta.url))), changed, path => existsSync(new URL(path, new URL('../', import.meta.url))) && (matchesInvoiceApproval(path, read(path)) || matchesPricingApproval(path, read(path)) || matchesReconciliationApproval(path, read(path)) || matchesParserApproval(path, read(path)) || matchesSecurityApproval(path, read(path)) || matchesZ1DomainApproval(path, read(path)) || matchesZ1ContractApproval(path, read(path)) || matchesZ1DataApproval(path, read(path)) || matchesZ2EngineApproval(path, read(path)) || matchesZ2CommercialApproval(path, read(path))));
   const routes = files.filter((path) => path.startsWith('apps/web/src/app/') && path.endsWith('/page.tsx'));
   assert.deepEqual(failures, [], failures.join('\n'));
   console.log('Z2-B1: five exact additive engine files accepted; no order/payment/DB activation.');

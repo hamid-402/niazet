@@ -16,13 +16,17 @@ import { CustomerFinanceOverviewService } from './customer-finance-overview.serv
 import { WalletPaymentsService } from './wallet-payments.service';
 import { WalletPaymentsController } from './wallet-payments.controller';
 import { OrderWorkflowModule } from '../orders/domain/order-workflow.module';
+import { CommercialModule } from '../pricing/commercial.module';
+import { CommercialReviewController } from './commercial-review.controller';
+import { CommercialReviewService } from './commercial-review.service';
 
 @Module({
-  imports: [OrderWorkflowModule],
+  imports: [OrderWorkflowModule, CommercialModule],
   controllers: [
     CustomerFinanceController,
     FinanceAdminController,
     WalletPaymentsController,
+    CommercialReviewController,
   ],
   providers: [
     LedgerService,
@@ -38,6 +42,7 @@ import { OrderWorkflowModule } from '../orders/domain/order-workflow.module';
     FinanceReconciliationService,
     CustomerFinanceOverviewService,
     WalletPaymentsService,
+    CommercialReviewService,
   ],
   exports: [
     LedgerService,

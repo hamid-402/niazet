@@ -16,6 +16,9 @@ import { IdempotencyService } from './idempotency.service';
 import { LedgerService } from './ledger.service';
 import { PaymentGatewayService } from './zarinpal.gateway';
 import { OrderWorkflowService } from '../orders/domain/order-workflow.service';
+import { CommercialService } from '../pricing/commercial.service';
+import { CommercialClock } from '../pricing/commercial-clock';
+import { commercialReviewAccount } from './commercial-review.service';
 
 interface InitiatePaymentParams {
   orderId: string;
@@ -34,6 +37,12 @@ export class PaymentsService {
     private readonly idempotency: IdempotencyService,
     private readonly workflow: OrderWorkflowService = new OrderWorkflowService(
       prisma,
+    ),
+    private readonly commercial: CommercialService = new CommercialService(
+      prisma,
+      idempotency,
+      workflow,
+      new CommercialClock(),
     ),
   ) {}
 
@@ -99,6 +108,7 @@ export class PaymentsService {
         }
 
         const requestKey = `payment:${params.customerId}:${params.idempotencyKey}`;
+        await this.commercial.assertPayable(tx, params.orderId);
         const payment = await tx.payment.create({
           data: {
             orderId: params.orderId,
@@ -110,6 +120,7 @@ export class PaymentsService {
             idempotencyKey: requestKey,
           },
         });
+        await this.commercial.bindPayment(tx, params.orderId, payment.id);
         const gatewayRequest = await this.gateway.createPaymentRequest({
           amount: params.amount,
           orderId: params.orderId,
@@ -191,12 +202,23 @@ export class PaymentsService {
           where: { id: payment.milestoneId },
         })
       : null;
+    const commercialLink = await tx.commercialPaymentLink.findUnique({
+      where: { paymentId: payment.id },
+    });
+    if (commercialLink?.financialReviewAt)
+      return {
+        payment,
+        escrow: null,
+        requiresFinancialReview: !commercialLink.resolvedAt,
+        alreadyProcessed: true,
+      };
     if (
-      payableOrder.status !== 'pending_payment' ||
-      payableOrder.currency !== 'IRT' ||
-      (!payment.milestoneId && payableOrder.finalPrice !== payment.amount) ||
-      (payment.milestoneId && paidMilestone?.amount !== payment.amount) ||
-      paidMilestone?.paymentStatus === PaymentStatus.succeeded
+      !commercialLink &&
+      (payableOrder.status !== 'pending_payment' ||
+        payableOrder.currency !== 'IRT' ||
+        (!payment.milestoneId && payableOrder.finalPrice !== payment.amount) ||
+        (payment.milestoneId && paidMilestone?.amount !== payment.amount) ||
+        paidMilestone?.paymentStatus === PaymentStatus.succeeded)
     ) {
       // Preserve late money for explicit financial review; never auto-refund,
       // re-open/finalize an order or credit a second escrow.
@@ -267,6 +289,95 @@ export class PaymentsService {
       return { paymentId: payment.id, verificationFailed: true as const };
     }
 
+    const commercialVerdict = await this.commercial.gatewayVerdict(
+      tx,
+      payment.id,
+    );
+    if (commercialVerdict.kind === 'review') {
+      const [clearing, pendingReview] = await Promise.all([
+        this.ledger.getSystemAccount(
+          LedgerAccountType.payment_gateway_clearing,
+          tx,
+        ),
+        commercialReviewAccount(tx),
+      ]);
+      await this.ledger.postEntry(
+        {
+          debitAccountId: clearing.id,
+          creditAccountId: pendingReview.id,
+          amount: payment.amount,
+          referenceType: LedgerReferenceType.payment,
+          referenceId: payment.id,
+          idempotencyKey: `commercial-late:${payment.id}`,
+        },
+        tx,
+      );
+      const reviewedPayment = await tx.payment.update({
+        where: { id: payment.id },
+        data: {
+          status: PaymentStatus.verifying,
+          verifiedAt: commercialVerdict.now,
+          failureReason: 'commercial_verified_payment_requires_review',
+        },
+      });
+      await tx.commercialPaymentLink.update({
+        where: { paymentId: payment.id },
+        data: {
+          financialReviewAt: commercialVerdict.now,
+          reviewReason: 'expired_or_changed_commercial_contract',
+        },
+      });
+      await tx.capacityReservation.updateMany({
+        where: {
+          revisionId: commercialVerdict.link.revisionId,
+          status: 'held',
+        },
+        data: {
+          status:
+            commercialVerdict.link.revision.reservation &&
+            commercialVerdict.now <
+              commercialVerdict.link.revision.reservation.expiresAt
+              ? 'released'
+              : 'expired',
+        },
+      });
+      await tx.auditLog.create({
+        data: {
+          actorUserId: params.customerId,
+          actorRole: 'customer',
+          action: 'commercial.payment.review_required',
+          entityType: 'payment',
+          entityId: payment.id,
+          after: {
+            orderId: payment.orderId,
+            amount: payment.amount,
+            reason: 'expired_or_changed_commercial_contract',
+          },
+          sensitivity: 'critical',
+        },
+      });
+      await tx.outboxEvent.create({
+        data: {
+          eventType: 'commercial.payment.review_required',
+          payload: {
+            paymentId: payment.id,
+            orderId: payment.orderId,
+            customerId: payment.customerId,
+          },
+        },
+      });
+      return {
+        payment: reviewedPayment,
+        escrow: null,
+        requiresFinancialReview: true,
+        alreadyProcessed: false,
+      };
+    }
+    await this.commercial.commitPayment(
+      tx,
+      payment.id,
+      commercialVerdict.kind === 'valid' ? commercialVerdict.now : undefined,
+    );
     const claimed = await tx.payment.updateMany({
       where: {
         id: payment.id,
@@ -274,7 +385,10 @@ export class PaymentsService {
       },
       data: {
         status: PaymentStatus.succeeded,
-        verifiedAt: new Date(),
+        verifiedAt:
+          commercialVerdict.kind === 'valid'
+            ? commercialVerdict.now
+            : new Date(),
         failureReason: null,
       },
     });
