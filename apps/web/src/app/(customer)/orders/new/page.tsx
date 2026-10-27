@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiFetch, ApiError } from "@/lib/api";
+import { formatNumber, formatToman } from "@/lib/format";
 import {
   Button,
   Card,
@@ -30,6 +31,13 @@ type DraftDetail = OrderDetail & {
   acceptanceCriteria?: { description: string }[];
 };
 type DraftResult = { id: string; version: number };
+
+function reviewAnswer(value: FormValue | undefined) {
+  if (Array.isArray(value)) return value.join("، ");
+  if (typeof value === "boolean") return value ? "بله" : "خیر";
+  if (typeof value === "number") return formatNumber(value);
+  return value || "—";
+}
 
 function fieldConfig(options: unknown) {
   const record =
@@ -281,10 +289,14 @@ function NewOrderForm() {
     {},
   );
   const [reviewing, setReviewing] = useState(false);
+  const [requirements, setRequirements] = useState(false);
+  const [advancing, setAdvancing] = useState(false);
+  const advanceRef = useRef(false);
   const [ready, setReady] = useState(false);
   const [resumedDraft, setResumedDraft] = useState(false);
   const [draftId, setDraftId] = useState<string | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<OrderFile[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [saveState, setSaveState] = useState<
     "idle" | "saving" | "saved" | "error"
@@ -464,9 +476,12 @@ function NewOrderForm() {
 
   async function onReview(event: React.FormEvent) {
     event.preventDefault();
+    if (advanceRef.current || uploading) return;
     const validationError = validateForReview();
     if (validationError) return setError(validationError);
     setError("");
+    advanceRef.current = true;
+    setAdvancing(true);
     try {
       await persistDraft();
       setReviewing(true);
@@ -474,6 +489,31 @@ function NewOrderForm() {
       setError(
         cause instanceof ApiError ? cause.message : "ذخیره پیش‌نویس ممکن نشد.",
       );
+    } finally {
+      advanceRef.current = false;
+      setAdvancing(false);
+    }
+  }
+
+  async function onContinue(event: React.FormEvent) {
+    event.preventDefault();
+    if (advanceRef.current) return;
+    if (!serviceId) return setError("نوع خدمت را انتخاب کنید.");
+    if (title.trim().length < 3)
+      return setError("عنوان درخواست باید حداقل ۳ کاراکتر باشد.");
+    setError("");
+    advanceRef.current = true;
+    setAdvancing(true);
+    try {
+      await persistDraft();
+      setRequirements(true);
+    } catch (cause) {
+      setError(
+        cause instanceof ApiError ? cause.message : "ذخیره پیش‌نویس ممکن نشد.",
+      );
+    } finally {
+      advanceRef.current = false;
+      setAdvancing(false);
     }
   }
 
@@ -509,9 +549,13 @@ function NewOrderForm() {
         </div>
       </div>
       <ol className={styles.composerSteps} aria-label="مراحل ثبت درخواست">
-        <li aria-current={!reviewing ? 'step' : undefined}><span aria-hidden="true">۰۱</span> تعریف نیاز</li>
-        <li aria-current={reviewing ? 'step' : undefined}><span aria-hidden="true">۰۲</span> مرور و ثبت</li>
+        <li aria-current={!requirements && !reviewing ? 'step' : undefined}><span aria-hidden="true">۰۱</span> اطلاعات درخواست</li>
+        <li aria-current={requirements && !reviewing ? 'step' : undefined}><span aria-hidden="true">۰۲</span> نیازها و فایل‌ها</li>
+        <li aria-current={reviewing ? 'step' : undefined}><span aria-hidden="true">۰۳</span> مرور و ثبت</li>
       </ol>
+      <p role="status" aria-live="polite" aria-atomic="true" className="mb-4 text-xs text-fg-muted">
+        {reviewing ? "مرحله ۳ از ۳: مرور و ثبت درخواست" : requirements ? "مرحله ۲ از ۳: نیازها و فایل‌ها" : "مرحله ۱ از ۳: اطلاعات درخواست"}
+      </p>
       {resumedDraft && !reviewing && (
         <p className="mb-4 rounded-control border border-info-border bg-info-subtle px-3 py-2 text-sm text-info">
           آخرین پیش‌نویس شما بازیابی شد؛ می‌توانید از همان‌جا ادامه دهید.
@@ -534,7 +578,11 @@ function NewOrderForm() {
               </div>
               <div>
                 <dt className="text-fg-muted">فوریت</dt>
-                <dd className="font-bold text-fg">{urgency}</dd>
+                <dd className="font-bold text-fg">{{ low: "کم", normal: "عادی", high: "زیاد", urgent: "فوری" }[urgency] ?? urgency}</dd>
+              </div>
+              <div>
+                <dt className="text-fg-muted">بودجه تقریبی</dt>
+                <dd className="font-bold text-fg">{budgetHint !== "" ? formatToman(Number(budgetHint)) : "تعیین نشده"}</dd>
               </div>
               <div>
                 <dt className="text-fg-muted">پکیج</dt>
@@ -561,25 +609,30 @@ function NewOrderForm() {
                     <div key={field.id}>
                       <dt className="text-xs text-fg-muted">{field.label}</dt>
                       <dd className="text-sm font-bold text-fg">
-                        {Array.isArray(formResponses[field.fieldKey])
-                          ? (formResponses[field.fieldKey] as string[]).join(
-                              "، ",
-                            )
-                          : String(formResponses[field.fieldKey] ?? "—")}
+                        {reviewAnswer(formResponses[field.fieldKey])}
                       </dd>
                     </div>
                   ))}
                 </dl>
               </div>
             )}
+            <div className="mt-4 border-t border-border pt-4">
+              <h3 className="mb-2 text-sm font-bold text-fg">معیارهای پذیرش</h3>
+              <p className="whitespace-pre-wrap text-sm text-fg">{acceptanceCriteria.trim() || "معیارهای استاندارد خدمت"}</p>
+            </div>
+            <div className="mt-4 border-t border-border pt-4">
+              <h3 className="mb-2 text-sm font-bold text-fg">فایل‌های ورودی</h3>
+              {uploadedFiles.length ? <div className="space-y-2">{uploadedFiles.map((file) => <SecureFileLink key={file.id} file={file} />)}</div> : <p className="text-sm text-fg-muted">فایلی اضافه نشده است.</p>}
+            </div>
           </Card>
           <PriceEstimate serviceSlug={selectedService?.slug} packageId={packageId} urgency={urgency} />
+          <p className="text-sm leading-7 text-fg-muted">با ثبت درخواست، ابتدا نیاز شما بررسی می‌شود. برآورد بالا مجوز پرداخت نیست؛ پرداخت فقط پس از اعلام و تأیید قیمت قطعی در دسترس خواهد بود.</p>
           {error && <ErrorBanner message={error} />}
           <div className="flex flex-col-reverse gap-3 sm:flex-row">
             <Button
               type="button"
               variant="secondary"
-              onClick={() => setReviewing(false)}
+              onClick={() => { setReviewing(false); setError(""); }}
               disabled={submitting}
             >
               بازگشت و ویرایش
@@ -595,7 +648,9 @@ function NewOrderForm() {
           </div>
         </div>
       ) : (
-        <form onSubmit={onReview} className="flex flex-col gap-5">
+        <form onSubmit={requirements ? onReview : onContinue} className="flex flex-col gap-5" aria-busy={advancing}>
+          <fieldset hidden={requirements} disabled={requirements || advancing} className="min-w-0">
+            <legend className="sr-only">اطلاعات درخواست</legend>
           <Card className={styles.composerCard}>
             <h2 className={styles.composerSectionTitle}>تعریف درخواست</h2>
             <p className={styles.composerSectionHint}>خدمت، خروجی موردنظر و زمان‌بندی را با جزئیات لازم مشخص کنید.</p>
@@ -665,20 +720,6 @@ function NewOrderForm() {
             </div>
             <div className="mt-4">
               <Field
-                label="شرح نیاز"
-                hint="هرچه دقیق‌تر بنویسید، بررسی سریع‌تر انجام می‌شود."
-              >
-                <textarea
-                  className={`${inputClass} min-h-28`}
-                  value={briefDescription}
-                  onChange={(event) => setBriefDescription(event.target.value)}
-                  minLength={10}
-                  required
-                />
-              </Field>
-            </div>
-            <div className="mt-4">
-              <Field
                 label="بودجه تقریبی (اختیاری)"
                 hint="در صورت نبودن قیمت ثابت، پس از بررسی قیمت‌گذاری می‌شود."
               >
@@ -693,7 +734,16 @@ function NewOrderForm() {
               </Field>
             </div>
           </Card>
+          </fieldset>
           <PriceEstimate serviceSlug={selectedService?.slug} packageId={packageId} urgency={urgency} />
+          <fieldset hidden={!requirements} disabled={!requirements || advancing} className="min-w-0 space-y-5">
+            <legend className="sr-only">نیازها و فایل‌ها</legend>
+          <Card className={styles.composerCard}>
+            <h2 className={styles.composerSectionTitle}>نیازها و فایل‌ها</h2>
+            <Field label="شرح نیاز" hint="هرچه دقیق‌تر بنویسید، بررسی سریع‌تر انجام می‌شود.">
+              <textarea className={`${inputClass} min-h-28`} value={briefDescription} onChange={(event) => setBriefDescription(event.target.value)} minLength={10} required />
+            </Field>
+          </Card>
           {selectedService && dynamicFields.length > 0 && (
             <Card className={styles.composerCard}>
               <h2 className="mb-1 text-base font-extrabold text-fg">
@@ -732,6 +782,7 @@ function NewOrderForm() {
                 orderId={draftId}
                 fileKind="input"
                 label="آپلود فایل ورودی"
+                onUploadingChange={setUploading}
                 onUploaded={(file) =>
                   setUploadedFiles((current) => [...current, file])
                 }
@@ -761,6 +812,7 @@ function NewOrderForm() {
               />
             </Field>
           </Card>
+          </fieldset>
           {error && <ErrorBanner message={error} />}
           <div className={styles.composerSubmit}>
             <p
@@ -775,12 +827,15 @@ function NewOrderForm() {
                     ? "ذخیره خودکار ناموفق بود"
                     : "تغییرات به‌صورت خودکار ذخیره می‌شوند"}
             </p>
+            <div className="flex flex-wrap gap-3">
+            {requirements && <Button type="button" variant="secondary" disabled={advancing || uploading} onClick={() => { setRequirements(false); setError(""); }}>بازگشت به اطلاعات</Button>}
             <Button
               type="submit"
-              disabled={!serviceId || saveState === "saving"}
+              disabled={!serviceId || saveState === "saving" || advancing || uploading}
             >
-              مرور و ثبت نهایی
+              {advancing ? "در حال ذخیره…" : requirements ? "مرور و ثبت نهایی" : "ادامه به نیازها و فایل‌ها"}
             </Button>
+            </div>
           </div>
         </form>
       )}

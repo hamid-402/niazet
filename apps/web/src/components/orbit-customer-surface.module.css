@@ -22,7 +22,7 @@
 .ordersTable { border-radius: 1.25rem; }
 .ordersTable a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; border-radius: .2rem; }
 .orderComposer { width: min(100%, 56rem); margin-inline: auto; min-width: 0; }
-.composerSteps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin: 0 0 1.5rem; padding: 0; list-style: none; }
+.composerSteps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; margin: 0 0 1.5rem; padding: 0; list-style: none; }
 .composerSteps li { display: flex; align-items: center; gap: .7rem; min-width: 0; min-height: 3.5rem; padding: .75rem 1rem; border: 1px solid var(--color-border); border-radius: .9rem; background: var(--color-surface); color: var(--color-fg-muted); font-size: .85rem; font-weight: 700; }
 .composerSteps li[aria-current='step'] { border-color: var(--color-accent); color: var(--color-fg); box-shadow: 0 8px 28px color-mix(in srgb, var(--color-accent) 10%, transparent); }
 .composerSteps span { color: var(--color-accent); font-size: .8rem; }
@@ -72,6 +72,7 @@
 @media (min-width: 1024px) { .financeMetrics { grid-template-columns: repeat(5, minmax(0, 1fr)); } .financeMetric:last-child { grid-column: auto; } }
 @media (min-width: 768px) { .tabHint { display: none; } }
 @media (max-width: 639px) { .composerSubmit button { width: 100%; } }
+@media (max-width: 639px) { .composerSteps { gap: .4rem; } .composerSteps li { flex-direction: column; align-items: flex-start; gap: .35rem; padding: .65rem; font-size: .75rem; line-height: 1.8; } .composerSubmit > div { width: 100%; } }
 @media (prefers-reduced-motion: no-preference) {
   .page[data-motion='on'] .metric, .page[data-motion='on'] .recentCard, .page[data-motion='on'] .filters { animation: customer-settle 360ms ease-out both; }
   .page[data-motion='on'] .metric:nth-child(2) { animation-delay: 45ms; }

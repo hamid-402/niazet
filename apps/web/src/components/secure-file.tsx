@@ -15,6 +15,7 @@ export function SecureFileUpload({
   fileKind,
   label = "افزودن فایل",
   disabled = false,
+  onUploadingChange,
   onUploaded,
 }: {
   orderId: string;
@@ -27,6 +28,7 @@ export function SecureFileUpload({
     | "report";
   label?: string;
   disabled?: boolean;
+  onUploadingChange?: (uploading: boolean) => void;
   onUploaded: (file: OrderFile) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -44,6 +46,7 @@ export function SecureFileUpload({
     body.append("orderId", orderId);
     body.append("fileKind", fileKind);
     setUploading(true);
+    onUploadingChange?.(true);
     try {
       const uploaded = await apiFetch<OrderFile>("/files/upload", {
         method: "POST",
@@ -58,6 +61,7 @@ export function SecureFileUpload({
       );
     } finally {
       setUploading(false);
+      onUploadingChange?.(false);
       if (inputRef.current) inputRef.current.value = "";
     }
   }

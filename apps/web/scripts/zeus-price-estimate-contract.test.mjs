@@ -52,11 +52,14 @@ for (const invalid of [NaN, Infinity, 1.5, 2_147_483_648, '131', null]) {
 test('rejects non-object envelopes', () => {
   for (const value of [null, [], '131', 131]) assert.throws(() => readPriceEstimate(value, request));
 });
-test('the complete original form is identical after removing only the three additive UI insertions', () => {
+test('historical estimate packet at 14180b2 preserves the complete original form after its three additive UI insertions', () => {
   const path = 'apps/web/src/app/(customer)/orders/new/page.tsx';
   const root = new URL('../../../', import.meta.url);
   const before = execFileSync('git', ['show', `30555d2a26bb5f9a4e1649160751929b5354d1bc:${path}`], { cwd: root, encoding: 'utf8', windowsHide: true });
-  const after = readFileSync(new URL(path, root), 'utf8').replaceAll('\r\n', '\n');
+  // Z3 intentionally changes the wizard. Keep this old packet's exact proof,
+  // not a false claim of byte equality for the new form. Current preservation
+  // and all three steps are checked in zeus-order-composer-contract/runtime.
+  const after = execFileSync('git', ['show', `14180b2:${path}`], { cwd: root, encoding: 'utf8', windowsHide: true }).replaceAll('\r\n', '\n');
   const insertion = '          <PriceEstimate serviceSlug={selectedService?.slug} packageId={packageId} urgency={urgency} />\n';
   assert.equal(after.split(insertion).length, 3, 'Edit and review each include the estimate');
   assert.equal(after.replace('import { PriceEstimate } from "@/components/price-estimate";\n', '').replaceAll(insertion, ''), before.replaceAll('\r\n', '\n'));

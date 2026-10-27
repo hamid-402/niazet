@@ -4323,7 +4323,7 @@
       "dir": "rtl",
       "theme": "simple-light",
       "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
-      "bodyHeight": 2328,
+      "bodyHeight": 1488,
       "overflowX": 0,
       "colors": {
         "background": "rgb(242, 245, 250)",
@@ -4334,7 +4334,7 @@
           "x": 0,
           "y": 76,
           "width": 320,
-          "height": 2252
+          "height": 1412
         },
         "header": {
           "x": 0,
@@ -4346,17 +4346,15 @@
         "footer": null
       },
       "counts": {
-        "headings": 5,
+        "headings": 3,
         "links": 1,
-        "controls": 13,
+        "controls": 8,
         "landmarks": 2
       },
       "headings": [
         "H1:ثبت درخواست جدید",
         "H2:تعریف درخواست",
-        "H2:برآورد هزینه",
-        "H2:جزئیات تخصصی خدمت",
-        "H2:فایل‌های ورودی"
+        "H2:برآورد هزینه"
       ],
       "duplicateIds": [],
       "undersizedControls": []
@@ -4367,7 +4365,7 @@
       "dir": "rtl",
       "theme": "simple-dark",
       "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
-      "bodyHeight": 2360,
+      "bodyHeight": 1520,
       "overflowX": 0,
       "colors": {
         "background": "rgb(16, 37, 68)",
@@ -4378,7 +4376,7 @@
           "x": 0,
           "y": 76,
           "width": 320,
-          "height": 2288
+          "height": 1448
         },
         "header": {
           "x": 0,
@@ -4390,17 +4388,15 @@
         "footer": null
       },
       "counts": {
-        "headings": 5,
+        "headings": 3,
         "links": 1,
-        "controls": 13,
+        "controls": 8,
         "landmarks": 2
       },
       "headings": [
         "H1:ثبت درخواست جدید",
         "H2:تعریف درخواست",
-        "H2:برآورد هزینه",
-        "H2:جزئیات تخصصی خدمت",
-        "H2:فایل‌های ورودی"
+        "H2:برآورد هزینه"
       ],
       "duplicateIds": [],
       "undersizedControls": []
@@ -4411,7 +4407,7 @@
       "dir": "rtl",
       "theme": "simple-light",
       "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
-      "bodyHeight": 1904,
+      "bodyHeight": 1144,
       "overflowX": 0,
       "colors": {
         "background": "rgb(242, 245, 250)",
@@ -4422,7 +4418,7 @@
           "x": 0,
           "y": 72,
           "width": 512,
-          "height": 1828
+          "height": 1068
         },
         "header": {
           "x": 0,
@@ -4439,17 +4435,15 @@
         "footer": null
       },
       "counts": {
-        "headings": 5,
+        "headings": 3,
         "links": 10,
-        "controls": 14,
+        "controls": 9,
         "landmarks": 4
       },
       "headings": [
         "H1:ثبت درخواست جدید",
         "H2:تعریف درخواست",
-        "H2:برآورد هزینه",
-        "H2:جزئیات تخصصی خدمت",
-        "H2:فایل‌های ورودی"
+        "H2:برآورد هزینه"
       ],
       "duplicateIds": [],
       "undersizedControls": []
@@ -4460,7 +4454,7 @@
       "dir": "rtl",
       "theme": "simple-dark",
       "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
-      "bodyHeight": 1904,
+      "bodyHeight": 1144,
       "overflowX": 0,
       "colors": {
         "background": "rgb(16, 37, 68)",
@@ -4471,7 +4465,7 @@
           "x": 0,
           "y": 72,
           "width": 512,
-          "height": 1828
+          "height": 1068
         },
         "header": {
           "x": 0,
@@ -4488,17 +4482,15 @@
         "footer": null
       },
       "counts": {
-        "headings": 5,
+        "headings": 3,
         "links": 10,
-        "controls": 14,
+        "controls": 9,
         "landmarks": 4
       },
       "headings": [
         "H1:ثبت درخواست جدید",
         "H2:تعریف درخواست",
-        "H2:برآورد هزینه",
-        "H2:جزئیات تخصصی خدمت",
-        "H2:فایل‌های ورودی"
+        "H2:برآورد هزینه"
       ],
       "duplicateIds": [],
       "undersizedControls": []
@@ -4509,7 +4501,7 @@
       "dir": "rtl",
       "theme": "simple-light",
       "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
-      "bodyHeight": 1944,
+      "bodyHeight": 1160,
       "overflowX": 0,
       "colors": {
         "background": "rgb(242, 245, 250)",
@@ -4520,7 +4512,7 @@
           "x": 0,
           "y": 72,
           "width": 1024,
-          "height": 1872
+          "height": 1088
         },
         "header": {
           "x": 0,
@@ -4537,17 +4529,15 @@
         "footer": null
       },
       "counts": {
-        "headings": 5,
+        "headings": 3,
         "links": 10,
-        "controls": 14,
+        "controls": 9,
         "landmarks": 4
       },
       "headings": [
         "H1:ثبت درخواست جدید",
         "H2:تعریف درخواست",
-        "H2:برآورد هزینه",
-        "H2:جزئیات تخصصی خدمت",
-        "H2:فایل‌های ورودی"
+        "H2:برآورد هزینه"
       ],
       "duplicateIds": [],
       "undersizedControls": []
@@ -4558,7 +4548,7 @@
       "dir": "rtl",
       "theme": "simple-dark",
       "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
-      "bodyHeight": 1944,
+      "bodyHeight": 1160,
       "overflowX": 0,
       "colors": {
         "background": "rgb(16, 37, 68)",
@@ -4569,7 +4559,7 @@
           "x": 0,
           "y": 72,
           "width": 1024,
-          "height": 1872
+          "height": 1088
         },
         "header": {
           "x": 0,
@@ -4586,17 +4576,15 @@
         "footer": null
       },
       "counts": {
-        "headings": 5,
+        "headings": 3,
         "links": 10,
-        "controls": 14,
+        "controls": 9,
         "landmarks": 4
       },
       "headings": [
         "H1:ثبت درخواست جدید",
         "H2:تعریف درخواست",
-        "H2:برآورد هزینه",
-        "H2:جزئیات تخصصی خدمت",
-        "H2:فایل‌های ورودی"
+        "H2:برآورد هزینه"
       ],
       "duplicateIds": [],
       "undersizedControls": []
@@ -4607,7 +4595,7 @@
       "dir": "rtl",
       "theme": "simple-light",
       "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
-      "bodyHeight": 1952,
+      "bodyHeight": 1168,
       "overflowX": 0,
       "colors": {
         "background": "rgb(242, 245, 250)",
@@ -4618,7 +4606,7 @@
           "x": 256,
           "y": 72,
           "width": 1152,
-          "height": 1880
+          "height": 1096
         },
         "header": {
           "x": 0,
@@ -4635,17 +4623,15 @@
         "footer": null
       },
       "counts": {
-        "headings": 5,
+        "headings": 3,
         "links": 10,
-        "controls": 14,
+        "controls": 9,
         "landmarks": 4
       },
       "headings": [
         "H1:ثبت درخواست جدید",
         "H2:تعریف درخواست",
-        "H2:برآورد هزینه",
-        "H2:جزئیات تخصصی خدمت",
-        "H2:فایل‌های ورودی"
+        "H2:برآورد هزینه"
       ],
       "duplicateIds": [],
       "undersizedControls": []
@@ -4656,7 +4642,7 @@
       "dir": "rtl",
       "theme": "simple-dark",
       "title": "نیازت با ما | خدمات تخصصی مدیریت‌شده",
-      "bodyHeight": 1952,
+      "bodyHeight": 1168,
       "overflowX": 0,
       "colors": {
         "background": "rgb(16, 37, 68)",
@@ -4667,7 +4653,7 @@
           "x": 256,
           "y": 72,
           "width": 1152,
-          "height": 1880
+          "height": 1096
         },
         "header": {
           "x": 0,
@@ -4684,17 +4670,15 @@
         "footer": null
       },
       "counts": {
-        "headings": 5,
+        "headings": 3,
         "links": 10,
-        "controls": 14,
+        "controls": 9,
         "landmarks": 4
       },
       "headings": [
         "H1:ثبت درخواست جدید",
         "H2:تعریف درخواست",
-        "H2:برآورد هزینه",
-        "H2:جزئیات تخصصی خدمت",
-        "H2:فایل‌های ورودی"
+        "H2:برآورد هزینه"
       ],
       "duplicateIds": [],
       "undersizedControls": []

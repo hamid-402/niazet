@@ -117,8 +117,6 @@ try {
       await page.waitForFunction(() => document.querySelector('[data-estimate-total]')?.textContent?.includes('۲۶۱'));
       assert.equal(await page.getByLabel(/^بودجه تقریبی \(اختیاری\)/).inputValue(), '', 'Estimate never fills budget');
       await page.getByLabel('عنوان درخواست', { exact: true }).fill('درخواست آزمایشی حفظ فرم');
-      await page.getByLabel(/^شرح نیاز/).fill('توضیحات کافی برای آزمون فرم واقعی و حفظ جریان ثبت درخواست');
-      await page.getByLabel('خروجی نمونه', { exact: true }).fill('PDF');
       const axe = await new AxeBuilder({ page }).include('[data-price-estimate]').analyze();
       assert.deepEqual(axe.violations, []);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, 'No horizontal overflow');
@@ -138,7 +136,7 @@ try {
       await estimate.locator('[data-estimate-state="error"]').waitFor();
       assert.equal(await total.count(), 0);
       assert.equal(await page.getByLabel('عنوان درخواست', { exact: true }).inputValue(), 'درخواست آزمایشی حفظ فرم');
-      assert.equal(await page.getByRole('button', { name: 'مرور و ثبت نهایی', exact: true }).isEnabled(), true);
+      assert.equal(await page.getByRole('button', { name: 'ادامه به نیازها و فایل‌ها', exact: true }).isEnabled(), true);
       await estimate.getByRole('button', { name: 'تلاش دوباره برای برآورد' }).click();
       await total.waitFor();
       failNext = 429;
@@ -165,13 +163,17 @@ try {
 
       await urgency.selectOption('normal');
       await total.waitFor();
+      await page.getByRole('button', { name: 'ادامه به نیازها و فایل‌ها', exact: true }).click();
+      await page.getByLabel(/^شرح نیاز/).fill('توضیحات کافی برای آزمون فرم واقعی و حفظ جریان ثبت درخواست');
+      await page.getByLabel('خروجی نمونه', { exact: true }).fill('PDF');
       await page.getByRole('button', { name: 'مرور و ثبت نهایی', exact: true }).click();
       await page.getByRole('heading', { name: 'مرور نهایی درخواست' }).waitFor();
       await total.waitFor();
       assert.match(await total.innerText(), /۲۰۱ تومان/);
       await page.getByRole('button', { name: 'بازگشت و ویرایش', exact: true }).click();
-      await page.getByLabel('عنوان درخواست', { exact: true }).waitFor();
       assert.equal(await page.getByLabel('خروجی نمونه', { exact: true }).inputValue(), 'PDF');
+      await page.getByRole('button', { name: 'بازگشت به اطلاعات', exact: true }).click();
+      await page.getByLabel('عنوان درخواست', { exact: true }).waitFor();
 
       await service.selectOption(otherId);
       await estimate.getByText('نیازمند بررسی و اعلام قیمت؛ مبلغ قطعی برای این انتخاب موجود نیست.').waitFor();
