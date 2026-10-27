@@ -5,6 +5,7 @@ import {
   IsBoolean,
   IsOptional,
   IsString,
+  Matches,
   ValidateNested,
 } from 'class-validator';
 
@@ -26,8 +27,17 @@ export class SubmitQcReviewDto {
   comment?: string;
 
   @IsArray()
-  @ArrayMinSize(1)
+  @ArrayMinSize(0)
   @ValidateNested({ each: true })
   @Type(() => QcReviewItemDto)
   items!: QcReviewItemDto[];
+
+  @IsOptional()
+  @IsBoolean()
+  outputReviewed?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @Matches(/^[a-f0-9]{64}$/)
+  manifestFingerprint?: string;
 }

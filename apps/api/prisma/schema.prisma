@@ -1062,11 +1062,13 @@ model OrderFile {
   order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
   uploader User  @relation("FileUploader", fields: [uploadedByUserId], references: [id])
 
-  reports         OrderReport[]
-  messages        OrderMessage[]
-  ticketMessages  TicketMessage[]
-  signedUrlGrants SignedUrlGrant[]
+  reports            OrderReport[]
+  messages           OrderMessage[]
+  ticketMessages     TicketMessage[]
+  signedUrlGrants    SignedUrlGrant[]
+  outputPublications OutputPublication[]
 
+  @@unique([id, orderId])
   @@index([scanStatus, purgedAt, createdAt])
   @@map("order_files")
 }
@@ -1084,10 +1086,12 @@ model OrderReport {
   status            ReportStatus @default(draft)
   createdAt         DateTime     @default(now()) @map("created_at")
 
-  order  Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  author User       @relation("ReportAuthor", fields: [authorUserId], references: [id])
-  file   OrderFile? @relation(fields: [fileId], references: [id])
+  order              Order               @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  author             User                @relation("ReportAuthor", fields: [authorUserId], references: [id])
+  file               OrderFile?          @relation(fields: [fileId], references: [id])
+  outputPublications OutputPublication[]
 
+  @@unique([id, orderId])
   @@unique([orderId, reportType, version])
   @@map("order_reports")
 }
@@ -1183,12 +1187,41 @@ model QcReview {
   reviewedAt     DateTime? @map("reviewed_at")
   createdAt      DateTime  @default(now()) @map("created_at")
 
-  order    Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  reviewer User?          @relation("QcReviewer", fields: [reviewerUserId], references: [id])
-  items    QcReviewItem[]
+  order              Order               @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  reviewer           User?               @relation("QcReviewer", fields: [reviewerUserId], references: [id])
+  items              QcReviewItem[]
+  outputPublications OutputPublication[]
 
+  @@unique([id, orderId])
   @@index([orderId])
   @@map("qc_reviews")
+}
+
+model OutputPublication {
+  id                 String    @id @default(uuid())
+  orderId            String    @map("order_id")
+  fileId             String    @map("file_id")
+  deliveryReportId   String?   @map("delivery_report_id")
+  qcReviewId         String?   @map("qc_review_id")
+  checksum           String
+  storageKey         String    @map("storage_key")
+  sizeBytes          Int       @map("size_bytes")
+  basis              String    @default("pending_qc")
+  bindingActorUserId String?   @map("binding_actor_user_id")
+  reviewerUserId     String?   @map("reviewer_user_id")
+  reason             String?
+  checklistSnapshot  Json?     @map("checklist_snapshot")
+  releasedAt         DateTime? @map("released_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
+
+  file           OrderFile    @relation(fields: [fileId, orderId], references: [id, orderId], onDelete: Cascade, onUpdate: NoAction)
+  deliveryReport OrderReport? @relation(fields: [deliveryReportId, orderId], references: [id, orderId], onDelete: Cascade, onUpdate: NoAction)
+  qcReview       QcReview?    @relation(fields: [qcReviewId, orderId], references: [id, orderId], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([qcReviewId, fileId])
+  @@index([orderId, releasedAt])
+  @@index([fileId, releasedAt])
+  @@map("output_publications")
 }
 
 model QcReviewItem {

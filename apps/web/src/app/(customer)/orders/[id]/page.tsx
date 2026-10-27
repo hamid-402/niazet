@@ -22,6 +22,8 @@ import { customerNextAction, OrderTimeline } from "@/components/order-timeline";
 import { OrbitCustomerSurface } from "@/components/orbit-customer-surface";
 import { ConfirmationModal } from "@/components/confirmation-modal";
 import { WalletOrderPayment } from "@/components/wallet-actions";
+import { CommercialOrderPanel } from "@/components/commercial-order-panel";
+import { readCommercialState, type CommercialAccess } from "@/components/commercial-order-contract";
 import styles from "@/components/orbit-customer-surface.module.css";
 
 const TABS = [
@@ -47,6 +49,7 @@ export default function CustomerOrderDetailPage({
   const [tab, setTab] = useState<(typeof TABS)[number]>("خلاصه");
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState("");
+  const [commercialAccess, setCommercialAccess] = useState<CommercialAccess>('checking');
   const [revisionReason, setRevisionReason] = useState("");
   const [customerDecision, setCustomerDecision] = useState<"confirm" | "dispute" | null>(null);
   const cancelCustomerDecision = useCallback(() => setCustomerDecision(null), []);
@@ -80,6 +83,14 @@ export default function CustomerOrderDetailPage({
     }
   }
 
+  async function assertLegacyPayment() {
+    const current = readCommercialState(await apiFetch(`/customer/orders/${encodeURIComponent(id)}/commercial`, { dedupe: false, retry: 0 }));
+    if (current !== null) {
+      setCommercialAccess('managed');
+      throw new Error('این سفارش قرارداد نسخه‌دار دارد؛ قیمت و مهلت همان قرارداد را بررسی کنید.');
+    }
+  }
+
   async function submitCustomerDecision(note: string) {
     if (!customerDecision) return;
     setActionError("");
@@ -99,7 +110,7 @@ export default function CustomerOrderDetailPage({
   }
 
   if (error) return <ErrorBanner message={error} />;
-  if (!order) return <PageLoading />;
+  if (!order || order.id !== id) return <PageLoading />;
 
   const handler = order.publicHandlers?.[0];
 
@@ -115,6 +126,12 @@ export default function CustomerOrderDetailPage({
         </div>
         <OrderStatusBadge status={order.status} />
       </div>
+
+      {searchParams.get('submitted') === '1' && order.status !== 'draft' && <Card role="status" className="space-y-2 border-success-border">
+        <h2 className="font-bold text-success">درخواست ثبت شده است</h2>
+        <p className="text-sm leading-7 text-fg">کد پیگیری: <bdi>{order.code}</bdi> — وضعیت و اطلاعات این رسید از خود سفارش خوانده می‌شود، نه از نشانی صفحه.</p>
+        <p className="text-sm leading-7 text-fg-muted">برای مرحلهٔ بعد، بخش «اقدام بعدی» را ببینید. زمان بررسی تا اعلام تیم عملیات نامشخص است؛ ثبت درخواست به معنی پرداخت یا رزرو همان‌روز نیست.</p>
+      </Card>}
 
       {actionError && !customerDecision && (
         <div className="mb-4">
@@ -158,25 +175,28 @@ export default function CustomerOrderDetailPage({
           {customerNextAction(order.status)}
         </p>
         <div className="flex flex-wrap gap-2">
-          {order.status === "quoted" && (
+          {order.status === "quoted" && commercialAccess === 'legacy' && (
             <Button
               disabled={busy}
               onClick={() =>
-                runAction(() =>
-                  apiFetch(`/customer/orders/${id}/accept-quote`, {
+                runAction(async () => {
+                  await assertLegacyPayment();
+                  return apiFetch(`/customer/orders/${id}/accept-quote`, {
                     method: "POST",
-                  }),
+                  });
+                },
                 )
               }
             >
               تایید قیمت و ادامه به پرداخت
             </Button>
           )}
-          {order.status === "pending_payment" && (
+          {order.status === "pending_payment" && commercialAccess === 'legacy' && (
             <Button
               disabled={busy}
               onClick={() =>
                 runAction(async () => {
+                  await assertLegacyPayment();
                   const pay = await apiFetch<{ payment: { id: string; gateway: string }; redirectUrl: string }>(
                     `/customer/orders/${id}/pay`,
                     {
@@ -203,12 +223,12 @@ export default function CustomerOrderDetailPage({
               پرداخت امن سفارش
             </Button>
           )}
-          {returnedPaymentId && order.status === 'pending_payment' && (
-            <Button variant="secondary" disabled={busy} onClick={() => runAction(() => apiFetch(
+          {returnedPaymentId && order.status === 'pending_payment' && commercialAccess === 'legacy' && (
+            <Button variant="secondary" disabled={busy} onClick={() => runAction(async () => { await assertLegacyPayment(); return apiFetch(
               `/customer/orders/${id}/payments/${encodeURIComponent(returnedPaymentId)}/verify`, { method: 'POST' },
-            ))}>بررسی نتیجه پرداخت بانکی</Button>
+            ); })}>بررسی نتیجه پرداخت بانکی</Button>
           )}
-          {order.status === 'pending_payment' && <WalletOrderPayment orderId={id} amount={order.finalPrice} milestones={order.milestones} onPaid={load} />}
+          {order.status === 'pending_payment' && commercialAccess === 'legacy' && <WalletOrderPayment orderId={id} amount={order.finalPrice} milestones={order.milestones} onPaid={load} beforePay={assertLegacyPayment} />}
           {order.status === "delivered" && (
             <>
               <Button
@@ -296,6 +316,8 @@ export default function CustomerOrderDetailPage({
           )}
         </div>
       </Card>
+
+      <CommercialOrderPanel key={id} order={order} onChanged={load} onAccess={setCommercialAccess} returnedPaymentId={returnedPaymentId} />
 
       {customerDecision === "confirm" && <ConfirmationModal
         open title="تأیید تحویل سفارش" description={`سفارش ${order.code} — ${order.title}`}

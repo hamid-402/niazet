@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useCallback, useEffect, useState } from "react";
+import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch, ApiError } from "@/lib/api";
 import {
@@ -22,6 +22,7 @@ interface ChecklistItem {
 interface QcReviewDetail {
   id: string;
   comment: string | null;
+  publicationManifest?: { fingerprint: string; requiresManualBinding: boolean; versions: { fileId: string; deliveryVersion: number | null }[] };
   order: {
     code: string;
     title: string;
@@ -43,10 +44,15 @@ export default function AdminQcDetailPage({
   const [comment, setComment] = useState("");
   const [checked, setChecked] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState(false);
+  const [humanReviewed, setHumanReviewed] = useState(false);
+  const lastReview = useRef<string | null>(null);
 
   const load = useCallback(() => {
     apiFetch<QcReviewDetail>(`/admin/qc/${id}`)
-      .then(setReview)
+      .then((data) => {
+        if (lastReview.current !== data.id) { setHumanReviewed(false); setChecked({}); setComment(""); lastReview.current = data.id; }
+        setReview(data);
+      })
       .catch((e) => setError(e.message));
   }, [id]);
 
@@ -54,13 +60,16 @@ export default function AdminQcDetailPage({
     load();
   }, [load]);
 
-  if (!review) return error ? <ErrorBanner message={error} /> : <PageLoading />;
+  if (!review || review.id !== id) return error ? <ErrorBanner message={error} /> : <PageLoading />;
 
   const checklistItems = review.order.serviceLine.qcChecklistTemplates.flatMap(
     (t) => t.items,
   );
+  const needsHumanConfirmation = checklistItems.length === 0;
+  const invalidHumanConfirmation = needsHumanConfirmation && (!humanReviewed || comment.trim().length < 3 || comment.trim().length > 500);
 
   async function submit(action: "approve" | "request-rework" | "reject") {
+    if (!review || review.id !== id || busy) return;
     setBusy(true);
     setError("");
     try {
@@ -68,6 +77,8 @@ export default function AdminQcDetailPage({
         method: "POST",
         body: {
           comment,
+          ...(review.publicationManifest ? { manifestFingerprint: review.publicationManifest.fingerprint } : {}),
+          ...(needsHumanConfirmation ? { outputReviewed: humanReviewed } : {}),
           items: checklistItems.map((item) => ({
             checklistItemId: item.id,
             passed: !!checked[item.id],
@@ -95,14 +106,15 @@ export default function AdminQcDetailPage({
       )}
 
       <Card className="mb-4">
-        <h3 className="mb-2 font-bold text-fg">شرح سفارش</h3>
+        <h2 className="mb-2 font-bold text-fg">شرح سفارش</h2>
         <p className="text-sm text-fg-muted">
           {review.order.briefDescription}
         </p>
       </Card>
 
       <Card className="mb-4">
-        <h3 className="mb-2 font-bold text-fg">فایل‌های خروجی</h3>
+        <h2 className="mb-2 font-bold text-fg">فایل‌های خروجی</h2>
+        {review.publicationManifest?.requiresManualBinding && <p className="mb-3 text-sm leading-7 text-warning">این پرونده قدیمی مدرک نسخه ندارد؛ ابتدا نسخهٔ فایل باید با بررسی انسانی به پرونده متصل شود. قبولی سفارش یا فایل دیگر، مجوز این نسخه نیست.</p>}
         {review.order.files.length === 0 ? (
           <p className="text-sm text-fg-subtle">فایلی ثبت نشده است.</p>
         ) : (
@@ -118,7 +130,7 @@ export default function AdminQcDetailPage({
 
       {checklistItems.length > 0 && (
         <Card className="mb-4">
-          <h3 className="mb-2 font-bold text-fg">چک‌لیست QC</h3>
+          <h2 className="mb-2 font-bold text-fg">چک‌لیست QC</h2>
           <div className="space-y-2">
             {checklistItems.map((item) => (
               <label
@@ -143,6 +155,7 @@ export default function AdminQcDetailPage({
       )}
 
       <Card>
+        {needsHumanConfirmation && <label className="mb-4 flex items-start gap-3 text-sm leading-7 text-fg"><input type="checkbox" checked={humanReviewed} disabled={busy} onChange={(event) => setHumanReviewed(event.target.checked)} className="mt-2" /><span>خروجی‌های همین پرونده را بازبینی کردم؛ نبود چک‌لیست به معنی معافیت از QC نیست. علت نتیجه را در یادداشت بنویسید.</span></label>}
         <textarea
           aria-label="یادداشت کنترل کیفیت"
           className={`${inputClass} mb-3 min-h-20`}
@@ -151,19 +164,19 @@ export default function AdminQcDetailPage({
           onChange={(e) => setComment(e.target.value)}
         />
         <div className="flex flex-wrap gap-2">
-          <Button disabled={busy} onClick={() => submit("approve")}>
+          <Button disabled={busy || invalidHumanConfirmation || !!review.publicationManifest?.requiresManualBinding} onClick={() => submit("approve")}>
             تایید برای مشتری
           </Button>
           <Button
             variant="secondary"
-            disabled={busy}
+            disabled={busy || invalidHumanConfirmation}
             onClick={() => submit("request-rework")}
           >
             درخواست اصلاح
           </Button>
           <Button
             variant="danger"
-            disabled={busy}
+            disabled={busy || invalidHumanConfirmation}
             onClick={() => submit("reject")}
           >
             رد

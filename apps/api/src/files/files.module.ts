@@ -7,6 +7,12 @@ import { FilesController } from './files.controller';
 import { FileCleanupService } from './file-cleanup.service';
 import { AntivirusService } from './antivirus.service';
 import { ObjectStorageService } from './object-storage.service';
+import { OutputPublicationService } from './output-publication.service';
+import {
+  AdminOutputPublicationController,
+  CustomerOutputPublicationController,
+} from './output-publication.controller';
+import { IdempotencyService } from '../finance/idempotency.service';
 
 @Module({
   imports: [
@@ -14,12 +20,18 @@ import { ObjectStorageService } from './object-storage.service';
     JwtModule.register({}),
     MulterModule.register({ storage: undefined }),
   ],
-  controllers: [FilesController],
+  controllers: [
+    FilesController,
+    AdminOutputPublicationController,
+    CustomerOutputPublicationController,
+  ],
   providers: [
     FilesService,
     FileCleanupService,
     AntivirusService,
     ObjectStorageService,
+    OutputPublicationService,
+    IdempotencyService,
   ],
   exports: [
     FilesService,

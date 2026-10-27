@@ -9,6 +9,11 @@ import { PrismaService } from '../prisma/prisma.service';
 import { OrdersService } from '../orders/orders.service';
 import { SubmitQcReviewDto } from './dto/qc.dto';
 import { createVersionedOrderReport } from '../orders/domain/order-reports';
+import {
+  requireQcManifest,
+  releaseQcManifest,
+  qcManifestFingerprint,
+} from '../files/output-publication';
 
 @Injectable()
 export class QcService {
@@ -44,6 +49,12 @@ export class QcService {
     const review = await this.prisma.qcReview.findUnique({
       where: { id },
       include: {
+        outputPublications: {
+          include: {
+            file: true,
+            deliveryReport: { select: { version: true } },
+          },
+        },
         order: {
           include: {
             files: { where: { fileKind: 'output', scanStatus: 'clean' } },
@@ -57,7 +68,25 @@ export class QcService {
       },
     });
     if (!review) throw new NotFoundException('پرونده QC یافت نشد.');
-    return review;
+    return {
+      ...review,
+      publicationManifest: {
+        fingerprint: qcManifestFingerprint(review.outputPublications),
+        requiresManualBinding: review.outputPublications.length === 0,
+        versions: review.outputPublications.map((binding) => ({
+          fileId: binding.fileId,
+          deliveryVersion: binding.deliveryReport?.version ?? null,
+        })),
+      },
+      order: {
+        ...review.order,
+        files: review.outputPublications.length
+          ? review.outputPublications
+              .map((binding) => binding.file)
+              .filter((file) => file.scanStatus === 'clean' && !file.purgedAt)
+          : review.order.files,
+      },
+    };
   }
 
   approve(reviewId: string, reviewerUserId: string, dto: SubmitQcReviewDto) {
@@ -84,6 +113,7 @@ export class QcService {
   ) {
     return this.prisma.$transaction(
       async (tx) => {
+        await tx.$queryRaw`SELECT id FROM qc_reviews WHERE id = ${reviewId} FOR UPDATE`;
         const review = await tx.qcReview.findUnique({
           where: { id: reviewId },
           include: {
@@ -104,6 +134,16 @@ export class QcService {
           throw new BadRequestException('این پرونده قبلاً بررسی شده است.');
         if (review.order.status !== 'qc_in_review') {
           throw new BadRequestException('سفارش در وضعیت بررسی QC نیست.');
+        }
+        if (result === QcResult.passed) {
+          const manifest = await requireQcManifest(tx, reviewId);
+          if (
+            manifest.some((binding) => !binding.deliveryReportId) &&
+            dto.manifestFingerprint !== qcManifestFingerprint(manifest)
+          )
+            throw new BadRequestException(
+              'فهرست نسخه‌های قدیمی تغییر کرده است؛ پرونده را بازخوانی و همان فهرست را بازبینی کنید.',
+            );
         }
         if (!review.order.files.length) {
           throw new BadRequestException(
@@ -127,6 +167,16 @@ export class QcService {
           );
         const submittedIds = dto.items.map((item) => item.checklistItemId);
         if (
+          expectedIds.length === 0 &&
+          (dto.outputReviewed !== true ||
+            (dto.comment?.trim().length ?? 0) < 3 ||
+            (dto.comment?.trim().length ?? 0) > 500)
+        ) {
+          throw new BadRequestException(
+            'بدون چک‌لیست، تأیید صریح بازبینی خروجی و توضیح واقعیِ ۳ تا ۵۰۰ نویسه‌ای لازم است.',
+          );
+        }
+        if (
           new Set(submittedIds).size !== submittedIds.length ||
           expectedIds.length !== submittedIds.length ||
           expectedIds.some((id) => !submittedIds.includes(id))
@@ -145,6 +195,7 @@ export class QcService {
         }
         if (
           result !== QcResult.passed &&
+          expectedIds.length > 0 &&
           dto.items.every((item) => item.passed)
         ) {
           throw new BadRequestException(
@@ -173,6 +224,7 @@ export class QcService {
           throw new BadRequestException('پرونده هم‌زمان بررسی شده است.');
 
         if (result === QcResult.passed) {
+          await releaseQcManifest(tx, reviewId);
           await tx.orderAcceptanceCriteria.updateMany({
             where: { orderId: review.orderId },
             data: { isMet: true },
@@ -192,7 +244,11 @@ export class QcService {
             action: `qc.${result}`,
             entityType: 'qc_review',
             entityId: reviewId,
-            after: { orderId: review.orderId, comment: dto.comment ?? null },
+            after: {
+              orderId: review.orderId,
+              comment: dto.comment ?? null,
+              ...(expectedIds.length === 0 ? { outputReviewed: true } : {}),
+            },
             sensitivity: 'sensitive',
           },
         });

@@ -64,7 +64,7 @@ export function WalletFundingPanel({ onChanged }: { onChanged: () => Promise<voi
 }
 
 type Milestone = { id: string; title: string; amount?: number; paymentStatus?: string };
-export function WalletOrderPayment({ orderId, amount, milestones = [], onPaid }: { orderId: string; amount?: number | null; milestones?: Milestone[]; onPaid: () => Promise<unknown> }) {
+export function WalletOrderPayment({ orderId, amount, milestones = [], onPaid, beforePay, disabled = false }: { orderId: string; amount?: number | null; milestones?: Milestone[]; onPaid: () => Promise<unknown>; beforePay?: () => Promise<void>; disabled?: boolean }) {
   const [balance, setBalance] = useState<number | null>(null);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState('');
@@ -85,6 +85,7 @@ export function WalletOrderPayment({ orderId, amount, milestones = [], onPaid }:
     const operation = milestone?.id ?? 'full';
     if (!keys.current.has(operation)) keys.current.set(operation, crypto.randomUUID());
     try {
+      await beforePay?.();
       await apiFetch(`/customer/orders/${encodeURIComponent(orderId)}/pay-from-wallet`, { method: 'POST', body: milestone ? { milestoneId: milestone.id } : {}, idempotencyKey: keys.current.get(operation) });
       setOpen(false); setNotice('پرداخت از کیف پول ثبت و وجه وارد حساب امانی شد.'); invalidateApiCache('/customer/');
       try { await Promise.all([onPaid(), readBalance().then(setBalance)]); } catch { setError('پرداخت ثبت شد؛ برای آخرین وضعیت، صفحه را بازخوانی کنید.'); }
@@ -99,7 +100,7 @@ export function WalletOrderPayment({ orderId, amount, milestones = [], onPaid }:
     {unknownMilestone && <p className="mt-2 text-sm text-warning">اطلاعات مراحل پرداخت کامل نیست؛ صفحه را بازخوانی کنید.</p>}
     {notice && <p role="status" className="mt-2 text-sm text-success">{notice}</p>}
     {error && !open && <div className="mt-2"><ErrorBanner message={error} /></div>}
-    <Button className="mt-3" variant="secondary" disabled={unknownMilestone || balance === null || !payable || payable <= 0 || balance < payable} onClick={() => { setError(''); setOpen(true); }}>پرداخت {formatToman(payable ?? 0)} از موجودی</Button>
+    <Button className="mt-3" variant="secondary" disabled={disabled || unknownMilestone || balance === null || !payable || payable <= 0 || balance < payable} onClick={() => { setError(''); setOpen(true); }}>پرداخت {formatToman(payable ?? 0)} از موجودی</Button>
     <ConfirmationModal open={open} title="تأیید پرداخت از کیف پول" description={`مبلغ ${formatToman(payable ?? 0)} از موجودی کسر و به حساب امانی این سفارش منتقل می‌شود؛ هنوز به مجری آزاد نمی‌شود.`} confirmLabel="تأیید و پرداخت از موجودی" tone="primary" showNote={false} requireNote={false} errorMessage={error} onCancel={() => setOpen(false)} onConfirm={pay} />
   </div>;
 }

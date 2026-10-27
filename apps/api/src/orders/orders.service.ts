@@ -44,6 +44,7 @@ import {
 } from './dto/order.dto';
 import { answersFromSnapshot, snapshotServiceForm } from './service-form';
 import { createVersionedOrderReport } from './domain/order-reports';
+import { bindDeliveryOutputs } from '../files/output-publication';
 
 const DEFAULT_IN_PROGRESS_CANCEL_REFUND_RATE = 0.5;
 
@@ -1131,7 +1132,7 @@ export class OrdersService {
           );
         }
 
-        await createVersionedOrderReport(tx, {
+        const deliveryReport = await createVersionedOrderReport(tx, {
           orderId,
           authorUserId: executorUserId,
           reportType: 'delivery',
@@ -1161,40 +1162,14 @@ export class OrdersService {
           tx,
         );
 
-        if (!order.serviceLine.qcChecklistTemplates.length) {
-          await tx.orderAcceptanceCriteria.updateMany({
-            where: { orderId },
-            data: { isMet: true },
-          });
-          await this.transition(
-            orderId,
-            OrderStatus.ready_for_customer_review,
-            OrderStatusSource.system,
-            null,
-            'این خدمت نیازمند QC نیست',
-            {},
-            tx,
-          );
-          const delivered = await this.transition(
-            orderId,
-            OrderStatus.delivered,
-            OrderStatusSource.system,
-            null,
-            'نمایش خروجی به مشتری',
-            { deliveredAt: new Date() },
-            tx,
-          );
-          await this.notifications.notifyUser(
-            order.customerId,
-            'order.delivered',
-            'خروجی سفارش شما آماده است',
-            `سفارش ${order.code} برای بازبینی شما آماده است.`,
-            tx,
-          );
-          return delivered;
-        }
-
-        await tx.qcReview.create({ data: { orderId } });
+        // Owner decision Z3-QC-02: missing checklist is NOT an automatic waiver.
+        const qcReview = await tx.qcReview.create({ data: { orderId } });
+        await bindDeliveryOutputs(tx, {
+          orderId,
+          deliveryReportId: deliveryReport.id,
+          qcReviewId: qcReview.id,
+          fileIds: uniqueFileIds,
+        });
         await this.notifications.notifyUser(
           order.customerId,
           'order.submitted_for_qc',

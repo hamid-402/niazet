@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+import { inverseZ3UiInput, verifyZ3UiApproval } from './orbit-z3-customer-ui-approval.mjs';
 export const walletUiOriginalRef = '30555d2a26bb5f9a4e1649160751929b5354d1bc';
 // UI-only activation approval; NOT the Orbit fixed baseline or a folder waiver.
 export const walletUiPins = {
@@ -29,8 +30,9 @@ export const walletUiPins = {
   }
 };
 const hash = value => createHash('sha256').update(value.toString('utf8').replaceAll('\r\n', '\n')).digest('hex');
-export function matchesWalletUiApproval(path, bytes) { return Object.hasOwn(walletUiPins, path) && hash(bytes) === walletUiPins[path].after; }
+export function matchesWalletUiApproval(path, bytes) { return Object.hasOwn(walletUiPins, path) && hash(inverseZ3UiInput(path, bytes)) === walletUiPins[path].after; }
 export function verifyWalletUiApproval(originalRead, currentRead) {
+  verifyZ3UiApproval(currentRead);
   for (const [path, pin] of Object.entries(walletUiPins)) {
     assert(matchesWalletUiApproval(path, currentRead(path)), 'Wallet UI pin drift: ' + path);
     if (pin.before !== null) assert.equal(hash(originalRead(path)), pin.before);

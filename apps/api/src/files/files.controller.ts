@@ -68,7 +68,7 @@ export class FilesController {
     @Res() res: Response,
   ) {
     const file = await this.files.resolveSignedToken(token, req.ip);
-    const body = await this.storage.get(file.storageKey);
+    const body = file.verifiedBody ?? (await this.storage.get(file.storageKey));
     res.setHeader('Cache-Control', 'private, no-store');
     res.setHeader('Content-Type', file.mimeType);
     res.setHeader(

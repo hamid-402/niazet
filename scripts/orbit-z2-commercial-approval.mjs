@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { inverseZ3OutputInput, verifyZ3OutputApproval } from './orbit-z3-output-approval.mjs';
 
 // Explicit owner approval: Z2.1–Z2.6. Exact paths/bytes only; no folder waiver.
 export const z2CommercialOriginalRef = '4945367';
@@ -110,16 +111,18 @@ function old(path) {
   return previous.get(path);
 }
 export function matchesZ2CommercialApproval(path, bytes) {
-  return Object.hasOwn(z2CommercialPins, path) && hash(bytes) === z2CommercialPins[path].after;
+  return Object.hasOwn(z2CommercialPins, path) && hash(inverseZ3OutputInput(path, bytes)) === z2CommercialPins[path].after;
 }
 /** Earlier guards still validate their original input, after an exact new pin. */
 export function inverseZ2CommercialInput(path, bytes) {
+  bytes = inverseZ3OutputInput(path, bytes);
   if (!Object.hasOwn(z2CommercialPins, path) || !matchesZ2CommercialApproval(path, bytes) || z2CommercialPins[path].before === null) return bytes;
   const original = old(path);
   assert.equal(hash(original), z2CommercialPins[path].before, 'Z2 previous source checkpoint drift: ' + path);
   return original;
 }
 export function verifyZ2CommercialApproval(read) {
+  verifyZ3OutputApproval(read);
   assert(Object.keys(z2CommercialPins).length > 0, 'Z2 exact approval is not finalized');
   for (const [path, pin] of Object.entries(z2CommercialPins)) {
     assert(matchesZ2CommercialApproval(path, read(path)), 'Z2 commercial pin drift: ' + path);

@@ -22,6 +22,10 @@ import type { AuthenticatedUser } from '../common/types/authenticated-user';
 import { matchesDeclaredMime } from './file-signature';
 import { AuditService } from '../audit/audit.service';
 import { AntivirusService, type ScanResult } from './antivirus.service';
+import {
+  assertCustomerOutputPublication,
+  checksumOf,
+} from './output-publication';
 
 import {
   ObjectStorageService,
@@ -330,6 +334,16 @@ export class FilesService {
     if (file.scanStatus !== 'clean') {
       throw new ForbiddenException('فایل هنوز از بررسی امنیتی عبور نکرده است.');
     }
+    if (file.purgedAt)
+      throw new ForbiddenException('فایل دیگر برای دانلود در دسترس نیست.');
+    const publication =
+      user.role === UserRole.customer &&
+      file.order.customerId === user.id &&
+      [FileKind.output, FileKind.revision].includes(
+        file.fileKind as 'output' | 'revision',
+      )
+        ? await assertCustomerOutputPublication(this.prisma, file.id, user.id)
+        : null;
     const jti = randomUUID();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
     const token = await this.jwt.signAsync(
@@ -339,6 +353,12 @@ export class FilesService {
         role: user.role,
         typ: 'file-download',
         jti,
+        ...(publication
+          ? {
+              publicationId: publication.id,
+              publicationChecksum: publication.checksum,
+            }
+          : {}),
       },
       {
         secret: this.downloadTokenSecret(),
@@ -375,6 +395,8 @@ export class FilesService {
         typ: string;
         role: UserRole;
         jti: string;
+        publicationId?: string;
+        publicationChecksum?: string;
       }>(token, {
         secret: this.downloadTokenSecret(),
         audience: 'niazat-file-download',
@@ -400,13 +422,39 @@ export class FilesService {
       }
       const file = await this.prisma.orderFile.findUnique({
         where: { id: payload.fileId },
+        include: { order: { select: { customerId: true } } },
       });
       if (!file) throw new NotFoundException('فایل یافت نشد.');
-      if (file.scanStatus !== 'clean') {
+      if (file.scanStatus !== 'clean' || file.purgedAt) {
         throw new ForbiddenException('فایل برای دانلود امن نیست.');
       }
       if (!(await this.storage.exists(file.storageKey))) {
         throw new NotFoundException('محتوای فایل یافت نشد.');
+      }
+      let verifiedBody: Buffer | undefined;
+      let publication: Awaited<
+        ReturnType<typeof assertCustomerOutputPublication>
+      > | null = null;
+      if (
+        payload.role === UserRole.customer &&
+        file.order.customerId === payload.sub &&
+        ['output', 'revision'].includes(file.fileKind)
+      ) {
+        if (!payload.publicationId || !payload.publicationChecksum)
+          throw new ForbiddenException(
+            'مجوز این نسخه باید پس از تأیید QC دوباره صادر شود.',
+          );
+        publication = await assertCustomerOutputPublication(
+          this.prisma,
+          file.id,
+          payload.sub,
+          { id: payload.publicationId, checksum: payload.publicationChecksum },
+        );
+        verifiedBody = await this.storage.get(file.storageKey);
+        if (checksumOf(verifiedBody) !== publication.checksum)
+          throw new ForbiddenException(
+            'محتوای فایل با نسخهٔ تأییدشده برابر نیست.',
+          );
       }
       await this.audit.record({
         actorUserId: payload.sub,
@@ -423,12 +471,38 @@ export class FilesService {
           usedAt: null,
           revokedAt: null,
           expiresAt: { gt: new Date() },
+          file: {
+            scanStatus: 'clean',
+            purgedAt: null,
+            storageKey: file.storageKey,
+            checksum: file.checksum,
+            ...(publication
+              ? {
+                  outputPublications: {
+                    some: {
+                      id: publication.id,
+                      checksum: publication.checksum,
+                      releasedAt: { not: null },
+                      ...(publication.basis === 'qc_passed'
+                        ? {
+                            qcReview: {
+                              result: 'passed',
+                              reviewerUserId: publication.reviewerUserId,
+                              reviewedAt: publication.releasedAt,
+                            },
+                          }
+                        : {}),
+                    },
+                  },
+                }
+              : {}),
+          },
         },
         data: { usedAt: new Date() },
       });
       if (claimed.count !== 1)
         throw new ForbiddenException('مجوز دانلود قبلاً استفاده شده است.');
-      return file;
+      return { ...file, verifiedBody };
     } catch {
       throw new ForbiddenException('لینک دانلود منقضی یا نامعتبر است.');
     }

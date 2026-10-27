@@ -5,6 +5,7 @@ import { spawnSync, execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { matchesZ3OutputApproval } from '../orbit-z3-output-approval.mjs';
 
 if (process.argv.includes('--old-client-probe')) {
   const target = new URL(process.env.ZEUS_Z2_TEST_URL);
@@ -54,7 +55,7 @@ const maintenance = new URL(source); maintenance.pathname = '/postgres';
 const control = new PrismaClient({ datasources: { db: { url: maintenance.toString() } } });
 const runtime = resolve(root, '_runtime/apps/api');
 const temp = mkdtempSync(join(runtime, 'z2-upgrade-'));
-const output = join(root, '.artifacts/zeus/z2-phase'); mkdirSync(output, { recursive: true });
+const output = join(root, '.artifacts/zeus/z3-historical-z2'); mkdirSync(output, { recursive: true });
 const report = { date: '2026-10-27', status: 'running', mainDatabaseConnected: false, liveProvidersUsed: false, cases: [] };
 const redact = value => String(value).replace(/postgres(?:ql)?:\/\/[^\s"']+/gi, '<database URL>');
 const key = () => randomUUID();
@@ -64,6 +65,11 @@ const inputFiles = ['apps/api/prisma/schema.prisma', 'apps/api/prisma/migrations
 const compiledFiles = ['pricing/commercial.service.js', 'pricing/commercial-policy.js', 'pricing/commercial-clock.js', 'pricing/commercial.controller.js', 'pricing/commercial.dto.js', 'pricing/commercial.module.js', 'finance/commercial-review.service.js', 'finance/commercial-review.controller.js', 'finance/finance.module.js', 'finance/payments.service.js', 'finance/wallet-payments.service.js'].map(file => 'apps/api/dist/' + file);
 const fileHashes = paths => Object.fromEntries(paths.map(path => [path, digest(readFileSync(join(root, path), 'utf8').replaceAll('\r\n', '\n'))]));
 report.sourceHashes = fileHashes(inputFiles); report.compiledHashes = fileHashes(compiledFiles);
+const customerContractPath = 'apps/web/src/components/commercial-order-contract.ts';
+const customerContractSource = readFileSync(join(root, customerContractPath), 'utf8');
+report.customerUiContractHash = digest(customerContractSource.replaceAll('\r\n', '\n'));
+const customerContractJs = req('typescript').transpileModule(customerContractSource, { compilerOptions: { target: req('typescript').ScriptTarget.ES2023, module: req('typescript').ModuleKind.ESNext } }).outputText;
+const { readCommercialRevision, readCommercialState } = await import('data:text/javascript;base64,' + Buffer.from(customerContractJs).toString('base64'));
 const cli = args => {
   const result = spawnSync(process.execPath, [join(api, 'node_modules/prisma/build/index.js'), ...args], { cwd: api, env: { ...process.env, DATABASE_URL: target.toString(), NODE_ENV: 'test' }, encoding: 'utf8', windowsHide: true, timeout: 90000 });
   assert.equal(result.status, 0, redact(result.stdout + '\n' + result.stderr).slice(-2500));
@@ -88,11 +94,21 @@ try {
   mkdirSync(join(temp, 'migrations'));
   const migrations = join(api, 'prisma/migrations');
   cpSync(join(migrations, 'migration_lock.toml'), join(temp, 'migrations/migration_lock.toml'));
-  const names = readdirSync(migrations).filter(n => /^\d/.test(n)).sort();
+  const allNames = readdirSync(migrations).filter(n => /^\d/.test(n)).sort();
+  const names = allNames.filter(n => n <= '20261027120000_zeus_commercial_capacity');
+  for (const later of allNames.filter(n => !names.includes(n))) assert(matchesZ3OutputApproval(`apps/api/prisma/migrations/${later}/migration.sql`, readFileSync(join(migrations, later, 'migration.sql'))), 'Unapproved later migration in historical Z2 rehearsal');
   assert.equal(names.length, 26);
   for (const entry of names.slice(0, -1)) cpSync(join(migrations, entry), join(temp, 'migrations', entry), { recursive: true });
   const configPath = join(temp, 'prisma.config.ts');
   writeFileSync(configPath, `import { defineConfig } from 'prisma/config';\nexport default defineConfig({schema:${JSON.stringify(join(temp, 'schema.prisma'))},migrations:{path:${JSON.stringify(join(temp, 'migrations'))}},datasource:{url:process.env.DATABASE_URL!}});\n`);
+  const acceptedTarget = join(temp, 'accepted-z2-target'); mkdirSync(acceptedTarget); mkdirSync(join(acceptedTarget, 'migrations'));
+  const acceptedSchema = execFileSync('git', ['show', '166804b:apps/api/prisma/schema.prisma'], { cwd: root, encoding: 'utf8', windowsHide: true });
+  writeFileSync(join(acceptedTarget, 'schema.prisma'), acceptedSchema);
+  cpSync(join(migrations, 'migration_lock.toml'), join(acceptedTarget, 'migrations/migration_lock.toml'));
+  for (const entry of names) cpSync(join(migrations, entry), join(acceptedTarget, 'migrations', entry), { recursive: true });
+  const acceptedConfig = join(acceptedTarget, 'prisma.config.ts');
+  writeFileSync(acceptedConfig, `import {defineConfig} from 'prisma/config';export default defineConfig({schema:${JSON.stringify(join(acceptedTarget, 'schema.prisma'))},migrations:{path:${JSON.stringify(join(acceptedTarget, 'migrations'))}},datasource:{url:process.env.DATABASE_URL!}});`);
+  report.historicalTarget = { phase: 'Z2', migrationCount: 26, schemaRef: '166804b', schemaHash: digest(acceptedSchema.replaceAll('\r\n', '\n')), currentPhaseAccepted: false };
   await control.$executeRawUnsafe(`CREATE DATABASE "${name}"`); created = true;
   cli(['migrate', 'deploy', '--config', configPath]);
   cli(['generate', '--config', configPath]);
@@ -105,11 +121,11 @@ try {
   const oldOrder = await db.order.create({ data: { code: 'TEST-' + key(), customerId: owner.id, serviceId: service.id, title: 'Historic quote fixture', briefDescription: 'Retain old amount and identifier', status: 'pending_payment', finalPrice: 123 } });
   const oldTables = (await db.$queryRaw`SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename <> '_prisma_migrations' ORDER BY tablename`).map(r => r.tablename);
   const before = await snapshot(db, oldTables);
-  cli(['migrate', 'deploy']);
+  cli(['migrate', 'deploy', '--config', acceptedConfig]);
   const oldClientProbe = spawnSync(process.execPath, [fileURLToPath(import.meta.url), '--old-client-probe'], { cwd: root, env: { ...process.env, ZEUS_Z2_TEST_URL: target.toString(), ZEUS_Z2_OLD_CLIENT: join(temp, 'client'), ZEUS_Z2_OLD_USER: owner.id, ZEUS_Z2_OLD_ORDER: oldOrder.id }, windowsHide: true, encoding: 'utf8', timeout: 60000 });
   assert.equal(oldClientProbe.status, 0, redact(oldClientProbe.stdout + '\n' + oldClientProbe.stderr).slice(-2000));
   assert.deepEqual(await snapshot(db, oldTables), before);
-  cli(['migrate', 'deploy']);
+  cli(['migrate', 'deploy', '--config', acceptedConfig]);
   assert.equal(await db.commercialState.count(), 0);
   assert.equal((await db.order.findUnique({ where: { id: oldOrder.id } })).finalPrice, 123);
   report.upgrade = { previousTablesPreserved: oldTables.length, oldRowsAndColumnsUnchanged: true, previousGeneratedClientReadWriteAfterUpgrade: true, migrationCount: 26, noHistoricBackfill: true };
@@ -347,13 +363,17 @@ try {
   await http('GET', endpoint, null, null, 401); await http('GET', endpoint, other, null, 404);
   for (const denied of [ops, finance, support, executor]) await http('GET', endpoint, denied, null, 403);
   assert.equal((await http('GET', endpoint, owner, null, 200)).final_price, 392);
+  assert.equal(readCommercialState(await http('GET', endpoint, owner, null, 200)).final_price, 392);
   await http('PUT', `/v1/admin/commercial/services/${service.id}/policy`, finance, { version: 2, config: policy, reason: 'Finance cannot alter rates' }, 403);
   await http('GET', '/v1/admin/commercial/financial-review', ops, null, 403); await http('GET', '/v1/admin/commercial/financial-review', finance, null, 200); await http('GET', '/v1/admin/commercial/financial-review', superAdmin, null, 200);
   const forged = await order();
   await http('POST', `/v1/customer/orders/${forged.id}/commercial/offers`, owner, { priority: 'normal', final_price: 1 }, 400);
   await http('POST', `/v1/customer/orders/${forged.id}/commercial/offers`, owner, { priority: 'normal', now: '2026-10-27T01:00:00Z' }, 400);
   const roundTrip = await http('POST', `/v1/customer/orders/${forged.id}/commercial/offers`, owner, { priority: 'normal' }, 201);
+  assert.equal(readCommercialRevision(roundTrip).fingerprint, roundTrip.fingerprint);
   await http('POST', `/v1/customer/orders/${forged.id}/commercial/offers/${roundTrip.id}/accept`, owner, { fingerprint: roundTrip.fingerprint }, 201);
+  assert.equal(readCommercialState(await http('GET', `/v1/customer/orders/${forged.id}/commercial`, owner, null, 200)).paymentAllowed, true);
+  report.customerUiContractAcceptedAgainstRealHttp = true;
   const getPolicy = await http('GET', `/v1/admin/commercial/services/${service.id}/policy`, ops, null, 200);
   assert.equal(getPolicy.version, 1);
   await http('PUT', `/v1/admin/commercial/services/${service.id}/policy`, ops, { version: 2, config: policy, reason: 'Explicit HTTP policy revision' }, 200);
@@ -388,6 +408,7 @@ try {
   report.status = 'passed';
   assert.deepEqual(fileHashes(inputFiles), report.sourceHashes, 'Source changed while acceptance was running');
   assert.deepEqual(fileHashes(compiledFiles), report.compiledHashes, 'Compiled code changed while acceptance was running');
+  assert.equal(digest(readFileSync(join(root, customerContractPath), 'utf8').replaceAll('\r\n', '\n')), report.customerUiContractHash);
 } catch (error) {
   report.status = 'failed'; report.error = redact(error.stack || error.message); process.exitCode = 1;
 } finally {

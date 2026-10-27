@@ -30,6 +30,7 @@ try {
         if (method !== 'GET') writes.push({ path, key: request.headers()['idempotency-key'], body: request.postDataJSON() });
         if (path === '/auth/me') return send({ id: 'ui-only', role: 'customer', capabilities: [], fullName: 'آزمون نمایشی', phone: '09129999999', email: null });
         if (path === '/customer/orders') return send([]);
+        if (method === 'GET' && path.endsWith('/commercial')) return send(null);
         if (path === '/notifications') return send([]);
         if (path === '/notifications/preferences') return send({ inAppEnabled: true, emailEnabled: false, smsEnabled: false });
         if (method === 'GET' && path === '/customer/wallet/top-ups') return send(intents);
