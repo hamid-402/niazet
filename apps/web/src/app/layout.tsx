@@ -11,7 +11,8 @@ import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/lib/site';
 
 const vazirmatn = Vazirmatn({
   variable: '--font-vazirmatn',
-  subsets: ['arabic', 'latin'],
+  subsets: ['arabic'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {

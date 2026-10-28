@@ -24,6 +24,8 @@ import { inverseZ2CommercialInput, matchesZ2CommercialApproval } from '../orbit-
 import { matchesZ3OutputApproval } from '../orbit-z3-output-approval.mjs';
 import { inverseZ3UiInput, matchesZ3UiApproval } from '../orbit-z3-customer-ui-approval.mjs';
 import { matchesZ3PublicationApproval } from '../orbit-z3-publication-ui-approval.mjs';
+import { matchesRegistrationApproval } from '../orbit-z3-registration-approval.mjs';
+import { inverseCustomerContinuation, matchesCustomerContinuation } from '../orbit-z3-customer-continuation-approval.mjs';
 
 const root = new URL("../../", import.meta.url);
 const composerPins = {
@@ -32,7 +34,7 @@ const composerPins = {
   'apps/web/src/components/orbit-customer-surface.module.css': '6afcf5e70935000113f538a99625881f20fcfcd8110d16e05e38476e6ae5a99f',
 };
 const read = (path) => {
-  const bytes = inverseZ2CommercialInput(path, inverseZ3UiInput(path, readFileSync(new URL(path, root))));
+  const bytes = inverseZ2CommercialInput(path, inverseZ3UiInput(path, inverseCustomerContinuation(path, readFileSync(new URL(path, root)))));
   // Only exact accepted B1 bytes reconstruct its earlier historical source.
   if (Object.hasOwn(composerPins, path) && createHash('sha256').update(bytes.toString('utf8').replaceAll('\r\n', '\n')).digest('hex') === composerPins[path]) return execFileSync('git', ['show', `14180b2:${path}`], { cwd: root, windowsHide: true });
   return bytes;
@@ -434,7 +436,7 @@ export function checkHistoricalReview() {
   ]) {
     if (!Object.hasOwn(saved.sourceInputs, path))
       assert(
-        matchesZ1DomainApproval(path, read(path)) || matchesWalletUiApproval(path, read(path)) || matchesZ1ContractApproval(path, read(path)) || matchesZ1DataApproval(path, read(path)) || matchesZ2EngineApproval(path, read(path)) || matchesZ2CommercialApproval(path, read(path)) || matchesZ3OutputApproval(path, readFileSync(new URL(path, root))) || matchesZ3UiApproval(path, readFileSync(new URL(path, root))) || matchesZ3PublicationApproval(path, readFileSync(new URL(path, root))),
+        matchesZ1DomainApproval(path, read(path)) || matchesWalletUiApproval(path, read(path)) || matchesZ1ContractApproval(path, read(path)) || matchesZ1DataApproval(path, read(path)) || matchesZ2EngineApproval(path, read(path)) || matchesZ2CommercialApproval(path, read(path)) || matchesZ3OutputApproval(path, readFileSync(new URL(path, root))) || matchesZ3UiApproval(path, readFileSync(new URL(path, root))) || matchesZ3PublicationApproval(path, readFileSync(new URL(path, root))) || matchesRegistrationApproval(path, readFileSync(new URL(path, root))) || matchesCustomerContinuation(path, readFileSync(new URL(path, root))),
         `Unapproved new historical source: ${path}`,
       );
   }

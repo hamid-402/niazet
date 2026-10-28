@@ -5,7 +5,11 @@ import { createRequire } from 'node:module';
 import test from 'node:test';
 import { inverseZ2CommercialInput, matchesZ2CommercialApproval, verifyZ2CommercialApproval, z2CommercialOriginalRef, z2CommercialPins } from '../orbit-z2-commercial-approval.mjs';
 import { inverseZ3OutputInput } from '../orbit-z3-output-approval.mjs';
-const root = new URL('../../', import.meta.url), read = path => readFileSync(new URL(path, root));
+import { inverseRegistrationInput } from '../orbit-z3-registration-approval.mjs';
+import { inverseCustomerContinuation } from '../orbit-z3-customer-continuation-approval.mjs';
+// Historical assertions retain their original exact inputs. Current source has
+// separate registration/UI negative, AST and runtime acceptance.
+const root = new URL('../../', import.meta.url), read = path => inverseRegistrationInput(path, inverseCustomerContinuation(path, readFileSync(new URL(path, root))));
 const req = createRequire(new URL('../../apps/api/package.json', import.meta.url));
 const ts = req('typescript');
 const before = path => execFileSync('git', ['show', `${z2CommercialOriginalRef}:${path}`], { cwd: root, windowsHide: true });

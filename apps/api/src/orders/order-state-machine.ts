@@ -72,7 +72,9 @@ export const ORDER_TRANSITION_SOURCES: TransitionSources = {
     cancelled: [OrderStatusSource.customer, OrderStatusSource.admin],
   },
   pending_triage: {
-    triaging: [OrderStatusSource.admin],
+    // Owner may initiate fixed-price registration only through the dynamic
+    // eligibility gate in OrderWorkflowService; other services stay manual.
+    triaging: [OrderStatusSource.admin, OrderStatusSource.customer],
     cancelled: [OrderStatusSource.admin, OrderStatusSource.customer],
   },
   triaging: {

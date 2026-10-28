@@ -6,7 +6,7 @@ import { chromium } from 'playwright';
 import AxeBuilder from '@axe-core/playwright';
 // Production UI fixtures only. All API traffic is intercepted, never main DB.
 const root = fileURLToPath(new URL('../../../', import.meta.url));
-const output = fileURLToPath(new URL('../../../.artifacts/zeus/z3-commercial-ui/', import.meta.url));
+const output = fileURLToPath(new URL(process.argv.includes('--current-navigation') ? '../../../.artifacts/zeus/z3-commercial-navigation-ui/' : '../../../.artifacts/zeus/z3-commercial-ui/', import.meta.url));
 mkdirSync(output, { recursive: true });
 const base = 'http://localhost:3109';
 const child = spawn(process.execPath, ['apps/web/node_modules/next/dist/bin/next', 'start', 'apps/web', '--port', '3109', '--hostname', '127.0.0.1'], { cwd: root, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
@@ -55,7 +55,11 @@ try {
       });
       await page.goto(base + '/orders/commercial-order?submitted=1');
       const panel = page.locator('[data-commercial-order]'); await panel.getByRole('heading', { name: 'قیمت قطعی و مهلت سفارش' }).waitFor();
-      assert.equal(writes.length, 0); assert.equal(await page.getByRole('tab').count(), 7);
+      assert.equal(writes.length, 0);
+      const tabs = await page.getByRole('tab').allTextContents();
+      assert.equal(tabs.filter(label => label !== 'تاریخچه').length, 7);
+      assert.equal(await page.getByRole('tab').count(), 8);
+      for (const label of ['خلاصه', 'مراحل', 'گزارش‌ها', 'فایل‌ها', 'پیام‌ها', 'پرداخت‌ها', 'تیکت‌ها', 'تاریخچه']) assert.equal(await page.getByRole('tab', { name: label, exact: true }).count(), 1);
       assert.equal(await page.getByRole('button', { name: 'تایید قیمت و ادامه به پرداخت', exact: true }).count(), 0);
       assert.equal(await panel.getByRole('button', { name: /از موجودی/ }).count(), 0);
       const accept = panel.getByRole('button', { name: 'بررسی و پذیرش این قیمت و مهلت' });

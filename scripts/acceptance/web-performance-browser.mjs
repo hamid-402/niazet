@@ -37,6 +37,7 @@ export async function measureWebPerformance(browser, origin, report, beforeCase,
             new PerformanceObserver(list => {
               for (const entry of list.getEntries()) {
                 const value = entry.toJSON();
+                if (type === 'largest-contentful-paint' && entry.element) value.element = { tag: entry.element.tagName, id: entry.element.id, className: typeof entry.element.className === 'string' ? entry.element.className : '', text: (entry.element.textContent ?? '').trim().slice(0, 100) };
                 if (type === 'layout-shift') value.sources = entry.sources.map(source => ({
                   tag: source.node?.nodeName, id: source.node?.id, className: typeof source.node?.className === 'string' ? source.node.className : '',
                   previousRect: source.previousRect.toJSON(), currentRect: source.currentRect.toJSON(),
@@ -79,6 +80,7 @@ export async function measureWebPerformance(browser, origin, report, beforeCase,
           totalTransferBytes: raw.resources.reduce((sum, entry) => sum + entry.transfer, raw.navigation.transferSize),
           observedBlockingMs: raw.observed.tasks.filter(entry => entry.startTime >= raw.paint).reduce((sum, entry) => sum + Math.max(0, entry.duration - 50), 0),
           expectedSession401, resources: raw.resources, layoutShifts: raw.observed.shifts,
+          lcpCandidates: raw.observed.lcp,
         });
       } finally { await context.close(); }
     }

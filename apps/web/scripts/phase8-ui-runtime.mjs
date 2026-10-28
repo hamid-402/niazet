@@ -21,7 +21,7 @@ const apiEntry = resolve(apiRoot, 'dist/main.js');
 const nextCli = resolve(webRoot, 'node_modules/next/dist/bin/next');
 const apiRequire = createRequire(resolve(apiRoot, 'package.json'));
 const { PrismaClient } = apiRequire('@prisma/client');
-const artifactRoot = resolve(repositoryRoot, '.artifacts/ui-runtime');
+const artifactRoot = resolve(repositoryRoot, process.argv.includes('--zeus-z3') ? '.artifacts/zeus/z3-integrated-ui' : '.artifacts/ui-runtime');
 const baselinePath = resolve(webRoot, 'tests/phase8-visual-baseline.json');
 const updateBaseline = process.argv.includes('--update-baseline');
 const updateScope = process.argv.find((argument) => argument.startsWith('--update-scenarios='))?.split('=')[1].split(',');
@@ -829,7 +829,10 @@ async function verifyCustomerOrderDetailUi(page, webOrigin) {
   await page.goto(`${webOrigin}/orders/00000000-0000-4000-8000-000000000011`);
   await page.getByRole('heading', { name: 'بررسی پیشنهاد برای سفارش', exact: true }).waitFor();
   assert.equal(await page.getByRole('region', { name: 'اطلاعات سفارش' }).locator('.premium-card').count(), 4);
-  assert.equal(await page.getByRole('tab').count(), 7, 'Every customer order section must remain available.');
+  const sectionLabels = await page.getByRole('tab').allTextContents();
+  assert.equal(sectionLabels.filter(label => label !== 'تاریخچه').length, 7, 'Every customer order section must remain available.');
+  assert.equal(await page.getByRole('tab').count(), 8, 'The independent history section is additive.');
+  for (const label of ['خلاصه', 'مراحل', 'گزارش‌ها', 'فایل‌ها', 'پیام‌ها', 'پرداخت‌ها', 'تیکت‌ها', 'تاریخچه']) assert.equal(await page.getByRole('tab', { name: label, exact: true }).count(), 1);
   await page.getByRole('tab', { name: 'مراحل' }).click();
   await page.getByRole('tabpanel', { name: 'مراحل' }).waitFor();
   await page.getByRole('tab', { name: 'فایل‌ها' }).click();
@@ -892,7 +895,7 @@ let browser;
 const contexts = [];
 let apiOutput = '';
 let webOutput = '';
-const report = { schemaVersion: 1, generatedAt: new Date().toISOString(), snapshots: [], axe: [], keyboard: 'pending' };
+const report = { schemaVersion: 1, generatedAt: new Date().toISOString(), baselineUpdated: updateBaseline, baselineUpdateScope: updateScope ?? [], snapshots: [], axe: [], keyboard: 'pending' };
 let testError;
 
 try {

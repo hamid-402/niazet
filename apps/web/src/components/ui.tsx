@@ -169,6 +169,7 @@ export function Skeleton({ className = '' }: { className?: string }) {
 export function PageSkeleton() {
   return (
     <div role="status" aria-label="در حال آماده‌سازی صفحه" className="space-y-4 py-4">
+      <p className="text-sm leading-7 text-fg-muted">در حال آماده‌سازی امن صفحه؛ لطفاً کمی صبر کنید.</p>
       <Skeleton className="h-8 w-48" />
       <Skeleton className="h-24 w-full" />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

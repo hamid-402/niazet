@@ -16,6 +16,8 @@ import {
 import { SecureFileLink, SecureFileUpload } from "@/components/secure-file";
 import { OrbitCustomerSurface } from "@/components/orbit-customer-surface";
 import { PriceEstimate } from "@/components/price-estimate";
+import { fixedCheckoutChoice, updateCustomerQuery } from "@/components/customer-navigation";
+import { readCommercialRevision } from "@/components/commercial-order-contract";
 import styles from "@/components/orbit-customer-surface.module.css";
 import type {
   OrderDetail,
@@ -306,9 +308,11 @@ function NewOrderForm() {
   const versionRef = useRef(0);
   const createKeyRef = useRef<string | null>(null);
   const submitKeyRef = useRef<string | null>(null);
+  const registrationKeyRef = useRef<string | null>(null);
   const saveInFlightRef = useRef<Promise<DraftResult> | null>(null);
 
   const selectedService = services?.find((service) => service.id === serviceId);
+  const checkoutPriority = selectedService?.pricingModel === 'fixed' ? fixedCheckoutChoice(new URLSearchParams(params.toString())) : null;
   const dynamicFields = useMemo(
     () => selectedService?.formFields ?? [],
     [selectedService],
@@ -523,10 +527,21 @@ function NewOrderForm() {
     setError("");
     try {
       submitKeyRef.current ??= crypto.randomUUID();
-      await apiFetch(`/customer/orders/${draftIdRef.current}/submit`, {
+      const submitted = await apiFetch<DraftResult>(`/customer/orders/${draftIdRef.current}/submit`, {
         method: "POST",
         idempotencyKey: submitKeyRef.current,
       });
+      if (checkoutPriority) {
+        registrationKeyRef.current ??= crypto.randomUUID();
+        try {
+          if (!Number.isSafeInteger(submitted.version)) throw new Error('نسخهٔ ثبت روشن نیست.');
+          readCommercialRevision(await apiFetch(`/customer/orders/${draftIdRef.current}/commercial/registration-offer`, { method: 'POST', body: { priority: checkoutPriority, version: submitted.version }, idempotencyKey: registrationKeyRef.current, retry: 0 }));
+          router.push(`/orders/${draftIdRef.current}?submitted=1&tab=payments`);
+        } catch {
+          router.push(`/orders/${draftIdRef.current}?submitted=1&checkout=check`);
+        }
+        return;
+      }
       router.push(`/orders/${draftIdRef.current}?submitted=1`);
     } catch (cause) {
       setError(
@@ -536,7 +551,6 @@ function NewOrderForm() {
     }
   }
 
-  if (!services && !ready) return <PageLoading />;
   return (
     <OrbitCustomerSurface>
     <div className={styles.orderComposer}>
@@ -546,8 +560,10 @@ function NewOrderForm() {
           <SectionTitle subtitle="اطلاعات شما خودکار به‌عنوان پیش‌نویس ذخیره می‌شود">
             ثبت درخواست جدید
           </SectionTitle>
+          <p className={styles.composerSectionHint}>خدمت، خروجی موردنظر و زمان‌بندی را با جزئیات لازم مشخص کنید.</p>
         </div>
       </div>
+      {!services && !ready ? <div role="status" aria-label="در حال آماده‌سازی صفحه"><PageLoading /></div> : <>
       <ol className={styles.composerSteps} aria-label="مراحل ثبت درخواست">
         <li aria-current={!requirements && !reviewing ? 'step' : undefined}><span aria-hidden="true">۰۱</span> اطلاعات درخواست</li>
         <li aria-current={requirements && !reviewing ? 'step' : undefined}><span aria-hidden="true">۰۲</span> نیازها و فایل‌ها</li>
@@ -627,6 +643,7 @@ function NewOrderForm() {
           </Card>
           <PriceEstimate serviceSlug={selectedService?.slug} packageId={packageId} urgency={urgency} />
           <p className="text-sm leading-7 text-fg-muted">با ثبت درخواست، ابتدا نیاز شما بررسی می‌شود. برآورد بالا مجوز پرداخت نیست؛ پرداخت فقط پس از اعلام و تأیید قیمت قطعی در دسترس خواهد بود.</p>
+          {selectedService?.pricingModel === 'fixed' && <Card className="space-y-3"><h2 className="font-bold text-fg">مسیر ثبت و قرارداد پرداخت</h2><Field label="مسیر قیمت‌گذاری هنگام ثبت"><select className={inputClass} value={checkoutPriority ?? 'review'} disabled={submitting} onChange={event => window.history.replaceState(null, '', updateCustomerQuery(window.location.search, 'checkout', event.target.value))}><option value="review">ثبت برای بررسی — مسیر فعلی</option><option value="normal">قرارداد قطعی عادی و ادامه به پرداخت</option><option value="urgent">قرارداد قطعی فوری و ادامه به پرداخت</option><option value="same_day">قرارداد همان‌روز — مشروط به ظرفیت و ساعت سرور</option></select></Field><p className="text-sm leading-7 text-fg-muted">برآورد یا بودجه مبلغ پرداخت نیست. فقط با سیاست معتبر سرور قرارداد ساخته می‌شود؛ سپس مبلغ و مهلت را جداگانه می‌پذیرید و پرداخت می‌کنید. فوریت کم/زیاد قبلی خودکار تبدیل نمی‌شود؛ اولویت قرارداد را اینجا صریح انتخاب کنید. نبود ظرفیت یا خطا هیچ اولویتی را خودکار عوض نمی‌کند و سفارش ثبت‌شده از دست نمی‌رود.</p></Card>}
           {error && <ErrorBanner message={error} />}
           <div className="flex flex-col-reverse gap-3 sm:flex-row">
             <Button
@@ -643,7 +660,7 @@ function NewOrderForm() {
               disabled={submitting}
               className="flex-1"
             >
-              {submitting ? "در حال ثبت نهایی..." : "تأیید و ارسال برای بررسی"}
+              {submitting ? "در حال ثبت نهایی..." : checkoutPriority ? "ثبت و دریافت قرارداد پرداخت" : "تأیید و ارسال برای بررسی"}
             </Button>
           </div>
         </div>
@@ -653,7 +670,6 @@ function NewOrderForm() {
             <legend className="sr-only">اطلاعات درخواست</legend>
           <Card className={styles.composerCard}>
             <h2 className={styles.composerSectionTitle}>تعریف درخواست</h2>
-            <p className={styles.composerSectionHint}>خدمت، خروجی موردنظر و زمان‌بندی را با جزئیات لازم مشخص کنید.</p>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label="نوع خدمت">
                 <select
@@ -839,6 +855,7 @@ function NewOrderForm() {
           </div>
         </form>
       )}
+      </>}
     </div>
     </OrbitCustomerSurface>
   );

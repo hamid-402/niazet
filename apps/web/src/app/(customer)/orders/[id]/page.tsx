@@ -18,6 +18,7 @@ import { OrderStatusBadge } from "@/components/status-badge";
 import { SecureFileUpload } from "@/components/secure-file";
 import { CustomerOutputPublications, CustomerOutputFileLink } from "@/components/customer-output-publications";
 import { outputKindLabel } from "@/components/output-publication-contract";
+import { ORDER_SECTIONS, readOrderSection, updateCustomerQuery, type OrderSection } from "@/components/customer-navigation";
 import type { OrderDetail, OrderFile } from "@/lib/types";
 import { formatDate, formatNumber, formatToman } from "@/lib/format";
 import { customerNextAction, OrderTimeline } from "@/components/order-timeline";
@@ -36,6 +37,7 @@ const TABS = [
   "پیام‌ها",
   "پرداخت‌ها",
   "تیکت‌ها",
+  "تاریخچه",
 ] as const;
 
 export default function CustomerOrderDetailPage({
@@ -48,7 +50,12 @@ export default function CustomerOrderDetailPage({
   const returnedPaymentId = searchParams.get('paymentId');
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [error, setError] = useState("");
-  const [tab, setTab] = useState<(typeof TABS)[number]>("خلاصه");
+  const section = readOrderSection(new URLSearchParams(searchParams.toString()));
+  const tab = ORDER_SECTIONS[section];
+  const setTab = (value: string) => {
+    const key = (Object.keys(ORDER_SECTIONS) as OrderSection[]).find(key => ORDER_SECTIONS[key] === value);
+    if (key) window.history.pushState(null, '', updateCustomerQuery(window.location.search, 'tab', key));
+  };
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState("");
   const [commercialAccess, setCommercialAccess] = useState<CommercialAccess>('checking');
@@ -133,7 +140,8 @@ export default function CustomerOrderDetailPage({
       {searchParams.get('submitted') === '1' && order.status !== 'draft' && <Card role="status" className="space-y-2 border-success-border">
         <h2 className="font-bold text-success">درخواست ثبت شده است</h2>
         <p className="text-sm leading-7 text-fg">کد پیگیری: <bdi>{order.code}</bdi> — وضعیت و اطلاعات این رسید از خود سفارش خوانده می‌شود، نه از نشانی صفحه.</p>
-        <p className="text-sm leading-7 text-fg-muted">برای مرحلهٔ بعد، بخش «اقدام بعدی» را ببینید. زمان بررسی تا اعلام تیم عملیات نامشخص است؛ ثبت درخواست به معنی پرداخت یا رزرو همان‌روز نیست.</p>
+        <p className="text-sm leading-7 text-fg-muted">{['quoted', 'pending_payment'].includes(order.status) ? 'قرارداد قطعی را در بخش اقدام بعدی بررسی و صریحاً بپذیرید؛ ثبت درخواست به‌تنهایی پرداخت یا رزرو پرداخت‌شده نیست.' : 'برای مرحلهٔ بعد، بخش «اقدام بعدی» را ببینید. زمان بررسی تا اعلام تیم عملیات نامشخص است؛ ثبت درخواست به معنی پرداخت یا رزرو همان‌روز نیست.'}</p>
+        {searchParams.get('checkout') === 'check' && <p className="text-sm leading-7 text-warning">پاسخ آماده‌سازی قرارداد کامل دریافت نشد؛ وضعیت واقعی سفارش و قرارداد را از همین صفحه بازخوانی کنید. دوباره سفارش یا پرداخت نسازید.</p>}
       </Card>}
 
       {actionError && !customerDecision && (
@@ -338,6 +346,7 @@ export default function CustomerOrderDetailPage({
       <TabList idPrefix="order" label="بخش‌های سفارش" items={TABS.map((item) => ({ value: item, label: item }))} value={tab} onChange={(value) => setTab(value as (typeof TABS)[number])} />
       <p className={styles.tabHint}>برای دیدن بخش‌های دیگر، نوار بالا را افقی حرکت دهید.</p>
 
+      {tab === "تاریخچه" && <Card role="tabpanel" id="order-panel-تاریخچه" aria-labelledby="order-tab-تاریخچه" tabIndex={0}><h2 className="mb-4 font-bold text-fg">تاریخچهٔ وضعیت سفارش</h2><OrderTimeline order={{ statusHistory: order.statusHistory }} /></Card>}
       {tab === "خلاصه" && (
         <Card role="tabpanel" id="order-panel-خلاصه" aria-labelledby="order-tab-خلاصه" tabIndex={0}>
           <p className="text-sm leading-7 text-fg-muted">
@@ -345,9 +354,9 @@ export default function CustomerOrderDetailPage({
           </p>
           {order.acceptanceCriteria && order.acceptanceCriteria.length > 0 && (
             <div className="mt-4">
-              <h4 className="mb-2 text-sm font-bold text-fg">
+              <h3 className="mb-2 text-sm font-bold text-fg">
                 معیار پذیرش
-              </h4>
+              </h3>
               <ul className="list-inside list-disc space-y-1 text-sm text-fg-muted">
                 {order.acceptanceCriteria.map((c) => (
                   <li key={c.id}>{c.description}</li>
@@ -521,9 +530,9 @@ export default function CustomerOrderDetailPage({
           )}
           {order.escrowHolds && order.escrowHolds.length > 0 && (
             <div className="mt-4 border-t border-border pt-3">
-              <h4 className="mb-2 text-sm font-bold text-fg">
+              <h3 className="mb-2 text-sm font-bold text-fg">
                 وضعیت امانت (escrow)
-              </h4>
+              </h3>
               {order.escrowHolds.map((e) => (
                 <div key={e.id} className="flex justify-between text-sm">
                   <span>{formatToman(e.amount)}</span>

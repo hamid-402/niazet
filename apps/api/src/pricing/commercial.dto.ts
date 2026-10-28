@@ -21,6 +21,10 @@ export class CommercialOfferDto {
   @IsIn(['normal', 'urgent', 'same_day']) priority!: PricingPriority;
   @IsOptional() @IsObject() inputs?: Record<string, unknown>;
 }
+export class FixedRegistrationOfferDto {
+  @IsIn(['normal', 'urgent', 'same_day']) priority!: PricingPriority;
+  @IsInt() @Min(0) @Max(2147483647) version!: number;
+}
 export class CommercialAdminOfferDto extends CommercialOfferDto {
   @IsOptional() @IsInt() @Min(0) @Max(2000000000) quotedBasePrice?: number;
   @IsString() @MinLength(3) @MaxLength(500) reason!: string;

@@ -10,5 +10,5 @@
 @media (prefers-reduced-motion: no-preference) {
   .surface[data-motion='on'] > div > :global(.premium-card) { animation: ops-settle 320ms ease-out both; }
 }
-@keyframes ops-settle { from { opacity: .95; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes ops-settle { from { transform: translateY(6px); } to { transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .surface *, .surface *::before, .surface *::after { animation: none !important; transition: none !important; } }

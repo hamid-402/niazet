@@ -79,9 +79,9 @@
 @media (max-width: 63.99rem) { .layout { gap: 2rem; grid-template-columns: 1fr 1fr; } .title { font-size: clamp(2.1rem, 4.8vw, 3.25rem); } .stackInner { padding: 1rem; } }
 @media (max-width: 47.99rem) {
   .hero { padding-top: 1.3rem; }
-  .topline { flex-wrap: wrap; gap: .3rem; }
-  .eyebrow { font-size: .68rem; }
-  .motionToggle { margin-inline-start: auto; }
+  .topline { display: grid; grid-template-columns: minmax(0, 1fr); gap: .6rem; }
+  .eyebrow { font-size: .68rem; min-block-size: 2.6rem; }
+  .motionToggle { margin-inline-start: auto; justify-self: end; }
   .layout { grid-template-columns: 1fr; gap: 1.5rem; }
   .title { font-size: clamp(2.1rem, 10vw, 3.2rem); }
   .copy { padding: 0; }

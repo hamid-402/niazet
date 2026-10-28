@@ -263,207 +263,203 @@ export class CommercialService {
     orderId: string,
     dto: CommercialOfferDto | CommercialAdminOfferDto,
     key: string,
+    existingTransaction?: Tx,
   ) {
+    const work = async (tx: Tx) => {
+      const order = await this.lockOrder(
+        tx,
+        orderId,
+        actor.role === 'customer' ? actor.id : undefined,
+      );
+      if (
+        !['triaging', 'pending_quote', 'quoted', 'pending_payment'].includes(
+          order.status,
+        )
+      )
+        throw new ConflictException('تریاژ معتبر پیش از قیمت قطعی لازم است.');
+      if (actor.role === 'customer' && order.status === 'pending_quote')
+        throw new ConflictException('این سفارش به بررسی قیمت مدیر نیاز دارد.');
+      if (
+        await tx.payment.count({
+          where: {
+            orderId,
+            status: { in: ['pending', 'verifying', 'succeeded'] },
+          },
+        })
+      )
+        throw new ConflictException('ابتدا پرداخت موجود تعیین تکلیف شود.');
+      await tx.$queryRaw(
+        Prisma.sql`SELECT id FROM service_lines WHERE id = ${order.serviceId} FOR UPDATE`,
+      );
+      const policy = await tx.commercialPolicy.findFirst({
+        where: { serviceId: order.serviceId },
+        orderBy: { version: 'desc' },
+      });
+      if (!policy)
+        throw new ConflictException(
+          'سیاست معتبر قیمت و تحویل هنوز تنظیم نشده است.',
+        );
+      const config = readCommercialPolicy(policy.config),
+        now = await this.clock.now(tx);
+      if (!order.serviceLine.isActive)
+        throw new ConflictException('خدمت فعال نیست.');
+      const selected = order.packageId
+        ? order.serviceLine.packages.find(
+            (p) => p.id === order.packageId && p.isActive,
+          )
+        : null;
+      if (order.packageId && !selected)
+        throw new ConflictException('بسته فعال نیست.');
+      let price: ReturnType<typeof calculatePrice>;
+      let formulaSnapshot: unknown = null;
+      if (order.serviceLine.pricingModel === 'manual_quote') {
+        if (
+          actor.role !== 'admin' ||
+          !('quotedBasePrice' in dto) ||
+          dto.quotedBasePrice == null
+        )
+          throw new ConflictException(
+            'قیمت توافقی فقط پس از پیشنهاد مدیر مجاز است.',
+          );
+        reason(dto.reason);
+        price = calculatePrice(dto.quotedBasePrice, dto.priority);
+      } else if (order.serviceLine.pricingModel === 'formula') {
+        if (!config.formula)
+          throw new ConflictException('فرمول معتبر موجود نیست.');
+        const result = calculateFormulaPrice(
+          config.formula,
+          dto.inputs ?? {},
+          dto.priority,
+        );
+        price = result;
+        formulaSnapshot = {
+          formula: result.formula_snapshot,
+          inputs: result.inputs_snapshot,
+        };
+      } else {
+        if (dto.inputs && Object.keys(dto.inputs).length)
+          throw new BadRequestException('خدمت ثابت ورودی محاسبه ندارد.');
+        const base = selected ? selected.price : order.serviceLine.basePrice;
+        if (base === null) throw new ConflictException('قیمت پایه مشخص نیست.');
+        price = calculatePrice(base, dto.priority);
+      }
+      if (price.final_price < 1 || price.final_price > 2_000_000_000)
+        throw new ConflictException(
+          'این مبلغ مسیر پرداخت خودکار معتبر ندارد؛ بررسی انسانی لازم است.',
+        );
+      const window = calculateSameDayWindow(
+        now,
+        config.sameDayEnabled,
+        config.calendar,
+      );
+      if (
+        dto.priority === 'same_day' &&
+        (!window.available || order.milestones.length)
+      )
+        throw new ConflictException('همان‌روز یا پرداخت کامل واجد شرایط نیست.');
+      const deadlineNormal = calculateElapsedDeadline(
+        now,
+        config.normalMinutes,
+      )!;
+      const proposedDeadline =
+        dto.priority === 'same_day' && window.available
+          ? window.deadlineAt
+          : calculateElapsedDeadline(
+              now,
+              dto.priority === 'urgent'
+                ? config.urgentMinutes
+                : config.normalMinutes,
+            )!;
+      const expiresAt = new Date(
+        Math.min(
+          now.getTime() + config.quoteTtlMinutes * 60000,
+          proposedDeadline.getTime(),
+          dto.priority === 'same_day' && window.available
+            ? window.holdExpiresAt.getTime()
+            : Infinity,
+        ),
+      );
+      const old = await tx.commercialState.findUnique({
+        where: { orderId },
+        include: { revision: true },
+      });
+      if (old) {
+        await tx.commercialRevision.updateMany({
+          where: { id: old.revisionId, invalidatedAt: null },
+          data: { invalidatedAt: now },
+        });
+        await tx.capacityReservation.updateMany({
+          where: { revisionId: old.revisionId, status: 'held' },
+          data: { status: 'released' },
+        });
+      }
+      const snapshot = json({
+        schemaVersion: 1,
+        currency: 'IRT',
+        policyVersion: policy.version,
+        config,
+        cartFingerprint: this.cartFingerprint(order),
+        formulaSnapshot,
+        inputs: dto.inputs ?? {},
+        customerId: order.customerId,
+        serviceId: order.serviceId,
+        packageId: order.packageId,
+        price,
+        issuedAt: now.toISOString(),
+        expiresAt: expiresAt.toISOString(),
+        proposedDeadlineAt: proposedDeadline.toISOString(),
+        deadlineNormal: deadlineNormal.toISOString(),
+      });
+      const revision = await tx.commercialRevision.create({
+        data: {
+          orderId,
+          policyId: policy.id,
+          sequence: (old?.revision.sequence ?? 0) + 1,
+          priority: dto.priority,
+          basePrice: price.base_price,
+          surchargePct: price.surcharge_pct,
+          surchargeAmount: price.surcharge_amount,
+          finalPrice: price.final_price,
+          snapshot,
+          fingerprint: requestFingerprint(snapshot),
+          issuedAt: now,
+          expiresAt,
+        },
+      });
+      await tx.commercialState.upsert({
+        where: { orderId },
+        create: { orderId, revisionId: revision.id },
+        update: { revisionId: revision.id },
+      });
+      if (order.status === 'triaging' || order.status === 'pending_quote') {
+        await this.workflow.transition(
+          orderId,
+          'quoted',
+          actor.role === 'admin' ? 'admin' : 'system',
+          actor.role === 'admin' ? actor.id : null,
+          'پیشنهاد نسخه‌دار قیمت؛ نیازمند پذیرش مشتری',
+          { finalPrice: price.final_price, quotedAt: now },
+          tx,
+        );
+      } else
+        await tx.order.update({
+          where: { id: orderId },
+          data: { finalPrice: price.final_price, version: { increment: 1 } },
+        });
+      await this.audit(tx, actor, 'commercial.offer.created', revision.id, {
+        orderId,
+        fingerprint: revision.fingerprint,
+        reason:
+          'reason' in dto ? reason(dto.reason) : 'درخواست مشتری برای قیمت قطعی',
+      });
+      return this.view(revision);
+    };
+    if (existingTransaction) return work(existingTransaction);
     return this.idempotency.execute({
       key,
       scope: `commercial.offer:${actor.id}:${orderId}`,
       request: dto,
-      work: async (tx) => {
-        const order = await this.lockOrder(
-          tx,
-          orderId,
-          actor.role === 'customer' ? actor.id : undefined,
-        );
-        if (
-          !['triaging', 'pending_quote', 'quoted', 'pending_payment'].includes(
-            order.status,
-          )
-        )
-          throw new ConflictException('تریاژ معتبر پیش از قیمت قطعی لازم است.');
-        if (actor.role === 'customer' && order.status === 'pending_quote')
-          throw new ConflictException(
-            'این سفارش به بررسی قیمت مدیر نیاز دارد.',
-          );
-        if (
-          await tx.payment.count({
-            where: {
-              orderId,
-              status: { in: ['pending', 'verifying', 'succeeded'] },
-            },
-          })
-        )
-          throw new ConflictException('ابتدا پرداخت موجود تعیین تکلیف شود.');
-        await tx.$queryRaw(
-          Prisma.sql`SELECT id FROM service_lines WHERE id = ${order.serviceId} FOR UPDATE`,
-        );
-        const policy = await tx.commercialPolicy.findFirst({
-          where: { serviceId: order.serviceId },
-          orderBy: { version: 'desc' },
-        });
-        if (!policy)
-          throw new ConflictException(
-            'سیاست معتبر قیمت و تحویل هنوز تنظیم نشده است.',
-          );
-        const config = readCommercialPolicy(policy.config),
-          now = await this.clock.now(tx);
-        if (!order.serviceLine.isActive)
-          throw new ConflictException('خدمت فعال نیست.');
-        const selected = order.packageId
-          ? order.serviceLine.packages.find(
-              (p) => p.id === order.packageId && p.isActive,
-            )
-          : null;
-        if (order.packageId && !selected)
-          throw new ConflictException('بسته فعال نیست.');
-        let price: ReturnType<typeof calculatePrice>;
-        let formulaSnapshot: unknown = null;
-        if (order.serviceLine.pricingModel === 'manual_quote') {
-          if (
-            actor.role !== 'admin' ||
-            !('quotedBasePrice' in dto) ||
-            dto.quotedBasePrice == null
-          )
-            throw new ConflictException(
-              'قیمت توافقی فقط پس از پیشنهاد مدیر مجاز است.',
-            );
-          reason(dto.reason);
-          price = calculatePrice(dto.quotedBasePrice, dto.priority);
-        } else if (order.serviceLine.pricingModel === 'formula') {
-          if (!config.formula)
-            throw new ConflictException('فرمول معتبر موجود نیست.');
-          const result = calculateFormulaPrice(
-            config.formula,
-            dto.inputs ?? {},
-            dto.priority,
-          );
-          price = result;
-          formulaSnapshot = {
-            formula: result.formula_snapshot,
-            inputs: result.inputs_snapshot,
-          };
-        } else {
-          if (dto.inputs && Object.keys(dto.inputs).length)
-            throw new BadRequestException('خدمت ثابت ورودی محاسبه ندارد.');
-          const base = selected ? selected.price : order.serviceLine.basePrice;
-          if (base === null)
-            throw new ConflictException('قیمت پایه مشخص نیست.');
-          price = calculatePrice(base, dto.priority);
-        }
-        if (price.final_price < 1 || price.final_price > 2_000_000_000)
-          throw new ConflictException(
-            'این مبلغ مسیر پرداخت خودکار معتبر ندارد؛ بررسی انسانی لازم است.',
-          );
-        const window = calculateSameDayWindow(
-          now,
-          config.sameDayEnabled,
-          config.calendar,
-        );
-        if (
-          dto.priority === 'same_day' &&
-          (!window.available || order.milestones.length)
-        )
-          throw new ConflictException(
-            'همان‌روز یا پرداخت کامل واجد شرایط نیست.',
-          );
-        const deadlineNormal = calculateElapsedDeadline(
-          now,
-          config.normalMinutes,
-        )!;
-        const proposedDeadline =
-          dto.priority === 'same_day' && window.available
-            ? window.deadlineAt
-            : calculateElapsedDeadline(
-                now,
-                dto.priority === 'urgent'
-                  ? config.urgentMinutes
-                  : config.normalMinutes,
-              )!;
-        const expiresAt = new Date(
-          Math.min(
-            now.getTime() + config.quoteTtlMinutes * 60000,
-            proposedDeadline.getTime(),
-            dto.priority === 'same_day' && window.available
-              ? window.holdExpiresAt.getTime()
-              : Infinity,
-          ),
-        );
-        const old = await tx.commercialState.findUnique({
-          where: { orderId },
-          include: { revision: true },
-        });
-        if (old) {
-          await tx.commercialRevision.updateMany({
-            where: { id: old.revisionId, invalidatedAt: null },
-            data: { invalidatedAt: now },
-          });
-          await tx.capacityReservation.updateMany({
-            where: { revisionId: old.revisionId, status: 'held' },
-            data: { status: 'released' },
-          });
-        }
-        const snapshot = json({
-          schemaVersion: 1,
-          currency: 'IRT',
-          policyVersion: policy.version,
-          config,
-          cartFingerprint: this.cartFingerprint(order),
-          formulaSnapshot,
-          inputs: dto.inputs ?? {},
-          customerId: order.customerId,
-          serviceId: order.serviceId,
-          packageId: order.packageId,
-          price,
-          issuedAt: now.toISOString(),
-          expiresAt: expiresAt.toISOString(),
-          proposedDeadlineAt: proposedDeadline.toISOString(),
-          deadlineNormal: deadlineNormal.toISOString(),
-        });
-        const revision = await tx.commercialRevision.create({
-          data: {
-            orderId,
-            policyId: policy.id,
-            sequence: (old?.revision.sequence ?? 0) + 1,
-            priority: dto.priority,
-            basePrice: price.base_price,
-            surchargePct: price.surcharge_pct,
-            surchargeAmount: price.surcharge_amount,
-            finalPrice: price.final_price,
-            snapshot,
-            fingerprint: requestFingerprint(snapshot),
-            issuedAt: now,
-            expiresAt,
-          },
-        });
-        await tx.commercialState.upsert({
-          where: { orderId },
-          create: { orderId, revisionId: revision.id },
-          update: { revisionId: revision.id },
-        });
-        if (order.status === 'triaging' || order.status === 'pending_quote') {
-          await this.workflow.transition(
-            orderId,
-            'quoted',
-            actor.role === 'admin' ? 'admin' : 'system',
-            actor.role === 'admin' ? actor.id : null,
-            'پیشنهاد نسخه‌دار قیمت؛ نیازمند پذیرش مشتری',
-            { finalPrice: price.final_price, quotedAt: now },
-            tx,
-          );
-        } else
-          await tx.order.update({
-            where: { id: orderId },
-            data: { finalPrice: price.final_price, version: { increment: 1 } },
-          });
-        await this.audit(tx, actor, 'commercial.offer.created', revision.id, {
-          orderId,
-          fingerprint: revision.fingerprint,
-          reason:
-            'reason' in dto
-              ? reason(dto.reason)
-              : 'درخواست مشتری برای قیمت قطعی',
-        });
-        return this.view(revision);
-      },
+      work,
     });
   }
 

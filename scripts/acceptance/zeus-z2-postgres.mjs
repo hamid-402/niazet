@@ -34,6 +34,7 @@ const { PrismaClient } = req('@prisma/client');
 const { ConfigService } = req('@nestjs/config');
 const load = path => req('./dist/' + path + '.js');
 const { CommercialService } = load('pricing/commercial.service');
+const { FixedRegistrationService } = load('pricing/fixed-registration.service');
 const { CommercialClock } = load('pricing/commercial-clock');
 const { CommercialReviewService } = load('finance/commercial-review.service');
 const { OrderWorkflowService } = load('orders/domain/order-workflow.service');
@@ -55,14 +56,20 @@ const maintenance = new URL(source); maintenance.pathname = '/postgres';
 const control = new PrismaClient({ datasources: { db: { url: maintenance.toString() } } });
 const runtime = resolve(root, '_runtime/apps/api');
 const temp = mkdtempSync(join(runtime, 'z2-upgrade-'));
-const output = join(root, '.artifacts/zeus/z3-historical-z2'); mkdirSync(output, { recursive: true });
-const report = { date: '2026-10-27', status: 'running', mainDatabaseConnected: false, liveProvidersUsed: false, cases: [] };
+const registrationMode = process.argv.includes('--with-registration');
+const output = join(root, registrationMode ? '.artifacts/zeus/z3-registration' : '.artifacts/zeus/z3-historical-z2'); mkdirSync(output, { recursive: true });
+const report = { date: registrationMode ? '2026-10-28' : '2026-10-27', status: 'running', mainDatabaseConnected: false, liveProvidersUsed: false, cases: [] };
 const redact = value => String(value).replace(/postgres(?:ql)?:\/\/[^\s"']+/gi, '<database URL>');
 const key = () => randomUUID();
 const reject = (work, status = 409) => assert.rejects(work, e => e.getStatus?.() === status);
 const digest = value => createHash('sha256').update(value).digest('hex');
 const inputFiles = ['apps/api/prisma/schema.prisma', 'apps/api/prisma/migrations/20261027120000_zeus_commercial_capacity/migration.sql', 'apps/api/src/pricing/commercial.service.ts', 'apps/api/src/pricing/commercial-policy.ts', 'apps/api/src/pricing/commercial-clock.ts', 'apps/api/src/pricing/commercial.controller.ts', 'apps/api/src/pricing/commercial.dto.ts', 'apps/api/src/pricing/commercial.module.ts', 'apps/api/src/finance/commercial-review.service.ts', 'apps/api/src/finance/commercial-review.controller.ts', 'apps/api/src/finance/finance.module.ts', 'apps/api/src/finance/payments.service.ts', 'apps/api/src/finance/wallet-payments.service.ts'];
 const compiledFiles = ['pricing/commercial.service.js', 'pricing/commercial-policy.js', 'pricing/commercial-clock.js', 'pricing/commercial.controller.js', 'pricing/commercial.dto.js', 'pricing/commercial.module.js', 'finance/commercial-review.service.js', 'finance/commercial-review.controller.js', 'finance/finance.module.js', 'finance/payments.service.js', 'finance/wallet-payments.service.js'].map(file => 'apps/api/dist/' + file);
+if (registrationMode) {
+  inputFiles.push('apps/api/src/orders/order-state-machine.ts', 'apps/api/src/orders/domain/order-workflow.service.ts', 'apps/api/src/orders/domain/fixed-registration-eligibility.ts', 'apps/api/src/orders/domain/fixed-registration-eligibility.spec.ts', 'apps/api/src/pricing/fixed-registration.service.ts', 'scripts/acceptance/zeus-z3-registration-cases.mjs');
+  compiledFiles.push(...['orders/order-state-machine.js', 'orders/domain/order-workflow.service.js', 'orders/domain/fixed-registration-eligibility.js', 'pricing/fixed-registration.service.js'].map(file => 'apps/api/dist/' + file));
+  report.currentAcceptance = { feature: 'Z3 fixed registration', historicalReceiptIsCurrentAcceptance: false, completePhaseAccepted: false };
+}
 const fileHashes = paths => Object.fromEntries(paths.map(path => [path, digest(readFileSync(join(root, path), 'utf8').replaceAll('\r\n', '\n'))]));
 report.sourceHashes = fileHashes(inputFiles); report.compiledHashes = fileHashes(compiledFiles);
 const customerContractPath = 'apps/web/src/components/commercial-order-contract.ts';
@@ -133,6 +140,7 @@ try {
 
   const idempotency = new IdempotencyService(db), ledger = new LedgerService(db), workflow = new OrderWorkflowService(db);
   const commercial = new CommercialService(db, idempotency, workflow, clock);
+  const registration = new FixedRegistrationService(db, idempotency, workflow, commercial);
   const config = new ConfigService({ NODE_ENV: 'test', ZEUS_WALLET_ENABLED: true, PAYMENT_GATEWAY_DRIVER: 'mock', JWT_ACCESS_SECRET: key() + key(), WEB_URL: 'http://127.0.0.1:3002' });
   const mock = new MockPaymentGateway(config), gateway = new PaymentGatewayService(config, mock);
   const wallets = new WalletPaymentsService(db, ledger, idempotency, gateway, config, workflow, commercial);
@@ -352,11 +360,11 @@ try {
   const { CustomerCommercialController, CommercialAdminController } = load('pricing/commercial.controller'), { CommercialReviewController } = load('finance/commercial-review.controller');
   const { WalletPaymentsController } = load('finance/wallet-payments.controller');
   const sessions = new AuthSessionService(db, new AuthTokenService(new JwtService(), config));
-  const mod = await Test.createTestingModule({ controllers: [CustomerCommercialController, CommercialAdminController, CommercialReviewController, WalletPaymentsController], providers: [RolesGuard, AdminScopeGuard, { provide: WalletPaymentsService, useValue: wallets }, { provide: CommercialService, useValue: commercial }, { provide: CommercialReviewService, useValue: reviews }, { provide: JwtStrategy, useValue: new JwtStrategy(config, sessions) }, { provide: AuthSessionService, useValue: sessions }] }).compile();
+  const mod = await Test.createTestingModule({ controllers: [CustomerCommercialController, CommercialAdminController, CommercialReviewController, WalletPaymentsController], providers: [RolesGuard, AdminScopeGuard, { provide: WalletPaymentsService, useValue: wallets }, { provide: CommercialService, useValue: commercial }, { provide: FixedRegistrationService, useValue: registration }, { provide: CommercialReviewService, useValue: reviews }, { provide: JwtStrategy, useValue: new JwtStrategy(config, sessions) }, { provide: AuthSessionService, useValue: sessions }] }).compile();
   app = mod.createNestApplication({ logger: false }); app.useGlobalGuards(new JwtAuthGuard(new Reflector()), new RateLimitGuard(new Reflector())); app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true })); await app.listen(0, '127.0.0.1');
   const tokens = new Map(); for (const actor of [owner, other, ops, finance, support, executor, superAdmin]) tokens.set(actor.id, (await sessions.issue(actor)).accessToken);
-  const http = async (method, path, actor, body, expected) => {
-    const response = await fetch(await app.getUrl() + path, { method, headers: { ...(actor ? { Authorization: `Bearer ${tokens.get(actor.id)}` } : {}), 'Content-Type': 'application/json', 'Idempotency-Key': key() }, ...(body ? { body: JSON.stringify(body) } : {}) });
+  const http = async (method, path, actor, body, expected, requestKey = key()) => {
+    const response = await fetch(await app.getUrl() + path, { method, headers: { ...(actor ? { Authorization: `Bearer ${tokens.get(actor.id)}` } : {}), 'Content-Type': 'application/json', 'Idempotency-Key': requestKey }, ...(body ? { body: JSON.stringify(body) } : {}) });
     const result = await response.json(); assert.equal(response.status, expected, JSON.stringify(result)); return result;
   };
   const endpoint = `/v1/customer/orders/${formula.o.id}/commercial`;
@@ -393,6 +401,10 @@ try {
   await http('POST', `/v1/customer/orders/${forged.id}/commercial/release`, owner, { reason: '   ' }, 400);
   assert.equal((await http('GET', `/v1/customer/orders/${forged.id}/commercial`, owner, null, 200)).fingerprint, roundTrip.fingerprint);
   report.cases.push('http_real_db_sessions_jwt_roles_scopes_ownership_dto_tampering_and_customer_acceptance');
+  if (registrationMode) {
+    const { verifyFixedRegistration } = await import('./zeus-z3-registration-cases.mjs');
+    report.registration = await verifyFixedRegistration({ db, http, actors: { owner, other, ops, finance, support, executor }, service, policy, commercial, registration, wallets, ledger, snapshotServiceForm: load('orders/service-form').snapshotServiceForm });
+  }
   const entryCountBeforeRateLimit = await db.ledgerEntry.count(); let rateLimited = false;
   for (let attempt = 0; attempt < 61; attempt++) {
     const response = await fetch(await app.getUrl() + endpoint, { headers: { Authorization: `Bearer ${tokens.get(owner.id)}` } });

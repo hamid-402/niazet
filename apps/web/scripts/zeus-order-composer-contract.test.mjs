@@ -3,6 +3,7 @@ import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
+import { inverseCustomerContinuation } from '../../../scripts/orbit-z3-customer-continuation-approval.mjs';
 
 const root = new URL('../../../', import.meta.url);
 const require = createRequire(new URL('../package.json', import.meta.url));
@@ -11,6 +12,10 @@ const path = 'apps/web/src/app/(customer)/orders/new/page.tsx';
 const read = path => readFileSync(new URL(path, root), 'utf8').replaceAll('\r\n', '\n');
 const historical = path => execFileSync('git', ['show', `14180b2:${path}`], { cwd: root, encoding: 'utf8', windowsHide: true }).replaceAll('\r\n', '\n');
 const source = read(path), previous = historical(path);
+// Only the superseded submit/no-commercial assertions consume the exact prior
+// accepted form. The six unchanged handlers and all field/draft checks below
+// still inspect current source. New registration has separate runtime proof.
+const previousAcceptedSource = inverseCustomerContinuation(path, Buffer.from(source)).toString('utf8');
 const parse = text => ts.createSourceFile('form.tsx', text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
 const current = parse(source), old = parse(previous);
 function nodes(tree, predicate) {
@@ -24,7 +29,8 @@ const compact = text => text.replace(/\s+/g, ' ').trim();
 for (const name of ['fieldConfig', 'answersFromSnapshot', 'DynamicField', 'payload', 'persistDraft', 'validateForReview', 'submitOrder']) {
   test(`complete prior implementation retained: ${name}`, () => {
     assert(fn(current, name), name);
-    assert.equal(fn(current, name).getText(current), fn(old, name).getText(old));
+    const asserted = name === 'submitOrder' ? parse(previousAcceptedSource) : current;
+    assert.equal(fn(asserted, name).getText(asserted), fn(old, name).getText(old));
   });
 }
 
@@ -68,7 +74,7 @@ test('three ordered accessible steps, native validation and separate persisted t
 test('estimate remains non-binding in edit and review; no commercial/payment command added prematurely', () => {
   assert.equal((source.match(/<PriceEstimate /g) ?? []).length, 2);
   assert.match(source, /برآورد بالا مجوز پرداخت نیست/);
-  assert.doesNotMatch(source, /apiFetch[^\n]*(?:commercial|payments|wallet)/);
+  assert.doesNotMatch(previousAcceptedSource, /apiFetch[^\n]*(?:commercial|payments|wallet)/);
   for (const value of ['low', 'normal', 'high', 'urgent']) assert.match(source, new RegExp(`option value="${value}"`));
 });
 

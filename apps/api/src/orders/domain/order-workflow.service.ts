@@ -9,6 +9,7 @@ import { Order, OrderStatus, OrderStatusSource, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { isTransitionAllowedForSource } from '../order-state-machine';
 import { captureQuotedContract } from '../../contracts/order-snapshot';
+import { assertFixedRegistrationEligibility } from './fixed-registration-eligibility';
 
 export interface FinancialTransitionEffect {
   type: string;
@@ -184,6 +185,12 @@ export class OrderWorkflowService {
       }
       if (toStatus === OrderStatus.paid)
         await this.assertPaidProof(client, order, financialEffect);
+      if (
+        order.status === OrderStatus.pending_triage &&
+        toStatus === OrderStatus.triaging &&
+        source === OrderStatusSource.customer
+      )
+        await assertFixedRegistrationEligibility(client, order);
       const claimed = await client.order.updateMany({
         where: { id: orderId, status: order.status, version: order.version },
         data: { status: toStatus, version: { increment: 1 }, ...extraData },

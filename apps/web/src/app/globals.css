@@ -484,13 +484,13 @@ textarea:disabled,
 /* Route-aware entry motion stays deliberately quiet: public pages gain a
    small spatial cue, while operational workspaces only fade into place. */
 @keyframes route-enter-public {
-  from { opacity: 0.97; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { transform: translateY(6px); }
+  to { transform: translateY(0); }
 }
 
 @keyframes route-enter-workspace {
-  from { opacity: 0.985; }
-  to { opacity: 1; }
+  from { transform: translateY(2px); }
+  to { transform: translateY(0); }
 }
 
 .route-transition--public {

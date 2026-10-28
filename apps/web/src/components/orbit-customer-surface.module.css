@@ -84,5 +84,5 @@
   .page[data-motion='on'] .financeMetric, .page[data-motion='on'] .financeReminder { animation: customer-settle 360ms ease-out both; }
   .page[data-motion='on'] .organizationMetric, .page[data-motion='on'] .organizationCard { animation: customer-settle 360ms ease-out both; }
 }
-@keyframes customer-settle { from { opacity: .94; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes customer-settle { from { transform: translateY(7px); } to { transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .page *, .page *::before, .page *::after { animation: none !important; transition: none !important; } }

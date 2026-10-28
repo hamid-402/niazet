@@ -16,6 +16,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { AdminScopeGuard } from '../common/guards/admin-scope.guard';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
 import { CommercialService } from './commercial.service';
+import { FixedRegistrationService } from './fixed-registration.service';
 import { RateLimit } from '../common/decorators/rate-limit.decorator';
 import {
   CapacityBucketDto,
@@ -24,6 +25,7 @@ import {
   CommercialOfferDto,
   CommercialPolicyDto,
   CommercialReasonDto,
+  FixedRegistrationOfferDto,
 } from './commercial.dto';
 
 @Controller('v1/customer/orders/:id/commercial')
@@ -31,7 +33,18 @@ import {
 @Roles(UserRole.customer)
 @RateLimit({ name: 'commercial-customer', limit: 60, windowMs: 60000 })
 export class CustomerCommercialController {
-  constructor(private readonly commercial: CommercialService) {}
+  constructor(
+    private readonly commercial: CommercialService,
+    private readonly registration: FixedRegistrationService,
+  ) {}
+  @Post('registration-offer') registrationOffer(
+    @CurrentUser() u: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: FixedRegistrationOfferDto,
+    @Headers('idempotency-key') key: string,
+  ) {
+    return this.registration.offer(u.id, id, dto, key);
+  }
   @Get() current(@CurrentUser() u: AuthenticatedUser, @Param('id') id: string) {
     return this.commercial.current(u.id, id);
   }

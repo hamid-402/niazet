@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { updateCustomerQuery } from "@/components/customer-navigation";
 import { WalletFundingPanel } from "@/components/wallet-actions";
 import { apiFetch, downloadAuthenticated } from "@/lib/api";
 import {
@@ -127,9 +129,13 @@ function StatusBadge({ status }: { status: string }) {
   return <Badge color={statusColor(status)}>{STATUS_LABELS[status] ?? status}</Badge>;
 }
 
-export default function WalletPage() {
+export default function WalletPage() { return <Suspense fallback={<PageLoading />}><WalletContent /></Suspense>; }
+function WalletContent() {
   const [data, setData] = useState<FinanceOverview | null>(null);
-  const [tab, setTab] = useState<FinanceTab>("overview");
+  const params = useSearchParams();
+  const values = params.getAll('tab');
+  const tab = values.length === 1 && TABS.some(item => item.id === values[0]) ? values[0] as FinanceTab : 'overview';
+  const setTab = (value: FinanceTab) => window.history.pushState(null, '', updateCustomerQuery(window.location.search, 'tab', value));
   const [error, setError] = useState("");
   const [downloadingInvoiceId, setDownloadingInvoiceId] = useState("");
 

@@ -1,0 +1,38 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+import { customerContinuationPins, inverseCustomerContinuation, verifyCustomerContinuation } from '../orbit-z3-customer-continuation-approval.mjs';
+import { verifyRegistrationApproval, registrationApiPins } from '../orbit-z3-registration-approval.mjs';
+const root = new URL('../../', import.meta.url), read = p => readFileSync(new URL(p, root));
+const json = p => JSON.parse(read(p));
+const hash = bytes => createHash('sha256').update(bytes.toString('utf8').replaceAll('\r\n', '\n')).digest('hex');
+verifyCustomerContinuation(read); verifyRegistrationApproval(p => inverseCustomerContinuation(p, read(p)));
+const proof = json('docs/zeus/z3-customer-continuation-acceptance.json');
+assert.equal(proof.packet, 'Z3-registration-navigation-performance'); assert.equal(proof.baseline, '2c701d7'); assert.equal(proof.baseHead, '7e5409f');
+assert.equal(proof.phaseAccepted, false); assert.equal(proof.remoteCiAccepted, false); assert.equal(proof.liveProvidersAccepted, false);
+for (const [p, expected] of Object.entries(proof.fileHashes)) assert.equal(hash(read(p)), expected, 'Current packet source drift: ' + p);
+for (const [p, expected] of Object.entries(proof.evidenceHashes)) assert.equal(hash(read(p)), expected, 'Accepted runtime receipt drift: ' + p);
+for (const p of [...Object.keys(customerContinuationPins), ...Object.keys(registrationApiPins)]) assert(Object.hasOwn(proof.fileHashes, p), 'Current source omitted: ' + p);
+const db = json('.artifacts/zeus/z3-registration/report.json'), ui = json('.artifacts/zeus/z3-customer-runtime/report.json');
+assert.equal(db.status, 'passed'); assert.equal(db.cases.length, 20); assert.equal(db.registration.status, 'passed'); assert.equal(db.registration.cases.length, 7);
+assert.equal(db.mainDatabaseConnected, false); assert.equal(db.liveProvidersUsed, false); assert.equal(db.temporaryDatabaseRemoved, true);
+for (const [p, expected] of Object.entries({ ...db.sourceHashes, ...db.compiledHashes })) assert.equal(hash(read(p)), expected, 'Native proof source/compiled drift: ' + p);
+assert.equal(ui.status, 'passed'); assert.equal(ui.results.length, 8); assert.equal(ui.otpIndependentRouteRealSession, true);
+assert.equal(ui.realAuthProxyApiDatabase, true); assert.equal(ui.mainDatabaseConnected, false); assert.equal(ui.liveProvidersUsed, false); assert.equal(ui.temporaryDatabaseRemoved, true);
+for (const result of ui.results) {
+  assert.equal(result.status, 'passed'); assert.equal(result.axeViolations, 0);
+  for (const key of ['realThreeStepRegistrationAndExplicitAcceptancePayment', 'eightTabsAndHistoryNavigation', 'ambiguousResponsePreservesExactlyOneOrderAndQuote', 'negotiatedPathRetained', 'balancedWallet']) assert.equal(result[key], true);
+}
+for (const [p, expected] of Object.entries(ui.sourceHashes)) assert.equal(hash(read(p)), expected, 'Real browser source drift: ' + p);
+const matrix = json('.artifacts/zeus/z3-integrated-ui/report.json');
+assert.equal(matrix.failure, undefined); assert.equal(matrix.baselineUpdated, false); assert.deepEqual(matrix.baselineUpdateScope, []);
+assert.equal(matrix.snapshots.length, 192); assert.equal(matrix.axe.length, 192); assert(matrix.axe.every(r => r.violations.length === 0));
+assert.deepEqual(matrix.snapshots, json('apps/web/tests/phase8-visual-baseline.json').snapshots);
+assert.equal(matrix.keyboard, 'passed'); assert.equal(matrix.motion, 'passed'); assert.equal(matrix.customerDecisions.status, 'passed');
+const performance = json('.artifacts/performance/web/report.json');
+assert.equal(performance.status, 'passed'); assert.equal(performance.coverage.full, true); assert.equal(performance.cases.length, 22);
+assert.equal(performance.cases.reduce((n, c) => n + c.samples.length, 0), 66);
+const regression = json('.artifacts/zeus/z3-commercial-navigation-ui/report.json'); assert.equal(regression.status, 'passed'); assert.equal(regression.results.length, 8);
+for (const p of ['docs/zeus/z0-acceptance.json', 'docs/zeus/z1-phase-acceptance.json', 'docs/zeus/z2-phase-acceptance.json', 'docs/zeus/z3-composer-acceptance.json', 'docs/zeus/z3-qc-acceptance.json', 'docs/zeus/z3-publication-ui-acceptance.json']) assert.equal(hash(read(p)), hash(execFileSync('git', ['show', '7e5409f:' + p], { cwd: root, windowsHide: true })));
+console.log(JSON.stringify({ packet: proof.packet, status: 'accepted-local-packet', originalApiGroups: 20, registrationGroups: 7, realBrowserCases: 8, integratedStates: 192, performanceSamples: 66, phaseAccepted: false, liveProvidersAccepted: false, remoteCiAccepted: false }));

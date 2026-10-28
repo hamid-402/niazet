@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { inverseRegistrationInput } from './orbit-z3-registration-approval.mjs';
 // Z3 B3 presentation only, using approved QC APIs. No backend/auth/money change.
 export const z3PublicationOriginalRef = '3868336';
 export const z3PublicationPins = {
@@ -77,9 +78,11 @@ function original(path) {
   return originals.get(path);
 }
 export function matchesZ3PublicationApproval(path, bytes) {
+  bytes = inverseRegistrationInput(path, bytes);
   return Object.hasOwn(z3PublicationPins, path) && hash(bytes) === z3PublicationPins[path].after;
 }
 export function inverseZ3PublicationInput(path, bytes) {
+  bytes = inverseRegistrationInput(path, bytes);
   if (!matchesZ3PublicationApproval(path, bytes) || z3PublicationPins[path].before === null) return bytes;
   const before = original(path);
   assert.equal(hash(before), z3PublicationPins[path].before, 'Z3 B3 original source drift: ' + path);

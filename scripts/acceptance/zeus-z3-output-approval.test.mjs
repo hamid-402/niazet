@@ -7,7 +7,10 @@ import test from 'node:test';
 import { z3OutputPins, z3OutputOriginalRef, matchesZ3OutputApproval, inverseZ3OutputInput, verifyZ3OutputApproval } from '../orbit-z3-output-approval.mjs';
 import { inverseZ3UiInput, verifyZ3UiApproval } from '../orbit-z3-customer-ui-approval.mjs';
 import { validateQcLocalTarget } from './zeus-z3-output-activate-local.mjs';
-const root = new URL('../../', import.meta.url), read = p => readFileSync(new URL(p, root));
+import { inverseRegistrationInput } from '../orbit-z3-registration-approval.mjs';
+import { inverseCustomerContinuation } from '../orbit-z3-customer-continuation-approval.mjs';
+// Historical proof only; current state/source permission is independently tested.
+const root = new URL('../../', import.meta.url), read = p => inverseRegistrationInput(p, inverseCustomerContinuation(p, readFileSync(new URL(p, root))));
 const text = b => b.toString('utf8').replaceAll('\r\n', '\n');
 const before = p => execFileSync('git', ['show', `${z3OutputOriginalRef}:${p}`], { cwd: root, windowsHide: true });
 test('local activation rejects nonlocal, maintenance, test, live and production targets', () => {
