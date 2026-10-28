@@ -1,0 +1,209 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-27",
+  "phase": "Z3",
+  "packet": "Z3-B1",
+  "baseHead": "14180b2",
+  "baseline": "2c701d7",
+  "packetAccepted": true,
+  "phaseAccepted": false,
+  "productAccepted": false,
+  "remoteCiAccepted": false,
+  "completeZeusPhases": 3,
+  "remainingZeusPhases": 7,
+  "coverage": {
+    "partial": [
+      "Z3.1",
+      "Z3.3",
+      "ZEUS-UI-016"
+    ],
+    "completedPhaseSubtasks": [],
+    "next": "Z3-B2: customer commercial revision, definitive price/deadline, expiry and same-day reservation display"
+  },
+  "scope": {
+    "backendChanged": false,
+    "authOrRolesChanged": false,
+    "schemaOrDependenciesChanged": false,
+    "mainDatabaseWrites": false,
+    "liveProvidersUsed": false,
+    "automaticPaymentOrRefund": false,
+    "visualSystem": "Existing simple-light/simple-dark and common lapis/honey tokens",
+    "historicalEstimateProof": "Exact byte proof retained at 14180b2; new current-form AST/control/browser acceptance replaces any false claim of byte equality for the redesigned wizard"
+  },
+  "acceptance": {
+    "lint": "passed",
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "contractTestsPassed": 47,
+    "staticUiContractsPassed": 24,
+    "productionComposer": {
+      "status": "passed",
+      "mode": "production-build",
+      "kind": "UI-fixture-only-not-auth-or-financial-acceptance",
+      "mainDatabaseConnected": false,
+      "fullAcceptance": false,
+      "results": [
+        {
+          "theme": "simple-light",
+          "width": 320,
+          "status": "passed",
+          "steps": 3,
+          "axeScans": 3,
+          "fixtureDraftWrites": 7,
+          "fixtureSubmissions": 2,
+          "realDbWrites": 0
+        },
+        {
+          "theme": "simple-light",
+          "width": 768,
+          "status": "passed",
+          "steps": 3,
+          "axeScans": 3,
+          "fixtureDraftWrites": 7,
+          "fixtureSubmissions": 2,
+          "realDbWrites": 0
+        },
+        {
+          "theme": "simple-light",
+          "width": 1280,
+          "status": "passed",
+          "steps": 3,
+          "axeScans": 3,
+          "fixtureDraftWrites": 7,
+          "fixtureSubmissions": 2,
+          "realDbWrites": 0
+        },
+        {
+          "theme": "simple-light",
+          "width": 1920,
+          "status": "passed",
+          "steps": 3,
+          "axeScans": 3,
+          "fixtureDraftWrites": 7,
+          "fixtureSubmissions": 2,
+          "realDbWrites": 0
+        },
+        {
+          "theme": "simple-dark",
+          "width": 320,
+          "status": "passed",
+          "steps": 3,
+          "axeScans": 3,
+          "fixtureDraftWrites": 7,
+          "fixtureSubmissions": 2,
+          "realDbWrites": 0
+        },
+        {
+          "theme": "simple-dark",
+          "width": 768,
+          "status": "passed",
+          "steps": 3,
+          "axeScans": 3,
+          "fixtureDraftWrites": 7,
+          "fixtureSubmissions": 2,
+          "realDbWrites": 0
+        },
+        {
+          "theme": "simple-dark",
+          "width": 1280,
+          "status": "passed",
+          "steps": 3,
+          "axeScans": 3,
+          "fixtureDraftWrites": 7,
+          "fixtureSubmissions": 2,
+          "realDbWrites": 0
+        },
+        {
+          "theme": "simple-dark",
+          "width": 1920,
+          "status": "passed",
+          "steps": 3,
+          "axeScans": 3,
+          "fixtureDraftWrites": 7,
+          "fixtureSubmissions": 2,
+          "realDbWrites": 0
+        }
+      ],
+      "fileHashes": {
+        "apps/web/src/app/(customer)/orders/new/page.tsx": "bf180269302a7a9cec6bef90907c199623c121e13fbd5fb09de8d165d0bebc53",
+        "apps/web/src/components/secure-file.tsx": "e1c0c94dd2f3286ee970655f0c9b62c80fcd25b975ddad9ec8ec53a1a022a5fa",
+        "apps/web/src/components/orbit-customer-surface.module.css": "6afcf5e70935000113f538a99625881f20fcfcd8110d16e05e38476e6ae5a99f"
+      }
+    },
+    "estimateHttp": {
+      "kind": "real-pricing-http-with-read-only-prisma-and-ui-auth-order-fixtures",
+      "cases": 8,
+      "axeScans": 8
+    },
+    "integratedUi": {
+      "status": "passed",
+      "generatedAt": "2026-10-27T11:16:49.821Z",
+      "completedAt": "2026-10-27T11:21:32.837Z",
+      "snapshots": 192,
+      "axe": 192,
+      "keyboard": "passed",
+      "actionMenu": "passed-eight-ui-fixture-states-no-db-writes",
+      "governance": {
+        "status": "passed",
+        "additionalAxeScans": 64,
+        "additionalScreenshots": 64,
+        "financeSettingsStatus": 403,
+        "smallCohortsSuppressed": true,
+        "scopeControlsReadable": true
+      },
+      "customerDecisions": {
+        "status": "passed",
+        "additionalScreenshots": 24,
+        "additionalAxeScans": 24,
+        "confirmRequests": 3,
+        "disputeRequests": 1
+      },
+      "temporaryDatabase": "Random niazat_ui_*; finally cleanup completed with process exit 0; all providers mock; no main database writes"
+    },
+    "visualBaseline": {
+      "changedRecords": 8,
+      "unchangedRecords": 184,
+      "changedKeys": [
+        "customer-new-order__mobile-320__simple-light",
+        "customer-new-order__mobile-320__simple-dark",
+        "customer-new-order__tablet-768__simple-light",
+        "customer-new-order__tablet-768__simple-dark",
+        "customer-new-order__laptop-1280__simple-light",
+        "customer-new-order__laptop-1280__simple-dark",
+        "customer-new-order__desktop-1920__simple-light",
+        "customer-new-order__desktop-1920__simple-dark"
+      ],
+      "scope": "customer-new-order only",
+      "independentFullReplay": "Not rerun after this single scoped baseline update; final phase acceptance remains open"
+    }
+  },
+  "localActivation": {
+    "api": "healthy",
+    "web": "healthy",
+    "url": "http://localhost:3002/orders/new"
+  },
+  "reportHashes": {
+    ".artifacts/zeus/order-composer/report.json": "5f774e10e9292045a90d2797085737c4c241b6a673f52e594f7dfab829447c01",
+    ".artifacts/zeus/price-estimate/report.json": "a8421ff82ac2a9f5524313ea25423ec0b7e020b5934e3ec2f6999f3fa2cbc95f",
+    ".artifacts/ui-runtime/report.json": "6129483a3d2c5ccb9d88470e19b50141875d33f1b547f12f83c418af4e131cec"
+  },
+  "fileHashes": {
+    "apps/web/src/app/(customer)/orders/new/page.tsx": "bf180269302a7a9cec6bef90907c199623c121e13fbd5fb09de8d165d0bebc53",
+    "apps/web/src/components/secure-file.tsx": "e1c0c94dd2f3286ee970655f0c9b62c80fcd25b975ddad9ec8ec53a1a022a5fa",
+    "apps/web/src/components/orbit-customer-surface.module.css": "6afcf5e70935000113f538a99625881f20fcfcd8110d16e05e38476e6ae5a99f",
+    "apps/web/scripts/zeus-order-composer-contract.test.mjs": "12c87679f594bc8c7ea4bbd70a85c436b49814f162084eb42b35dbc79cdd9d8e",
+    "apps/web/scripts/zeus-order-composer-runtime.mjs": "05f138c8f8e7504e627f9db09b16d12048d107b30e3b02adf8311a6675d2c4aa",
+    "apps/web/scripts/zeus-price-estimate-contract.test.mjs": "48a853c2c77adedb498f16dbacd7fe588ee2ccb2ab4d047be95ab4d862f406c4",
+    "apps/web/scripts/zeus-price-estimate-runtime.mjs": "e1105e15eb042ce9d27670a88cf12efba1d584f4c4c8a0142036b2c2bfcee0ab",
+    "apps/web/scripts/phase8-ui-runtime.mjs": "ccbdb613792114249bc6f65f6c6cc75901bb09059106f2b50c0e9c526385feb3",
+    "apps/web/tests/phase8-visual-baseline.json": "4dc6019b18c398472f3812b9420081803c1291d9550ccde9d77eb120f4fbc0f5"
+  },
+  "limitations": [
+    "No definitive commercial price/acceptance/payment UI in this packet",
+    "No same_day option or invented production capacity introduced",
+    "Z3 remaining pages, navigation and performance work still open",
+    "Current UI fixture acceptance is not a fresh acceptance of real authentication or financial transactions",
+    "Z2 gate freshly passed without changing backend; full API unit suite was not repeated in Z3",
+    "Online CI and production/live-provider acceptance remain open"
+  ]
+}

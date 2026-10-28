@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-25",
+  "packets": [
+    "ZEUS-EXEC-006 / Z1-B3 security dependencies",
+    "ZEUS-EXEC-007 / Z1-B4 isolated wallet and contract foundations"
+  ],
+  "phase": "Z1",
+  "phaseAccepted": false,
+  "productAccepted": false,
+  "acceptedCommit": null,
+  "baseline": "2c701d7",
+  "baseHead": "30555d2a26bb5f9a4e1649160751929b5354d1bc",
+  "createdAt": "2026-10-25T08:28:30.244Z",
+  "fileHashes": {
+    "apps/api/prisma/schema.prisma": "d0a4db162d32ad79d9815d975d3ba7664fa34da2300c794a7adaa56651d271a5",
+    "apps/api/prisma/migrations/20261025100000_zeus_wallet_funding/migration.sql": "743723836790772ca4519836fb68d6e361858e4e10935d16c4d7ff31556dc741",
+    "apps/api/src/auth/auth-session.service.spec.ts": "6ff5327af0a09e6e8a684cb0b58230410ed108ed786133956c3fdbfa84f4aa2a",
+    "apps/api/src/auth/auth-session.service.ts": "3c258278276decc72fdeb70deee68023b616b90274bec896142fb2c275373bd3",
+    "apps/api/src/auth/auth.controller.ts": "e4e7f5fae8cd83c7972a3d075b084ea29c554daac72bd3ca2c14c0cc0f4e04f4",
+    "apps/api/src/finance/finance.module.ts": "ebecf34099830dce447d875f2251bfaf95b37eed531a88ceeceec297650cf476",
+    "apps/api/src/finance/idempotency.service.spec.ts": "9c0a4725aba5d1568aaaf9246931e5e2924f9a5e1852d683dc2c2f7752b5181c",
+    "apps/api/src/finance/idempotency.service.ts": "34ba333a686e475dc14e8ad3c12ee69c9d63b218f8116796e6a2a46da5c3d630",
+    "apps/api/src/finance/payment-gateway.ts": "d9272031abe3b0f615213ac22faedda3179a7efba5b498af54176ec6dc9c7c54",
+    "apps/api/src/finance/payments.service.ts": "93f7fe35b4ea8cc4b5f00c8cee397ec88c52c360b42a8c60be6419447d76e320",
+    "apps/api/src/finance/wallet-payments.controller.ts": "54367ab82adb1165553e95f1c3f68e657c53d55ed89668b8643f71c9b7a96b83",
+    "apps/api/src/finance/wallet-payments.service.ts": "5ae8beed37f0c3af2139212a09a2329f980decfd27254ba9cb05d9451c7ce40f",
+    "apps/api/src/finance/wallet-payments.service.spec.ts": "c4db0e2c0c48caeded607360edf1fe80524894818835306577b1ec52d5c5b408",
+    "apps/api/src/orders/domain/order-workflow.service.ts": "15bfc00eeb1e8f24f1283324bf20bbd65c672b07e903423fcc92607863dca174",
+    "apps/api/src/orders/order-state-machine.ts": "1cc479383ea56ba428e32c57a4a7a8281282319af582bbd1843e10c938d04da2",
+    "apps/api/package.json": "33426f2d525d7274f3ff4467287a2df8fb6a5d061765d78d714a0ed4214c283b",
+    "apps/api/package-lock.json": "6937f66c240d982fa801c2d2eebf0652052926f30936d04d1fe538340b23a2d5",
+    "apps/web/package.json": "a3d53a5b6c13efa109eca30ed9d4f97b22546be4702553dc7aab889789984de0",
+    "apps/web/package-lock.json": "d675f687229056ca4a96af27781a05b0a1d4611d5d022ac284aba24660d85987",
+    "scripts/orbit-preservation-contract.mjs": "70f6e6c1f941d46657e3cc60b2e59eb1a18899453f408ff38955be074da0cc92",
+    "scripts/orbit-z1-domain-approval.mjs": "a4a29a1efad37a6f1d1763c704d7482717542f59ff8eb418515bf505a7c7b2de",
+    "scripts/orbit-security-approval.mjs": "134cf693cda0911a34d6c7549c8005110d202b09ff88441f7c185d28aaa8615a",
+    "scripts/orbit-parser-approval.mjs": "a887897cacddcb81457d21d719b72e7479c6075f04b6c0197332094069033472",
+    "scripts/dependency-license-policy.mjs": "8a598f86d19d26cba03eb08d7a31ff0db42ae31d7cc77b08b8484bb212aef62f",
+    "scripts/acceptance/zeus-wallet-postgres.mjs": "e08065ba8acacdfdb980e13b3e392c693eb3f8027c52d59f82af211a4b8af926",
+    "scripts/acceptance/zeus-z1-packet-approval.test.mjs": "a7ac035db609cb56f32a71cbaa12c7156643cadb76f22a0d8f6c69c29bcede35",
+    "scripts/acceptance/zeus-z1-dependency-review.mjs": "c9043f5aec149574a439e7375c5a9e0f8652e443873718c7a2561b1c96d9b2b7",
+    "scripts/acceptance/zeus-z1-dependency-review.test.mjs": "6597c65adfbd072c7d7eedf1ddc2ddcd02e13f1b31e9cf7c835a4685c8594833",
+    "scripts/acceptance/zeus-z1-local-evidence.mjs": "bb14e763153f534a592c1faef7a26ebbde9928ab58d199aed37448fe55ea4b7d",
+    "scripts/dependency-license-policy.test.mjs": "e737ba6622098f38fb4a13d47319911af1a8f15a08d04ab9101c5f15019ff94b"
+  },
+  "permission": {
+    "scope": "Owner approval of remaining Z1.1-Z1.6 with exact file/hash exceptions, additive migration and financial acceptance on isolated DB only",
+    "mainDatabaseMigration": false,
+    "mainDatabaseFinancialWrites": false,
+    "liveProviders": false,
+    "accountMerge": false
+  },
+  "reports": {
+    "apiAll": {
+      "processExitCode": 0,
+      "auditReportVersion": 2,
+      "vulnerabilities": {},
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0,
+          "total": 0
+        },
+        "dependencies": {
+          "prod": 238,
+          "dev": 636,
+          "optional": 57,
+          "peer": 16,
+          "peerOptional": 0,
+          "total": 873
+        }
+      }
+    },
+    "webAll": {
+      "processExitCode": 0,
+      "auditReportVersion": 2,
+      "vulnerabilities": {},
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0,
+          "total": 0
+        },
+        "dependencies": {
+          "prod": 18,
+          "dev": 391,
+          "optional": 95,
+          "peer": 0,
+          "peerOptional": 0,
+          "total": 446
+        }
+      }
+    },
+    "apiProduction": {
+      "processExitCode": 0,
+      "auditReportVersion": 2,
+      "vulnerabilities": {},
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0,
+          "total": 0
+        },
+        "dependencies": {
+          "prod": 238,
+          "dev": 636,
+          "optional": 57,
+          "peer": 16,
+          "peerOptional": 0,
+          "total": 873
+        }
+      }
+    },
+    "webProduction": {
+      "processExitCode": 0,
+      "auditReportVersion": 2,
+      "vulnerabilities": {},
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0,
+          "total": 0
+        },
+        "dependencies": {
+          "prod": 18,
+          "dev": 391,
+          "optional": 95,
+          "peer": 0,
+          "peerOptional": 0,
+          "total": 446
+        }
+      }
+    }
+  },
+  "acceptance": {
+    "apiJest": {
+      "suitesPassed": 41,
+      "testsPassed": 307,
+      "testsSkipped": 1,
+      "testsFailed": 0,
+      "skipPreExisting": true
+    },
+    "apiBuild": true,
+    "apiTypecheck": true,
+    "apiLint": true,
+    "webBuild": true,
+    "webLint": true,
+    "structuralGate": {
+      "baselineFilesRetained": 490,
+      "pageRoutesRetained": 54,
+      "selfTests": 5
+    },
+    "supplyChainLockedPackages": 1319,
+    "rootRegressionTests": {
+      "existingApprovalParserLicense": 30,
+      "newSecurityDomain": 8,
+      "historicalReview": 9,
+      "combinedPassed": 47
+    },
+    "isolatedPostgres": {
+      "passedCases": 17,
+      "databaseCreatedRandomLocal": true,
+      "databaseRemoved": true,
+      "mainDatabaseConnected": false,
+      "covers": [
+        "migration deploy/redeploy",
+        "topup owner/replay/amount mismatch",
+        "concurrent topup verification",
+        "wallet-to-escrow payment and invoice",
+        "partial existing refund and replay",
+        "milestone totals/partial payment/currency",
+        "concurrent last funds",
+        "forced post-ledger outbox failure atomic rollback",
+        "late gateway payment review without order resurrection",
+        "workflow actor/override/audit",
+        "bearer-only logout",
+        "FK/check constraints/unknown historic facts",
+        "disabled feature retains financial records",
+        "Real HTTP/JWT/DB sessions: four wallet endpoints, 401/403/404/409/429, DTO whitelist, role/capability, owner-only projections and revocation"
+      ],
+      "httpProductionGuardsWithRealDbSessions": true
+    },
+    "guestBrowser": {
+      "routes": [
+        "/",
+        "/services",
+        "/login",
+        "/status"
+      ],
+      "runner": "apps/web/scripts/dev-runtime-smoke.mjs",
+      "browser": "existing system Chrome, no browser download",
+      "cssPreloadErrors": 0,
+      "pageErrors": 0,
+      "idleHmrReconnects": 0,
+      "fullVisualRoleAcceptance": false
+    }
+  },
+  "compatibility": {
+    "newTables": 6,
+    "existingScalarColumnsAltered": false,
+    "existingEnumValuesAltered": false,
+    "backfillPerformed": false,
+    "mainWalletFeatureEnabled": false,
+    "ledgerFundingReference": "Existing LedgerReferenceType.payment + funding-intent reference ID and wallet-topup-settle prefix; no synthetic order or new enum, preserving old-client compatibility",
+    "extensionsAreRuntimeFeatures": false
+  },
+  "remaining": [
+    "Z1.1: complete semantic/data mapping and runtime capture of new contract snapshots; tables alone do not implement pricing/SLA/login/reviews",
+    "Z1.2: all state transitions and financial commands through common validated workflow, policy and source/audit acceptance",
+    "Z1.3: 29 D1 and 55 D3 API contracts with current payload/role/ownership/error and real HTTP positive/negative acceptance; pending-registration security gap remains",
+    "Z1.5: upgrade over populated pre-migration DB and actual old-client rollback compatibility, not merely clean deploy/flag-off",
+    "CI and final product/role/visual acceptance are not certified; live providers remain deferred"
+  ],
+  "localSubtasksAccepted": [
+    "Z1.4",
+    "Z1.6"
+  ]
+}

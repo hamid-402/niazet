@@ -1,0 +1,62 @@
+# This file normalizes line endings for all text files in the repository
+# to LF, regardless of the OS/editor used to check them out or edit them.
+# This avoids CRLF/LF churn in diffs on Windows/WSL checkouts.
+#
+# Binary files are explicitly marked `-text` so Git never attempts to
+# perform any line-ending conversion on them.
+
+# Default: treat all files as text and normalize to LF unless overridden below.
+* text=auto eol=lf
+
+# Explicit text types (Node.js / Next.js / NestJS / TypeScript stack)
+*.ts     text eol=lf
+*.tsx    text eol=lf
+*.js     text eol=lf
+*.jsx    text eol=lf
+*.mjs    text eol=lf
+*.cjs    text eol=lf
+*.json   text eol=lf
+*.md     text eol=lf
+*.mdx    text eol=lf
+*.css    text eol=lf
+*.scss   text eol=lf
+*.html   text eol=lf
+*.yml    text eol=lf
+*.yaml   text eol=lf
+*.toml   text eol=lf
+*.sql    text eol=lf
+*.prisma text eol=lf
+*.sh     text eol=lf
+*.env            text eol=lf
+*.env.example    text eol=lf
+.gitignore       text eol=lf
+.gitattributes   text eol=lf
+.prettierrc      text eol=lf
+.editorconfig    text eol=lf
+
+# SVGs are XML/text and should also be normalized to LF.
+*.svg    text eol=lf
+
+# Shell scripts must always use LF regardless of platform.
+*.sh     text eol=lf
+
+# Explicit binary types: never touch line endings, never diff as text.
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.webp   binary
+*.ico    binary
+*.woff   binary
+*.woff2  binary
+*.ttf    binary
+*.otf    binary
+*.eot    binary
+*.pdf    binary
+*.zip    binary
+*.gz     binary
+*.tar    binary
+*.db     binary
+*.sqlite binary
+*.mp4    binary
+*.mp3    binary

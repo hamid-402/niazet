@@ -1,0 +1,6390 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Z0 source/index baseline; not complete atomic traceability or product acceptance",
+  "acceptedZeusPhases": 0,
+  "scope": "Local Z0 inventory only; no migration, provider or product changes authorized here",
+  "decisionAuthority": {
+    "date": "2026-10-24",
+    "ordinaryProductChoices": "Explicitly delegated by owner; select and document professional defaults without repeated product questionnaires",
+    "separateAuthority": "Protected-workflow exceptions, production data changes, live connections/costs and material financial/security/permission changes still require scoped authority; delegation does not bypass preservation controls"
+  },
+  "ownerDecisions": {
+    "DEC01": {
+      "status": "approved",
+      "date": "2026-10-22",
+      "choice": "Keep Next.js/NestJS/Prisma; complete source capabilities; disclose literal technology deviation"
+    },
+    "DEC02": {
+      "status": "approved-with-price-and-state-guards",
+      "date": "2026-10-22",
+      "choice": "Payment during registration only for definitively priced services; negotiated services require a final quote accepted by the customer; retain workflow, QC and idempotency"
+    },
+    "DEC03": {
+      "status": "approved-with-consent-and-moderation",
+      "date": "2026-10-22",
+      "choice": "Optional moderated public order/service reviews; no internal staff identity/profile disclosure; retain existing private feedback and complaints"
+    },
+    "DEC04": {
+      "status": "target-contract-explicitly-approved",
+      "date": "2026-10-24",
+      "choice": "Four working hours for the first meaningful public support reply, not resolution time. Versioned configurable Asia/Tehran calendar; default Saturday–Thursday 09:00–18:00, Friday and registered holidays closed. Automated replies/internal notes do not count; customer-wait does not pause first-response clock. Resolution metric separate; preserve legacy tickets.",
+      "implementationAuthority": "Target policy only. No blanket protected-source exception, production migration, live connection, cost, account merge or financial mutation authorization."
+    },
+    "DEC05": {
+      "status": "target-contract-explicitly-approved",
+      "date": "2026-10-24",
+      "choice": "Eligible service on a working day strictly before 14:00 Asia/Tehran, atomic capacity reservation. Payment reservation lasts 15 minutes capped at 14:00; retry never extends it. Delivery by 21:00 only after successful payment inside valid hold. Late verified funds require financial reconciliation, without automatic refund or same/next-day commitment absent customer consent. Snapshot calendar/rules; live providers deferred.",
+      "implementationAuthority": "Target policy only. No blanket protected-source exception, production migration, live connection, cost, account merge or financial mutation authorization."
+    },
+    "DEC06": {
+      "status": "feature-scope-approved-with-ledger-guards",
+      "date": "2026-10-22",
+      "choice": "Add wallet top-up and order payment from wallet balance, retaining existing wallet/refunds; balanced ledger, concurrency and duplicate-spend prevention required. Live gateway remains deferred; no production migration authorized by this record"
+    },
+    "DEC07": {
+      "status": "approved-preserve-current-formats",
+      "date": "2026-10-22",
+      "choice": "Keep all current identifier/document formats for now, including new orders; do not activate the proposed new source format or rewrite historic identifiers. Do not fabricate deadlines; any literal source-format deviation remains disclosed"
+    },
+    "DEC08": {
+      "status": "approved-by-owner-delegated-choice",
+      "date": "2026-10-24",
+      "choice": "Owner delegated the choice; interpret original operator as existing support role. Keep four roles, scopes and capabilities; no fifth role, new runtime alias or permission expansion"
+    },
+    "DEC09": {
+      "status": "approved-preserve-current-api-and-disclose-path-deviation",
+      "date": "2026-10-24",
+      "choice": "Owner accepted the proposed preservation of current API routes, with explicit documentation of source path/method differences. Use validated domain commands, not a generic direct status setter; do not add compatibility aliases merely for literal source matching"
+    },
+    "DEC10": {
+      "status": "approved-live-connections-still-deferred",
+      "date": "2026-10-24",
+      "choice": "Live payment/SMS/email/storage/antivirus and AI engine remain deferred. Complete infrastructure and local/mock tests only; live acceptance and whole-scope completion claims stay open until separately authorized and evidenced"
+    },
+    "DEC11": {
+      "status": "approved-with-sensitive-conflicts-held",
+      "date": "2026-10-22",
+      "choice": "v4 plus addendum for technical logic; UI blueprint for interaction; preserve additional initial capabilities; approve financial/SLA/cancellation/privacy conflicts separately"
+    },
+    "DEC12": {
+      "status": "target-contract-explicitly-approved",
+      "date": "2026-10-24",
+      "choice": "Explicit D4 transition rows take precedence over blanket nonfinal-cancel sentence; preserve existing prepayment customer cancellation. Ops paid/assigned refund 100%; in_progress follows currently approved refund policy. QC/delivery use revision/dispute routes; disputed exits only resolve-dispute. Partial-refund remainder requires explicit finance disposition, never automatic release.",
+      "implementationAuthority": "Target policy only. No blanket protected-source exception, production migration, live connection, cost, account merge or financial mutation authorization."
+    },
+    "DEC13": {
+      "status": "target-contract-explicitly-approved",
+      "date": "2026-10-24",
+      "choice": "Command-specific proxy capability with explicit true owner/subject and separate admin actor audit. No impersonation/token fabrication; Support gets no payment/settlement authority. Ops/Finance remain within their own scopes; Super Admin does not bypass state/QC/financial preconditions. Per-command permission implementation remains a separately authorized package.",
+      "implementationAuthority": "Target policy only. No blanket protected-source exception, production migration, live connection, cost, account merge or financial mutation authorization."
+    },
+    "DEC14": {
+      "status": "target-ui-contract-selected-by-owner-delegation",
+      "date": "2026-10-24",
+      "choice": "Preserve current design system, two themes and canonical pages. Apply D5 section/tab semantics additively; entity drawers are progressive enhancements with direct-page fallback, URL allowlists, focus/dirty/pending guards and no permission bypass. No new brand, removed page or runtime acceptance inferred"
+    },
+    "DEC15": {
+      "status": "target-contract-explicitly-approved",
+      "date": "2026-10-24",
+      "choice": "Verified unique email can identify an account; no automatic legacy-account linking/merging by similar email. Preserve password/mobile/OTP/recovery. Optional email; nonblocking onboarding; collaboration interest cannot grant executor capability. SMS/email live sending remains deferred. Auth/DB changes require scoped implementation approval.",
+      "implementationAuthority": "Target policy only. No blanket protected-source exception, production migration, live connection, cost, account merge or financial mutation authorization."
+    },
+    "DEC16": {
+      "status": "target-contract-explicitly-approved",
+      "date": "2026-10-24",
+      "choice": "Metrics/rules/AI are proposals and alerts only; sensitive employee status/access effects require authorized human command plus audit. Existing automatic under_review job change is a later protected package. Server trims and rejects blank reasons for sensitive commands that actually consume a reason; keep approved customer confirmation without decorative unused note. Unknown data is not zero or definite risk.",
+      "implementationAuthority": "Target policy only. No blanket protected-source exception, production migration, live connection, cost, account merge or financial mutation authorization."
+    }
+  },
+  "sources": [
+    {
+      "id": "D1",
+      "ownerFilename": "ساختار کلی پروژه.md",
+      "sha256": "8b6638c8c0197629c788b97ef5dc6fdd721e95d6f40bc407899837c4946345df",
+      "bytes": 15301,
+      "repoCopy": null,
+      "headings": [
+        {
+          "line": 1,
+          "heading": "# ساختار کامل پروژه «نیازت با ما»"
+        },
+        {
+          "line": 3,
+          "heading": "## فولدربندی پروژه"
+        },
+        {
+          "line": 130,
+          "heading": "## اسکیمای دیتابیس PostgreSQL"
+        },
+        {
+          "line": 132,
+          "heading": "### جدول users"
+        },
+        {
+          "line": 150,
+          "heading": "### جدول services (لاین‌های خدماتی)"
+        },
+        {
+          "line": 168,
+          "heading": "### جدول orders"
+        },
+        {
+          "line": 197,
+          "heading": "### جدول order_files"
+        },
+        {
+          "line": 211,
+          "heading": "### جدول order_messages (مکاتبات ساختاریافته)"
+        },
+        {
+          "line": 225,
+          "heading": "### جدول payments"
+        },
+        {
+          "line": 241,
+          "heading": "### جدول wallets"
+        },
+        {
+          "line": 251,
+          "heading": "### جدول tickets"
+        },
+        {
+          "line": 273,
+          "heading": "### جدول ticket_messages"
+        },
+        {
+          "line": 285,
+          "heading": "### جدول reviews (امتیازدهی)"
+        },
+        {
+          "line": 299,
+          "heading": "### جدول notifications"
+        },
+        {
+          "line": 316,
+          "heading": "## منطق قیمت‌گذاری — سرویس Pricing"
+        },
+        {
+          "line": 340,
+          "heading": "## API Endpoints اصلی"
+        },
+        {
+          "line": 389,
+          "heading": "## گزینه «همان روز» در فرم سفارش"
+        }
+      ],
+      "semanticMappingStatus": "pending"
+    },
+    {
+      "id": "D2",
+      "ownerFilename": "دیاگرام نیازت.png",
+      "sha256": "5a833dfd3bfa35a44ab89b0e3d6d31c13e8089386b2e457b4e18f1b5ee73e92a",
+      "bytes": 1472109,
+      "repoCopy": null,
+      "headings": [],
+      "semanticMappingStatus": "pending"
+    },
+    {
+      "id": "D3",
+      "ownerFilename": "niazat_master_final_architecture_v4.md",
+      "sha256": "8b06ad2ed04f16877b62b0084ba6472720f064c6b9f2210cd7fd46811c62569a",
+      "bytes": 40493,
+      "repoCopy": "docs/specs/architecture-v4.md",
+      "headings": [
+        {
+          "line": 1,
+          "heading": "# سند نهایی جامع محصول، طراحی و معماری «نیازت با ما»"
+        },
+        {
+          "line": 10,
+          "heading": "## ۱. نسبت این سند با فایل‌های قبلی"
+        },
+        {
+          "line": 36,
+          "heading": "## ۲. تعریف محصول"
+        },
+        {
+          "line": 56,
+          "heading": "## ۳. تصمیم‌های قطعی محصول"
+        },
+        {
+          "line": 58,
+          "heading": "### ۳.۱ مدل اجرا"
+        },
+        {
+          "line": 71,
+          "heading": "### ۳.۲ رابطه مشتری با کارمند"
+        },
+        {
+          "line": 96,
+          "heading": "### ۳.۳ طراحی UI"
+        },
+        {
+          "line": 113,
+          "heading": "## ۴. نقش‌ها و مدل دسترسی"
+        },
+        {
+          "line": 115,
+          "heading": "### ۴.۱ Roleهای اصلی"
+        },
+        {
+          "line": 126,
+          "heading": "### ۴.۲ سطح دسترسی ادمین"
+        },
+        {
+          "line": 136,
+          "heading": "### ۴.۳ قابلیت چندنقشی"
+        },
+        {
+          "line": 153,
+          "heading": "## ۵. سطح دسترسی خلاصه"
+        },
+        {
+          "line": 179,
+          "heading": "## ۶. نقشه صفحات عمومی"
+        },
+        {
+          "line": 181,
+          "heading": "### ۶.۱ صفحه اصلی"
+        },
+        {
+          "line": 198,
+          "heading": "### ۶.۲ صفحه خدمات"
+        },
+        {
+          "line": 210,
+          "heading": "### ۶.۳ صفحه جزئیات خدمت"
+        },
+        {
+          "line": 225,
+          "heading": "## ۷. صفحات مشتری"
+        },
+        {
+          "line": 227,
+          "heading": "### ۷.۱ میز کار مشتری"
+        },
+        {
+          "line": 254,
+          "heading": "### ۷.۲ ثبت درخواست جدید"
+        },
+        {
+          "line": 286,
+          "heading": "### ۷.۳ صفحه موفقیت ثبت درخواست"
+        },
+        {
+          "line": 297,
+          "heading": "### ۷.۴ لیست سفارش‌های مشتری"
+        },
+        {
+          "line": 318,
+          "heading": "### ۷.۵ جزئیات سفارش مشتری"
+        },
+        {
+          "line": 359,
+          "heading": "### ۷.۶ تحویل و اعتراض"
+        },
+        {
+          "line": 377,
+          "heading": "### ۷.۷ کیف پول، پرداخت و فاکتورها"
+        },
+        {
+          "line": 396,
+          "heading": "### ۷.۸ تیکت مشتری"
+        },
+        {
+          "line": 417,
+          "heading": "### ۷.۹ پروفایل مشتری"
+        },
+        {
+          "line": 431,
+          "heading": "## ۸. پنل کارمند / مجری داخلی"
+        },
+        {
+          "line": 433,
+          "heading": "### ۸.۱ داشبورد کارهای من"
+        },
+        {
+          "line": 449,
+          "heading": "### ۸.۲ سفارش‌های ارجاع‌شده"
+        },
+        {
+          "line": 460,
+          "heading": "### ۸.۳ اجرای سفارش"
+        },
+        {
+          "line": 480,
+          "heading": "### ۸.۴ تحویل خروجی"
+        },
+        {
+          "line": 490,
+          "heading": "### ۸.۵ عملکرد شخصی"
+        },
+        {
+          "line": 511,
+          "heading": "## ۹. پنل پشتیبان"
+        },
+        {
+          "line": 513,
+          "heading": "### ۹.۱ داشبورد پشتیبانی"
+        },
+        {
+          "line": 523,
+          "heading": "### ۹.۲ صف تیکت‌ها"
+        },
+        {
+          "line": 535,
+          "heading": "### ۹.۳ جزئیات تیکت"
+        },
+        {
+          "line": 549,
+          "heading": "### ۹.۴ گزارش عملکرد پشتیبان"
+        },
+        {
+          "line": 561,
+          "heading": "## ۱۰. پنل ادمین عملیاتی"
+        },
+        {
+          "line": 563,
+          "heading": "### ۱۰.۱ داشبورد عملیات"
+        },
+        {
+          "line": 577,
+          "heading": "### ۱۰.۲ مدیریت سفارش‌ها"
+        },
+        {
+          "line": 593,
+          "heading": "### ۱۰.۳ تریاژ سفارش"
+        },
+        {
+          "line": 604,
+          "heading": "### ۱۰.۴ تخصیص کار"
+        },
+        {
+          "line": 621,
+          "heading": "### ۱۰.۵ کنترل کیفیت QC"
+        },
+        {
+          "line": 641,
+          "heading": "## ۱۱. مدیریت کارمندان و مجریان"
+        },
+        {
+          "line": 643,
+          "heading": "### ۱۱.۱ لیست کارمندان/مجریان"
+        },
+        {
+          "line": 663,
+          "heading": "### ۱۱.۲ پروفایل کارمند/مجری"
+        },
+        {
+          "line": 678,
+          "heading": "### ۱۱.۳ شاخص‌های عملکرد"
+        },
+        {
+          "line": 698,
+          "heading": "### ۱۱.۴ امتیاز مشتری به کارمند یا تیم"
+        },
+        {
+          "line": 721,
+          "heading": "### ۱۱.۵ جذب مجری آینده"
+        },
+        {
+          "line": 740,
+          "heading": "## ۱۲. پنل مالی و حسابرسی"
+        },
+        {
+          "line": 742,
+          "heading": "### ۱۲.۱ داشبورد مالی"
+        },
+        {
+          "line": 753,
+          "heading": "### ۱۲.۲ پرداخت"
+        },
+        {
+          "line": 763,
+          "heading": "### ۱۲.۳ کیف پول"
+        },
+        {
+          "line": 773,
+          "heading": "### ۱۲.۴ Escrow"
+        },
+        {
+          "line": 790,
+          "heading": "### ۱۲.۵ Refund"
+        },
+        {
+          "line": 802,
+          "heading": "### ۱۲.۶ Ledger"
+        },
+        {
+          "line": 818,
+          "heading": "### ۱۲.۷ فاکتور"
+        },
+        {
+          "line": 830,
+          "heading": "## ۱۳. خدمات، پکیج‌ها و فرم‌ها"
+        },
+        {
+          "line": 832,
+          "heading": "### ۱۳.۱ لاین‌های خدماتی"
+        },
+        {
+          "line": 845,
+          "heading": "### ۱۳.۲ هر خدمت باید داشته باشد"
+        },
+        {
+          "line": 860,
+          "heading": "### ۱۳.۳ مدیریت خدمات توسط ادمین"
+        },
+        {
+          "line": 874,
+          "heading": "## ۱۴. سفارش و چرخه عمر"
+        },
+        {
+          "line": 876,
+          "heading": "### ۱۴.۱ وضعیت‌های سفارش"
+        },
+        {
+          "line": 901,
+          "heading": "### ۱۴.۲ اصول state machine"
+        },
+        {
+          "line": 908,
+          "heading": "### ۱۴.۳ milestone"
+        },
+        {
+          "line": 922,
+          "heading": "## ۱۵. پیام، فایل و گزارش"
+        },
+        {
+          "line": 924,
+          "heading": "### ۱۵.۱ پیام‌ها"
+        },
+        {
+          "line": 937,
+          "heading": "### ۱۵.۲ فایل‌ها"
+        },
+        {
+          "line": 949,
+          "heading": "### ۱۵.۳ گزارش‌ها"
+        },
+        {
+          "line": 972,
+          "heading": "## ۱۶. QC، تحویل، dispute و اصلاح"
+        },
+        {
+          "line": 974,
+          "heading": "### ۱۶.۱ QC"
+        },
+        {
+          "line": 987,
+          "heading": "### ۱۶.۲ تحویل به مشتری"
+        },
+        {
+          "line": 995,
+          "heading": "### ۱۶.۳ اصلاح"
+        },
+        {
+          "line": 1004,
+          "heading": "### ۱۶.۴ Dispute"
+        },
+        {
+          "line": 1024,
+          "heading": "## ۱۷. تیکت، SLA و پشتیبانی"
+        },
+        {
+          "line": 1026,
+          "heading": "### ۱۷.۱ مدل تیکت"
+        },
+        {
+          "line": 1041,
+          "heading": "### ۱۷.۲ وضعیت‌های تیکت"
+        },
+        {
+          "line": 1052,
+          "heading": "### ۱۷.۳ SLA"
+        },
+        {
+          "line": 1065,
+          "heading": "## ۱۸. اعلان‌ها"
+        },
+        {
+          "line": 1096,
+          "heading": "## ۱۹. امنیت و حریم داده"
+        },
+        {
+          "line": 1121,
+          "heading": "## ۲۰. هوش مصنوعی"
+        },
+        {
+          "line": 1144,
+          "heading": "## ۲۱. مدل داده مرجع"
+        },
+        {
+          "line": 1146,
+          "heading": "### ۲۱.۱ کاربران"
+        },
+        {
+          "line": 1166,
+          "heading": "### ۲۱.۲ پروفایل کارمند/مجری"
+        },
+        {
+          "line": 1192,
+          "heading": "### ۲۱.۳ سفارش"
+        },
+        {
+          "line": 1205,
+          "heading": "### ۲۱.۴ نمایش کد مسئول به مشتری"
+        },
+        {
+          "line": 1223,
+          "heading": "### ۲۱.۵ QC"
+        },
+        {
+          "line": 1232,
+          "heading": "### ۲۱.۶ تیکت"
+        },
+        {
+          "line": 1241,
+          "heading": "### ۲۱.۷ مالی"
+        },
+        {
+          "line": 1255,
+          "heading": "### ۲۱.۸ بازخورد و امتیاز"
+        },
+        {
+          "line": 1276,
+          "heading": "### ۲۱.۹ audit و outbox"
+        },
+        {
+          "line": 1287,
+          "heading": "## ۲۲. APIهای اصلی"
+        },
+        {
+          "line": 1289,
+          "heading": "### ۲۲.۱ Auth"
+        },
+        {
+          "line": 1298,
+          "heading": "### ۲۲.۲ Customer"
+        },
+        {
+          "line": 1309,
+          "heading": "### ۲۲.۳ Executor"
+        },
+        {
+          "line": 1318,
+          "heading": "### ۲۲.۴ Support"
+        },
+        {
+          "line": 1326,
+          "heading": "### ۲۲.۵ Admin Ops"
+        },
+        {
+          "line": 1339,
+          "heading": "### ۲۲.۶ Admin QC"
+        },
+        {
+          "line": 1347,
+          "heading": "### ۲۲.۷ Admin Finance"
+        },
+        {
+          "line": 1359,
+          "heading": "### ۲۲.۸ Services"
+        },
+        {
+          "line": 1370,
+          "heading": "## ۲۳. پردازش پس‌زمینه"
+        },
+        {
+          "line": 1386,
+          "heading": "## ۲۴. گزارش‌ها و داشبورد مدیریتی"
+        },
+        {
+          "line": 1408,
+          "heading": "## ۲۵. معیار پذیرش MVP"
+        },
+        {
+          "line": 1439,
+          "heading": "## ۲۶. خارج از MVP ولی باید آماده باشد"
+        },
+        {
+          "line": 1455,
+          "heading": "## ۲۷. قواعد غیرقابل مذاکره"
+        },
+        {
+          "line": 1474,
+          "heading": "## ۲۸. چک‌لیست پوشش کامل"
+        },
+        {
+          "line": 1505,
+          "heading": "## ۲۹. نتیجه نهایی"
+        }
+      ],
+      "semanticMappingStatus": "pending"
+    },
+    {
+      "id": "D4",
+      "ownerFilename": "niazat_v4_addendum_state_machine_ledger.md",
+      "sha256": "b0bf6394e0f2efaa1aa91d9534b112f713dba525cb2fa8ad660d1859f1e785ae",
+      "bytes": 12011,
+      "repoCopy": "docs/specs/addendum-state-machine-ledger.md",
+      "headings": [
+        {
+          "line": 1,
+          "heading": "# الحاقیه سند معماری v4 — جدول گذار وضعیت سفارش و رابطه Ledger/Wallet"
+        },
+        {
+          "line": 7,
+          "heading": "## ۱. جدول گذار صریح وضعیت سفارش"
+        },
+        {
+          "line": 9,
+          "heading": "### ۱.۱ فهرست وضعیت‌ها (مطابق سند v4، بخش ۱۴.۱)"
+        },
+        {
+          "line": 13,
+          "heading": "### ۱.۲ دیاگرام مسیر اصلی (happy path)"
+        },
+        {
+          "line": 21,
+          "heading": "### ۱.۳ جدول کامل گذارهای مجاز"
+        },
+        {
+          "line": 46,
+          "heading": "### ۱.۴ قواعد پیاده‌سازی (بدون تغییر نسبت به اصل سند v4)"
+        },
+        {
+          "line": 53,
+          "heading": "### ۱.۵ نکته درباره QC reviewer"
+        },
+        {
+          "line": 59,
+          "heading": "## ۲. رابطه Ledger و Wallet — منبع حقیقت"
+        },
+        {
+          "line": 61,
+          "heading": "### ۲.۱ تصمیم"
+        },
+        {
+          "line": 67,
+          "heading": "### ۲.۲ معماری لایه‌ای"
+        },
+        {
+          "line": 79,
+          "heading": "### ۲.۳ جدول ledger_accounts (حساب‌های داخلی سیستم)"
+        },
+        {
+          "line": 95,
+          "heading": "### ۲.۴ جدول ledger_entries (منبع حقیقت، دوطرفه)"
+        },
+        {
+          "line": 116,
+          "heading": "### ۲.۵ مثال جریان مالی با ledger"
+        },
+        {
+          "line": 138,
+          "heading": "### ۲.۶ نقش wallets / wallet_transactions به‌عنوان cache"
+        },
+        {
+          "line": 144,
+          "heading": "### ۲.۷ چرا این لایه‌بندی به‌جای فقط ledger یا فقط wallet"
+        },
+        {
+          "line": 152,
+          "heading": "## ۳. تغییرات لازم در بقیه سند v4 (فقط ارجاع، نه بازنویسی کامل)"
+        }
+      ],
+      "semanticMappingStatus": "pending"
+    },
+    {
+      "id": "D5",
+      "ownerFilename": "niazat_final_ui_pages_blueprint_v2.md",
+      "sha256": "f36c6f3bd21884f9f3e82d4c75ffdeeb4c9014c7e773564bc0f97a845088ad18",
+      "bytes": 36139,
+      "repoCopy": "docs/specs/ui-pages-blueprint-v2.md",
+      "headings": [
+        {
+          "line": 1,
+          "heading": "# سند نهایی طراحی صفحات، UX و رفتار رابط کاربری «نیازت با ما»"
+        },
+        {
+          "line": 10,
+          "heading": "## ۱. اصل طراحی نهایی"
+        },
+        {
+          "line": 30,
+          "heading": "## ۲. رابطه این سند با معماری v4"
+        },
+        {
+          "line": 63,
+          "heading": "## ۳. نقش‌ها و تجربه هر نقش"
+        },
+        {
+          "line": 65,
+          "heading": "### ۳.۱ مشتری / `customer`"
+        },
+        {
+          "line": 105,
+          "heading": "### ۳.۲ کارمند داخلی / مجری / `executor`"
+        },
+        {
+          "line": 125,
+          "heading": "### ۳.۳ پشتیبان / `support`"
+        },
+        {
+          "line": 142,
+          "heading": "### ۳.۴ ادمین عملیاتی / `admin + ops_admin`"
+        },
+        {
+          "line": 161,
+          "heading": "### ۳.۵ ادمین مالی / `admin + finance_admin`"
+        },
+        {
+          "line": 180,
+          "heading": "### ۳.۶ ادمین کل / `admin + super_admin`"
+        },
+        {
+          "line": 193,
+          "heading": "## ۴. ناوبری کلی"
+        },
+        {
+          "line": 195,
+          "heading": "### ۴.۱ ناوبری عمومی"
+        },
+        {
+          "line": 207,
+          "heading": "### ۴.۲ ناوبری مشتری"
+        },
+        {
+          "line": 219,
+          "heading": "### ۴.۳ ناوبری کارمند داخلی"
+        },
+        {
+          "line": 231,
+          "heading": "### ۴.۴ ناوبری پشتیبان"
+        },
+        {
+          "line": 242,
+          "heading": "### ۴.۵ ناوبری ادمین عملیاتی"
+        },
+        {
+          "line": 256,
+          "heading": "### ۴.۶ ناوبری ادمین مالی"
+        },
+        {
+          "line": 269,
+          "heading": "### ۴.۷ ناوبری ادمین کل"
+        },
+        {
+          "line": 284,
+          "heading": "## ۵. زبان طراحی و کامپوننت‌ها"
+        },
+        {
+          "line": 286,
+          "heading": "### ۵.۱ سبک بصری"
+        },
+        {
+          "line": 306,
+          "heading": "### ۵.۲ کامپوننت‌های اصلی"
+        },
+        {
+          "line": 331,
+          "heading": "### ۵.۳ الگوی جدول"
+        },
+        {
+          "line": 345,
+          "heading": "### ۵.۴ الگوی Drawer"
+        },
+        {
+          "line": 365,
+          "heading": "### ۵.۵ الگوی Modal حساس"
+        },
+        {
+          "line": 388,
+          "heading": "## ۶. سیاست نمایش مسئول سفارش به مشتری"
+        },
+        {
+          "line": 390,
+          "heading": "### ۶.۱ اصل"
+        },
+        {
+          "line": 394,
+          "heading": "### ۶.۲ نمایش پیشنهادی"
+        },
+        {
+          "line": 403,
+          "heading": "### ۶.۳ رفتار در تیکت"
+        },
+        {
+          "line": 411,
+          "heading": "### ۶.۴ رفتار در ادمین"
+        },
+        {
+          "line": 424,
+          "heading": "## ۷. صفحات عمومی"
+        },
+        {
+          "line": 426,
+          "heading": "### ۷.۱ صفحه خانه"
+        },
+        {
+          "line": 455,
+          "heading": "### ۷.۲ صفحه خدمات"
+        },
+        {
+          "line": 482,
+          "heading": "### ۷.۳ صفحه جزئیات خدمت"
+        },
+        {
+          "line": 509,
+          "heading": "## ۸. صفحات احراز هویت و ورود"
+        },
+        {
+          "line": 511,
+          "heading": "### ۸.۱ ورود"
+        },
+        {
+          "line": 526,
+          "heading": "### ۸.۲ ثبت‌نام"
+        },
+        {
+          "line": 540,
+          "heading": "### ۸.۳ تکمیل پروفایل اولیه"
+        },
+        {
+          "line": 556,
+          "heading": "## ۹. صفحات مشتری"
+        },
+        {
+          "line": 558,
+          "heading": "### ۹.۱ میز کار مشتری"
+        },
+        {
+          "line": 599,
+          "heading": "### ۹.۲ ساخت درخواست جدید"
+        },
+        {
+          "line": 648,
+          "heading": "### ۹.۳ صفحه موفقیت ثبت درخواست"
+        },
+        {
+          "line": 663,
+          "heading": "### ۹.۴ لیست سفارش‌ها"
+        },
+        {
+          "line": 695,
+          "heading": "### ۹.۵ جزئیات سفارش"
+        },
+        {
+          "line": 784,
+          "heading": "### ۹.۶ تحویل، تایید و اعتراض"
+        },
+        {
+          "line": 802,
+          "heading": "### ۹.۷ کیف پول و فاکتورها"
+        },
+        {
+          "line": 829,
+          "heading": "### ۹.۸ تیکت‌های مشتری"
+        },
+        {
+          "line": 859,
+          "heading": "### ۹.۹ پروفایل مشتری"
+        },
+        {
+          "line": 872,
+          "heading": "## ۱۰. صفحات کارمند داخلی / مجری"
+        },
+        {
+          "line": 874,
+          "heading": "### ۱۰.۱ داشبورد کارهای من"
+        },
+        {
+          "line": 889,
+          "heading": "### ۱۰.۲ سفارش‌های ارجاع‌شده"
+        },
+        {
+          "line": 907,
+          "heading": "### ۱۰.۳ صفحه اجرای سفارش"
+        },
+        {
+          "line": 927,
+          "heading": "### ۱۰.۴ ارسال خروجی"
+        },
+        {
+          "line": 943,
+          "heading": "### ۱۰.۵ اصلاحات QC"
+        },
+        {
+          "line": 953,
+          "heading": "### ۱۰.۶ عملکرد شخصی"
+        },
+        {
+          "line": 973,
+          "heading": "## ۱۱. صفحات پشتیبان"
+        },
+        {
+          "line": 975,
+          "heading": "### ۱۱.۱ داشبورد پشتیبانی"
+        },
+        {
+          "line": 985,
+          "heading": "### ۱۱.۲ صف تیکت‌ها"
+        },
+        {
+          "line": 1008,
+          "heading": "### ۱۱.۳ جزئیات تیکت"
+        },
+        {
+          "line": 1028,
+          "heading": "### ۱۱.۴ گزارش عملکرد پشتیبان"
+        },
+        {
+          "line": 1040,
+          "heading": "## ۱۲. صفحات ادمین عملیاتی"
+        },
+        {
+          "line": 1042,
+          "heading": "### ۱۲.۱ داشبورد عملیات"
+        },
+        {
+          "line": 1056,
+          "heading": "### ۱۲.۲ مدیریت سفارش‌ها"
+        },
+        {
+          "line": 1080,
+          "heading": "### ۱۲.۳ تریاژ سفارش"
+        },
+        {
+          "line": 1099,
+          "heading": "### ۱۲.۴ تخصیص کار"
+        },
+        {
+          "line": 1121,
+          "heading": "### ۱۲.۵ کنترل کیفیت QC"
+        },
+        {
+          "line": 1146,
+          "heading": "### ۱۲.۶ مدیریت کارمندان و مجریان"
+        },
+        {
+          "line": 1174,
+          "heading": "### ۱۲.۷ پروفایل کارمند/مجری"
+        },
+        {
+          "line": 1201,
+          "heading": "### ۱۲.۸ مدیریت خدمات و پکیج‌ها"
+        },
+        {
+          "line": 1221,
+          "heading": "### ۱۲.۹ گزارش‌های عملیاتی"
+        },
+        {
+          "line": 1236,
+          "heading": "## ۱۳. صفحات ادمین مالی"
+        },
+        {
+          "line": 1238,
+          "heading": "### ۱۳.۱ داشبورد مالی"
+        },
+        {
+          "line": 1249,
+          "heading": "### ۱۳.۲ پرداخت‌ها"
+        },
+        {
+          "line": 1262,
+          "heading": "### ۱۳.۳ Escrow"
+        },
+        {
+          "line": 1282,
+          "heading": "### ۱۳.۴ Refund"
+        },
+        {
+          "line": 1293,
+          "heading": "### ۱۳.۵ Ledger"
+        },
+        {
+          "line": 1306,
+          "heading": "### ۱۳.۶ فاکتورها"
+        },
+        {
+          "line": 1316,
+          "heading": "### ۱۳.۷ Withdrawal"
+        },
+        {
+          "line": 1330,
+          "heading": "## ۱۴. صفحات ادمین کل"
+        },
+        {
+          "line": 1332,
+          "heading": "### ۱۴.۱ داشبورد کل"
+        },
+        {
+          "line": 1344,
+          "heading": "### ۱۴.۲ مدیریت کاربران"
+        },
+        {
+          "line": 1355,
+          "heading": "### ۱۴.۳ مدیریت ادمین‌ها"
+        },
+        {
+          "line": 1365,
+          "heading": "### ۱۴.۴ تنظیمات سیستم"
+        },
+        {
+          "line": 1379,
+          "heading": "### ۱۴.۵ Audit log"
+        },
+        {
+          "line": 1393,
+          "heading": "## ۱۵. حالت‌های مشترک UI"
+        },
+        {
+          "line": 1395,
+          "heading": "### ۱۵.۱ Empty State"
+        },
+        {
+          "line": 1412,
+          "heading": "### ۱۵.۲ Loading State"
+        },
+        {
+          "line": 1424,
+          "heading": "### ۱۵.۳ Error State"
+        },
+        {
+          "line": 1439,
+          "heading": "### ۱۵.۴ Permission State"
+        },
+        {
+          "line": 1447,
+          "heading": "### ۱۵.۵ Confirmation State"
+        },
+        {
+          "line": 1458,
+          "heading": "## ۱۶. رفتارهای مهم فرم‌ها"
+        },
+        {
+          "line": 1460,
+          "heading": "### ۱۶.۱ فرم ثبت سفارش"
+        },
+        {
+          "line": 1470,
+          "heading": "### ۱۶.۲ فرم تیکت"
+        },
+        {
+          "line": 1478,
+          "heading": "### ۱۶.۳ فرم عملیات مالی"
+        },
+        {
+          "line": 1490,
+          "heading": "## ۱۷. وضعیت‌ها و Badgeها"
+        },
+        {
+          "line": 1492,
+          "heading": "### ۱۷.۱ سفارش"
+        },
+        {
+          "line": 1512,
+          "heading": "### ۱۷.۲ پرداخت"
+        },
+        {
+          "line": 1524,
+          "heading": "### ۱۷.۳ تیکت"
+        },
+        {
+          "line": 1537,
+          "heading": "### ۱۷.۴ کارمند"
+        },
+        {
+          "line": 1550,
+          "heading": "## ۱۸. Responsive و موبایل"
+        },
+        {
+          "line": 1570,
+          "heading": "## ۱۹. دسترس‌پذیری و کیفیت تجربه"
+        },
+        {
+          "line": 1585,
+          "heading": "## ۲۰. اولویت ساخت صفحات"
+        },
+        {
+          "line": 1587,
+          "heading": "### فاز ۱"
+        },
+        {
+          "line": 1604,
+          "heading": "### فاز ۲"
+        },
+        {
+          "line": 1614,
+          "heading": "### فاز ۳"
+        },
+        {
+          "line": 1624,
+          "heading": "## ۲۱. چک‌لیست پوشش نهایی"
+        },
+        {
+          "line": 1650,
+          "heading": "## ۲۲. تصمیم نهایی طراحی"
+        }
+      ],
+      "semanticMappingStatus": "pending"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "A01",
+      "roadmapRowHashes": [
+        "0d6ea1c3c471b92a995b9f9e8068b358b7d9d93129bb2784312d58db182670c5"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "A02",
+      "roadmapRowHashes": [
+        "6f90c45d4126c7d3acaa16ae51bc3a4e5ad7fd35817584847e5ea545afb708b9"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "A03",
+      "roadmapRowHashes": [
+        "2151efc5a4168da6e01131600fdcd99a4637eaea2fc4717c7c1a835dfc3f4ec6"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "A04",
+      "roadmapRowHashes": [
+        "f9b184f8adbdd33a7253e51318738b2ab4e4a961fb7398cb37f41c136bb57b43"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "A05",
+      "roadmapRowHashes": [
+        "a04eceafc6a6fe87ffb1fa31b9253216df91948fb1f5b9df93564d797de33c00"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "A06",
+      "roadmapRowHashes": [
+        "a975862c1856da7f04063313f10316debdff0dca716e070ab79b814f9e52eea7"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "A07",
+      "roadmapRowHashes": [
+        "d086697ab50525fc9efe4c77a7d1eaede2e13ba4164da25f55f2a00ab5477e6f"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "A08",
+      "roadmapRowHashes": [
+        "25533228a2a6d916869820474845fd024277d1273dc289eeb005856251d333b1"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "A09",
+      "roadmapRowHashes": [
+        "41b116431a76992b204d643fbd2a82d8b7402a05ee6cbf15e6b5f3c1e37d018b"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "A10",
+      "roadmapRowHashes": [
+        "c9499bb6bfae9ead31b0c4560e2cde90b56fc7e74bdc522f82e7da1b7460c1de"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "B01",
+      "roadmapRowHashes": [
+        "e00c261756bab1ceece8a75c58df828edd957d91bf6fb6197ccbfc8ea8a93a9b"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "B02",
+      "roadmapRowHashes": [
+        "13ab702d9d08e3f21e8121739ce90a74a8dccf24eeeb0d960c3ee52625cc9d42"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "B03",
+      "roadmapRowHashes": [
+        "d92a38950587a5c3861c2bb0565ce30b244f59d5c7cc65200ecb4923eaf94147"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "B04",
+      "roadmapRowHashes": [
+        "7535329375021d1a284f31fcd186c0367e13d2bf237078cd1a20b4788325886c"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "B05",
+      "roadmapRowHashes": [
+        "039175fdb73b8d78d288fb7d690ab5c720fc4f16ed676bb378ca5814f8a5f34a"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "B06",
+      "roadmapRowHashes": [
+        "06b48f073596330b7fc015790243de0649da0263b9ea479c06bb7b5e70b68639"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "B07",
+      "roadmapRowHashes": [
+        "33e5f9eb875cef6958e39d269491f6cf229ae760884e42a7ca3accd76d09db66"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "B08",
+      "roadmapRowHashes": [
+        "1333326932834cb50d4261df7d7dfc99472e32f4575e4daa6e7e7d4be709c87a"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "B09",
+      "roadmapRowHashes": [
+        "ca9c7ad53eb2ff7751b3a7734c4e2c259ea71ad6baacdb1df724aebf777bf993"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "B10",
+      "roadmapRowHashes": [
+        "41c2ad61d9fe85be1b4f24ec3d77f5f272bf1dfade23de3e792b3919396036ba"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "B11",
+      "roadmapRowHashes": [
+        "75fa732b36a0ecbc72b64e2e6ea1222aa6a063c6cc3d441486e1324055c025f8"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "B12",
+      "roadmapRowHashes": [
+        "d5f80292971ef85d8aab764c7eb95adfb84d7fe32c19d3531612ddea2f7e80cf"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "C01",
+      "roadmapRowHashes": [
+        "cc15c050c1864a187a18bcc69c54574a6f99ba06a9a299eff59004f16057337a"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "C02",
+      "roadmapRowHashes": [
+        "780f8b220d2010e9c59b39887fe984de80774678f00ac423abfbdaf6f6ef082c"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "C03",
+      "roadmapRowHashes": [
+        "491bf205931ea3baaf09a66082afc288bb1a4c95ca3caedff6bb3e4daeee3329"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "C04",
+      "roadmapRowHashes": [
+        "7fd16a6df600117404c20de46bda321cc4cfaaf9fa58b9a48239f1498128599d"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "C05",
+      "roadmapRowHashes": [
+        "2a6edf5dc96fb4acdc4c3ddf24039fca5b89ecf7f03f7a121fcfeb3683a72521"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "C06",
+      "roadmapRowHashes": [
+        "f02d14eee39e91929bc3de120d66321a4f9ecc08db95b8b1dc5d0ce568cae842"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "C07",
+      "roadmapRowHashes": [
+        "1b2895dfacb0eab6d43ad68dd80feca4f9e6218ccf6cc1ac6998135a5c9fe6e1"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "C08",
+      "roadmapRowHashes": [
+        "5ec73a4390eee2048cb19da70790b58beb6818b457f857db0d365ed0f737b085"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "D01",
+      "roadmapRowHashes": [
+        "6120da8ef3838e386181137f5f872453229b8a66cb782d42378f57c5e303f7cf"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "D02",
+      "roadmapRowHashes": [
+        "731f397722598c4e41a79e2cd6571a69290ece271a27a5ac2244841bc3cbc0f0"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "D03",
+      "roadmapRowHashes": [
+        "fdf2990488d5c3704bcbb8716c6614630d0957b36088c210f5306e12cb10d9b3"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "D04",
+      "roadmapRowHashes": [
+        "a5e0c374b51fb806233de5df8d6d6441cb6d4abfc1ce0ae85c9081ee129177d0"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "D05",
+      "roadmapRowHashes": [
+        "607a393c84b6bd6a379bcd9973ddec43a2f3d00187550bf4022eceb722f93ed1"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "D06",
+      "roadmapRowHashes": [
+        "8c9552a7788f5ec62b154cb278f299d43d63b82765a7bac1768dda00849841ce"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "D07",
+      "roadmapRowHashes": [
+        "079c487be990cc0705e1b1450eead0438f964b23b541f65f5a14b04db957c2e6"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "D08",
+      "roadmapRowHashes": [
+        "748b932e9e9ce0a2e17bbe0849356bf78e327dd704d89c3da06e3e36c27caa58"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "E01",
+      "roadmapRowHashes": [
+        "38d44a2332c16c8a3e3fb888aa364b75ae67ea3f5067011cfaf7cf33a30049c2"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "E02",
+      "roadmapRowHashes": [
+        "c85d0fd901eb957fb64936b664b5e71b7b63781b5123bc9595c92a50b1df9e79"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "E03",
+      "roadmapRowHashes": [
+        "1783e550d9f867a1dab0422175a6ac4535a02c60b74ad6f9ef36560f3fa4f390"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "E04",
+      "roadmapRowHashes": [
+        "aed5b201b2484f6ee5ba642f5e0204c418309035a8b1da5bc95a4b96a6ef2255"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "E05",
+      "roadmapRowHashes": [
+        "4cd0eb8c6bbac030a27a8f4cfa689e1b91de5b743c522ebd3259eb2581ac6e98"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "E06",
+      "roadmapRowHashes": [
+        "e4e3d1ef11760aecef25cfb3e4e0dbc3e2baa9ab8df6b14397c8d234fb8d90d8"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "E07",
+      "roadmapRowHashes": [
+        "7c2706e54fdcba6663d1c38e5df8fafa79b4f2f647abc2725a0966731d328230"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "E08",
+      "roadmapRowHashes": [
+        "21673f91f50de64a927f1ebcf5ab66ea789c5645d8784a8398b43f5422cc1de8"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "F01",
+      "roadmapRowHashes": [
+        "33b5f8299b983c6cf8d1553c9dd24c9d2b3b7b78b9d56c8bf99ccfc3a869f27c"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "F02",
+      "roadmapRowHashes": [
+        "b2ade3d6a705da99ccdadde7430649fa7fca1276687b255a76f8c1c4f2cd676d"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "F03",
+      "roadmapRowHashes": [
+        "935ac84639537f0c993a9d4142efa6f5f7a1a82f4acdbdd18bb9a8848216c047"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "F04",
+      "roadmapRowHashes": [
+        "877f942d618a8c3e04754005e2f7525582c08aed498c6132457f5e6584077076"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "F05",
+      "roadmapRowHashes": [
+        "66c9fb87e123fbf47cb91239c7842d6ba19d75d3cc9a54905f5b2ea1f321f90b"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "F06",
+      "roadmapRowHashes": [
+        "0fa7e2cd63ca3de91b823bdf75bd9485ca576070f40cbfc80b77739c78ac465f"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "F07",
+      "roadmapRowHashes": [
+        "cf47d88fab3e80976e82f2bdd6a079f614c974af7317a897d35278b83370131b"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "F08",
+      "roadmapRowHashes": [
+        "433caabb894c0316ce2d8e847287df3ce59e163f403d101424e08d0d16f0aaa8"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "G01",
+      "roadmapRowHashes": [
+        "ed8b0a34eda4b3f722ddf242c0557a33c5f458ff509867998d8d2e370af9938c"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "G02",
+      "roadmapRowHashes": [
+        "2e9bde45c5feed16ca2162547ba5a836c54a7fce70bf1bde4c63a1292a2995ad"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "G03",
+      "roadmapRowHashes": [
+        "934d32d5a0820660f908e121148bdafcf423736c815f3ee0351019e27f809046"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "G04",
+      "roadmapRowHashes": [
+        "b77bbe155282dbac1998ba913d4e31d326c233dfff96b5d2fe0894d06b603b5d"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "G05",
+      "roadmapRowHashes": [
+        "ad30a37b2972f1938471c3e603b11570b5bf67a20e2a042a0605d5795986dd06"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "G06",
+      "roadmapRowHashes": [
+        "faeb1b1845b3f70debc70290abaf851a3084826b2ef991fefb394383a05421b1"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "G07",
+      "roadmapRowHashes": [
+        "57695536fb48760f6ef29a5ece250160bbfc64eff8cf0043f486613e9cac1883"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "G08",
+      "roadmapRowHashes": [
+        "8bbd3067126fe88b670257b021e3ec7d38035c277655790198c7907e85b9f9db"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "G09",
+      "roadmapRowHashes": [
+        "9649c097ffbb418b08403768b65642e622c11895a97e00f04c82bfacaee88fe7"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "G10",
+      "roadmapRowHashes": [
+        "664bcc34ddcc2087803ef5b9ca9d9305ca8740897b4906c6735e0c4efbd83ca4"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "H01",
+      "roadmapRowHashes": [
+        "96f993f60e11d416927bd58579691f3b28cf0f098f244b84c37ad4133352bf17"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "H02",
+      "roadmapRowHashes": [
+        "92bb7bc69b5513c95700dbaed1251fe78c5274ebcb89925c47e5291b82237231"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "H03",
+      "roadmapRowHashes": [
+        "5be0d7de4d25b9b39834b9446d8a5dfca4abe21086e13cf8c0872d65a6a729b3"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "H04",
+      "roadmapRowHashes": [
+        "944fdc46ced29c07ce7961db85c00fd6a4f7eb1aaa187a8e12893b8954ecc50d"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "H05",
+      "roadmapRowHashes": [
+        "2265f2dfa122777d0f4421feaae41a55a4da0c6ea70637662c001eaae6dd4a4b"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "H06",
+      "roadmapRowHashes": [
+        "7e162e029b8f29940da3f6533b3d356accacd7d354ba1b659e24611ac493872c"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "H07",
+      "roadmapRowHashes": [
+        "610c86232a4cf4c77703105141b1d8de61e1e1da26ae22b78d6e141baeed433e"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "H08",
+      "roadmapRowHashes": [
+        "ad3ef3dc29b5497b79abab2c12ea97d6d30ea1e98ea829edc4d8c1011044b9c8"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API01",
+      "roadmapRowHashes": [
+        "d546fc46bc29c51fbcbd011f34dd85bf2efb06af028f1bdc0b3151a432a60396"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API02",
+      "roadmapRowHashes": [
+        "73d8c8ee2bfa65c5e232f428ce923510ae30fd1f090c73480a26ae3aa410d9f9"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API03",
+      "roadmapRowHashes": [
+        "41a7743d9ee620d8ff371bcc98c297b07da3689b69d1d150cba845f39d9a501f"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API04",
+      "roadmapRowHashes": [
+        "358ad7158e6d9775a12199930c643b0f644f0fbfe4a85c4f50bbddffb5f1cf87"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API05",
+      "roadmapRowHashes": [
+        "bfe5fc973ea23a244c61eb8c3cd7cdf0d8a84c778bf5db8781c5567755db835b"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API06",
+      "roadmapRowHashes": [
+        "397ca67afeb1c5ac2e4f092dbec29b23f7433500386681522b297519fefe4698"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API07",
+      "roadmapRowHashes": [
+        "298f634014498660cafb51a918db02a884c21ba53fc54a36a65b18192c1b9299"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API08",
+      "roadmapRowHashes": [
+        "812c2b1034dfe9818f75ca467c3ab4f8ee08b62168f0ff47311e8c6d825b8fe9"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API09",
+      "roadmapRowHashes": [
+        "150e22ffd8f32b6089cfe7141d4dfc21cdd149751fbab399764896deca212744"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API10",
+      "roadmapRowHashes": [
+        "948839bad331c9c7c4563510c6ff02d96237c6f846350d9554215409201d9515"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API11",
+      "roadmapRowHashes": [
+        "173b8209cb6de2bb07627699607bd3b2a8246dd634fd69e6974add25e6bf756c"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API12",
+      "roadmapRowHashes": [
+        "dc1aba75821f5f93b347dc550f98d78a401da908b33533e1f3aaeb61fb783500"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API13",
+      "roadmapRowHashes": [
+        "3207bf3c5a3bced214d5f5e69cea186d8c93834466c89e18aad6c47460ed851b"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API14",
+      "roadmapRowHashes": [
+        "236575ce78147ee2a5c94d1de9f01a9ab1a00131da00d62c5b9cf375349203d7"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API15",
+      "roadmapRowHashes": [
+        "f9258fb98e510daf218e7f58aa6ea0dd46a630bd9d121b4aabc91f14cd99e19c"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API16",
+      "roadmapRowHashes": [
+        "a091a1280a0aab3cdffb266c02cc4a20ed61f994511b2c3d6b35c44692950899"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API17",
+      "roadmapRowHashes": [
+        "e0c205138781c5b568fe95a35fb50ecfcb499b812efced0fa7055bc2191a3b78"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API18",
+      "roadmapRowHashes": [
+        "a97f01cca9394a7d5421cf76c25971834754b08b7d20bcac8007d9509b6c75d5"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API19",
+      "roadmapRowHashes": [
+        "901f48e065a5549e9c90f21e216d13b9462bceb34f61afe6a6233cabed4c503e"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API20",
+      "roadmapRowHashes": [
+        "d20f47ad5cc51ab3539bc06cab649da801ec0bf0536fd0991d2964cbdb392313"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API21",
+      "roadmapRowHashes": [
+        "c023d8ddff9937c1cbf11e856bd341bec4baa45f0ae5290916eb1439e24b7250"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API22",
+      "roadmapRowHashes": [
+        "b5ac25351bbe7beb0dce1979ee1da54817355e174f676f64c06495168fc8f38e"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API23",
+      "roadmapRowHashes": [
+        "54f5deac2aae3080b90789323f0d70f9824a50507a7ddadf1a3b906022ed4bf2"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API24",
+      "roadmapRowHashes": [
+        "c2509a0968f544f33d1f39dec263ecfe9d8d6325bb7d4c8729b4c8e68e670e4d"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API25",
+      "roadmapRowHashes": [
+        "874a71eb1b53845148bc9d74f3fe40da10014bc60cc33e76c65b893667517bb9"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API26",
+      "roadmapRowHashes": [
+        "15cbe2dcc23ffedac714ffdfda87125014546ee7eaac74e20c2ae9fa6eafb976"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API27",
+      "roadmapRowHashes": [
+        "452d64494c33c1236825d8e734981ae5e05cf29fade1a4af958178ea744edce5"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API28",
+      "roadmapRowHashes": [
+        "9742c04764e0060fafeec66cf0d959a4619f9dcb07e0cf33f13e40bf94f93b4b"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "API29",
+      "roadmapRowHashes": [
+        "921fc5d41c0a2f72f74eb77427693191bcce75d88a30ea9e624235e975716276"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "T01",
+      "roadmapRowHashes": [
+        "96a2b515ba06b56c535e0ad972f6fc5737e55835bb6e9e774ae5919e24218a25"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "T02",
+      "roadmapRowHashes": [
+        "737dd75d631ac8b557579de7cc7516b6aad01fd3f785295c9a73e7b1604dcfa5"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "T03",
+      "roadmapRowHashes": [
+        "86a8614f4491bfb4e5cdc03176810b72ebaf1c47f9dab332ab1e55c575305e73"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "T04",
+      "roadmapRowHashes": [
+        "a1cf03edec761f5ae0965a6a80938ad238bb728611b89a097ac190e99531d508"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "T05",
+      "roadmapRowHashes": [
+        "4f70216216373ce031d307e265ca19aecea144f104e76b38ce2314ea4b285c9d"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "T06",
+      "roadmapRowHashes": [
+        "7d9098b9f3698906bc47634df1db84242e6524fe91a68fd37af218cde4da6ccd"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "T07",
+      "roadmapRowHashes": [
+        "dcd18efc6cfbae859d8f071fe97609b2490ed8670c39c5dfe27374ca2694e57f"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "T08",
+      "roadmapRowHashes": [
+        "fa1ce4dafcaf2874282b0d6f2f782c76df2f4615120712eb47e2a849ffa3cc2d"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "T09",
+      "roadmapRowHashes": [
+        "27043995ec651228cd97cad3760ea9d8b83bfa547c05b2437a840bf959cd62f9"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "T10",
+      "roadmapRowHashes": [
+        "cec176113fb903ec297ada9b67f85d33b2629447bf6ee368a3b84f7580abdb4e"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-009",
+      "roadmapRowHashes": [
+        "26f997426a95b521a4ff9f147dbb56fec4fb4ed01de0bf4a0ea22aeb2093a789",
+        "c2f2e2e787d8882e379e24852e5fa1633772cf66f1c96ba8c5b15468a610968e"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-010",
+      "roadmapRowHashes": [
+        "79c3456db22f980524fa476e9f85798691418d47e20273b4168f343150952543",
+        "8206bde0f4762eadc57a7cc829e674f8d83eb138b3a8317d063aac1e8aa3c077"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-012",
+      "roadmapRowHashes": [
+        "4787b26b320e05c4f6e1361cde5835f7f9c7c78f5fa031523a180cbd4493e957",
+        "c61f2c3e3607a5750117e3c179fbd129b598cfbe420e991ddb93bad6d77db500"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-013",
+      "roadmapRowHashes": [
+        "329d9f5fa2a82d761d392ab3a39fd5207af087f12a8f1407cd49952d1c8f4ac8",
+        "58147953b44b62dc6f69ed71eaa6e6e958c9dd02009b3e88e32bb43bbfd9ef48"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-015",
+      "roadmapRowHashes": [
+        "268312567ef95e57a50760c1fac8a6419cbb37fbdd89c271093f56fc46cb3cf3",
+        "524900b0028951706b2318ad582a9e9b9d518e20b0bf390c425f7faa719420d5"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-016",
+      "roadmapRowHashes": [
+        "40d55b8a8337b08042158a477d23c1f024cd345149d4912ff8dbfbc4230c3ec5",
+        "e4191c46814f9ff29c08a05356fd717ebb7d313cab84a0daa548425dee92dc15"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-020",
+      "roadmapRowHashes": [
+        "6ae12fe6a2ff64cfbcfff8851856bcc50265b48c8ba6142e34442e1a2158a02e",
+        "0b1878941175671b34ed7e23506cde9991e5eab67bed9361a2e3b07c914eb98e"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-022",
+      "roadmapRowHashes": [
+        "811dcc28e994ec5c25260b8e72d7dc3fcd615a0927c933ea6bbecbbfc4af34ed",
+        "7b1af63c7de95cc50bb01473bd7234b24066b1e2e19d6a356f782b7c51de7a68"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-026",
+      "roadmapRowHashes": [
+        "ca52dc2331c78577833bb2e20756a83d9a31bfd3ca2218ee6124b6c21c226d2f",
+        "c0cdce0f951b951c8a905b4107ba3470dedf2cac0a163808cbb8a24043d50ac9"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-029",
+      "roadmapRowHashes": [
+        "86057978e3f9b33329c00625636bcd0f02ad4319071d857604917356124caaf3",
+        "bd471c1fa4f4947ab56b25b2072feaae5477ef3b4085f56bf9b38d70907f361c"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-031",
+      "roadmapRowHashes": [
+        "61f0759e7c80830fef1bc8f39eeb62f73de90acc92d421b4f8ef44475a019339",
+        "5c02e02006beb35b2c7fba34db988fca583df22c7c77b7d0c8388043f78ad666"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-032",
+      "roadmapRowHashes": [
+        "fa634228cd296e77d4e3e550be9cf029031aba8d1e361482abe41c20d2a54e6b",
+        "6cb840f33ca4df2de9859592234918b29db94b9667b87305bff4b42e61eb36c8"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-039",
+      "roadmapRowHashes": [
+        "4dede05d3454c74081f81a0d16af40e8be62df2df3f069a41ffa0ef08f39d79b",
+        "b851718ed29965fc6f94eadd6879b57201e6ca2818f347da71784014532bbd1f"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-040",
+      "roadmapRowHashes": [
+        "bb9be04470b78e2b007ad9db44ff648d2b6dc6c89610f12b2c226d67796af8d7",
+        "a4c7c235689a1d3a4e8552c0c965802dbe83265f183b2db313fd05cd97a6badc"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-041",
+      "roadmapRowHashes": [
+        "ec6e320b3053291b0a2b5d2e11f807a98f477cb6c96fcd15bc6e37a2804ff73c",
+        "ddcfded21045474270f43c8d879efa7cc011111a6b6c623693cdcb669d93a48c"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-042",
+      "roadmapRowHashes": [
+        "cc099520a16a052c6b42e479e06f30af1b23c25cbdba4acf2445c37a17020321",
+        "dcb3c0c1495f2db9f5ffb00b86b6bec53bf9004a06b71a930cc4c3c2a51f5b1c"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-045",
+      "roadmapRowHashes": [
+        "7c860dd659e9f917e6655c5f56fb24e0b19b278b79e2d38f48ba7ab2237956f7",
+        "43bb6eb4ab20935c90003becfc11ff5c4fa67b9e446e7708281601bef0da0d31"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-049",
+      "roadmapRowHashes": [
+        "1e25e2af942e10479cfe93dabdf78e30a126b14b2dd4f429c3d663efe99f0ace",
+        "fbfb58d0df4eab7c38d952c6eccbcb0608e2eaa1e15764240b5e5138f26beccd"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-050",
+      "roadmapRowHashes": [
+        "8aa53f250244c31692d6d12bc58edbe0c80631414b18c5b9f365117a9a1c6348",
+        "a66104d244679c66399ea5abc911030a85b0231ce149414c5c9933bc1a047343"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-051",
+      "roadmapRowHashes": [
+        "207259c3225cb19e0e269451178c43ee44e01b76d3a2ab7660261faaebc2d864",
+        "70ca0fed8218c7886d7913b65a7e2a6caccd3e79a0fd55c30c02753c55c95974"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-052",
+      "roadmapRowHashes": [
+        "6042a26c333454a6288461876394b6bfe480bec757e9b6c2af689cefa2740b1b",
+        "de64eeec8d64eb45d2c431b476703a508258121a94840ed32724463ad08da27c"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-054",
+      "roadmapRowHashes": [
+        "1bf9986f381ebe03d02a7a0856f8d3d9c2c7114738861c346efd9835ef6c6f1c",
+        "f2f415076782376f88e5d1a15c9b2b4b37a8b8fbb1e93a16cf4807a3cb00ab0b"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-056",
+      "roadmapRowHashes": [
+        "f5b07c7a78e4bb1e9fb892006abd5aa68502c215d7b5e5596a8f01cd001187a8",
+        "1e36595620f1c3c276dec4cecc6f2c248eef9192244cd10b6694af855b8e46e6"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-058",
+      "roadmapRowHashes": [
+        "7b29cef2f9be3cc60b468a198a7847ef9540bf2f5a28b3bfb8ea12899838765e",
+        "64b844f233aab87266876b096d66efe3ca7105c3a9f931130bfa24291fa25006"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-060",
+      "roadmapRowHashes": [
+        "34ec9e4bf28291e752b516a6e9ccff707fa8033f1692c6300bc346d9aec8d00c",
+        "87f1407d1acbe102b00b79475169fb0a927f41f0b5f58b0098e4fa3b4d47ba58"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-067",
+      "roadmapRowHashes": [
+        "bccc805cd4def71da0fe5b5901c873278cec0568de449700f041e71f09e0a3bd",
+        "076dd274763ec4498d2eff22b0eb644e70c2ebbbe0bd2182e03cd9cd14c230ee"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-068",
+      "roadmapRowHashes": [
+        "8210f1881725458030dc33fd5025cbcbf272d26ce3f298cc7849e45683d8e1b6",
+        "ec6a2a1ba0e75c98e4e102bd5f462c0229c1caa3ad06173ec313cb88ae463011"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-070",
+      "roadmapRowHashes": [
+        "28001b78515370ecb7455b5e5463ee36530072037ccd76459de413ee16ea753f",
+        "3884a0148dbe3cf6ef8496ad94b808ed3f188242bf1c503ec392331c9a59083a"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-073",
+      "roadmapRowHashes": [
+        "6564b321a9cad8f700000ef1bded2f4848713c2d99bae446378c65dbf31f071c",
+        "0afef3e087898e1b6eb0995210ccc3de5342a47541db2cb67726137d674bd42a"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-074",
+      "roadmapRowHashes": [
+        "8372141a3d3ea80cf011feb7c828e53ab9f0f55577ceb4057a5b2b856df35e1e",
+        "19583aa885bdde9a1cdfb9031ca6eacc1f73c34b2ced6434c6b33970b4c513bf"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-076",
+      "roadmapRowHashes": [
+        "aa1bfdfaba4329c418bf06c089767eb06d66e406a0603e09ff9f027c744c041b",
+        "35b021d7ec9ac065c2c95ab6d53c3623105942ac80d8901cf6380405dfb99527"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-079",
+      "roadmapRowHashes": [
+        "bd3e191ad0b9997a054e4a23373a436abc2e57421abb953c27fa6a6841e83de8",
+        "48be07a173192dee8219985d2f46d78a05c94c4546c2dd08e9d43f79568bbba6"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-081",
+      "roadmapRowHashes": [
+        "9d8170d8fad9ba3be457031a4c87456be53a7ed3ceb50126e14d7e78efed9f3e",
+        "fe188612b43d8c48e832c511a1e5e57f1c2322f414f45bf82c64212a9cb41bc0"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-083",
+      "roadmapRowHashes": [
+        "fa61c0d6aaf17cc99ea8b6f2f5bb8c81ed4de576013751c6b7b5554116512293",
+        "ba01383e199b1034575b058191a8cd94b5e56fd1b2daf025d3655f0affb38da9"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-086",
+      "roadmapRowHashes": [
+        "b3a3b3f6cd9a76500f90a28b9c096cca87632b2c61cbe0ba422ec2f1f6ade037",
+        "fd0903ef12c43bff50b8888b27002308e6cc0e3e39039436cd88c54d01853405"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-087",
+      "roadmapRowHashes": [
+        "5223f50988a377db20ac6d95e0895a7421b9401e658a86dd178f7bceedb7ec83",
+        "3cd197dd2191e31fea39d4a359741ce225b4a2440c5fdedaccaee800684d06c4"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-088",
+      "roadmapRowHashes": [
+        "0787c625027533aeb9795fb0d219622c5e79d26aa258314b41ab0b59155fcae6",
+        "905742c11b5c21e95fc989fe4d937f1be41764024490f1f0dd81fbdc79e15d09"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-092",
+      "roadmapRowHashes": [
+        "7d6f6ff76bd1eead12e85f80197404ab3911f3740fa56242e74ae5cadb275c72",
+        "93d47fe50e488f57cccaa6bd0a87f5d421315b49702cc5a5c49d572ce7e6af9f"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-094",
+      "roadmapRowHashes": [
+        "2bd879442120e05ca7c2acda822b3267aa159c6f737c37453d098a968d9f8a2f",
+        "2c09ee9d67e93566d1b04edf47f49d2c2e170c054c5a9b689e2b14ba9226a00f"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-097",
+      "roadmapRowHashes": [
+        "8230566b0b694a72df30db46a3f8b3f0c94f7019536b7d064cdec99a83e39e88",
+        "935fb3c7121eb8854148e6ef9668c411487dee00d8d255d3bda0b922637f266a"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-099",
+      "roadmapRowHashes": [
+        "05b7fc979b509c93e090cea9ef19682330fecaf437a981614f6af966c57c373e",
+        "7b61e43eee3c37d3ef494a56c56bcd83ad1712d9eceed7c2f22a76c655c71a41"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-100",
+      "roadmapRowHashes": [
+        "f2940722cfd91d230cd444d9989a3264ec7566badb68beb70451f65e3c2b5089",
+        "2bddf9a6bed8e1a6ef5471d06ba4b9234ce63c35eee17f27304ac126f4404a35"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-S03",
+      "roadmapRowHashes": [
+        "6eedaa82d32208808bf7a5d01e207afe7b207e81c8e7a64e6903ae47f82e421b",
+        "21b52cf7c4250babbf5bfbb35bc92236d2f7436122d97263dccee2d4ba33daf8"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-S05",
+      "roadmapRowHashes": [
+        "aab5b603f84e23d6ab611ff1a580b7f4de21107826f589ae7a94e4ea46725e09",
+        "f2626a67e5449c58ee04c65543c1cd8db5eb49b2dd36a74a6a11593b01f830c5"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-S07",
+      "roadmapRowHashes": [
+        "d00cbb9789a8c0a58030bc46655e239e96a8f431a1da69d5db6b1a4fa26f040c",
+        "f7284f26445ce22dc9da2fcebb011f110d661393fdf19dde8e8260e363925071"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-001",
+      "roadmapRowHashes": [
+        "0f6d52a441458d55008e5b250125cee6065ded94a3b8c6d71a6d27fbca5a4f21"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-002",
+      "roadmapRowHashes": [
+        "7500acf013ccf019f1a37ba0805cf918bb7da1fa3be2738ca837d9b4413d0df3"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-003",
+      "roadmapRowHashes": [
+        "3fc94c1e7f1de97d54095019a772a8a69a0c53be4644917cd24ac551555d78f2"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-004",
+      "roadmapRowHashes": [
+        "bdd9132c10b6fcb8807804b01efb34d07e18c1f4ea3e0b23b2705a336c710c38"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-005",
+      "roadmapRowHashes": [
+        "58aa66103c793ec1f1b03c69e8b38c170ea4271f3110c841c10e39a64955bcf4"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-006",
+      "roadmapRowHashes": [
+        "12acc3b0ed105da3a812c3f9395b0e419b61108b76fb1daa3f9a7097b9180cf9"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-007",
+      "roadmapRowHashes": [
+        "029dea5e001ba547c530b461ca27e29f733f3c95fd9d2d6ab0cb9616bbac4dc3"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-008",
+      "roadmapRowHashes": [
+        "cfaa30c8f0f1227eb4985249996b6bb36bf511c74f622868e2a8fa31719f8d37"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-009",
+      "roadmapRowHashes": [
+        "bbf51b48cb426ca921a27e953bb757941a375c8c6e9f4b6373fa1b013b99f8ec"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-010",
+      "roadmapRowHashes": [
+        "6ad2013ffee85dc683763e63ca8c9db159361ae67c83be9025baf33b03013708"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-011",
+      "roadmapRowHashes": [
+        "134268eba6f32b422913572f59862529761ed1b6c0779dde44267b749cc6db04"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-012",
+      "roadmapRowHashes": [
+        "ba9e5652ec44748ab27cd5c8578f9b70dd075d1b8866dbd7798e46d09150d1a4"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-013",
+      "roadmapRowHashes": [
+        "47fc5d12993eeadadf1b9f8be9d82f395bbcaabcc51e069a0ecdabf703b6553f"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-014",
+      "roadmapRowHashes": [
+        "b0d6904026de9773fd595ce8f30969dd4f3715c64e641cf8e40017c6b14a0ddc"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-015",
+      "roadmapRowHashes": [
+        "2678948bc5b8c527f2eafde9ccf9dc14b5218cef53513b6a9c71e1f792b9e5c1"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-016",
+      "roadmapRowHashes": [
+        "913fb3300e7fe6d671233a9ffd2370bb54a05b8828964a8d4bab8fb96cf82632"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-017",
+      "roadmapRowHashes": [
+        "a68ab9eb9f8e2dad73ad4dc8df306acdbed0dfbe49359a9f9425536bfc8ab07b"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-018",
+      "roadmapRowHashes": [
+        "1925b4e3666951191956e7df2c0bb8b72791fa3daeb5e762a86dfcd491158725"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-019",
+      "roadmapRowHashes": [
+        "2d80ebd8d95f61455f451e54108c4a5e035a3e865cf5ef788747cc16d9892708"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-020",
+      "roadmapRowHashes": [
+        "5c7318ff731a3c3227914388e5676c0b5fb83d83e05b4a5db96d04ba67c9ee2b"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-021",
+      "roadmapRowHashes": [
+        "7d8abe4beaf4f19ffe370cf68dc217d61d79ed58ca7366c41b769327c42c7904"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-022",
+      "roadmapRowHashes": [
+        "72910f561366071eeb22fb19734f6d930cdb2c525368dc4d7bd0e6038c2f1620"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-023",
+      "roadmapRowHashes": [
+        "ef4dff8a502096a9de81d767fd37babd1b546da414ab040a66348dd6218b22db"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-024",
+      "roadmapRowHashes": [
+        "0e7314afc6a5827d0aedfaefdf783bc974682f84a74a472a6b5c909786b6f086"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-025",
+      "roadmapRowHashes": [
+        "37d03d3420d6a0e417386be14415c69f3ec5ca1b36f33deb12bb8a7c2f66b0b2"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-026",
+      "roadmapRowHashes": [
+        "22d0f3deec3864ddd7025f93307822e4cb24e5794d1ba226253002ccfd2dab5d"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-027",
+      "roadmapRowHashes": [
+        "a47972fff969a0af7971bbf706c0a9e23965447700cc2fdfa766fc336c1be903"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-028",
+      "roadmapRowHashes": [
+        "32b3029824ca243ec1e9a44a3a6470165faec98a4e6a531fde325408e07e5603"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-029",
+      "roadmapRowHashes": [
+        "86b43df7f3a5e903223fe869690773b32351f5bdb8ee7e9822381f981b8be7ae"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-030",
+      "roadmapRowHashes": [
+        "24916eaa0d5e779d8c2ae1562f00c82045b43990df00c33df22d9c294ccf844a"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-031",
+      "roadmapRowHashes": [
+        "fb8574507a583247bfd1768a4341d3542cd91703cd2c67ed590f2cc33282f070"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-032",
+      "roadmapRowHashes": [
+        "a8b7ff7472311acf27b25b01e66d3af67132c0b4fdd3abbefdc24019a60e8280"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-033",
+      "roadmapRowHashes": [
+        "7d32f9d7eb1895e43a00422495f0e4f8beaae9768a01a5bd13a9e99d8c272be5"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-034",
+      "roadmapRowHashes": [
+        "738b7c102e3fcd4b38290a4bb6d92f5bbc76b3788ef5d45bfe673003c8f7342f"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-035",
+      "roadmapRowHashes": [
+        "caf2081cbe596618478cb7f6e856820e15bdffc5dee7ffd097600621cb1af132"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-036",
+      "roadmapRowHashes": [
+        "9f7288d148926026b7fddb417b5ed915371ef1fee7643ff66ca044c661c8d2c1"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-037",
+      "roadmapRowHashes": [
+        "a08ca661b63698d87e37fb70d9ec84caf085318f28c67edaaee30e73fd118413"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-038",
+      "roadmapRowHashes": [
+        "caba395f38152cca555d9a8c0c47a5d0353c84b200b065f20a9bf4597198e685"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-039",
+      "roadmapRowHashes": [
+        "00c8cf6e2fb57c21b40734ad03c3d89a3d2f41efb279ecbe83907689b3b61eab"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-040",
+      "roadmapRowHashes": [
+        "038dd61fff521992aab65bcaa093542c1ca93267c9b9caa9e41e9fb920eefe56"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-041",
+      "roadmapRowHashes": [
+        "7ed35bf83536ebceb80a0d340287941ca5c244b10b0ba537ff07951ea8ae7b84"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-042",
+      "roadmapRowHashes": [
+        "4af398739efe86d81356d79865d6766ddb188ad66fd69fcee7317a9eae9586fb"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-043",
+      "roadmapRowHashes": [
+        "6d7b9033152a2c5b07c66c4f1fc2653cabdbefcc64109fc716b9ab33d0f032cb"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-044",
+      "roadmapRowHashes": [
+        "16e86ece665c87b3ec9375e7a862004a207a044d21e33e68f6d5840660950a2e"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-045",
+      "roadmapRowHashes": [
+        "7edacf0aa987f5c1567b0d968ee228f71c739cc3dda6ee4ae10f837147271841"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-046",
+      "roadmapRowHashes": [
+        "b8d946a32bbb339cb242472ea916aa7b7e88f9efacf29649438606f86f31fc1d"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-047",
+      "roadmapRowHashes": [
+        "66f3d406b930fc5866b8f92d6b9f32674b2a53b59d0c5063d5b03f6329e79615"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-048",
+      "roadmapRowHashes": [
+        "99f171068b4ba8021db1bd12e674fda635fae6bddbda90c427fa937d6b9f33cd"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-049",
+      "roadmapRowHashes": [
+        "b05d7f683ec631789cafc94dcdce231169fe3ba9389a5115a4f09ca9c3605f8e"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-050",
+      "roadmapRowHashes": [
+        "9104659dda55f70b1110736988a707b30e55e9395cdfa077304668fdb8971976"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-051",
+      "roadmapRowHashes": [
+        "dc46bad84910ea933c996a5ea2bf1e932fe270c70e9e7f4f353b0c1712884318"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-052",
+      "roadmapRowHashes": [
+        "37803dd5c7890649577ffbd427d4d3b756f4d8a7a810b6087e7c046a45179cae"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-053",
+      "roadmapRowHashes": [
+        "98f82559e28230a9266010c2e625808631ad42ff04bcf17adfa5e80b0bfbab7e"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-054",
+      "roadmapRowHashes": [
+        "684963e55c17823e2596a4b1489ff7c30971da7a3f36afd2f3afd2721173851b"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-API4-055",
+      "roadmapRowHashes": [
+        "26a75352b729670b0dc030568668d7b5dfa69c4a2cd37e9b89a73f6b50db1910"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-001",
+      "roadmapRowHashes": [
+        "a2484ab5af4655586cc2e04b22fcd2ab202fe0019843b10ece79a488f3500659"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-002",
+      "roadmapRowHashes": [
+        "ef62faac80f259460bff545482ed7fe4f7ec536494aaf66d3f4bcf757a8915bf"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-003",
+      "roadmapRowHashes": [
+        "8583fb4099654181a7c7b83e3efb846d6f1aeb8fac524628c405808984d7aa1b"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-004",
+      "roadmapRowHashes": [
+        "964a95e90c12ebbb4ac193486663909e641c93dd380fce061f9d7491f8c924b0"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-005",
+      "roadmapRowHashes": [
+        "111f38b58f9ef924d1cdd28d066903063601ce23b5b1f000156c82d770c4f993"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-006",
+      "roadmapRowHashes": [
+        "c668511a5cd79a09771093bfa77ec2a74e339ce10e17a8621b297bc13583fec5"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-007",
+      "roadmapRowHashes": [
+        "464895c63070d1fc0b09096f0934be6375839fa83793ca7f18b5603e90626136"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-008",
+      "roadmapRowHashes": [
+        "842f119f96692425540b137c3ad72c1754c10b7a14808e4eb96d340125cb0bde"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-011",
+      "roadmapRowHashes": [
+        "9cc79df2375cf9dbffc702a377a6a0ecbc0244b273517e2ade4e9b12d31f3178"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-014",
+      "roadmapRowHashes": [
+        "58c62d2f2946b525f29168831a92b869f3e9f90d48ba8fb8b4d0df735a3add8e"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-017",
+      "roadmapRowHashes": [
+        "70eabc94c95169e14c6319c0baa20030e938f084db08cf7168134841cfb209ac"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-018",
+      "roadmapRowHashes": [
+        "7ac0c3ec41e72cde338feb796bf3fb1676918fb309b49d75e784d98c4dca6656"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-019",
+      "roadmapRowHashes": [
+        "3cffecbb8a962bc4085de9abfd09e313e2f3336eea3acd50e6a4d6f3334442fe"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-021",
+      "roadmapRowHashes": [
+        "0b69090b9b879466905c866bdfeeccf7ee8d7d73b29afe86d07c24789976f55c"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-023",
+      "roadmapRowHashes": [
+        "5e5bb8d8adca7bad6ca43664a91c4786310b25d26984137399fa50e041c181b9"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-024",
+      "roadmapRowHashes": [
+        "396010b1c259906c0cd6951cc9049d4163f8329449abcb67735eddb433326b29"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-025",
+      "roadmapRowHashes": [
+        "6be55155f4974cf63833c049666b6efe099af503a4c8619014f03e860d7d3793"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-027",
+      "roadmapRowHashes": [
+        "d94e6ef235e6c7d0da65af298c13df78deff7b498bdbe6f03ea042e213ee9253"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-028",
+      "roadmapRowHashes": [
+        "3c8d3e90c40eb7500ee5a60b095becc4c66d0ea22bd593536a9eb23b46317fd3"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-030",
+      "roadmapRowHashes": [
+        "e921988d0a75bccd035affbf68aa5ada3847b8b4c9acd9551e6931208d68d7b4"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-033",
+      "roadmapRowHashes": [
+        "e0b1623ff3a3956ba6919eef1fabe87485ac9d91287c5ab58e859be6e93843e0"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-034",
+      "roadmapRowHashes": [
+        "fb187b47905be4e80d970bd177a28e40fa1cde83a433a705aa78aafc83fe35ec"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-035",
+      "roadmapRowHashes": [
+        "21129aa2c8095e43cc36b3f9d255b5f1f412240717f7c0e6b39efdea08ee1f9a"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-036",
+      "roadmapRowHashes": [
+        "41507b85ca2ac29a8ef63b4b0083f312e39f870293a4a3f032004764ac797df2"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-037",
+      "roadmapRowHashes": [
+        "ed45d2601744af83aa1c12e6d955ccd2aa35c6989aa835e8992670ee64ec3b7f"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-038",
+      "roadmapRowHashes": [
+        "76fddae88ab4c0a889db6ca42b08c456a2e49b4861341422988745ab353222f7"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-043",
+      "roadmapRowHashes": [
+        "0527f380cc9aa2a568e35a0a05ebf74778ba29577151a8dd122ee52a2affd414"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-044",
+      "roadmapRowHashes": [
+        "8a1f0a817fa0e61d0a809c3962ac6ca9fb448abfe62a09b65828d8654ef508ae"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-046",
+      "roadmapRowHashes": [
+        "760db5b3d1c78b8b43a9f4d7efc3cbd99fce9fb345a819d7555cc6423b5d00c1"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-047",
+      "roadmapRowHashes": [
+        "aceceb68656eff728bc9ffc9948b2176341272445be79d737812d74a14ab83bb"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-048",
+      "roadmapRowHashes": [
+        "60d7ceffefb013f5ada5788f1a0d075d9dae2f346f9d5efa29e1e950081d9afe"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-053",
+      "roadmapRowHashes": [
+        "3777369df77346360533130ed53823fcc03d184dcf674476ee6741cdbf980a1b"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-055",
+      "roadmapRowHashes": [
+        "f05774f5dd59fc81be36fa950a371e68ad810cc510bf2e6248b82ff2dfc70b84"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-057",
+      "roadmapRowHashes": [
+        "704be3a01a6a3bb8b498f968faecf10336743619e516c2516f1dcbce8cc12aab"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-059",
+      "roadmapRowHashes": [
+        "65de1d46d6375ee32ea3466f69a662d016ff7c322c6f50c9a675a38069484633"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-061",
+      "roadmapRowHashes": [
+        "2c768738746abbe9ce48277f736fb94ef42dee57482717ec44e46d8bd119904c"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-062",
+      "roadmapRowHashes": [
+        "5044255534c059edb9f52e002f7a2cdacec23e26e588405c4127eb72e8ef1051"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-063",
+      "roadmapRowHashes": [
+        "377ad080a0354a869035636bedc113871e96e337a27bb9ccd3941274578b18eb"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-064",
+      "roadmapRowHashes": [
+        "33322a61595cda942052d1bc89daba22a9495189370182b3ca05cd153e705c95"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-065",
+      "roadmapRowHashes": [
+        "6b8865986f4af1651180e94c2db81ccf679d2a2faaf2c67705dc3d149cfc05a6"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-066",
+      "roadmapRowHashes": [
+        "3a9f8091123db122df3c4219f7b81c6a03478010337fab852aa68cbd7c00d64f"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-069",
+      "roadmapRowHashes": [
+        "59e77ded32a12ff173bf792ce758cec1cae5e94ec03f288e149c197cd030af5c"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-071",
+      "roadmapRowHashes": [
+        "2b892c91c2fd8044ae0c257ceb22b6404e0a4de27b48ff8581a0ecbaf1557f4e"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-072",
+      "roadmapRowHashes": [
+        "9601553ba82cf4cef80c7eed0da52fee959fb9c5d9a49a1a5f9faf6f7353c4b9"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-075",
+      "roadmapRowHashes": [
+        "00317f1b07d48cdc643485791e945769814f2a642e355211715c4bb0c9f9b3d1"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-077",
+      "roadmapRowHashes": [
+        "d48f5e4444d8db9c5a3bf5aa61f8f40174516736c7ce0e5e66c995f572d39809"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-078",
+      "roadmapRowHashes": [
+        "19ad68e9fb992242626da06586e39d0c7942649ebbfd86ebddf6ecdfb37de136"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-080",
+      "roadmapRowHashes": [
+        "4c98796981b64c3d8822eaaa331f12a5d147e82adc0779c5f4977ae286c91f1d"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-082",
+      "roadmapRowHashes": [
+        "e41604eabfacc27ee9da8c8c04ac2698b3fb64ef118d4a99b25914fb856b594f"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-084",
+      "roadmapRowHashes": [
+        "199813cec6b1d8d4194d96558aae14e53803316f0d614924f5fcec7c2d20fea4"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-085",
+      "roadmapRowHashes": [
+        "cf2938e7e92ba4ecb0bb0fe9eba84627b1d093e596e7bb8743426ea512298f66"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-089",
+      "roadmapRowHashes": [
+        "29bdc978276dadb51b2ecc3007396410d0f84cd2a71a13634ea4df07279ffe02"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-090",
+      "roadmapRowHashes": [
+        "054e7a7d04448c4b0f76fcfa277b2fd1a8e95d05278cd7b0df1eba6090ee75c5"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-091",
+      "roadmapRowHashes": [
+        "04b1e5e459a027429cc9d6659584dc21b5147720ef25762f9dcc5a814111c0e2"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-093",
+      "roadmapRowHashes": [
+        "f7268f0de4d8f6ca575b557b545078650961058de87bde6859709b616c6e569c"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-095",
+      "roadmapRowHashes": [
+        "252a5c61c1b8481c79d04a4a8df6c0edc066e4af0976d7ae79f06e262e4ec2e3"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-096",
+      "roadmapRowHashes": [
+        "e5b179b28c5d76af0c9ca2a71f964aea8d4b9d1379308d5d12bf8c38546ff41c"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-V4-098",
+      "roadmapRowHashes": [
+        "b36d97373e08c482b63e415db44de70c3eb63fcf07436327081edc3ce852f091"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-S01",
+      "roadmapRowHashes": [
+        "e879b62ad8d573d11960f34dd915c9ec3cbcac1a4e1ef538481fdc463b824f24"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-S02",
+      "roadmapRowHashes": [
+        "05fc0ae5d46111502f1e7774f908041039a057fd3e889ad7db028b0ec5e7a712"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-S04",
+      "roadmapRowHashes": [
+        "1e4ee3f9bfbd6e74390376225325bd28fd6c4752d643cb4669ce34f20527e368"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-S06",
+      "roadmapRowHashes": [
+        "5128665da46a7805700c0db2f6d1f54d660295051bccdb21c42b5d08fb455e8b"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-S08",
+      "roadmapRowHashes": [
+        "17d8068a305ddc0e9f599ecf053f4ed4b411a0ae51e13d48b1e5acdbe9934fd9"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-S09",
+      "roadmapRowHashes": [
+        "62c4ce50eede487f407b16d6a5f8fc8f3fc960502bb5abdcf25d59e911700e46"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-S10",
+      "roadmapRowHashes": [
+        "7a5219cf34accf0a81dcec58d09d8a08b4f6d8f4717324e04d77f626b29a138b"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-L01",
+      "roadmapRowHashes": [
+        "e6b932fbe3caa4a40270ad5565fc5792487ceb3241e1dbad61606cf4bb990671"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-L02",
+      "roadmapRowHashes": [
+        "7589bb589f22fa0937e3094bbc966ee5901165784cf863d89157a219a84d6f32"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-L03",
+      "roadmapRowHashes": [
+        "98cdd314b779156cf6aed35c4ad0e644dce10ff44dd4b925734242709f9c1e3b"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-L04",
+      "roadmapRowHashes": [
+        "56d89e368baf08161f4e370fd5fd1ac6613019096ee666b15b4992f03205edda"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-L05",
+      "roadmapRowHashes": [
+        "e6270bea616889e647940ece1f7f469a25baaf14dad470a5e5f0555f36311af3"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-L06",
+      "roadmapRowHashes": [
+        "3a84219f390bd9a8bdf4371b674b3b669a0bd7bff90a2ce659b1bd5072092f89"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-L07",
+      "roadmapRowHashes": [
+        "1a9fc9094af7f037db82c228ae91f7559b5db64fa4821ec882bd81bba965da5a"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-L08",
+      "roadmapRowHashes": [
+        "0c39e85a343188b6ec654094d8569752b1371d35b083a11d0cbce55ee84f18db"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-L09",
+      "roadmapRowHashes": [
+        "5d3fe4c468d54e25ace2e8e40bc113977d8c9c0366b84a2393a618fea2b6ac4a"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-ADD-L10",
+      "roadmapRowHashes": [
+        "bc2388ac39854dc931148ca858907b28b91d1d0f298f0dac1c8dd818165b8418"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-001",
+      "roadmapRowHashes": [
+        "8b253617026f85d2cee06cdbd1eceb6db15dc69628f8097d7b3a889d15c92031"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-002",
+      "roadmapRowHashes": [
+        "f4e549d2f7b161e000610e3d3772279c453f0285e0175cb17810a7be2a57993c"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-003",
+      "roadmapRowHashes": [
+        "31081d0c85cb8f62667eb88c5d2c2c7e26ae2877582e597d7cd3756bf5af59ff"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-004",
+      "roadmapRowHashes": [
+        "125c9289e5a8f210457f8c86527ff3c0dbd564f7e8b85cf35658fd3c8adc6945"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-005",
+      "roadmapRowHashes": [
+        "6a2015c470aacd46feaf292f02e560d54e38b6de8d285575529bb08ed70bd0db"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-006",
+      "roadmapRowHashes": [
+        "6c1354730a7bec07a27c554148c2f6d8abb9c84b5b1921b7d2756b57a8dd9656"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-007",
+      "roadmapRowHashes": [
+        "68c42b60acdb6e371aa0145caf7e481a88848554ccb0a01e486b749a7c26215b"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-008",
+      "roadmapRowHashes": [
+        "95542545216b82f61f108eb30c6ed0d077d6ebb9d43034774b728e91b964d3f5"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-009",
+      "roadmapRowHashes": [
+        "6c1d1322b29ad786815cd7ea1c1668125202b709040a7d2c95d2e42178462399"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-010",
+      "roadmapRowHashes": [
+        "e089ee97cc501e258b64546187f767c136f8ebe7212349bdaab253d59b1e785d"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-011",
+      "roadmapRowHashes": [
+        "41b1268c82d6713f39570a25de7280c185d235bcd05ec6169dd50bccc0b1dec0"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-012",
+      "roadmapRowHashes": [
+        "8361fa725cb7c99a3e94093111d64bd894ed2f7bb36241c4a2b6810d93adaa8f"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-013",
+      "roadmapRowHashes": [
+        "cde46e2ac4bed059783271ff945e998a77026022ae578bc2fa1d5184d85d602a"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-014",
+      "roadmapRowHashes": [
+        "bd6253af5b40aff94d409952edd03dfb6aa0f40ec699aedfbbe3ae315b442d2d"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-015",
+      "roadmapRowHashes": [
+        "1a9161fe4e651084bb66963505b6cc1e6370dabcd21541ef3239fb31ce3f7eca"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-016",
+      "roadmapRowHashes": [
+        "4d2ff5044ee97db9f20b5964527c05499ee1177949a2fd9c5cc3de10682da138"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-017",
+      "roadmapRowHashes": [
+        "0a992e3a6e625a6a6aa60c65f5b719c1aa9b16210305fa034957a3b39d7cddee"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-018",
+      "roadmapRowHashes": [
+        "2c82f5a8098a5503764933f2d3077c8a7373450b23b0842e37b8b5886afd315a"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-019",
+      "roadmapRowHashes": [
+        "c54f1e5490cbb6f09e5eccc5bbe6c34a824a1b0b64d51afbbc08c8e0be498a84"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-020",
+      "roadmapRowHashes": [
+        "109b22021970b49dad473b32aba0c2d66a43d7014c717e77de36e713e53d865f"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-021",
+      "roadmapRowHashes": [
+        "ad13e96c5a8dca9154dd7f5ce02f6d229d3cf7c7d14d7465de045b270a923fe1"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-022",
+      "roadmapRowHashes": [
+        "1498d8fbdf01a1a5243831debef0cd1e251e3ce90c57202640a4f9d2402a5927"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-023",
+      "roadmapRowHashes": [
+        "17a2c47850beca443854eca51486be2a2a73ffe3975755592cd4a5fa072d9f1d"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-024",
+      "roadmapRowHashes": [
+        "87228933a1802cc8a8f2959d13e22a6216e2a9b447bfd5afe3e3c41e96ded82d"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-025",
+      "roadmapRowHashes": [
+        "dbe40cfa3c548ec14a81c2ba5aa4b138f422967bea820a7a0c1253b274f8ab8e"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-026",
+      "roadmapRowHashes": [
+        "48a05b6b26ffd387fac26584d6739890a8ab3ec3a971ec59d5d4ac3b37642756"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-027",
+      "roadmapRowHashes": [
+        "e8241fe632f11eb3a29a4e477b052afb6ff5bfac133b655132220e5135e00041"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-028",
+      "roadmapRowHashes": [
+        "0a5ebb5437a3f6119e4bbb6e2cb2e1929137e4780e350db53c2d49ba14d4078f"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-029",
+      "roadmapRowHashes": [
+        "0b169419d90631fc110d364359bfeb2c46e3129ed023143526afa8a1d1edf01f"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-030",
+      "roadmapRowHashes": [
+        "b3494a28846cde22543b1efc29a8fa391ca86480f7329bf1a69c4a94785205f5"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-031",
+      "roadmapRowHashes": [
+        "e98a5c2bec8af21a30cde139e2cf9c3bb1d305c9d71babe980e10963c1a2e374"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-032",
+      "roadmapRowHashes": [
+        "3263884aeb6abfee9310b74417e4ca093ad1e92971947102f2e35338e9b53024"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-033",
+      "roadmapRowHashes": [
+        "7bee925f595e842585f42defa15feb53b0f57eb01090ec9ccf16f7866b61f612"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-034",
+      "roadmapRowHashes": [
+        "303f3174ac59a12b530c436bbcbf34cba1346bf2cb6af34d7a19477ae7dd2b0a"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-035",
+      "roadmapRowHashes": [
+        "196c45a72009c51d8f685beb1fda7bbe211a0553d3ff5f25555f4ae28955c263"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-036",
+      "roadmapRowHashes": [
+        "29b05c587c774ef6901411f00cdc8294597f2b4a79a31c244a2b353847db6dea"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-037",
+      "roadmapRowHashes": [
+        "431ad4ed5194f1556d4761f5ad04dd15b7484d8d1b8b322a002e30441df94863"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-038",
+      "roadmapRowHashes": [
+        "78d4cf12844d956300eb3f6840c737272d75ba06b2c2a3ddd3c9d9ba84107068"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-039",
+      "roadmapRowHashes": [
+        "8fa37cc4a3863c44c16630d6a6326fb75126fe57756e97b9e1f5951dc3941e83"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-040",
+      "roadmapRowHashes": [
+        "7cfa108a56123984ddd65ded56914df1acc03f9bbd6170a434e749ef8453b697"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-041",
+      "roadmapRowHashes": [
+        "59752a377b66c1dbe4e3538e3cf4b33d8085636d1e4139c4e4d5277a1190c7c6"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-042",
+      "roadmapRowHashes": [
+        "4d615741c470c7da1a47f253b1ca7c5f03f6315e25df70fa8d2a3a2d2a8e52b4"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-043",
+      "roadmapRowHashes": [
+        "bbbfc5654d407ca7bd3cace7dbb5cb9dd89c451bc8b9f9f8bec2113b7c9e47ab"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-044",
+      "roadmapRowHashes": [
+        "6e2548254227478747df77b820a02abb9c2f85e550cb197bd5669e42761fafd7"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-045",
+      "roadmapRowHashes": [
+        "060bce9cd9c18bf54251cdfb797a54275c01d18b3bb7025a9aad627a059bf8d4"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-046",
+      "roadmapRowHashes": [
+        "f5eaedba4fe6ea7f84e1a41c7aec2137826b5ac7ded68b647c188f1780c2c54a"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-047",
+      "roadmapRowHashes": [
+        "496790705d33407fe72d73bcf8a4a8a8c124e06e4fc8e89795b23f9908e665b9"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-048",
+      "roadmapRowHashes": [
+        "1955dd10409b2a071902b145c87f30f96afdb3422132af0712fc13692cd6d317"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-049",
+      "roadmapRowHashes": [
+        "4be9072cae6dc914d39fecd81746d82e51e55bf337b5cd8463a5b9a558c7b89d"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-UI-050",
+      "roadmapRowHashes": [
+        "6356960895babb9280fe88bfa350bd962a6869319e74882c0494b293b0e1256b"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-OPS-001",
+      "roadmapRowHashes": [
+        "5a22f9aa51c34802c42c3a5e6d88bf72cad9d1c7bf1530bb9173e0abaa29fcfc"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-OPS-002",
+      "roadmapRowHashes": [
+        "62feccfebe539931d4d8dd047fc380fad1728b73df8d2a198a6254436e358fe2"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-OPS-003",
+      "roadmapRowHashes": [
+        "208b8fa062f90af859e2b9718bcddd45c2320528d3f88cebab841f48f0839769"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-OPS-004",
+      "roadmapRowHashes": [
+        "68c689ab6982363ca858ca0169f1c1b98251ffad8337545fe6d05b76397517cf"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-OPS-005",
+      "roadmapRowHashes": [
+        "fc09f82e0739a44e22eb1ea210d5e957916dd45721b49ec6746e76922854e4e7"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-OPS-006",
+      "roadmapRowHashes": [
+        "e0e609ef72eae0215552fb372fd03484c544f2c9170834f562484f81cba514d7"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-OPS-007",
+      "roadmapRowHashes": [
+        "7a4b582d5c86f1a1777ec2105e20aaa9ab3a5af381ead216481a39fdf94179d6"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-OPS-008",
+      "roadmapRowHashes": [
+        "f5c4819dad4ada8acdbccdaa76a26cc887dc4ad61e1bf704dca6061b042347e0"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-OPS-009",
+      "roadmapRowHashes": [
+        "bc9bb0203c387557fa2da0f49ba71634e06608a11346fa3c359022e2812cfafc"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-OPS-010",
+      "roadmapRowHashes": [
+        "5b741109fabe7353739d4ccaaf4aeee5f5f9beaabd08769dbb7066a30459a959"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-OPS-011",
+      "roadmapRowHashes": [
+        "cba7b0b16acc08f9ee7e10b0cda927c3925ea7b371666d91f76d72c4b3f91f20"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-OPS-012",
+      "roadmapRowHashes": [
+        "f9b8e485b3570cc5db6a54cb54aedfd02c550bfe25afdf44d912bf8ff0f34e59"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-OPS-013",
+      "roadmapRowHashes": [
+        "2a0ef226e76dc9e4e8c28108993eb03a5b6221925771e52cdbef4fa23ab2264f"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-OPS-014",
+      "roadmapRowHashes": [
+        "404d8e38783a357789d1380bcc62feaeaf0d613f5e35a5b0b7db096aee5a91c9"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    },
+    {
+      "id": "ZEUS-OPS-015",
+      "roadmapRowHashes": [
+        "b2402f12eb9185de8a11d19e4c8682e882f23abb23637116a0893149a5349a3c"
+      ],
+      "acceptance": "unaccepted",
+      "codeMapping": [],
+      "tests": []
+    }
+  ],
+  "d1Sql": [
+    {
+      "table": "users",
+      "source": "D1",
+      "fromLine": 134,
+      "toLine": 147,
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "line": 135,
+          "definition": "id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "full_name",
+          "type": "VARCHAR(100)",
+          "line": 136,
+          "definition": "full_name   VARCHAR(100) NOT NULL,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "mobile",
+          "type": "VARCHAR(15)",
+          "line": 137,
+          "definition": "mobile      VARCHAR(15) UNIQUE NOT NULL,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "email",
+          "type": "VARCHAR(150)",
+          "line": 138,
+          "definition": "email       VARCHAR(150) UNIQUE,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "password_hash",
+          "type": "VARCHAR(255)",
+          "line": 139,
+          "definition": "password_hash VARCHAR(255) NOT NULL,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "role",
+          "type": "VARCHAR(20)",
+          "line": 140,
+          "definition": "role        VARCHAR(20) NOT NULL DEFAULT 'customer',\n                -- customer | executor | operator | admin",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "city",
+          "type": "VARCHAR(50)",
+          "line": 142,
+          "definition": "city        VARCHAR(50),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "is_active",
+          "type": "BOOLEAN",
+          "line": 143,
+          "definition": "is_active   BOOLEAN DEFAULT TRUE,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "is_verified",
+          "type": "BOOLEAN",
+          "line": 144,
+          "definition": "is_verified BOOLEAN DEFAULT FALSE,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMPTZ",
+          "line": 145,
+          "definition": "created_at  TIMESTAMPTZ DEFAULT NOW(),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "last_login",
+          "type": "TIMESTAMPTZ",
+          "line": 146,
+          "definition": "last_login  TIMESTAMPTZ",
+          "mappingStatus": "pending"
+        }
+      ]
+    },
+    {
+      "table": "services",
+      "source": "D1",
+      "fromLine": 152,
+      "toLine": 165,
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "line": 153,
+          "definition": "id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(100)",
+          "line": 154,
+          "definition": "name            VARCHAR(100) NOT NULL,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "slug",
+          "type": "VARCHAR(100)",
+          "line": 155,
+          "definition": "slug            VARCHAR(100) UNIQUE NOT NULL,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "line": 156,
+          "definition": "description     TEXT,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "pricing_type",
+          "type": "VARCHAR(20)",
+          "line": 157,
+          "definition": "pricing_type    VARCHAR(20) NOT NULL,\n                    -- fixed | negotiable | formula",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "base_price",
+          "type": "INTEGER",
+          "line": 159,
+          "definition": "base_price      INTEGER,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "same_day_surcharge",
+          "type": "DECIMAL(5,2)",
+          "line": 160,
+          "definition": "same_day_surcharge  DECIMAL(5,2) DEFAULT 80.0,  -- 80% اضافه‌بار همان روز",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "urgent_surcharge",
+          "type": "DECIMAL(5,2)",
+          "line": 161,
+          "definition": "urgent_surcharge    DECIMAL(5,2) DEFAULT 30.0,  -- 30% اضافه‌بار فوری",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "form_fields",
+          "type": "JSONB",
+          "line": 162,
+          "definition": "form_fields     JSONB,   -- فیلدهای پویای فرم",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "is_active",
+          "type": "BOOLEAN",
+          "line": 163,
+          "definition": "is_active       BOOLEAN DEFAULT TRUE,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "sort_order",
+          "type": "INTEGER",
+          "line": 164,
+          "definition": "sort_order      INTEGER DEFAULT 0",
+          "mappingStatus": "pending"
+        }
+      ]
+    },
+    {
+      "table": "orders",
+      "source": "D1",
+      "fromLine": 170,
+      "toLine": 194,
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "line": 171,
+          "definition": "id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "order_code",
+          "type": "VARCHAR(30)",
+          "line": 172,
+          "definition": "order_code      VARCHAR(30) UNIQUE NOT NULL,  -- NB-14040418-0041",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "customer_id",
+          "type": "UUID",
+          "line": 173,
+          "definition": "customer_id     UUID REFERENCES users(id),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "executor_id",
+          "type": "UUID",
+          "line": 174,
+          "definition": "executor_id     UUID REFERENCES users(id),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "service_id",
+          "type": "UUID",
+          "line": 175,
+          "definition": "service_id      UUID REFERENCES services(id),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "title",
+          "type": "VARCHAR(200)",
+          "line": 176,
+          "definition": "title           VARCHAR(200) NOT NULL,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "form_data",
+          "type": "JSONB",
+          "line": 177,
+          "definition": "form_data       JSONB NOT NULL,   -- داده‌های فرم پویا",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(30)",
+          "line": 178,
+          "definition": "status          VARCHAR(30) NOT NULL DEFAULT 'pending_triage',\n                    -- pending_triage | triaging | assigned\n                    -- in_progress | delivered | confirmed\n                    -- closed | cancelled | disputed",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "priority",
+          "type": "VARCHAR(20)",
+          "line": 182,
+          "definition": "priority        VARCHAR(20) NOT NULL DEFAULT 'normal',\n                    -- normal | urgent | same_day",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "base_price",
+          "type": "INTEGER",
+          "line": 184,
+          "definition": "base_price      INTEGER,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "final_price",
+          "type": "INTEGER",
+          "line": 185,
+          "definition": "final_price     INTEGER,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "surcharge_pct",
+          "type": "DECIMAL(5,2)",
+          "line": 186,
+          "definition": "surcharge_pct   DECIMAL(5,2) DEFAULT 0,  -- درصد اضافه‌بار",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "deadline",
+          "type": "DATE",
+          "line": 187,
+          "definition": "deadline        DATE NOT NULL,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "same_day_deadline",
+          "type": "TIMESTAMPTZ",
+          "line": 188,
+          "definition": "same_day_deadline TIMESTAMPTZ,  -- برای سفارش همان روز — ساعت دقیق",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "notes",
+          "type": "TEXT",
+          "line": 189,
+          "definition": "notes           TEXT,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMPTZ",
+          "line": 190,
+          "definition": "created_at      TIMESTAMPTZ DEFAULT NOW(),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "assigned_at",
+          "type": "TIMESTAMPTZ",
+          "line": 191,
+          "definition": "assigned_at     TIMESTAMPTZ,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "delivered_at",
+          "type": "TIMESTAMPTZ",
+          "line": 192,
+          "definition": "delivered_at    TIMESTAMPTZ,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "confirmed_at",
+          "type": "TIMESTAMPTZ",
+          "line": 193,
+          "definition": "confirmed_at    TIMESTAMPTZ",
+          "mappingStatus": "pending"
+        }
+      ]
+    },
+    {
+      "table": "order_files",
+      "source": "D1",
+      "fromLine": 199,
+      "toLine": 208,
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "line": 200,
+          "definition": "id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "order_id",
+          "type": "UUID",
+          "line": 201,
+          "definition": "order_id    UUID REFERENCES orders(id),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "uploader_id",
+          "type": "UUID",
+          "line": 202,
+          "definition": "uploader_id UUID REFERENCES users(id),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "file_type",
+          "type": "VARCHAR(20)",
+          "line": 203,
+          "definition": "file_type   VARCHAR(20),  -- attachment | delivery",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "file_url",
+          "type": "VARCHAR(500)",
+          "line": 204,
+          "definition": "file_url    VARCHAR(500) NOT NULL,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "file_name",
+          "type": "VARCHAR(200)",
+          "line": 205,
+          "definition": "file_name   VARCHAR(200),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "file_size",
+          "type": "INTEGER",
+          "line": 206,
+          "definition": "file_size   INTEGER,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "uploaded_at",
+          "type": "TIMESTAMPTZ",
+          "line": 207,
+          "definition": "uploaded_at TIMESTAMPTZ DEFAULT NOW()",
+          "mappingStatus": "pending"
+        }
+      ]
+    },
+    {
+      "table": "order_messages",
+      "source": "D1",
+      "fromLine": 213,
+      "toLine": 222,
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "line": 214,
+          "definition": "id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "order_id",
+          "type": "UUID",
+          "line": 215,
+          "definition": "order_id    UUID REFERENCES orders(id),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "sender_id",
+          "type": "UUID",
+          "line": 216,
+          "definition": "sender_id   UUID REFERENCES users(id),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "message_type",
+          "type": "VARCHAR(50)",
+          "line": 217,
+          "definition": "message_type VARCHAR(50),\n                -- progress_report | file_request | clarification\n                -- extension_request | issue_report",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "content",
+          "type": "TEXT",
+          "line": 220,
+          "definition": "content     TEXT,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMPTZ",
+          "line": 221,
+          "definition": "created_at  TIMESTAMPTZ DEFAULT NOW()",
+          "mappingStatus": "pending"
+        }
+      ]
+    },
+    {
+      "table": "payments",
+      "source": "D1",
+      "fromLine": 227,
+      "toLine": 238,
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "line": 228,
+          "definition": "id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "order_id",
+          "type": "UUID",
+          "line": 229,
+          "definition": "order_id        UUID REFERENCES orders(id),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "user_id",
+          "type": "UUID",
+          "line": 230,
+          "definition": "user_id         UUID REFERENCES users(id),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "amount",
+          "type": "INTEGER",
+          "line": 231,
+          "definition": "amount          INTEGER NOT NULL,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "type",
+          "type": "VARCHAR(20)",
+          "line": 232,
+          "definition": "type            VARCHAR(20),  -- order | wallet_charge | withdrawal",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "line": 233,
+          "definition": "status          VARCHAR(20) DEFAULT 'pending',\n                    -- pending | completed | failed | refunded",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "gateway",
+          "type": "VARCHAR(30)",
+          "line": 235,
+          "definition": "gateway         VARCHAR(30),  -- zarinpal | wallet",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "gateway_ref",
+          "type": "VARCHAR(100)",
+          "line": 236,
+          "definition": "gateway_ref     VARCHAR(100),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMPTZ",
+          "line": 237,
+          "definition": "created_at      TIMESTAMPTZ DEFAULT NOW()",
+          "mappingStatus": "pending"
+        }
+      ]
+    },
+    {
+      "table": "wallets",
+      "source": "D1",
+      "fromLine": 243,
+      "toLine": 248,
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "line": 244,
+          "definition": "id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "user_id",
+          "type": "UUID",
+          "line": 245,
+          "definition": "user_id     UUID UNIQUE REFERENCES users(id),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "balance",
+          "type": "INTEGER",
+          "line": 246,
+          "definition": "balance     INTEGER DEFAULT 0,  -- تومان",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMPTZ",
+          "line": 247,
+          "definition": "updated_at  TIMESTAMPTZ DEFAULT NOW()",
+          "mappingStatus": "pending"
+        }
+      ]
+    },
+    {
+      "table": "tickets",
+      "source": "D1",
+      "fromLine": 253,
+      "toLine": 270,
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "line": 254,
+          "definition": "id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "ticket_code",
+          "type": "VARCHAR(20)",
+          "line": 255,
+          "definition": "ticket_code     VARCHAR(20) UNIQUE NOT NULL,  -- #1024",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "customer_id",
+          "type": "UUID",
+          "line": 256,
+          "definition": "customer_id     UUID REFERENCES users(id),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "assigned_to",
+          "type": "UUID",
+          "line": 257,
+          "definition": "assigned_to     UUID REFERENCES users(id),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "order_id",
+          "type": "UUID",
+          "line": 258,
+          "definition": "order_id        UUID REFERENCES orders(id),  -- اختیاری",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "subject",
+          "type": "VARCHAR(200)",
+          "line": 259,
+          "definition": "subject         VARCHAR(200) NOT NULL,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "category",
+          "type": "VARCHAR(30)",
+          "line": 260,
+          "definition": "category        VARCHAR(30),  -- financial | order | technical | general",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "priority",
+          "type": "VARCHAR(20)",
+          "line": 261,
+          "definition": "priority        VARCHAR(20) DEFAULT 'normal',\n                    -- urgent | high | normal",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "line": 263,
+          "definition": "status          VARCHAR(20) DEFAULT 'open',\n                    -- open | in_progress | answered | closed",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "sla_hours",
+          "type": "INTEGER",
+          "line": 265,
+          "definition": "sla_hours       INTEGER DEFAULT 4,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "sla_deadline",
+          "type": "TIMESTAMPTZ",
+          "line": 266,
+          "definition": "sla_deadline    TIMESTAMPTZ,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "customer_rating",
+          "type": "INTEGER",
+          "line": 267,
+          "definition": "customer_rating INTEGER,  -- ۱ تا ۵ بعد از بستن",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMPTZ",
+          "line": 268,
+          "definition": "created_at      TIMESTAMPTZ DEFAULT NOW(),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "closed_at",
+          "type": "TIMESTAMPTZ",
+          "line": 269,
+          "definition": "closed_at       TIMESTAMPTZ",
+          "mappingStatus": "pending"
+        }
+      ]
+    },
+    {
+      "table": "ticket_messages",
+      "source": "D1",
+      "fromLine": 275,
+      "toLine": 282,
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "line": 276,
+          "definition": "id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "ticket_id",
+          "type": "UUID",
+          "line": 277,
+          "definition": "ticket_id   UUID REFERENCES tickets(id),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "sender_id",
+          "type": "UUID",
+          "line": 278,
+          "definition": "sender_id   UUID REFERENCES users(id),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "content",
+          "type": "TEXT",
+          "line": 279,
+          "definition": "content     TEXT NOT NULL,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "is_internal",
+          "type": "BOOLEAN",
+          "line": 280,
+          "definition": "is_internal BOOLEAN DEFAULT FALSE,  -- یادداشت داخلی — مشتری نمی‌بینه",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMPTZ",
+          "line": 281,
+          "definition": "created_at  TIMESTAMPTZ DEFAULT NOW()",
+          "mappingStatus": "pending"
+        }
+      ]
+    },
+    {
+      "table": "reviews",
+      "source": "D1",
+      "fromLine": 287,
+      "toLine": 296,
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "line": 288,
+          "definition": "id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "order_id",
+          "type": "UUID",
+          "line": 289,
+          "definition": "order_id        UUID UNIQUE REFERENCES orders(id),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "customer_id",
+          "type": "UUID",
+          "line": 290,
+          "definition": "customer_id     UUID REFERENCES users(id),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "executor_id",
+          "type": "UUID",
+          "line": 291,
+          "definition": "executor_id     UUID REFERENCES users(id),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "rating",
+          "type": "INTEGER",
+          "line": 292,
+          "definition": "rating          INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "comment",
+          "type": "TEXT",
+          "line": 293,
+          "definition": "comment         TEXT,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "is_public",
+          "type": "BOOLEAN",
+          "line": 294,
+          "definition": "is_public       BOOLEAN DEFAULT TRUE,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMPTZ",
+          "line": 295,
+          "definition": "created_at      TIMESTAMPTZ DEFAULT NOW()",
+          "mappingStatus": "pending"
+        }
+      ]
+    },
+    {
+      "table": "notifications",
+      "source": "D1",
+      "fromLine": 301,
+      "toLine": 311,
+      "columns": [
+        {
+          "name": "id",
+          "type": "UUID",
+          "line": 302,
+          "definition": "id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "user_id",
+          "type": "UUID",
+          "line": 303,
+          "definition": "user_id     UUID REFERENCES users(id),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "type",
+          "type": "VARCHAR(50)",
+          "line": 304,
+          "definition": "type        VARCHAR(50),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "title",
+          "type": "VARCHAR(200)",
+          "line": 305,
+          "definition": "title       VARCHAR(200),",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "body",
+          "type": "TEXT",
+          "line": 306,
+          "definition": "body        TEXT,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "is_read",
+          "type": "BOOLEAN",
+          "line": 307,
+          "definition": "is_read     BOOLEAN DEFAULT FALSE,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "ref_type",
+          "type": "VARCHAR(30)",
+          "line": 308,
+          "definition": "ref_type    VARCHAR(30),  -- order | ticket | payment",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "ref_id",
+          "type": "UUID",
+          "line": 309,
+          "definition": "ref_id      UUID,",
+          "mappingStatus": "pending"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMPTZ",
+          "line": 310,
+          "definition": "created_at  TIMESTAMPTZ DEFAULT NOW()",
+          "mappingStatus": "pending"
+        }
+      ]
+    }
+  ],
+  "d1Tree": [
+    {
+      "path": "niazat/frontend",
+      "kind": "directory",
+      "sourceLine": 7,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/public",
+      "kind": "directory",
+      "sourceLine": 8,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src",
+      "kind": "directory",
+      "sourceLine": 9,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/api",
+      "kind": "directory",
+      "sourceLine": 10,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/api/auth.ts",
+      "kind": "file",
+      "sourceLine": 11,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/api/orders.ts",
+      "kind": "file",
+      "sourceLine": 12,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/api/tickets.ts",
+      "kind": "file",
+      "sourceLine": 13,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/api/users.ts",
+      "kind": "file",
+      "sourceLine": 14,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/api/payments.ts",
+      "kind": "file",
+      "sourceLine": 15,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/components",
+      "kind": "directory",
+      "sourceLine": 16,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/components/ui",
+      "kind": "directory",
+      "sourceLine": 17,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/components/ui/Button.tsx",
+      "kind": "file",
+      "sourceLine": 18,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/components/ui/Badge.tsx",
+      "kind": "file",
+      "sourceLine": 19,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/components/ui/Modal.tsx",
+      "kind": "file",
+      "sourceLine": 20,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/components/ui/Table.tsx",
+      "kind": "file",
+      "sourceLine": 21,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/components/ui/FileUpload.tsx",
+      "kind": "file",
+      "sourceLine": 22,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/components/layout",
+      "kind": "directory",
+      "sourceLine": 23,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/components/layout/Navbar.tsx",
+      "kind": "file",
+      "sourceLine": 24,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/components/layout/Sidebar.tsx",
+      "kind": "file",
+      "sourceLine": 25,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/components/layout/TopBar.tsx",
+      "kind": "file",
+      "sourceLine": 26,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/components/forms",
+      "kind": "directory",
+      "sourceLine": 27,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/components/forms/OrderForm.tsx",
+      "kind": "file",
+      "sourceLine": 28,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/components/forms/PrioritySelector.tsx",
+      "kind": "file",
+      "sourceLine": 29,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages",
+      "kind": "directory",
+      "sourceLine": 30,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/public",
+      "kind": "directory",
+      "sourceLine": 31,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/public/Landing.tsx",
+      "kind": "file",
+      "sourceLine": 32,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/public/Login.tsx",
+      "kind": "file",
+      "sourceLine": 33,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/public/Register.tsx",
+      "kind": "file",
+      "sourceLine": 34,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/public/OTP.tsx",
+      "kind": "file",
+      "sourceLine": 35,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/public/Services.tsx",
+      "kind": "file",
+      "sourceLine": 36,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/customer",
+      "kind": "directory",
+      "sourceLine": 37,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/customer/Dashboard.tsx",
+      "kind": "file",
+      "sourceLine": 38,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/customer/OrderDetail.tsx",
+      "kind": "file",
+      "sourceLine": 39,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/customer/Delivery.tsx",
+      "kind": "file",
+      "sourceLine": 40,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/customer/Wallet.tsx",
+      "kind": "file",
+      "sourceLine": 41,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/customer/Tickets.tsx",
+      "kind": "file",
+      "sourceLine": 42,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/customer/Profile.tsx",
+      "kind": "file",
+      "sourceLine": 43,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/executor",
+      "kind": "directory",
+      "sourceLine": 44,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/executor/Dashboard.tsx",
+      "kind": "file",
+      "sourceLine": 45,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/executor/NewRequests.tsx",
+      "kind": "file",
+      "sourceLine": 46,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/executor/ActiveOrder.tsx",
+      "kind": "file",
+      "sourceLine": 47,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/executor/Deliver.tsx",
+      "kind": "file",
+      "sourceLine": 48,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/executor/Income.tsx",
+      "kind": "file",
+      "sourceLine": 49,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/admin",
+      "kind": "directory",
+      "sourceLine": 50,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/admin/Dashboard.tsx",
+      "kind": "file",
+      "sourceLine": 51,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/admin/Orders.tsx",
+      "kind": "file",
+      "sourceLine": 52,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/admin/Users.tsx",
+      "kind": "file",
+      "sourceLine": 53,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/admin/UserDetail.tsx",
+      "kind": "file",
+      "sourceLine": 54,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/admin/Executors.tsx",
+      "kind": "file",
+      "sourceLine": 55,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/admin/Tickets.tsx",
+      "kind": "file",
+      "sourceLine": 56,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/admin/TicketDetail.tsx",
+      "kind": "file",
+      "sourceLine": 57,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/admin/Finance.tsx",
+      "kind": "file",
+      "sourceLine": 58,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/admin/StaffReport.tsx",
+      "kind": "file",
+      "sourceLine": 59,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/pages/admin/Settings.tsx",
+      "kind": "file",
+      "sourceLine": 60,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/hooks",
+      "kind": "directory",
+      "sourceLine": 61,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/hooks/useAuth.ts",
+      "kind": "file",
+      "sourceLine": 62,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/hooks/useOrders.ts",
+      "kind": "file",
+      "sourceLine": 63,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/hooks/useTickets.ts",
+      "kind": "file",
+      "sourceLine": 64,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/store",
+      "kind": "directory",
+      "sourceLine": 65,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/store/authStore.ts",
+      "kind": "file",
+      "sourceLine": 66,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/store/orderStore.ts",
+      "kind": "file",
+      "sourceLine": 67,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/utils",
+      "kind": "directory",
+      "sourceLine": 68,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/utils/jalali.ts",
+      "kind": "file",
+      "sourceLine": 69,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/utils/price.ts",
+      "kind": "file",
+      "sourceLine": 70,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/utils/constants.ts",
+      "kind": "file",
+      "sourceLine": 71,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/types",
+      "kind": "directory",
+      "sourceLine": 72,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/types/order.ts",
+      "kind": "file",
+      "sourceLine": 73,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/types/user.ts",
+      "kind": "file",
+      "sourceLine": 74,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/types/ticket.ts",
+      "kind": "file",
+      "sourceLine": 75,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/App.tsx",
+      "kind": "file",
+      "sourceLine": 76,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/src/main.tsx",
+      "kind": "file",
+      "sourceLine": 77,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/.env",
+      "kind": "file",
+      "sourceLine": 78,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/package.json",
+      "kind": "file",
+      "sourceLine": 79,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/frontend/vite.config.ts",
+      "kind": "file",
+      "sourceLine": 80,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend",
+      "kind": "directory",
+      "sourceLine": 82,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app",
+      "kind": "directory",
+      "sourceLine": 83,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/api",
+      "kind": "directory",
+      "sourceLine": 84,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/api/v1",
+      "kind": "directory",
+      "sourceLine": 85,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/api/v1/auth.py",
+      "kind": "file",
+      "sourceLine": 86,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/api/v1/orders.py",
+      "kind": "file",
+      "sourceLine": 87,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/api/v1/services.py",
+      "kind": "file",
+      "sourceLine": 88,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/api/v1/tickets.py",
+      "kind": "file",
+      "sourceLine": 89,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/api/v1/users.py",
+      "kind": "file",
+      "sourceLine": 90,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/api/v1/executors.py",
+      "kind": "file",
+      "sourceLine": 91,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/api/v1/payments.py",
+      "kind": "file",
+      "sourceLine": 92,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/api/v1/admin.py",
+      "kind": "file",
+      "sourceLine": 93,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/api/deps.py",
+      "kind": "file",
+      "sourceLine": 94,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/core",
+      "kind": "directory",
+      "sourceLine": 95,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/core/config.py",
+      "kind": "file",
+      "sourceLine": 96,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/core/security.py",
+      "kind": "file",
+      "sourceLine": 97,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/core/database.py",
+      "kind": "file",
+      "sourceLine": 98,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/models",
+      "kind": "directory",
+      "sourceLine": 99,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/models/user.py",
+      "kind": "file",
+      "sourceLine": 100,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/models/order.py",
+      "kind": "file",
+      "sourceLine": 101,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/models/service.py",
+      "kind": "file",
+      "sourceLine": 102,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/models/ticket.py",
+      "kind": "file",
+      "sourceLine": 103,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/models/payment.py",
+      "kind": "file",
+      "sourceLine": 104,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/models/executor.py",
+      "kind": "file",
+      "sourceLine": 105,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/schemas",
+      "kind": "directory",
+      "sourceLine": 106,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/schemas/user.py",
+      "kind": "file",
+      "sourceLine": 107,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/schemas/order.py",
+      "kind": "file",
+      "sourceLine": 108,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/schemas/ticket.py",
+      "kind": "file",
+      "sourceLine": 109,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/schemas/payment.py",
+      "kind": "file",
+      "sourceLine": 110,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/services",
+      "kind": "directory",
+      "sourceLine": 111,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/services/order_service.py",
+      "kind": "file",
+      "sourceLine": 112,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/services/pricing_service.py",
+      "kind": "file",
+      "sourceLine": 113,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/services/notification_service.py",
+      "kind": "file",
+      "sourceLine": 114,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/services/payment_service.py",
+      "kind": "file",
+      "sourceLine": 115,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/services/ai_service.py",
+      "kind": "file",
+      "sourceLine": 116,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/utils",
+      "kind": "directory",
+      "sourceLine": 117,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/utils/sms.py",
+      "kind": "file",
+      "sourceLine": 118,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/utils/email.py",
+      "kind": "file",
+      "sourceLine": 119,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/utils/storage.py",
+      "kind": "file",
+      "sourceLine": 120,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/app/main.py",
+      "kind": "file",
+      "sourceLine": 121,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/alembic",
+      "kind": "directory",
+      "sourceLine": 122,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/tests",
+      "kind": "directory",
+      "sourceLine": 123,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/.env",
+      "kind": "file",
+      "sourceLine": 124,
+      "mappingStatus": "pending"
+    },
+    {
+      "path": "niazat/backend/requirements.txt",
+      "kind": "file",
+      "sourceLine": 125,
+      "mappingStatus": "pending"
+    }
+  ],
+  "d1Apis": [
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/register",
+      "sourceLine": 344,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "sourceLine": 345,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/otp/send",
+      "sourceLine": 346,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/otp/verify",
+      "sourceLine": 347,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/refresh",
+      "sourceLine": 348,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/orders",
+      "sourceLine": 351,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "sourceLine": 352,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/orders/{id}",
+      "sourceLine": 353,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/orders/{id}/status",
+      "sourceLine": 354,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/orders/{id}/deliver",
+      "sourceLine": 355,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/orders/{id}/confirm",
+      "sourceLine": 356,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/orders/{id}/review",
+      "sourceLine": 357,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/pricing/calculate",
+      "sourceLine": 360,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "sourceLine": 363,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/tickets",
+      "sourceLine": 364,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/{id}",
+      "sourceLine": 365,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/tickets/{id}/reply",
+      "sourceLine": 366,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/tickets/{id}/close",
+      "sourceLine": 367,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/tickets/{id}/assign",
+      "sourceLine": 368,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/payments/initiate",
+      "sourceLine": 371,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/payments/verify",
+      "sourceLine": 372,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/payments/withdraw",
+      "sourceLine": 373,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/users",
+      "sourceLine": 376,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/users/{id}",
+      "sourceLine": 377,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/stats",
+      "sourceLine": 378,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/staff-report",
+      "sourceLine": 379,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/ai/suggest-price",
+      "sourceLine": 382,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/ai/triage",
+      "sourceLine": 383,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/ai/support-reply",
+      "sourceLine": 384,
+      "mappingStatus": "pending"
+    }
+  ],
+  "v4Apis": [
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/register",
+      "sourceLine": 1291,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "sourceLine": 1292,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "sourceLine": 1293,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/otp/request",
+      "sourceLine": 1294,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/otp/verify",
+      "sourceLine": 1295,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/me",
+      "sourceLine": 1296,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/customer/dashboard",
+      "sourceLine": 1300,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/customer/orders",
+      "sourceLine": 1301,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/customer/orders",
+      "sourceLine": 1302,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/customer/orders/{id}",
+      "sourceLine": 1303,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/customer/orders/{id}/confirm",
+      "sourceLine": 1304,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/customer/orders/{id}/revision",
+      "sourceLine": 1305,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/customer/orders/{id}/dispute",
+      "sourceLine": 1306,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/customer/orders/{id}/feedback",
+      "sourceLine": 1307,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/executor/dashboard",
+      "sourceLine": 1311,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/executor/orders",
+      "sourceLine": 1312,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/executor/orders/{id}",
+      "sourceLine": 1313,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/executor/orders/{id}/progress-report",
+      "sourceLine": 1314,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/executor/orders/{id}/deliver",
+      "sourceLine": 1315,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/executor/performance",
+      "sourceLine": 1316,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/support/tickets",
+      "sourceLine": 1320,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/support/tickets/{id}",
+      "sourceLine": 1321,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/support/tickets/{id}/reply",
+      "sourceLine": 1322,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/support/tickets/{id}/escalate",
+      "sourceLine": 1323,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/support/tickets/{id}/close",
+      "sourceLine": 1324,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/ops/dashboard",
+      "sourceLine": 1328,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/orders",
+      "sourceLine": 1329,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/orders/{id}/triage",
+      "sourceLine": 1330,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/orders/{id}/quote",
+      "sourceLine": 1331,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/orders/{id}/assign",
+      "sourceLine": 1332,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/orders/{id}/resolve-dispute",
+      "sourceLine": 1333,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/staff",
+      "sourceLine": 1334,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/staff/{id}",
+      "sourceLine": 1335,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/staff/{id}/performance",
+      "sourceLine": 1336,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/staff/{id}/status",
+      "sourceLine": 1337,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/qc/queue",
+      "sourceLine": 1341,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/qc/{id}",
+      "sourceLine": 1342,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/qc/{id}/approve",
+      "sourceLine": 1343,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/qc/{id}/request-rework",
+      "sourceLine": 1344,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/qc/{id}/reject",
+      "sourceLine": 1345,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/finance/dashboard",
+      "sourceLine": 1349,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/payments",
+      "sourceLine": 1350,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/escrow",
+      "sourceLine": 1351,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/escrow/{order_id}/release",
+      "sourceLine": 1352,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/escrow/{order_id}/refund",
+      "sourceLine": 1353,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/ledger",
+      "sourceLine": 1354,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/invoices",
+      "sourceLine": 1355,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/withdrawals",
+      "sourceLine": 1356,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/withdrawals/{id}/approve",
+      "sourceLine": 1357,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/services",
+      "sourceLine": 1361,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/services/{slug}",
+      "sourceLine": 1362,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/services",
+      "sourceLine": 1363,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/services",
+      "sourceLine": 1364,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/admin/services/{id}",
+      "sourceLine": 1365,
+      "mappingStatus": "pending"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/services/{id}/packages",
+      "sourceLine": 1366,
+      "mappingStatus": "pending"
+    }
+  ],
+  "remaining": [
+    "D2 atomic visual elements and edge semantics; major-group associations live in z0-mappings.json",
+    "Atomic subrequirements across D1-D5; 72 legacy/10 technical/118 tree and D3/D4/D5 associations are not atomic acceptance",
+    "Complete code/role/API/test evidence beyond structural associations in z0-mappings.json; source/code SQL and state facts in z0-domain-review.json are not DB/runtime acceptance",
+    "All sixteen target decisions recorded in z0-decisions.json; scoped runtime implementation and final contract review remain separate",
+    "Z0 acceptance"
+  ]
+}

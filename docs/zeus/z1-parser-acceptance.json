@@ -1,0 +1,881 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-25",
+  "packet": "ZEUS-EXEC-005 / Z1-B2: scoped parser dependency repair",
+  "scopeAccepted": true,
+  "zeusPhaseAccepted": false,
+  "productAccepted": false,
+  "authority": "Explicit owner approval: body-parser 2.4.0, its own content-type 2.1.0 and qs 6.16.1; package/lock + exact guard exception and _runtime install only. No auth/order/finance/schema/data/live-provider implementation.",
+  "sourceHashes": {
+    "apps/api/package.json": "7e0f7f7ce369dbb8f9b05b56d6ca70310d2f77faa8e7fd8b94f25b77f67181be",
+    "apps/api/package-lock.json": "0b6d3cc527a3aae207c3298ed9e9adb5d745a76e355fd5c6ce763330c8fb0f0d",
+    "scripts/orbit-parser-approval.mjs": "19b76750b08abf37331ea164c3f2382c354d6504c3a9789922997854f24217f1",
+    "scripts/orbit-invoice-approval.mjs": "426aa014bb16ae04087c0047d194b298c9995d9c3108e16802c92d187211874b",
+    "scripts/orbit-preservation-contract.mjs": "df94520793045ef4034938e7893c098ea3ca79cb8cef613ab1bea9e033e58b80",
+    "scripts/acceptance/zeus-parser-approval.test.mjs": "558527153536b45214560c4f3c7a8168d8a824cf8c185c06a99c216c200b3895",
+    "scripts/acceptance/zeus-parser-runtime.test.mjs": "7e89dd69b5457624e775cf4a72de1eed15e88284d91d0345e6e470de7c6f4ecf",
+    "scripts/acceptance/zeus-z1-dependency-review.mjs": "ae178c1912509366904f26d4c399520c99a7e3d3a4f2a791bd01ad5627660274",
+    "scripts/acceptance/zeus-z1-dependency-review.test.mjs": "378ce72ec6f6dc2ec3e2c13a19726368f45d40fc40483745704e62481639539f",
+    "docs/zeus/z1-parser-packages.json": "81a2e285146cdcbfbe44e7a23f62b9b62bbc14f0b8ba522a6c117efe9e822f31"
+  },
+  "baseline": "2c701d7",
+  "before": {
+    "manifest": "09c73d8559eba358488665800627b5f21d4c171d4a4681bcb58e3cc60dfc5861",
+    "lock": "109a27e51f95c5c1f304c33318b3dd010f16e0ad9c3b5ef08fc82bc3f50530f8",
+    "apiProductionFindings": 7,
+    "apiAllFindings": 12
+  },
+  "dependencyChanges": [
+    {
+      "path": "node_modules/body-parser",
+      "from": "2.3.0",
+      "to": "2.4.0"
+    },
+    {
+      "path": "node_modules/body-parser/node_modules/content-type",
+      "from": "2.0.0",
+      "to": "2.1.0"
+    },
+    {
+      "path": "node_modules/body-parser/node_modules/qs",
+      "from": null,
+      "to": "6.16.1"
+    }
+  ],
+  "preserved": {
+    "sharedQs": "6.16.0",
+    "typeIsContentType": "2.0.0",
+    "otherLockEntriesUnchanged": true,
+    "sourceRuntimeManifestsAndLocksIdentical": true,
+    "sourceJunctionRetained": true,
+    "invoiceInverseInputsExact": true,
+    "previousThreeScopedApprovalsRetained": true,
+    "baselineFiles": 490,
+    "pageRoutes": 54,
+    "guardSelfTests": 5
+  },
+  "install": {
+    "location": "_runtime/apps/api",
+    "command": "npm install --ignore-scripts --no-audit --no-fund --json",
+    "added": 1,
+    "changed": 2,
+    "removed": 0,
+    "scriptsExecuted": false,
+    "tarballIntegrity": "npm install validated locked SRI; separate registry signature/provenance verification not claimed",
+    "dryRun": "First dry-run proposed an extra shared type-is/content-type change; no install performed. Removed the unnecessary descendant override; second dry-run and actual install changed exactly the approved three locations."
+  },
+  "tests": {
+    "api": {
+      "command": "npm --prefix apps/api test -- --runInBand",
+      "suites": 40,
+      "passed": 288,
+      "skipped": 1,
+      "failed": 0,
+      "skippedTestIsNotPassed": true
+    },
+    "related": {
+      "nativePassed": 33,
+      "failed": 0,
+      "skipped": 0,
+      "includes": "invoice/pricing/reconciliation approval tests unchanged + parser approval/runtime and historical dependency review"
+    },
+    "parserChild": {
+      "httpCases": 13,
+      "passed": true,
+      "scope": "Disposable loopback HTTP process; no application boot, DB, secrets, live provider, main-server payloads or fabricated authentication",
+      "cases": [
+        "plain JSON",
+        "gzip",
+        "deflate",
+        "brotli",
+        "malformed JSON",
+        "invalid compression",
+        "unsupported encoding",
+        "oversize JSON",
+        "urlencoded/prototype boundary",
+        "compressed trailing bytes regression",
+        "alive after trailing bytes",
+        "multipart valid",
+        "multipart over limit"
+      ]
+    },
+    "build": {
+      "exitCode": 0
+    },
+    "typecheck": {
+      "exitCode": 0
+    },
+    "lintCheck": {
+      "exitCode": 0
+    },
+    "supplyChain": {
+      "lockedPackages": 1321,
+      "exitCode": 0,
+      "reports": ".artifacts/acceptance/zeus-z1-parser",
+      "meaning": "Existing license/SRI/secret policy and lock-based SBOM, not zero vulnerabilities or signed provenance"
+    },
+    "formatAndDiff": {
+      "exitCode": 0
+    }
+  },
+  "auditAfter": {
+    "apiProduction": {
+      "exitCode": 1,
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 2,
+          "high": 3,
+          "critical": 1,
+          "total": 6
+        },
+        "dependencies": {
+          "prod": 244,
+          "dev": 632,
+          "optional": 57,
+          "peer": 16,
+          "peerOptional": 0,
+          "total": 875
+        }
+      },
+      "findings": [
+        {
+          "package": "@nestjs/platform-express",
+          "severity": "high",
+          "isDirect": true,
+          "range": "<=11.2.5 || 12.0.0-alpha.0 - 12.0.1",
+          "nodes": ["node_modules/@nestjs/platform-express"],
+          "via": ["multer"],
+          "fixAvailable": true
+        },
+        {
+          "package": "@nestjs/swagger",
+          "severity": "moderate",
+          "isDirect": true,
+          "range": "11.4.6 - 12.0.0",
+          "nodes": ["node_modules/@nestjs/swagger"],
+          "via": ["js-yaml"],
+          "fixAvailable": {
+            "name": "@nestjs/swagger",
+            "version": "12.0.4",
+            "isSemVerMajor": true
+          }
+        },
+        {
+          "package": "js-yaml",
+          "severity": "moderate",
+          "isDirect": false,
+          "range": "5.0.0 - 5.4.0",
+          "nodes": ["node_modules/@nestjs/swagger/node_modules/js-yaml"],
+          "via": [
+            {
+              "name": "js-yaml",
+              "url": "https://github.com/advisories/GHSA-r3ph-w7gj-g6xm",
+              "title": "js-yaml: maxTotalMergeKeys does not limit CPU use for empty merge sources",
+              "range": ">=5.0.0 <=5.4.0",
+              "severity": "moderate"
+            }
+          ],
+          "fixAvailable": {
+            "name": "@nestjs/swagger",
+            "version": "12.0.4",
+            "isSemVerMajor": true
+          }
+        },
+        {
+          "package": "multer",
+          "severity": "high",
+          "isDirect": true,
+          "range": "<=2.4.0",
+          "nodes": ["node_modules/multer"],
+          "via": [
+            {
+              "name": "multer",
+              "url": "https://github.com/advisories/GHSA-wc9g-mqfw-jrwm",
+              "title": "multer vulnerable to Denial of Service via crafted multipart field names",
+              "range": "<2.3.0",
+              "severity": "high"
+            },
+            {
+              "name": "multer",
+              "url": "https://github.com/advisories/GHSA-qfvm-cv95-jqjf",
+              "title": "multer vulnerable to Denial of Service via file descriptor leak on aborted uploads",
+              "range": "=2.2.0",
+              "severity": "high"
+            },
+            {
+              "name": "multer",
+              "url": "https://github.com/advisories/GHSA-qvfw-j98x-7q72",
+              "title": "multer vulnerable to file size limit bypass via async fileFilter race condition",
+              "range": "<2.3.0",
+              "severity": "low"
+            },
+            {
+              "name": "multer",
+              "url": "https://github.com/advisories/GHSA-535w-7cp7-47q4",
+              "title": "multer vulnerable to Denial of Service via oversized array index in field names",
+              "range": "<2.3.0",
+              "severity": "high"
+            },
+            {
+              "name": "multer",
+              "url": "https://github.com/advisories/GHSA-3pph-fpjx-jg34",
+              "title": "multer vulnerable to Denial of Service via orphaned disk writes on aborted uploads",
+              "range": ">=2.2.0 <2.4.0",
+              "severity": "moderate"
+            },
+            {
+              "name": "multer",
+              "url": "https://github.com/advisories/GHSA-q7qp-rjg7-q26m",
+              "title": "multer vulnerable to Denial of Service via a pending asynchronous fileFilter after request teardown",
+              "range": ">=2.0.0 <2.5.0",
+              "severity": "high"
+            }
+          ],
+          "fixAvailable": true
+        },
+        {
+          "package": "nodemailer",
+          "severity": "high",
+          "isDirect": true,
+          "range": "<=10.1.3",
+          "nodes": ["node_modules/nodemailer"],
+          "via": [
+            {
+              "name": "nodemailer",
+              "url": "https://github.com/advisories/GHSA-6vj9-mwq6-2f5v",
+              "title": "Nodemailer: Process-global DNS cache reuses TLS `servername` across transports, enabling cross-tenant SMTP credential disclosure",
+              "range": ">=5.0.0 <10.0.2",
+              "severity": "moderate"
+            },
+            {
+              "name": "nodemailer",
+              "url": "https://github.com/advisories/GHSA-8vvx-rff5-p5rq",
+              "title": "Nodemailer: Nested structured recipient arrays bypass the parser depth limit and cause stack exhaustion DoS",
+              "range": "<10.0.2",
+              "severity": "moderate"
+            },
+            {
+              "name": "nodemailer",
+              "url": "https://github.com/advisories/GHSA-g57g-f23g-4646",
+              "title": "Nodemailer: Quoted local-part can produce malformed envelope recipient through RFC 5322 comment parsing",
+              "range": ">=9.1.0 <10.0.9",
+              "severity": "moderate"
+            },
+            {
+              "name": "nodemailer",
+              "url": "https://github.com/advisories/GHSA-v53p-9fqp-m79j",
+              "title": "Nodemailer: Quadratic backtracking in the addressparser free-text fallback allows remote denial of service",
+              "range": "<=10.0.5",
+              "severity": "high"
+            },
+            {
+              "name": "nodemailer",
+              "url": "https://github.com/advisories/GHSA-prgh-xp8r-p3m5",
+              "title": "Nodemailer addressparser: O(n^2) on comment-joined addresses enables a remote DoS (reachable via mailparser)",
+              "range": ">=9.1.0 <=10.0.4",
+              "severity": "high"
+            },
+            {
+              "name": "nodemailer",
+              "url": "https://github.com/advisories/GHSA-39m8-27wv-hr27",
+              "title": "Nodemailer: Quadratic (O(n^2)) DKIM header unfolding lets a large folded header cause remote denial of service during signing",
+              "range": ">=3.0.0 <=10.0.9",
+              "severity": "moderate"
+            },
+            {
+              "name": "nodemailer",
+              "url": "https://github.com/advisories/GHSA-8c8m-p3m8-cjg8",
+              "title": "Nodemailer: A nested comment ends early in addressparser, releasing the rest of the comment as a recipient",
+              "range": ">=3.0.0 <10.1.4",
+              "severity": "moderate"
+            },
+            {
+              "name": "nodemailer",
+              "url": "https://github.com/advisories/GHSA-m943-m63m-w62w",
+              "title": "Nodemailer: A \";\" inside a quoted string or comment ends an address group early in addressparser, turning display text into a recipient",
+              "range": ">=3.0.0 <10.1.4",
+              "severity": "moderate"
+            },
+            {
+              "name": "nodemailer",
+              "url": "https://github.com/advisories/GHSA-85x2-q946-cp5h",
+              "title": "Nodemailer: A \">\" inside a quoted local part ends an angle-addr early in addressparser, delivering to a domain the header does not name",
+              "range": ">=3.0.0 <10.1.4",
+              "severity": "moderate"
+            }
+          ],
+          "fixAvailable": {
+            "name": "nodemailer",
+            "version": "10.2.1",
+            "isSemVerMajor": false
+          }
+        },
+        {
+          "package": "proxy-addr",
+          "severity": "critical",
+          "isDirect": false,
+          "range": "1.1.0 - 2.0.7",
+          "nodes": ["node_modules/proxy-addr"],
+          "via": [
+            {
+              "name": "proxy-addr",
+              "url": "https://github.com/advisories/GHSA-jqcg-44mw-7w3h",
+              "title": "proxy-addr vulnerable to IP spoofing via IPv4-mapped IPv6 trust subnet",
+              "range": ">=1.1.0 <2.0.8",
+              "severity": "critical"
+            }
+          ],
+          "fixAvailable": true
+        }
+      ]
+    },
+    "apiAll": {
+      "exitCode": 1,
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 2,
+          "high": 7,
+          "critical": 2,
+          "total": 11
+        },
+        "dependencies": {
+          "prod": 244,
+          "dev": 632,
+          "optional": 57,
+          "peer": 16,
+          "peerOptional": 0,
+          "total": 875
+        }
+      },
+      "findings": [
+        {
+          "package": "@nestjs/platform-express",
+          "severity": "high",
+          "isDirect": true,
+          "range": "<=11.2.5 || 12.0.0-alpha.0 - 12.0.1",
+          "nodes": ["node_modules/@nestjs/platform-express"],
+          "via": ["multer"],
+          "fixAvailable": true
+        },
+        {
+          "package": "@nestjs/swagger",
+          "severity": "moderate",
+          "isDirect": true,
+          "range": "11.4.6 - 12.0.0",
+          "nodes": ["node_modules/@nestjs/swagger"],
+          "via": ["js-yaml"],
+          "fixAvailable": {
+            "name": "@nestjs/swagger",
+            "version": "12.0.4",
+            "isSemVerMajor": true
+          }
+        },
+        {
+          "package": "baseline-browser-mapping",
+          "severity": "moderate",
+          "isDirect": false,
+          "range": ">=2.0.0 <2.11.0",
+          "nodes": ["node_modules/baseline-browser-mapping"],
+          "via": [
+            {
+              "name": "baseline-browser-mapping",
+              "url": "https://github.com/advisories/GHSA-w5vr-8v7q-w6rv",
+              "title": "baseline-browser-mapping process termination on invalid input causes denial of service",
+              "range": ">=2.0.0 <2.11.0",
+              "severity": "moderate"
+            }
+          ],
+          "fixAvailable": true
+        },
+        {
+          "package": "brace-expansion",
+          "severity": "high",
+          "isDirect": false,
+          "range": "<=1.1.20 || 2.0.0 - 2.1.6 || 4.0.0 - 5.0.11",
+          "nodes": [
+            "node_modules/@jest/reporters/node_modules/brace-expansion",
+            "node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion",
+            "node_modules/brace-expansion",
+            "node_modules/glob/node_modules/brace-expansion",
+            "node_modules/jest-config/node_modules/brace-expansion",
+            "node_modules/jest-runtime/node_modules/brace-expansion"
+          ],
+          "via": [
+            {
+              "name": "brace-expansion",
+              "url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+              "title": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+              "range": "<1.1.17",
+              "severity": "high"
+            },
+            {
+              "name": "brace-expansion",
+              "url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+              "title": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+              "range": ">=2.0.0 <2.1.3",
+              "severity": "high"
+            },
+            {
+              "name": "brace-expansion",
+              "url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+              "title": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+              "range": ">=4.0.0 <5.0.8",
+              "severity": "high"
+            },
+            {
+              "name": "brace-expansion",
+              "url": "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+              "title": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+              "range": ">=4.0.0 <5.0.9",
+              "severity": "high"
+            },
+            {
+              "name": "brace-expansion",
+              "url": "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+              "title": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+              "range": ">=2.0.0 <2.1.4",
+              "severity": "high"
+            },
+            {
+              "name": "brace-expansion",
+              "url": "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+              "title": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+              "range": "<1.1.18",
+              "severity": "high"
+            },
+            {
+              "name": "brace-expansion",
+              "url": "https://github.com/advisories/GHSA-q2hr-2g5m-vwhr",
+              "title": "brace-expansion: Quadratic-time expansion of the `{a},b}` rewrite causes CPU denial of service",
+              "range": "<1.1.21",
+              "severity": "moderate"
+            },
+            {
+              "name": "brace-expansion",
+              "url": "https://github.com/advisories/GHSA-q2hr-2g5m-vwhr",
+              "title": "brace-expansion: Quadratic-time expansion of the `{a},b}` rewrite causes CPU denial of service",
+              "range": ">=2.0.0 <2.1.7",
+              "severity": "moderate"
+            },
+            {
+              "name": "brace-expansion",
+              "url": "https://github.com/advisories/GHSA-q2hr-2g5m-vwhr",
+              "title": "brace-expansion: Quadratic-time expansion of the `{a},b}` rewrite causes CPU denial of service",
+              "range": ">=4.0.0 <5.0.12",
+              "severity": "moderate"
+            },
+            {
+              "name": "brace-expansion",
+              "url": "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
+              "title": "brace-expansion: DoS via uncontrolled recursion on nested brace groups causing stack exhaustion",
+              "range": "<1.1.20",
+              "severity": "high"
+            },
+            {
+              "name": "brace-expansion",
+              "url": "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
+              "title": "brace-expansion: DoS via uncontrolled recursion on nested brace groups causing stack exhaustion",
+              "range": ">=2.0.0 <2.1.6",
+              "severity": "high"
+            },
+            {
+              "name": "brace-expansion",
+              "url": "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
+              "title": "brace-expansion: DoS via uncontrolled recursion on nested brace groups causing stack exhaustion",
+              "range": ">=4.0.0 <5.0.11",
+              "severity": "high"
+            },
+            {
+              "name": "brace-expansion",
+              "url": "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p",
+              "title": "brace-expansion: DoS via uncontrolled recursion in parseCommaParts causing stack exhaustion",
+              "range": "<1.1.19",
+              "severity": "high"
+            },
+            {
+              "name": "brace-expansion",
+              "url": "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p",
+              "title": "brace-expansion: DoS via uncontrolled recursion in parseCommaParts causing stack exhaustion",
+              "range": ">=2.0.0 <2.1.5",
+              "severity": "high"
+            },
+            {
+              "name": "brace-expansion",
+              "url": "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p",
+              "title": "brace-expansion: DoS via uncontrolled recursion in parseCommaParts causing stack exhaustion",
+              "range": ">=4.0.0 <5.0.10",
+              "severity": "high"
+            }
+          ],
+          "fixAvailable": true
+        },
+        {
+          "package": "browserslist",
+          "severity": "high",
+          "isDirect": false,
+          "range": "<=4.28.6",
+          "nodes": ["node_modules/browserslist"],
+          "via": [
+            {
+              "name": "browserslist",
+              "url": "https://github.com/advisories/GHSA-c83g-rgw3-j3cx",
+              "title": "Browserslist: Unbounded memory growth (no cache eviction) via distinct query results, leading to eventual OOM",
+              "range": "<=4.28.6",
+              "severity": "high"
+            },
+            {
+              "name": "browserslist",
+              "url": "https://github.com/advisories/GHSA-73wf-gq98-2v4g",
+              "title": "Browserslist: Uncaught crash / prototype write via untrusted browserslist-stats.json custom stats (normalizeStats)",
+              "range": "<=4.28.6",
+              "severity": "high"
+            }
+          ],
+          "fixAvailable": true
+        },
+        {
+          "package": "fast-uri",
+          "severity": "high",
+          "isDirect": false,
+          "range": "3.0.0 - 3.1.8",
+          "nodes": ["node_modules/fast-uri"],
+          "via": [
+            {
+              "name": "fast-uri",
+              "url": "https://github.com/advisories/GHSA-v2hh-gcrm-f6hx",
+              "title": "fast-uri vulnerable to host confusion via literal backslash authority delimiter",
+              "range": ">=3.0.0 <=3.1.3",
+              "severity": "high"
+            },
+            {
+              "name": "fast-uri",
+              "url": "https://github.com/advisories/GHSA-7p8r-x3mc-p8w7",
+              "title": "fast-uri vulnerable to host confusion via backslash authority introducer",
+              "range": ">=3.0.0 <3.1.5",
+              "severity": "high"
+            },
+            {
+              "name": "fast-uri",
+              "url": "https://github.com/advisories/GHSA-5jgf-p345-68v8",
+              "title": "fast-uri vulnerable to host confusion via skipped IDN canonicalization on scheme-relative references",
+              "range": ">=3.1.3 <3.1.6",
+              "severity": "high"
+            },
+            {
+              "name": "fast-uri",
+              "url": "https://github.com/advisories/GHSA-f65p-4m7j-42xc",
+              "title": "fast-uri vulnerable to server-side request forgery via malformed IPv6 normalization",
+              "range": ">=3.0.0 <3.1.6",
+              "severity": "high"
+            },
+            {
+              "name": "fast-uri",
+              "url": "https://github.com/advisories/GHSA-fph4-wmhf-6fwf",
+              "title": "fast-uri vulnerable to server-side request forgery via repeated hostname percent-decoding",
+              "range": ">=3.1.2 <3.1.6",
+              "severity": "high"
+            },
+            {
+              "name": "fast-uri",
+              "url": "https://github.com/advisories/GHSA-jqff-g426-hqxp",
+              "title": "fast-uri vulnerable to host confusion via percent-encoded scheme normalization",
+              "range": ">=3.0.0 <3.1.6",
+              "severity": "high"
+            },
+            {
+              "name": "fast-uri",
+              "url": "https://github.com/advisories/GHSA-qw65-cvwx-89v3",
+              "title": "fast-uri vulnerable to authority injection via an unvalidated port in serialize",
+              "range": ">=3.0.0 <3.1.7",
+              "severity": "high"
+            },
+            {
+              "name": "fast-uri",
+              "url": "https://github.com/advisories/GHSA-hrr3-gc8f-f4qj",
+              "title": "fast-uri vulnerable to inconsistent host case normalization via percent-encoded octets",
+              "range": ">=3.0.0 <3.1.8",
+              "severity": "moderate"
+            },
+            {
+              "name": "fast-uri",
+              "url": "https://github.com/advisories/GHSA-w74x-v6f9-j3xg",
+              "title": "fast-uri vulnerable to URI scheme spoofing via percent-encoded scheme decoding",
+              "range": ">=3.0.0 <3.1.9",
+              "severity": "moderate"
+            },
+            {
+              "name": "fast-uri",
+              "url": "https://github.com/advisories/GHSA-xhq7-xmqj-769h",
+              "title": "fast-uri vulnerable to improper path equivalence in relative reference normalization",
+              "range": ">=3.0.0 <3.1.9",
+              "severity": "low"
+            },
+            {
+              "name": "fast-uri",
+              "url": "https://github.com/advisories/GHSA-wjr9-j795-jxcr",
+              "title": "fast-uri vulnerable to host confusion via unchecked WHATWG host canonicalization",
+              "range": ">=3.1.3 <3.1.9",
+              "severity": "moderate"
+            },
+            {
+              "name": "fast-uri",
+              "url": "https://github.com/advisories/GHSA-333x-w4r6-6crp",
+              "title": "fast-uri vulnerable to scheme injection via an unescaped first-segment colon in suffix references",
+              "range": ">=3.0.0 <3.1.9",
+              "severity": "low"
+            }
+          ],
+          "fixAvailable": true
+        },
+        {
+          "package": "handlebars",
+          "severity": "critical",
+          "isDirect": false,
+          "range": "3.0.0 - 4.7.9",
+          "nodes": ["node_modules/handlebars"],
+          "via": [
+            {
+              "name": "handlebars",
+              "url": "https://github.com/advisories/GHSA-xw65-4hp5-5hc7",
+              "title": "Handlebars: JavaScript Injection via Unsafe Inline Embedding of Precompiled Templates",
+              "range": ">=4.0.0 <=4.7.9",
+              "severity": "moderate"
+            },
+            {
+              "name": "handlebars",
+              "url": "https://github.com/advisories/GHSA-8r5x-fm3f-whwj",
+              "title": "Handlebars: JavaScript Injection via AST Type Confusion in compile (bypass of CVE-2026-33937)",
+              "range": ">=4.0.0 <=4.7.9",
+              "severity": "critical"
+            },
+            {
+              "name": "handlebars",
+              "url": "https://github.com/advisories/GHSA-p8wg-vrv2-v86f",
+              "title": "Handlebars: JavaScript Injection via Own Property Check Bypass",
+              "range": ">=3.0.0 <=4.7.9",
+              "severity": "critical"
+            }
+          ],
+          "fixAvailable": true
+        },
+        {
+          "package": "js-yaml",
+          "severity": "high",
+          "isDirect": false,
+          "range": "3.0.0 - 3.15.1 || 4.0.0 - 4.3.1 || 5.0.0 - 5.4.0",
+          "nodes": [
+            "node_modules/@istanbuljs/load-nyc-config/node_modules/js-yaml",
+            "node_modules/@nestjs/swagger/node_modules/js-yaml",
+            "node_modules/js-yaml"
+          ],
+          "via": [
+            {
+              "name": "js-yaml",
+              "url": "https://github.com/advisories/GHSA-5p4m-2wfm-xmqj",
+              "title": "JS-YAML: Quadratic CPU consumption in !!omap resolution (3.x and 4.x) — CVE-2026-59870 fix not backported",
+              "range": ">=3.0.0 <3.15.1",
+              "severity": "high"
+            },
+            {
+              "name": "js-yaml",
+              "url": "https://github.com/advisories/GHSA-5p4m-2wfm-xmqj",
+              "title": "JS-YAML: Quadratic CPU consumption in !!omap resolution (3.x and 4.x) — CVE-2026-59870 fix not backported",
+              "range": ">=4.0.0 <4.3.1",
+              "severity": "high"
+            },
+            {
+              "name": "js-yaml",
+              "url": "https://github.com/advisories/GHSA-2883-xcg3-v3hh",
+              "title": "js-yaml: maxTotalMergeKeys does not limit CPU use for empty merge sources",
+              "range": ">=3.0.0 <3.15.2",
+              "severity": "high"
+            },
+            {
+              "name": "js-yaml",
+              "url": "https://github.com/advisories/GHSA-2883-xcg3-v3hh",
+              "title": "js-yaml: maxTotalMergeKeys does not limit CPU use for empty merge sources",
+              "range": ">=4.0.0 <4.3.2",
+              "severity": "high"
+            },
+            {
+              "name": "js-yaml",
+              "url": "https://github.com/advisories/GHSA-r3ph-w7gj-g6xm",
+              "title": "js-yaml: maxTotalMergeKeys does not limit CPU use for empty merge sources",
+              "range": ">=5.0.0 <=5.4.0",
+              "severity": "moderate"
+            }
+          ],
+          "fixAvailable": {
+            "name": "@nestjs/swagger",
+            "version": "12.0.4",
+            "isSemVerMajor": true
+          }
+        },
+        {
+          "package": "multer",
+          "severity": "high",
+          "isDirect": true,
+          "range": "<=2.4.0",
+          "nodes": ["node_modules/multer"],
+          "via": [
+            {
+              "name": "multer",
+              "url": "https://github.com/advisories/GHSA-wc9g-mqfw-jrwm",
+              "title": "multer vulnerable to Denial of Service via crafted multipart field names",
+              "range": "<2.3.0",
+              "severity": "high"
+            },
+            {
+              "name": "multer",
+              "url": "https://github.com/advisories/GHSA-qfvm-cv95-jqjf",
+              "title": "multer vulnerable to Denial of Service via file descriptor leak on aborted uploads",
+              "range": "=2.2.0",
+              "severity": "high"
+            },
+            {
+              "name": "multer",
+              "url": "https://github.com/advisories/GHSA-qvfw-j98x-7q72",
+              "title": "multer vulnerable to file size limit bypass via async fileFilter race condition",
+              "range": "<2.3.0",
+              "severity": "low"
+            },
+            {
+              "name": "multer",
+              "url": "https://github.com/advisories/GHSA-535w-7cp7-47q4",
+              "title": "multer vulnerable to Denial of Service via oversized array index in field names",
+              "range": "<2.3.0",
+              "severity": "high"
+            },
+            {
+              "name": "multer",
+              "url": "https://github.com/advisories/GHSA-3pph-fpjx-jg34",
+              "title": "multer vulnerable to Denial of Service via orphaned disk writes on aborted uploads",
+              "range": ">=2.2.0 <2.4.0",
+              "severity": "moderate"
+            },
+            {
+              "name": "multer",
+              "url": "https://github.com/advisories/GHSA-q7qp-rjg7-q26m",
+              "title": "multer vulnerable to Denial of Service via a pending asynchronous fileFilter after request teardown",
+              "range": ">=2.0.0 <2.5.0",
+              "severity": "high"
+            }
+          ],
+          "fixAvailable": true
+        },
+        {
+          "package": "nodemailer",
+          "severity": "high",
+          "isDirect": true,
+          "range": "<=10.1.3",
+          "nodes": ["node_modules/nodemailer"],
+          "via": [
+            {
+              "name": "nodemailer",
+              "url": "https://github.com/advisories/GHSA-6vj9-mwq6-2f5v",
+              "title": "Nodemailer: Process-global DNS cache reuses TLS `servername` across transports, enabling cross-tenant SMTP credential disclosure",
+              "range": ">=5.0.0 <10.0.2",
+              "severity": "moderate"
+            },
+            {
+              "name": "nodemailer",
+              "url": "https://github.com/advisories/GHSA-8vvx-rff5-p5rq",
+              "title": "Nodemailer: Nested structured recipient arrays bypass the parser depth limit and cause stack exhaustion DoS",
+              "range": "<10.0.2",
+              "severity": "moderate"
+            },
+            {
+              "name": "nodemailer",
+              "url": "https://github.com/advisories/GHSA-g57g-f23g-4646",
+              "title": "Nodemailer: Quoted local-part can produce malformed envelope recipient through RFC 5322 comment parsing",
+              "range": ">=9.1.0 <10.0.9",
+              "severity": "moderate"
+            },
+            {
+              "name": "nodemailer",
+              "url": "https://github.com/advisories/GHSA-v53p-9fqp-m79j",
+              "title": "Nodemailer: Quadratic backtracking in the addressparser free-text fallback allows remote denial of service",
+              "range": "<=10.0.5",
+              "severity": "high"
+            },
+            {
+              "name": "nodemailer",
+              "url": "https://github.com/advisories/GHSA-prgh-xp8r-p3m5",
+              "title": "Nodemailer addressparser: O(n^2) on comment-joined addresses enables a remote DoS (reachable via mailparser)",
+              "range": ">=9.1.0 <=10.0.4",
+              "severity": "high"
+            },
+            {
+              "name": "nodemailer",
+              "url": "https://github.com/advisories/GHSA-39m8-27wv-hr27",
+              "title": "Nodemailer: Quadratic (O(n^2)) DKIM header unfolding lets a large folded header cause remote denial of service during signing",
+              "range": ">=3.0.0 <=10.0.9",
+              "severity": "moderate"
+            },
+            {
+              "name": "nodemailer",
+              "url": "https://github.com/advisories/GHSA-8c8m-p3m8-cjg8",
+              "title": "Nodemailer: A nested comment ends early in addressparser, releasing the rest of the comment as a recipient",
+              "range": ">=3.0.0 <10.1.4",
+              "severity": "moderate"
+            },
+            {
+              "name": "nodemailer",
+              "url": "https://github.com/advisories/GHSA-m943-m63m-w62w",
+              "title": "Nodemailer: A \";\" inside a quoted string or comment ends an address group early in addressparser, turning display text into a recipient",
+              "range": ">=3.0.0 <10.1.4",
+              "severity": "moderate"
+            },
+            {
+              "name": "nodemailer",
+              "url": "https://github.com/advisories/GHSA-85x2-q946-cp5h",
+              "title": "Nodemailer: A \">\" inside a quoted local part ends an angle-addr early in addressparser, delivering to a domain the header does not name",
+              "range": ">=3.0.0 <10.1.4",
+              "severity": "moderate"
+            }
+          ],
+          "fixAvailable": {
+            "name": "nodemailer",
+            "version": "10.2.1",
+            "isSemVerMajor": false
+          }
+        },
+        {
+          "package": "proxy-addr",
+          "severity": "critical",
+          "isDirect": false,
+          "range": "1.1.0 - 2.0.7",
+          "nodes": ["node_modules/proxy-addr"],
+          "via": [
+            {
+              "name": "proxy-addr",
+              "url": "https://github.com/advisories/GHSA-jqcg-44mw-7w3h",
+              "title": "proxy-addr vulnerable to IP spoofing via IPv4-mapped IPv6 trust subnet",
+              "range": ">=1.1.0 <2.0.8",
+              "severity": "critical"
+            }
+          ],
+          "fixAvailable": true
+        }
+      ]
+    },
+    "web": "Not rerun: unchanged Web remains at the dated Z1-B1 audit (production4/all8, one critical production)."
+  },
+  "serviceActivation": {
+    "api": "Restarted verified tracked API tree only: prior9568 → current31252, /health healthy",
+    "web": "Original tracked process28952 retained, localhost3002 healthy",
+    "database": "No seed/migration/reset or test connection to main DB; existing application startup unchanged."
+  },
+  "historicalEvidence": "Z0 certificate and Z1-B1 audit/review remain dated pre-repair evidence, not overwritten or claimed current. Historical review revalidates all source inputs and permits only exact parser inverse for the two dependency files; the current-candidate Z0 gate remains strict and is not rerun/reissued as a shortcut.",
+  "notRun": [
+    "Web suite/build/browser/192 visual matrix (unchanged)",
+    "Database/concurrency/whole workflow HTTP acceptance",
+    "CI, Docker image and full clean install on another platform",
+    "Live providers or AI"
+  ],
+  "remaining": "API production6/all11 and Web production4/all8 remain open. Z1.1–Z1.6 and OPS-003/004/005 overall not complete; no extra patch authority inferred."
+}

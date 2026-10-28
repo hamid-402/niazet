@@ -1,0 +1,91 @@
+{
+  "date": "2026-10-25",
+  "scope": "Owner-approved body-parser 2.4.0, content-type 2.1.0, nested qs 6.16.1 only; npm view registry metadata. Signature fields retained, independent provenance/signature verification not claimed.",
+  "packages": {
+    "body-parser": {
+      "version": "2.4.0",
+      "dependencies": {
+        "qs": "^6.16.1",
+        "bytes": "^3.1.2",
+        "debug": "^4.4.3",
+        "type-is": "^2.1.0",
+        "raw-body": "^3.0.2",
+        "iconv-lite": "^0.7.3",
+        "http-errors": "^2.0.1",
+        "on-finished": "^2.4.1",
+        "content-type": "^2.1.0"
+      },
+      "engines": {
+        "node": ">=18"
+      },
+      "license": "MIT",
+      "dist": {
+        "shasum": "337a76249270f83e450ad385a9606ca3b4a75c06",
+        "tarball": "https://registry.npmjs.org/body-parser/-/body-parser-2.4.0.tgz",
+        "integrity": "sha512-Ifk1KcLrxaGt1occQagQNFNNOqRt1LFuehEnHHzB8Z6cRgIxRU1TBaiIsUiCdA+gy5PL7Y1IX31DNKkRmxtXjQ==",
+        "fileCount": 10,
+        "unpackedSize": 42899,
+        "attestations": {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/body-parser@2.4.0",
+          "provenance": {
+            "predicateType": "https://slsa.dev/provenance/v1"
+          }
+        },
+        "signatures": [
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEQCIA6c8Cf9d+zIJjrfrtDvepcZpRef95rxB4wRaHNB+gz5AiAshUr7gdLnSh7G+bU/wJ00pwfeWcQN7Oe42AeS7May9Q=="
+          }
+        ]
+      }
+    },
+    "content-type": {
+      "version": "2.1.0",
+      "engines": {
+        "node": ">=18"
+      },
+      "license": "MIT",
+      "dist": {
+        "shasum": "d9389c43c0a8cf6a355db464d21e07092a40493a",
+        "tarball": "https://registry.npmjs.org/content-type/-/content-type-2.1.0.tgz",
+        "fileCount": 6,
+        "integrity": "sha512-mj7UPXE0jaqaOsukNZRUEfEi2AcL7C/vwmwcHV0O97eO1E1pxBZuyjlZrx5seTaNBg1U6+o35wpa35Qfcc+7ag==",
+        "signatures": [
+          {
+            "sig": "MEQCIAesCKlTxK7DDJj+bRVxVqnPebCrDYKlCvXYXzC13PTbAiBzuJ2rrSEvAQKMfpV7FwOMi8eKomTRHVf5/y9ZnGl8sQ==",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "sig": "MEQCIDm2i9kdHCg3OWR9UNJs52nxr+qrdnmtp6Rhk0R0mi4EAiBtS5WDVW31UZOXRRfjO4UPpP3sfCJHmwURZckhcnrAyg==",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "unpackedSize": 23136
+      }
+    },
+    "qs": {
+      "version": "6.16.1",
+      "dependencies": {
+        "side-channel": "^1.1.1",
+        "es-define-property": "^1.0.1"
+      },
+      "engines": {
+        "node": ">=0.6"
+      },
+      "license": "BSD-3-Clause",
+      "dist": {
+        "shasum": "0643e17993e551759c85078e1f0bc4b9fe908020",
+        "tarball": "https://registry.npmjs.org/qs/-/qs-6.16.1.tgz",
+        "integrity": "sha512-5Px6J7rfHBAGUhNQ3es4YzcOdBBw0SDcVtThJml4RdnKw4tKs2epA0kPZ+K8X+WiHktT93RHVcQ/3ym5aTCgtg==",
+        "fileCount": 20,
+        "unpackedSize": 418793,
+        "signatures": [
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEQCIBD/HODTxSGXW4MI271pfIsMMMbbwHj3MeVovqvY+x3YAiBMpQnp/2uQ85UdZMgXXA6A3QTEwSE//1ueytFwpAC3Zw=="
+          }
+        ]
+      }
+    }
+  }
+}

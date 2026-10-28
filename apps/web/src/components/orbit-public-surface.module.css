@@ -1,0 +1,44 @@
+.surface { flex: 1; min-width: 0; color: var(--color-fg); background: var(--color-bg); }
+.content { width: min(100%, 76rem); margin-inline: auto; padding: clamp(2rem, 5vw, 4.5rem) clamp(1rem, 4vw, 3rem); }
+.intro { position: relative; padding-block: .5rem 2.25rem; margin-bottom: 2rem; border-bottom: 1px solid var(--color-border); }
+.intro::after { content: ''; position: absolute; inset-inline-start: 0; bottom: -1px; width: 4rem; height: 2px; background: var(--color-accent); }
+.intro h1 { max-width: 48rem; font-size: clamp(1.6rem, 3.3vw, 2.7rem); line-height: 1.65; letter-spacing: -.035em; }
+.intro p { max-width: 45rem; line-height: 2; }
+.catalogFilters { border-radius: 1.25rem; padding: clamp(1rem, 2vw, 1.6rem); box-shadow: 0 12px 40px color-mix(in srgb, var(--color-fg) 4%, transparent); }
+.catalogCard { position: relative; border-radius: 1.25rem; border-top: 2px solid var(--color-border); padding: 1.5rem; transition: border-color 180ms ease, box-shadow 180ms ease; }
+.catalogCard:hover { border-top-color: var(--color-accent); box-shadow: 0 16px 40px color-mix(in srgb, var(--color-fg) 7%, transparent); }
+.detailGrid { display: grid; gap: 1.5rem; align-items: start; }
+.detailBody { display: grid; gap: 1.25rem; min-width: 0; }
+.summary { min-width: 0; border-top: 2px solid var(--color-accent); border-radius: 1rem; }
+.detailBody > div, .summary > div { border-radius: 1.25rem; padding: clamp(1rem, 2.5vw, 1.75rem); }
+.detailBody h2 { font-size: 1.1rem; }
+.statusHeading { display: flex; justify-content: space-between; align-items: start; gap: 1rem; flex-wrap: wrap; }
+.authHeader { width: min(100%, 76rem); margin-inline: auto; padding: 1.25rem clamp(1rem, 4vw, 3rem); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border); }
+.authLayout { width: min(100%, 72rem); margin-inline: auto; padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1rem, 4vw, 3rem); display: grid; gap: clamp(2rem, 5vw, 5rem); align-items: start; }
+.authForm { min-width: 0; width: 100%; max-width: 30rem; margin-inline: auto; }
+.authForm > main > div { max-width: none; border-radius: 1.5rem; padding: clamp(1.1rem, 3vw, 2rem); box-shadow: 0 20px 60px color-mix(in srgb, var(--color-fg) 5%, transparent); }
+.authForm h1 { font-size: clamp(1.25rem, 2.2vw, 1.7rem); line-height: 1.7; }
+.authStory { min-width: 0; padding-block: 1rem; }
+.eyebrow { color: var(--color-accent); font-size: .78rem; font-weight: 700; margin-bottom: 1.5rem; }
+.authStory h2 { font-size: clamp(1.8rem, 3.3vw, 3rem); font-weight: 850; line-height: 1.65; letter-spacing: -.035em; margin-bottom: 1rem; }
+.authStory > p:not(.eyebrow) { color: var(--color-fg-muted); line-height: 2; max-width: 26rem; }
+.accountSteps { list-style: none; margin: 2rem 0; padding: 0; }
+.accountSteps li { display: flex; gap: 1rem; align-items: start; padding-block: 1rem; border-bottom: 1px solid var(--color-border); }
+.accountSteps li > span { color: var(--color-accent); font-size: .75rem; padding-top: .35rem; }
+.accountSteps strong { font-size: .9rem; }
+.accountSteps p { font-size: .8rem; color: var(--color-fg-muted); line-height: 1.9; margin-top: .4rem; }
+.explore { display: inline-flex; align-items: center; gap: 1.5rem; min-height: 44px; color: var(--color-accent); font-size: .85rem; font-weight: 700; }
+.explore span { transition: transform 180ms ease; }
+.surface[data-motion='on'] .explore:hover span { transform: translate(-3px, -3px); }
+@media (min-width: 900px) {
+  .authLayout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .detailGrid { grid-template-columns: minmax(0, 2fr) minmax(15rem, 1fr); }
+  .summary { position: sticky; top: 8rem; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .surface[data-motion='on'] .intro, .surface[data-motion='on'] .authForm { animation: settle 360ms ease-out; }
+  .surface[data-motion='on'] .catalogCard { transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease; }
+  .surface[data-motion='on'] .catalogCard:hover { transform: translateY(-3px); }
+}
+@keyframes settle { from { transform: translateY(8px); } to { transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .surface *, .surface *::before, .surface *::after { animation: none !important; transition: none !important; } }

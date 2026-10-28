@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-25",
+  "packet": "ZEUS-EXEC-008",
+  "phase": "Z1",
+  "phaseAccepted": false,
+  "productAccepted": false,
+  "acceptedCommit": null,
+  "baseline": "2c701d7",
+  "createdAt": "2026-10-25T11:58:16.513Z",
+  "baseHead": "30555d2a26bb5f9a4e1649160751929b5354d1bc",
+  "fileHashes": {
+    "apps/api/prisma/schema.prisma": "d0a4db162d32ad79d9815d975d3ba7664fa34da2300c794a7adaa56651d271a5",
+    "apps/api/prisma/migrations/20261025100000_zeus_wallet_funding/migration.sql": "f8234d7394c7412dc0ed8489557f8c74a3a7b2f2f53c41fd3eb3d04c520c989f",
+    "apps/api/src/auth/auth-session.service.spec.ts": "6ff5327af0a09e6e8a684cb0b58230410ed108ed786133956c3fdbfa84f4aa2a",
+    "apps/api/src/auth/auth-session.service.ts": "3c258278276decc72fdeb70deee68023b616b90274bec896142fb2c275373bd3",
+    "apps/api/src/auth/auth.controller.ts": "e4e7f5fae8cd83c7972a3d075b084ea29c554daac72bd3ca2c14c0cc0f4e04f4",
+    "apps/api/src/finance/finance.module.ts": "ebecf34099830dce447d875f2251bfaf95b37eed531a88ceeceec297650cf476",
+    "apps/api/src/finance/idempotency.service.spec.ts": "9c0a4725aba5d1568aaaf9246931e5e2924f9a5e1852d683dc2c2f7752b5181c",
+    "apps/api/src/finance/idempotency.service.ts": "34ba333a686e475dc14e8ad3c12ee69c9d63b218f8116796e6a2a46da5c3d630",
+    "apps/api/src/finance/payment-gateway.ts": "d9272031abe3b0f615213ac22faedda3179a7efba5b498af54176ec6dc9c7c54",
+    "apps/api/src/finance/payments.service.ts": "93f7fe35b4ea8cc4b5f00c8cee397ec88c52c360b42a8c60be6419447d76e320",
+    "apps/api/src/finance/wallet-payments.controller.ts": "54367ab82adb1165553e95f1c3f68e657c53d55ed89668b8643f71c9b7a96b83",
+    "apps/api/src/finance/wallet-payments.service.ts": "a46dd8f6656fd7fe432c528286168a9b99883f9d4b626dbc22a06d3e9d4f2f7a",
+    "apps/api/src/finance/wallet-payments.service.spec.ts": "b2ceeb4e8b9f11fc63d8115322d0cfba78f05c614a283f67a4b311030491adc0",
+    "apps/api/src/orders/domain/order-workflow.service.ts": "15bfc00eeb1e8f24f1283324bf20bbd65c672b07e903423fcc92607863dca174",
+    "apps/api/src/orders/order-state-machine.ts": "1cc479383ea56ba428e32c57a4a7a8281282319af582bbd1843e10c938d04da2",
+    "apps/web/src/app/(customer)/wallet/page.tsx": "15c2b4dce0348a5a2be388da8b52f6b2bd551a24901c6fc8351df4e5365d5538",
+    "apps/web/src/app/(customer)/orders/[id]/page.tsx": "fd6dbefe1061eae463865a4c3d4d422d69d801d88ee232690961970d8ea0fd39",
+    "apps/web/src/components/wallet-actions.tsx": "c0194efac13ec63013c551fe8cb47a3e55ad28e47805d7e24c8f66e77ace1b5e",
+    "apps/web/src/components/wallet-contract.ts": "115b654f63f2c653e4d9cb0a0e7666c4a73ccd919e6be70b8f7d539b33d648ce",
+    "apps/web/scripts/zeus-wallet-contract.test.mjs": "578c1aebe55d2f538b0730eef4994fa0685b3f072df736f078e1836569a3e5a5",
+    "apps/web/scripts/zeus-wallet-runtime.mjs": "bc322bbc1b882b98e7ad24b36ccbbef63e92a2f4c01e4a13d016de1f65f5ce62",
+    "apps/api/package.json": "33426f2d525d7274f3ff4467287a2df8fb6a5d061765d78d714a0ed4214c283b",
+    "apps/api/package-lock.json": "6937f66c240d982fa801c2d2eebf0652052926f30936d04d1fe538340b23a2d5",
+    "apps/web/package.json": "a3d53a5b6c13efa109eca30ed9d4f97b22546be4702553dc7aab889789984de0",
+    "apps/web/package-lock.json": "d675f687229056ca4a96af27781a05b0a1d4611d5d022ac284aba24660d85987",
+    "scripts/orbit-z1-domain-approval.mjs": "56a8cdc5482af79e1caafac5842712b88cb3d6c8f63a511f575d648563d8829e",
+    "scripts/orbit-wallet-ui-approval.mjs": "2f84d629014493438107717749f855efd80fb9402c23171cb6eb4edc5e69e4bc",
+    "scripts/orbit-preservation-contract.mjs": "047d5643c4929697da66cd8823124b836deec0fd124bf507be2d3ef45fc931a2",
+    "scripts/acceptance/zeus-wallet-upgrade.mjs": "fe0bbaf6ffae47deddbe301426984d6a8ce58225de2f482ff19d3f35c1c3bbcf",
+    "scripts/acceptance/zeus-wallet-postgres.mjs": "61e4ac611ae13452f1659de0723fdf5a13655da0790b92a93084a766d71fbafa",
+    "scripts/acceptance/zeus-wallet-ui-approval.test.mjs": "c22ce1dfaa64249e3752612a6bd81a10b42dfa2841b5310ff2e15275347f83de",
+    "scripts/acceptance/zeus-wallet-activation-evidence.mjs": "02d34a736e88b54e864b70e78050f988d2abef15a0fc53fa5ab2c93dd9a00fa0",
+    "scripts/acceptance/zeus-z1-dependency-review.mjs": "961f3157fe4f877d848fd400c83e75bd092b64490e06cf5ab753796a3b250c56",
+    "scripts/acceptance/zeus-z1-dependency-review.test.mjs": "5c6c21985f7555a55775c7708ca04e63609148ccb5710c98cf1e67ffd7bee9af"
+  },
+  "browser": {
+    "status": "passed",
+    "uiFixturesOnly": true,
+    "mainDatabaseTouched": false,
+    "results": [
+      {
+        "theme": "simple-light",
+        "width": 320,
+        "status": "passed",
+        "noFinancialWriteOnRenderOrCancel": true,
+        "retryKeyStable": true,
+        "axeViolations": 0
+      },
+      {
+        "theme": "simple-light",
+        "width": 1280,
+        "status": "passed",
+        "noFinancialWriteOnRenderOrCancel": true,
+        "retryKeyStable": true,
+        "axeViolations": 0
+      },
+      {
+        "theme": "simple-dark",
+        "width": 320,
+        "status": "passed",
+        "noFinancialWriteOnRenderOrCancel": true,
+        "retryKeyStable": true,
+        "axeViolations": 0
+      },
+      {
+        "theme": "simple-dark",
+        "width": 1280,
+        "status": "passed",
+        "noFinancialWriteOnRenderOrCancel": true,
+        "retryKeyStable": true,
+        "axeViolations": 0
+      }
+    ]
+  },
+  "localSubtasksAccepted": [
+    "Z1.4",
+    "Z1.5",
+    "Z1.6"
+  ],
+  "permission": {
+    "source": "Owner explicitly approved applying accepted changes safely to the main local system, including additive migration and wallet UI activation.",
+    "mainDatabaseMigration": true,
+    "mainLedgerMutationDuringAcceptance": false,
+    "liveProviders": false,
+    "accountMerge": false
+  },
+  "activation": {
+    "walletSwitchEnabled": true,
+    "paymentGatewayDriver": "mock",
+    "productionMockFundingForbidden": true,
+    "migrationCount": 24,
+    "consistentExistingWalletsReadOnly": 4,
+    "fundingIntentsAtStatusCheck": 0,
+    "serverHealthAtCapture": {
+      "api": "healthy :3001",
+      "web": "healthy :3002"
+    }
+  },
+  "mainMigration": {
+    "existingDataUnchanged": true,
+    "existingTables": 64,
+    "preservedSnapshotDigest": "8db124e9b6c46c7def2b42fdf09bf0ad370dc103c683224d7e744e1fcefc8232",
+    "existingBalancesRewritten": false,
+    "seedExecuted": false,
+    "appliedEarlierInThisPacketNotRepeatedOnResume": true,
+    "migrationSha256": "f8234d7394c7412dc0ed8489557f8c74a3a7b2f2f53c41fd3eb3d04c520c989f",
+    "recovery": "Disable feature, retain additive schema and all financial history; no destructive downgrade."
+  },
+  "rehearsal": {
+    "populatedUpgrade": true,
+    "existingTablesPreserved": 64,
+    "actualOldGeneratedClientReadWrite": true,
+    "oldClientReadsNewFinancialEntries": true,
+    "disabledFeaturePreservesData": true,
+    "temporaryDatabaseAndClientRemoved": true,
+    "mainDatabaseConnected": false
+  },
+  "security": {
+    "auditRerunInActivationPacket": false,
+    "reference": "docs/zeus/z1-foundation-acceptance.json",
+    "unchangedDependencyInputs": [
+      "apps/api/package.json",
+      "apps/api/package-lock.json",
+      "apps/web/package.json",
+      "apps/web/package-lock.json"
+    ],
+    "meaning": "Four previous zero-finding audit reports apply only to unchanged dependency inputs; not a fresh audit or whole-product security certification."
+  },
+  "verification": {
+    "lastCompletedApiSuite": {
+      "suites": 41,
+      "passed": 308,
+      "skipped": 1,
+      "skipPreExisting": true,
+      "meaning": "Completed in activation packet before resume; no functional API change since, only activation-comment pin finalized."
+    },
+    "isolatedPostgresHttp": {
+      "scenarios": 17,
+      "passed": true,
+      "mainDatabaseWritten": false
+    },
+    "uiContractTests": {
+      "passed": 17
+    },
+    "currentFinalPinAndHistoricalTests": {
+      "passed": 21
+    },
+    "webBuild": true,
+    "webLint": true,
+    "orbitPreservation": {
+      "baselineFiles": 490,
+      "routes": 54,
+      "selfTests": 5,
+      "passed": true
+    },
+    "fullVisualBaselineRewritten": false,
+    "fullCiAccepted": false
+  },
+  "remaining": [
+    "Z1.1 actual snapshot capture and complete semantic/data mapping",
+    "Z1.2 common validated transitions for all financial/order commands",
+    "Z1.3 remaining API contracts/HTTP/auth, including pending registration proof-of-ownership gap",
+    "Whole-phase/product/CI and live providers remain unaccepted"
+  ],
+  "historicalEvidence": "Earlier Z0/B1-B4 artifacts retained unchanged. Their old current-source validators can correctly report drift; this packet is the current activation witness."
+}

@@ -1,0 +1,1186 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-25",
+  "kind": "static-current-ticket-command-contract",
+  "phaseAccepted": false,
+  "runtimeAccepted": false,
+  "databaseQueried": false,
+  "facts": {
+    "commands": [
+      {
+        "id": "Z0-TKT-01",
+        "file": "apps/api/src/tickets/tickets.controller.ts",
+        "className": "TicketsController",
+        "signature": "POST /v1/customer/tickets",
+        "handler": "create",
+        "service": {
+          "file": "apps/api/src/tickets/tickets.service.ts",
+          "className": "TicketsService",
+          "methodName": "create",
+          "line": 53,
+          "hash": "faaf873299e94a67d62811b184965d54adca9143c6fecd432911dfdb97ef3aee"
+        },
+        "dto": {
+          "file": "apps/api/src/tickets/dto/ticket.dto.ts",
+          "name": "CreateTicketDto",
+          "line": 17,
+          "hash": "b8f823ced630efa82383145f3ae7de10d34bc43f2abbbfe755f2b3fd90af36f0",
+          "fields": [
+            {
+              "name": "subject",
+              "decorators": ["@IsString()"]
+            },
+            {
+              "name": "category",
+              "decorators": ["@IsIn(CATEGORIES)"]
+            },
+            {
+              "name": "orderId",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            },
+            {
+              "name": "relatedPublicHandlerCode",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            },
+            {
+              "name": "message",
+              "decorators": ["@IsString()"]
+            },
+            {
+              "name": "attachmentFileId",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            },
+            {
+              "name": "priority",
+              "decorators": ["@IsOptional()", "@IsIn(PRIORITIES)"]
+            }
+          ]
+        },
+        "requirement": "API15",
+        "route": {
+          "method": "POST",
+          "path": "/v1/customer/tickets",
+          "file": "apps/api/src/tickets/tickets.controller.ts",
+          "line": 32,
+          "className": "TicketsController",
+          "handler": "create",
+          "classDecorators": [
+            "@Controller('v1/customer/tickets')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.customer)"
+          ],
+          "methodDecorators": ["@Post()"],
+          "methodHash": "297120faff7b292d3100cd776a009fc4b0070a6a753822cb01806226d3d60894"
+        },
+        "controller": {
+          "file": "apps/api/src/tickets/tickets.controller.ts",
+          "className": "TicketsController",
+          "methodName": "create",
+          "line": 32,
+          "hash": "297120faff7b292d3100cd776a009fc4b0070a6a753822cb01806226d3d60894"
+        }
+      },
+      {
+        "id": "Z0-TKT-02",
+        "file": "apps/api/src/tickets/tickets.controller.ts",
+        "className": "TicketsController",
+        "signature": "POST /v1/customer/tickets/:id/messages",
+        "handler": "addMessage",
+        "service": {
+          "file": "apps/api/src/tickets/tickets.service.ts",
+          "className": "TicketsService",
+          "methodName": "addCustomerMessage",
+          "line": 150,
+          "hash": "58021765f0807fe10f562f68be411df22b45250e1f5ac0e6bee592fcd573e176"
+        },
+        "dto": {
+          "file": "apps/api/src/tickets/dto/ticket.dto.ts",
+          "name": "AddTicketMessageDto",
+          "line": 44,
+          "hash": "2d1ece3ee138f1aeb25603512afd66657265cc9a69e3ca152043d7fd4e3a16aa",
+          "fields": [
+            {
+              "name": "body",
+              "decorators": ["@IsString()"]
+            },
+            {
+              "name": "attachmentFileId",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            },
+            {
+              "name": "visibility",
+              "decorators": [
+                "@IsOptional()",
+                "@IsIn(['customer_visible', 'internal_only'])"
+              ]
+            }
+          ]
+        },
+        "requirement": "API17",
+        "route": {
+          "method": "POST",
+          "path": "/v1/customer/tickets/:id/messages",
+          "file": "apps/api/src/tickets/tickets.controller.ts",
+          "line": 42,
+          "className": "TicketsController",
+          "handler": "addMessage",
+          "classDecorators": [
+            "@Controller('v1/customer/tickets')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.customer)"
+          ],
+          "methodDecorators": ["@Post(':id/messages')"],
+          "methodHash": "c6c574354b615d457db225fb6d6af774e3b25df20cbc330c689530afd8511b82"
+        },
+        "controller": {
+          "file": "apps/api/src/tickets/tickets.controller.ts",
+          "className": "TicketsController",
+          "methodName": "addMessage",
+          "line": 42,
+          "hash": "c6c574354b615d457db225fb6d6af774e3b25df20cbc330c689530afd8511b82"
+        }
+      },
+      {
+        "id": "Z0-TKT-03",
+        "file": "apps/api/src/tickets/tickets.support.controller.ts",
+        "className": "TicketsSupportController",
+        "signature": "PATCH /v1/support/tickets/:id/assign",
+        "handler": "assign",
+        "service": {
+          "file": "apps/api/src/tickets/tickets.service.ts",
+          "className": "TicketsService",
+          "methodName": "assign",
+          "line": 236,
+          "hash": "36a0347d6cfa4043ceb698362b046865c77726c1515da4f844ac8d47ee196079"
+        },
+        "dto": {
+          "file": "apps/api/src/tickets/dto/ticket.dto.ts",
+          "name": "AssignTicketDto",
+          "line": 62,
+          "hash": "c1caab90cf1f8f67512b6d2cb7990d0bb9c603e9e3bcccf7ffc8472b43d7cfe0",
+          "fields": [
+            {
+              "name": "assignedToUserId",
+              "decorators": ["@IsString()"]
+            }
+          ]
+        },
+        "requirement": "API19",
+        "route": {
+          "method": "PATCH",
+          "path": "/v1/support/tickets/:id/assign",
+          "file": "apps/api/src/tickets/tickets.support.controller.ts",
+          "line": 78,
+          "className": "TicketsSupportController",
+          "handler": "assign",
+          "classDecorators": [
+            "@Controller('v1/support/tickets')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.support, UserRole.admin)"
+          ],
+          "methodDecorators": ["@Patch(':id/assign')"],
+          "methodHash": "70da4681e3766e4096b63c5e6741eebfae82e598e8b0efb025f48db3315631ca"
+        },
+        "controller": {
+          "file": "apps/api/src/tickets/tickets.support.controller.ts",
+          "className": "TicketsSupportController",
+          "methodName": "assign",
+          "line": 78,
+          "hash": "70da4681e3766e4096b63c5e6741eebfae82e598e8b0efb025f48db3315631ca"
+        }
+      },
+      {
+        "id": "Z0-TKT-04",
+        "file": "apps/api/src/tickets/tickets.support.controller.ts",
+        "className": "TicketsSupportController",
+        "signature": "POST /v1/support/tickets/:id/claim",
+        "handler": "claim",
+        "service": {
+          "file": "apps/api/src/tickets/tickets.service.ts",
+          "className": "TicketsService",
+          "methodName": "assign",
+          "line": 236,
+          "hash": "36a0347d6cfa4043ceb698362b046865c77726c1515da4f844ac8d47ee196079"
+        },
+        "dto": null,
+        "requirement": "D03",
+        "route": {
+          "method": "POST",
+          "path": "/v1/support/tickets/:id/claim",
+          "file": "apps/api/src/tickets/tickets.support.controller.ts",
+          "line": 87,
+          "className": "TicketsSupportController",
+          "handler": "claim",
+          "classDecorators": [
+            "@Controller('v1/support/tickets')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.support, UserRole.admin)"
+          ],
+          "methodDecorators": ["@Post(':id/claim')"],
+          "methodHash": "41d7376b7bfad74e8d8d15c875e256575bd442845246a76d45f7287c118d8158"
+        },
+        "controller": {
+          "file": "apps/api/src/tickets/tickets.support.controller.ts",
+          "className": "TicketsSupportController",
+          "methodName": "claim",
+          "line": 87,
+          "hash": "41d7376b7bfad74e8d8d15c875e256575bd442845246a76d45f7287c118d8158"
+        }
+      },
+      {
+        "id": "Z0-TKT-05",
+        "file": "apps/api/src/tickets/tickets.support.controller.ts",
+        "className": "TicketsSupportController",
+        "signature": "POST /v1/support/tickets/:id/reply",
+        "handler": "reply",
+        "service": {
+          "file": "apps/api/src/tickets/tickets.service.ts",
+          "className": "TicketsService",
+          "methodName": "reply",
+          "line": 275,
+          "hash": "f0c0cdb2db648f3e20e674358b2b7a7e9e651527ca3676f36a549f2ae6720332"
+        },
+        "dto": {
+          "file": "apps/api/src/tickets/dto/ticket.dto.ts",
+          "name": "AddTicketMessageDto",
+          "line": 44,
+          "hash": "2d1ece3ee138f1aeb25603512afd66657265cc9a69e3ca152043d7fd4e3a16aa",
+          "fields": [
+            {
+              "name": "body",
+              "decorators": ["@IsString()"]
+            },
+            {
+              "name": "attachmentFileId",
+              "decorators": ["@IsOptional()", "@IsString()"]
+            },
+            {
+              "name": "visibility",
+              "decorators": [
+                "@IsOptional()",
+                "@IsIn(['customer_visible', 'internal_only'])"
+              ]
+            }
+          ]
+        },
+        "requirement": "ZEUS-API4-023",
+        "route": {
+          "method": "POST",
+          "path": "/v1/support/tickets/:id/reply",
+          "file": "apps/api/src/tickets/tickets.support.controller.ts",
+          "line": 92,
+          "className": "TicketsSupportController",
+          "handler": "reply",
+          "classDecorators": [
+            "@Controller('v1/support/tickets')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.support, UserRole.admin)"
+          ],
+          "methodDecorators": ["@Post(':id/reply')"],
+          "methodHash": "a9d794bc42513c6c83dee826d2b1def0d43ba6f0ae65aaaf5c47b038db973625"
+        },
+        "controller": {
+          "file": "apps/api/src/tickets/tickets.support.controller.ts",
+          "className": "TicketsSupportController",
+          "methodName": "reply",
+          "line": 92,
+          "hash": "a9d794bc42513c6c83dee826d2b1def0d43ba6f0ae65aaaf5c47b038db973625"
+        }
+      },
+      {
+        "id": "Z0-TKT-06",
+        "file": "apps/api/src/tickets/tickets.support.controller.ts",
+        "className": "TicketsSupportController",
+        "signature": "POST /v1/support/tickets/:id/escalate",
+        "handler": "escalate",
+        "service": {
+          "file": "apps/api/src/tickets/tickets.service.ts",
+          "className": "TicketsService",
+          "methodName": "escalate",
+          "line": 327,
+          "hash": "5e74e5b14a91dfccb5423abf6c333288951f49a203c583400d54c5275e086333"
+        },
+        "dto": {
+          "file": "apps/api/src/tickets/dto/ticket.dto.ts",
+          "name": "EscalateTicketDto",
+          "line": 57,
+          "hash": "7eb7c1c565c59492e6a3ca2ba2c183a6b5ee8c6b3c86beb88abb0865db2dfee4",
+          "fields": [
+            {
+              "name": "reason",
+              "decorators": ["@IsString()"]
+            }
+          ]
+        },
+        "requirement": "ZEUS-API4-024",
+        "route": {
+          "method": "POST",
+          "path": "/v1/support/tickets/:id/escalate",
+          "file": "apps/api/src/tickets/tickets.support.controller.ts",
+          "line": 101,
+          "className": "TicketsSupportController",
+          "handler": "escalate",
+          "classDecorators": [
+            "@Controller('v1/support/tickets')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.support, UserRole.admin)"
+          ],
+          "methodDecorators": ["@Post(':id/escalate')"],
+          "methodHash": "9758ebb9baaac0c47f7c9746598a5742c8fa716558bb3afccf8033dad6b3b857"
+        },
+        "controller": {
+          "file": "apps/api/src/tickets/tickets.support.controller.ts",
+          "className": "TicketsSupportController",
+          "methodName": "escalate",
+          "line": 101,
+          "hash": "9758ebb9baaac0c47f7c9746598a5742c8fa716558bb3afccf8033dad6b3b857"
+        }
+      },
+      {
+        "id": "Z0-TKT-07",
+        "file": "apps/api/src/tickets/tickets.support.controller.ts",
+        "className": "TicketsSupportController",
+        "signature": "POST /v1/support/tickets/:id/resolve",
+        "handler": "resolve",
+        "service": {
+          "file": "apps/api/src/tickets/tickets.service.ts",
+          "className": "TicketsService",
+          "methodName": "resolve",
+          "line": 342,
+          "hash": "5401709e066a595248d00529c02558373e35dc1a2cc9ca9ca21a1eb8d9c7f1a0"
+        },
+        "dto": null,
+        "requirement": "ZEUS-UI-031",
+        "route": {
+          "method": "POST",
+          "path": "/v1/support/tickets/:id/resolve",
+          "file": "apps/api/src/tickets/tickets.support.controller.ts",
+          "line": 110,
+          "className": "TicketsSupportController",
+          "handler": "resolve",
+          "classDecorators": [
+            "@Controller('v1/support/tickets')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.support, UserRole.admin)"
+          ],
+          "methodDecorators": ["@Post(':id/resolve')"],
+          "methodHash": "deb6f13292cc29c05b505c7041671c427a62a43888b7646972262cd4323f5ace"
+        },
+        "controller": {
+          "file": "apps/api/src/tickets/tickets.support.controller.ts",
+          "className": "TicketsSupportController",
+          "methodName": "resolve",
+          "line": 110,
+          "hash": "deb6f13292cc29c05b505c7041671c427a62a43888b7646972262cd4323f5ace"
+        }
+      },
+      {
+        "id": "Z0-TKT-08",
+        "file": "apps/api/src/tickets/tickets.support.controller.ts",
+        "className": "TicketsSupportController",
+        "signature": "POST /v1/support/tickets/:id/close",
+        "handler": "close",
+        "service": {
+          "file": "apps/api/src/tickets/tickets.service.ts",
+          "className": "TicketsService",
+          "methodName": "close",
+          "line": 364,
+          "hash": "67321a24c44ee045ce7fd35dabd67c328524426525872bac8e3acdf263e2cae8"
+        },
+        "dto": null,
+        "requirement": "API18",
+        "route": {
+          "method": "POST",
+          "path": "/v1/support/tickets/:id/close",
+          "file": "apps/api/src/tickets/tickets.support.controller.ts",
+          "line": 115,
+          "className": "TicketsSupportController",
+          "handler": "close",
+          "classDecorators": [
+            "@Controller('v1/support/tickets')",
+            "@UseGuards(RolesGuard)",
+            "@Roles(UserRole.support, UserRole.admin)"
+          ],
+          "methodDecorators": ["@Post(':id/close')"],
+          "methodHash": "c27846a17a43f15075f0a4af448c5a67ad3e2c5599b6051e127300feb25e1b5d"
+        },
+        "controller": {
+          "file": "apps/api/src/tickets/tickets.support.controller.ts",
+          "className": "TicketsSupportController",
+          "methodName": "close",
+          "line": 115,
+          "hash": "c27846a17a43f15075f0a4af448c5a67ad3e2c5599b6051e127300feb25e1b5d"
+        }
+      }
+    ],
+    "downstream": [
+      {
+        "file": "apps/api/src/tickets/tickets.service.ts",
+        "className": "TicketsService",
+        "methodName": "ensureExists",
+        "line": 442,
+        "hash": "97660cae79bfabd4e3fd99c1ee55ec9931dccdf31e55e37e389bcdeeafd14514"
+      },
+      {
+        "file": "apps/api/src/tickets/tickets.service.ts",
+        "className": "TicketsService",
+        "methodName": "assertSupportCanAct",
+        "line": 448,
+        "hash": "35dcdea1a881bece807b7fbfa2f9b04205d83380ab1e6ed3ee264b2fb7e89662"
+      },
+      {
+        "file": "apps/api/src/tickets/tickets.service.ts",
+        "className": "TicketsService",
+        "methodName": "assertCustomerAttachment",
+        "line": 464,
+        "hash": "0c02febd9c0e88b0a3fe783a47f05628d4c77440cc270ceae14fa7e571b4dd46"
+      },
+      {
+        "file": "apps/api/src/tickets/tickets.service.ts",
+        "className": "TicketsService",
+        "methodName": "assertSupportAttachment",
+        "line": 488,
+        "hash": "3e02bf9bae18320d7bb21c28907e48e7e2db7bd2421b5cc534fc0535b725a864"
+      },
+      {
+        "file": "apps/api/src/tickets/tickets.service.ts",
+        "className": "TicketsService",
+        "methodName": "findOneForCustomer",
+        "line": 132,
+        "hash": "c61e39315a222abf1130266107055a8a53a95990f9c520d20df4d2c8679ff08e"
+      },
+      {
+        "file": "apps/api/src/tickets/tickets.service.ts",
+        "className": "TicketsService",
+        "methodName": "findOneForSupport",
+        "line": 214,
+        "hash": "ccb7c754aa2c52bc1e063558b01b1415f0eec5194a463b9cc14808f88e0f9555"
+      },
+      {
+        "file": "apps/api/src/tickets/tickets.service.ts",
+        "className": "TicketsService",
+        "methodName": "supportPerformance",
+        "line": 418,
+        "hash": "bd40d1a49b0aa38794ff2977234184827afcab36202a1302d667ba0474fe40b9"
+      },
+      {
+        "file": "apps/api/src/tickets/tickets.service.ts",
+        "className": "TicketsService",
+        "methodName": "flagOverdueTickets",
+        "line": 513,
+        "hash": "8c092c50fbfb3f7f51a22544b5268e2d4b6800be864bbf7e9d673e776293ab1c"
+      },
+      {
+        "file": "apps/api/src/orders/domain/order-reports.ts",
+        "name": "createVersionedOrderReport",
+        "line": 3,
+        "hash": "208d62471d30bf464dac97d8964ec268b6cfef3b8107ef9fea346ecd0c5ad17f"
+      }
+    ],
+    "inputHashes": {
+      "apps/api/src/tickets/tickets.service.ts": "a537f779a29f18d8652baa8f6846cfc750b41efdafc9901139da79f092a733dd",
+      "apps/api/src/tickets/tickets.controller.ts": "89564be4aac12b142b725e82d5025ba6fe8b8ce007ab7a6c458e9e3ee0299673",
+      "apps/api/src/tickets/tickets.support.controller.ts": "86248b0a6ab39a0ba84cb4552c900b134d3d81cde3e46f9e24a7c97f535a90d8",
+      "apps/api/src/tickets/dto/ticket.dto.ts": "422e3a4bfef6a569396388570c9dc981049a9ef9c88f3ab3bbedf75dfab22806",
+      "apps/api/src/common/utils/business-hours.ts": "5af48ab66b70e66a035fdcbf88a62ac869f1d011d9815b5ad5c1e6b09de21a1f",
+      "apps/api/src/common/utils/tehran-time.ts": "b39fef0d5ee9894e771d5e949891a21457cc9244c0cfa4c470fa146c0ccb536f",
+      "apps/api/src/common/guards/roles.guard.ts": "d102c37bf2e89d0412b723a695387927911260e774c94cc920d8fb2ff982dadf",
+      "apps/api/src/common/guards/jwt-auth.guard.ts": "d127b1e7e67f285e6a6225230a071e252c720eba2bb8718e424918b2e130ac6a",
+      "apps/api/src/auth/strategies/jwt.strategy.ts": "2715b92f4fe1e2cc67d3c17acab357b68e83788cf6ce10267e306e95a8ee2ad0",
+      "apps/api/src/auth/auth-session.service.ts": "5245d9239ffe53c1a05c30ae6e7438ebaa533087c3f6554386853226b3c0c65a",
+      "apps/api/src/orders/domain/order-reports.ts": "15b3cf84f72d57ed4e0c80096f270979b908e6cec0cb6aff0d1c6c02a5842822",
+      "apps/api/src/notifications/notifications.service.ts": "1fad9a57c1a80c86f5c62977d8176a02123742143687e0a1aff148667f42404e",
+      "apps/api/src/main.ts": "da4d33d349ee2d848906c546aca1438ec798130e53cbf81757481d09334f280d",
+      "apps/api/src/app.module.ts": "9d0d3c111235dae07907318fa8d0a54df2f3e5d87250b10fc0729765570e2904",
+      "apps/api/prisma/schema.prisma": "bfa97ddb906f4d2bdfb7e02940bd8b07a4bf6f375371b4df47408d87b66e99be",
+      "docs/zeus/z0-decisions.json": "dc0f7cd7feab46c41e1c0a737c92e755e837792a926efce0e8554be2e41d5f70"
+    },
+    "routeInventory": {
+      "totalRoutes": 180,
+      "nonReadRoutes": 104,
+      "reviewedRoutes": 39,
+      "scopedTicketRoutes": [
+        "PATCH /v1/support/tickets/:id/assign",
+        "POST /v1/customer/tickets",
+        "POST /v1/customer/tickets/:id/messages",
+        "POST /v1/support/tickets/:id/claim",
+        "POST /v1/support/tickets/:id/close",
+        "POST /v1/support/tickets/:id/escalate",
+        "POST /v1/support/tickets/:id/reply",
+        "POST /v1/support/tickets/:id/resolve"
+      ],
+      "remaining": [
+        {
+          "signature": "PUT /v1/customer/account/profile",
+          "file": "apps/api/src/account/account.controller.ts",
+          "className": "AccountController",
+          "handler": "updateProfile",
+          "hash": "43c0f938d905f10d1298243592dd4ef99d32607bc47a5fb6cba08b02d01462ee"
+        },
+        {
+          "signature": "POST /v1/customer/account/privacy/export",
+          "file": "apps/api/src/account/account.controller.ts",
+          "className": "AccountController",
+          "handler": "exportData",
+          "hash": "c5ead75800fb1f908d6aea3965f6694f63d26849441b0ef60249da9816fd326a"
+        },
+        {
+          "signature": "POST /v1/customer/account/privacy/deletion-request",
+          "file": "apps/api/src/account/account.controller.ts",
+          "className": "AccountController",
+          "handler": "requestDeletion",
+          "hash": "059ac5f9976590767e6694189d682e96bc88b69d226cfdf759487a2395d2429b"
+        },
+        {
+          "signature": "POST /v1/auth/register",
+          "file": "apps/api/src/auth/auth.controller.ts",
+          "className": "AuthController",
+          "handler": "register",
+          "hash": "1139e9a1c38c0b934b5af5c46e966f923de40bcafdb31eb0b4d4f0d420f51f84"
+        },
+        {
+          "signature": "POST /v1/auth/login",
+          "file": "apps/api/src/auth/auth.controller.ts",
+          "className": "AuthController",
+          "handler": "login",
+          "hash": "e828a632fc0b81dfb86a1da3233e21f75f5dae28be21a5d08f22bfcf5b78b38a"
+        },
+        {
+          "signature": "POST /v1/auth/otp/request",
+          "file": "apps/api/src/auth/auth.controller.ts",
+          "className": "AuthController",
+          "handler": "requestOtp",
+          "hash": "539abe249725a4bd097896b0069ab39acbfe563b4cf4fe3b5cceb50d2a0b1c5e"
+        },
+        {
+          "signature": "POST /v1/auth/otp/verify",
+          "file": "apps/api/src/auth/auth.controller.ts",
+          "className": "AuthController",
+          "handler": "verifyOtp",
+          "hash": "d1177187bea8c412a3eda052e7ab7f67a936f5bdd5631039e695b0542ac3fc5d"
+        },
+        {
+          "signature": "POST /v1/auth/refresh",
+          "file": "apps/api/src/auth/auth.controller.ts",
+          "className": "AuthController",
+          "handler": "refresh",
+          "hash": "5f1b50a0c0cdbaed360d349775ddeffc7e8be7abf4d30edd429e04822f1ae46c"
+        },
+        {
+          "signature": "POST /v1/auth/password/forgot",
+          "file": "apps/api/src/auth/auth.controller.ts",
+          "className": "AuthController",
+          "handler": "forgotPassword",
+          "hash": "dd48f96bcfdc51d3153d04894962f618ffc19cef552a5cd59d5a1a761b64baaf"
+        },
+        {
+          "signature": "POST /v1/auth/password/reset",
+          "file": "apps/api/src/auth/auth.controller.ts",
+          "className": "AuthController",
+          "handler": "resetPassword",
+          "hash": "8c2451329707989e1121a60c45f5f13ee3b815ba74f926b7333f288e4e3c30a2"
+        },
+        {
+          "signature": "POST /v1/auth/logout",
+          "file": "apps/api/src/auth/auth.controller.ts",
+          "className": "AuthController",
+          "handler": "logout",
+          "hash": "73e7b47c32b2cd502608d8acd7c426b618805dd07bafb99b17144b0756528f24"
+        },
+        {
+          "signature": "DELETE /v1/auth/sessions/others",
+          "file": "apps/api/src/auth/auth.controller.ts",
+          "className": "AuthController",
+          "handler": "revokeOtherSessions",
+          "hash": "5ad0a03dca0a0053fdc7e5d877c4f9e1fa369485a92055ca8c0a26520720e615"
+        },
+        {
+          "signature": "DELETE /v1/auth/sessions/:id",
+          "file": "apps/api/src/auth/auth.controller.ts",
+          "className": "AuthController",
+          "handler": "revokeSession",
+          "hash": "b0e1b6a3ab9352dd90cb050959691cfc92da6b3d800a9aa81e41ab355c0f68ed"
+        },
+        {
+          "signature": "POST /v1/admin/services",
+          "file": "apps/api/src/catalog/catalog.admin.controller.ts",
+          "className": "CatalogAdminController",
+          "handler": "create",
+          "hash": "cdd08af42191d69ad916a37c110b5fb46f1772090460db7a71ece5289875c5fd"
+        },
+        {
+          "signature": "PATCH /v1/admin/services/:id",
+          "file": "apps/api/src/catalog/catalog.admin.controller.ts",
+          "className": "CatalogAdminController",
+          "handler": "update",
+          "hash": "877fcf9090102513cddf3ad886bfc7f2686a5da58ce9d73254aa820562fae059"
+        },
+        {
+          "signature": "PATCH /v1/admin/services/:id/active",
+          "file": "apps/api/src/catalog/catalog.admin.controller.ts",
+          "className": "CatalogAdminController",
+          "handler": "setActive",
+          "hash": "b5802a97f1885b326bcff742c8e31635cecc54644ee3a486f2ba69e1a0bfa536"
+        },
+        {
+          "signature": "POST /v1/admin/services/:id/packages",
+          "file": "apps/api/src/catalog/catalog.admin.controller.ts",
+          "className": "CatalogAdminController",
+          "handler": "addPackage",
+          "hash": "1d87d38bb6b36c9810cb994747f6bee5ba31904d9a863c742af8a1d66cfc35f8"
+        },
+        {
+          "signature": "POST /v1/admin/services/:id/form-fields",
+          "file": "apps/api/src/catalog/catalog.admin.controller.ts",
+          "className": "CatalogAdminController",
+          "handler": "addFormField",
+          "hash": "b93da101813033299c2f01050a1ad6d5482910d8829f94bd63fc869f5518e4b7"
+        },
+        {
+          "signature": "POST /v1/admin/services/:id/acceptance-criteria",
+          "file": "apps/api/src/catalog/catalog.admin.controller.ts",
+          "className": "CatalogAdminController",
+          "handler": "addAcceptanceCriterion",
+          "hash": "b9faa1b803e2a557b9f08f997e6fabd6220e393fb893ac97de05588e01e24467"
+        },
+        {
+          "signature": "POST /v1/admin/services/:id/qc-templates",
+          "file": "apps/api/src/catalog/catalog.admin.controller.ts",
+          "className": "CatalogAdminController",
+          "handler": "addQcTemplate",
+          "hash": "2077d6893965c8a32a5d7f62447b974f8adcb8d165669e540755fd2d0d22227e"
+        },
+        {
+          "signature": "POST /v1/admin/services/:id/qc-templates/:templateId/items",
+          "file": "apps/api/src/catalog/catalog.admin.controller.ts",
+          "className": "CatalogAdminController",
+          "handler": "addQcItem",
+          "hash": "3f44155d39537abde0dafd9210cc053780bf8574d1d89661ae536c4bd3364914"
+        },
+        {
+          "signature": "POST /v1/admin/staff/:id/onboarding/start",
+          "file": "apps/api/src/executor/onboarding.controller.ts",
+          "className": "OnboardingController",
+          "handler": "start",
+          "hash": "7bfd592fb4055a36e448f6cc7e55086d7ffb39fadf7f352ad78c3f69bef0a0b5"
+        },
+        {
+          "signature": "POST /v1/admin/staff/:id/onboarding/review",
+          "file": "apps/api/src/executor/onboarding.controller.ts",
+          "className": "OnboardingController",
+          "handler": "review",
+          "hash": "ab78b467405bdf7dbbdce6837fc1ca8c040348c7412ce4a996dd6521e9060d5b"
+        },
+        {
+          "signature": "POST /v1/admin/staff",
+          "file": "apps/api/src/executor/staff.admin.controller.ts",
+          "className": "StaffAdminController",
+          "handler": "create",
+          "hash": "8b3edfdc62336e7c7eb737f7cd496144e479b32766468fea610e4b2f2d7d18b6"
+        },
+        {
+          "signature": "POST /v1/admin/staff/:id/performance/recalculate",
+          "file": "apps/api/src/executor/staff.admin.controller.ts",
+          "className": "StaffAdminController",
+          "handler": "performance",
+          "hash": "a4298bbf26f7c9f982d17726a01d12be8fd51307eaf62f7e72850ca382f1b518"
+        },
+        {
+          "signature": "PATCH /v1/admin/staff/:id/status",
+          "file": "apps/api/src/executor/staff.admin.controller.ts",
+          "className": "StaffAdminController",
+          "handler": "setStatus",
+          "hash": "bdb6c22ae846889a3660785987e5c8b8d3f60fb48130fce79b726e6bfb7bd018"
+        },
+        {
+          "signature": "PATCH /v1/admin/staff/:id/capacity",
+          "file": "apps/api/src/executor/staff.admin.controller.ts",
+          "className": "StaffAdminController",
+          "handler": "setCapacity",
+          "hash": "8205a049ae8909dde03459cefffd7448610d0b71b03c9fca0f15c22c015825e7"
+        },
+        {
+          "signature": "PATCH /v1/admin/staff/:id/profile",
+          "file": "apps/api/src/executor/staff.admin.controller.ts",
+          "className": "StaffAdminController",
+          "handler": "updateProfile",
+          "hash": "faa5afbded799e4470ed3e75de6bd38db2ff733e9038073cdd248e51b7412335"
+        },
+        {
+          "signature": "PATCH /v1/admin/staff/:id/skills",
+          "file": "apps/api/src/executor/staff.admin.controller.ts",
+          "className": "StaffAdminController",
+          "handler": "updateSkills",
+          "hash": "4261a9bfa028bbc4e6b51dcd576dac9ab3d7b4965bf8833855e9d2c59e5b8280"
+        },
+        {
+          "signature": "PATCH /v1/admin/staff/:id/attendance",
+          "file": "apps/api/src/executor/staff.admin.controller.ts",
+          "className": "StaffAdminController",
+          "handler": "upsertAttendance",
+          "hash": "2aa035cbbea32933d15908236706131e578229009903dd670d2c5b263a58c661"
+        },
+        {
+          "signature": "PATCH /v1/admin/staff/:id/access",
+          "file": "apps/api/src/executor/staff.admin.controller.ts",
+          "className": "StaffAdminController",
+          "handler": "updateAccess",
+          "hash": "6629371d25f8adab409a8ccfb71c5af380c4f94dbd2b26b60f2ef2eb8fc4d8e9"
+        },
+        {
+          "signature": "PATCH /v1/admin/staff/:id/alerts/:alertId/acknowledge",
+          "file": "apps/api/src/executor/staff.admin.controller.ts",
+          "className": "StaffAdminController",
+          "handler": "acknowledgeAlert",
+          "hash": "648a7c144fe1f06e8d5e2a760b29d573bfd4d457e6844547aa3984f1ebaf520a"
+        },
+        {
+          "signature": "POST /v1/admin/teams",
+          "file": "apps/api/src/executor/staff.admin.controller.ts",
+          "className": "TeamsAdminController",
+          "handler": "create",
+          "hash": "1b2298568aa29e07275f324e1ce480bd71e717b6e88f9066778aed255836b5c3"
+        },
+        {
+          "signature": "POST /v1/admin/skills",
+          "file": "apps/api/src/executor/staff.admin.controller.ts",
+          "className": "SkillsAdminController",
+          "handler": "create",
+          "hash": "aafd35e03d0adce53568333d7e8a22d2770d0a5192c44cc8cba58d90c9d1db9a"
+        },
+        {
+          "signature": "POST /v1/customer/orders/:orderId/feedback",
+          "file": "apps/api/src/feedback/feedback.controller.ts",
+          "className": "FeedbackController",
+          "handler": "create",
+          "hash": "8e1dfe5753f7e06a163b2fb491ba25a97f1ab7a4f5ef27040eba8a04f0479547"
+        },
+        {
+          "signature": "PATCH /v1/admin/feedback/:id/status",
+          "file": "apps/api/src/feedback/feedback.controller.ts",
+          "className": "FeedbackAdminController",
+          "handler": "updateStatus",
+          "hash": "8467bdc046f597c5c8b7a3faf7984672e80e036759c7fc23741cc7847e66722d"
+        },
+        {
+          "signature": "POST /v1/files/upload",
+          "file": "apps/api/src/files/files.controller.ts",
+          "className": "FilesController",
+          "handler": "upload",
+          "hash": "c178559c6608334c48ac01ab54b0d86189c3daa6238c8e098aa36ddba69f69bd"
+        },
+        {
+          "signature": "POST /v1/customer/withdrawals",
+          "file": "apps/api/src/finance/customer-finance.controller.ts",
+          "className": "CustomerFinanceController",
+          "handler": "requestWithdrawal",
+          "hash": "e582903cdd0628996971a02ef706282a264db4be1d444dcf0d1bf85948df3a13"
+        },
+        {
+          "signature": "POST /v1/admin/finance/reconciliation/run",
+          "file": "apps/api/src/finance/finance.admin.controller.ts",
+          "className": "FinanceAdminController",
+          "handler": "runReconciliation",
+          "hash": "60447ec0e98ca7acddd8e76449fa41daa9e5c0002c5e8990f8eba776788244ac"
+        },
+        {
+          "signature": "POST /v1/admin/finance/escrow/:orderId/release",
+          "file": "apps/api/src/finance/finance.admin.controller.ts",
+          "className": "FinanceAdminController",
+          "handler": "releaseEscrow",
+          "hash": "4e7144fe7b05031b2dd025aea0f365a4c206ba52db0e98d55d4cdcea8e608d53"
+        },
+        {
+          "signature": "POST /v1/admin/finance/escrow/:orderId/refund",
+          "file": "apps/api/src/finance/finance.admin.controller.ts",
+          "className": "FinanceAdminController",
+          "handler": "refundEscrow",
+          "hash": "8ba8f4ea4ecb4f32d7ec1f24ab951347099b057340ff8a7f3d8ad07773d71a8a"
+        },
+        {
+          "signature": "POST /v1/admin/finance/ledger/:id/correction",
+          "file": "apps/api/src/finance/finance.admin.controller.ts",
+          "className": "FinanceAdminController",
+          "handler": "correctLedgerEntry",
+          "hash": "eb2f170305e01d8f7c0469a2379e7125196294e29e7110e6ae60d0a0181a136b"
+        },
+        {
+          "signature": "PATCH /v1/admin/finance/withdrawals/:id/approve",
+          "file": "apps/api/src/finance/finance.admin.controller.ts",
+          "className": "FinanceAdminController",
+          "handler": "approveWithdrawal",
+          "hash": "37a58d2553ca16fa0933c203773f58c9104fb697ae36ccb4e2d5093cc9b0e0a6"
+        },
+        {
+          "signature": "PATCH /v1/admin/finance/withdrawals/:id/reject",
+          "file": "apps/api/src/finance/finance.admin.controller.ts",
+          "className": "FinanceAdminController",
+          "handler": "rejectWithdrawal",
+          "hash": "fc8a83c2fa0b8e47f9fc4a74409bda0ff9e1c647fc10a7dfd1316892edc793a6"
+        },
+        {
+          "signature": "POST /v1/admin/finance/withdrawals/verify-shaba",
+          "file": "apps/api/src/finance/finance.admin.controller.ts",
+          "className": "FinanceAdminController",
+          "handler": "verifyShaba",
+          "hash": "5cf2f24af0c4a6348bebfa2779afbc95fc5fe5a7e76274c2d64fd8facfc7b0f3"
+        },
+        {
+          "signature": "PUT /v1/notifications/preferences",
+          "file": "apps/api/src/notifications/notifications.controller.ts",
+          "className": "NotificationsController",
+          "handler": "updatePreferences",
+          "hash": "7fad65a78aac63d32450ddac2aad0cf3e78eb0bed4d50a519ffc7544cac26db6"
+        },
+        {
+          "signature": "PATCH /v1/notifications/read-all",
+          "file": "apps/api/src/notifications/notifications.controller.ts",
+          "className": "NotificationsController",
+          "handler": "markAllRead",
+          "hash": "ab6e6a63c01e7d4bf4a259e18d9a88cfb2c4754ef0a027160e0aa9eaeceacd1f"
+        },
+        {
+          "signature": "PATCH /v1/notifications/:id/read",
+          "file": "apps/api/src/notifications/notifications.controller.ts",
+          "className": "NotificationsController",
+          "handler": "markRead",
+          "hash": "b34654c6ea2d99b54716472a1a49fa9d08f99a574fff25bcece8630c82bf5da3"
+        },
+        {
+          "signature": "POST /v1/customer/organizations",
+          "file": "apps/api/src/organizations/organizations.controller.ts",
+          "className": "OrganizationsController",
+          "handler": "create",
+          "hash": "78d1d2c85c61a727118739949670c092a500cd93ca8dd2192e31a6e2ff773779"
+        },
+        {
+          "signature": "POST /v1/customer/organizations/invitations/:invitationId/respond",
+          "file": "apps/api/src/organizations/organizations.controller.ts",
+          "className": "OrganizationsController",
+          "handler": "respond",
+          "hash": "359026cc92c19e5dbc88d4bfd20f19822e0d482c69554b18834aa8d5b9b16c36"
+        },
+        {
+          "signature": "POST /v1/customer/organizations/:id/invitations",
+          "file": "apps/api/src/organizations/organizations.controller.ts",
+          "className": "OrganizationsController",
+          "handler": "invite",
+          "hash": "973210d37b7b4df33be3dbcba69e11ac2393856730ba068a049471eb511ff930"
+        },
+        {
+          "signature": "POST /v1/customer/organizations/:id/teams",
+          "file": "apps/api/src/organizations/organizations.controller.ts",
+          "className": "OrganizationsController",
+          "handler": "team",
+          "hash": "8955cc3373b0be7a4e7acab0d61a80fda2044e9d0a9f263a99e60a2d59fe5a03"
+        },
+        {
+          "signature": "PATCH /v1/customer/organizations/:id/members/:memberId",
+          "file": "apps/api/src/organizations/organizations.controller.ts",
+          "className": "OrganizationsController",
+          "handler": "edit",
+          "hash": "ca860365635fe7f0d89a9fc71db6ef487c90c7ebb216b5a98d5bccacade1bd1d"
+        },
+        {
+          "signature": "POST /v1/customer/organizations/:id/transfer-owner",
+          "file": "apps/api/src/organizations/organizations.controller.ts",
+          "className": "OrganizationsController",
+          "handler": "transfer",
+          "hash": "4a7060ce6987f8d35b7ed43074924f5219ea0ba13ebfbb84a2c7faa973eae4c8"
+        },
+        {
+          "signature": "POST /v1/customer/organizations/:id/plan-request",
+          "file": "apps/api/src/organizations/organizations.controller.ts",
+          "className": "OrganizationsController",
+          "handler": "request",
+          "hash": "64ecdef6954ae957badf5d9c230bf458f6514fee9eff055e61478058603c0e3d"
+        },
+        {
+          "signature": "POST /v1/customer/organizations/:id/orders",
+          "file": "apps/api/src/organizations/organizations.controller.ts",
+          "className": "OrganizationsController",
+          "handler": "attach",
+          "hash": "56ae96f363a9b82f0e68baf01c62e61182762435ea652b855924b47160286bf4"
+        },
+        {
+          "signature": "POST /v1/admin/organizations/plans",
+          "file": "apps/api/src/organizations/organizations.controller.ts",
+          "className": "OrganizationAdminController",
+          "handler": "create",
+          "hash": "6de29eb1aecfd764a2cc8075af54b08216086cdb4a6d2d4b7eb4ad449f6f7027"
+        },
+        {
+          "signature": "PATCH /v1/admin/organizations/plans/:id",
+          "file": "apps/api/src/organizations/organizations.controller.ts",
+          "className": "OrganizationAdminController",
+          "handler": "setActive",
+          "hash": "eb27092da243b4ac06692b02ef65c223b2c8ce1e256489cf840fb5d41bf245e8"
+        },
+        {
+          "signature": "POST /v1/admin/organizations/:id/subscription",
+          "file": "apps/api/src/organizations/organizations.controller.ts",
+          "className": "OrganizationAdminController",
+          "handler": "activate",
+          "hash": "a7e052fdda66550f8942e824abd04c9987006f52cb05fdef1b459328c3dd3c5b"
+        },
+        {
+          "signature": "POST /v1/admin/organizations/:id/subscription/cancel",
+          "file": "apps/api/src/organizations/organizations.controller.ts",
+          "className": "OrganizationAdminController",
+          "handler": "cancel",
+          "hash": "5fb4ea9f7501ac391a12529cd6e828b6d5aba8c7649a199aeca2c0bc70922031"
+        },
+        {
+          "signature": "POST /v1/pricing/calculate",
+          "file": "apps/api/src/pricing/pricing.controller.ts",
+          "className": "PricingController",
+          "handler": "calculate",
+          "hash": "f664db8458844971e70e3a9357e6cb4714b47461a3642fb1396849da182cc78f"
+        },
+        {
+          "signature": "PUT /v1/admin/settings",
+          "file": "apps/api/src/users/settings.controller.ts",
+          "className": "SettingsController",
+          "handler": "set",
+          "hash": "86dc4b4ed115148a9fa94e1e6d0abe7e8ea711618fbe755bb8bb69013df2236d"
+        },
+        {
+          "signature": "PATCH /v1/admin/users/:id/status",
+          "file": "apps/api/src/users/users.admin.controller.ts",
+          "className": "UsersAdminController",
+          "handler": "setStatus",
+          "hash": "14a8ccd5080b6acfaee1cd59e5a3519b0f892b8680b9bb3a1ec5a2fe50baa699"
+        },
+        {
+          "signature": "POST /v1/admin/admins",
+          "file": "apps/api/src/users/users.admin.controller.ts",
+          "className": "AdminsAdminController",
+          "handler": "create",
+          "hash": "68ee0b8a3b97edc267617a50f6945863b07607e260e0b9e17331050c8dfc6f4e"
+        },
+        {
+          "signature": "PATCH /v1/admin/admins/:id/scope",
+          "file": "apps/api/src/users/users.admin.controller.ts",
+          "className": "AdminsAdminController",
+          "handler": "updateScope",
+          "hash": "e1c36c3188ef3cb4c280b5811433e98bae67af22954fcf2f1ac974467d1ac729"
+        }
+      ],
+      "controllerSetHash": "a6a830df57ed6931fb6f6ac6813aea89e94ed3fd74a2005ccc226cddaef0bf1a",
+      "note": "Non-read HTTP inventory includes the nonbinding read-only pricing calculation POST. A classified route is not accepted runtime behavior, transitive review or complete Z0."
+    }
+  },
+  "contracts": [
+    {
+      "id": "Z0-TKT-01",
+      "actor": "Authenticated customer role or customer capability via RolesGuard; user.id supplied by JWT, not body.",
+      "ownership": "Optional order must belong to customer; supplied public handler must be active/customer-visible within that order. Attachment requires an order and own uploaded ticket_attachment with clean scan.",
+      "preconditions": "Category/priority enums; strings only for subject/message, no trim/min/max. No-order public-handler code has no lookup. SLA derives from current mutable holiday setting and priority, not a versioned snapshot.",
+      "effects": "Nested ticket + initial customer-visible message in one Prisma create; no order transition or financial call.",
+      "replayConcurrency": "No command idempotency key; retries can create multiple tickets/codes. Ownership/attachment reads outside create.",
+      "auditHistory": "Ticket/message sender and timestamps persisted; no explicit creation AuditLog in service.",
+      "testsNeeded": [
+        "foreign order/handler/dirty or foreign attachment rejects without writes",
+        "blank/oversized body DTO and no-order handler semantics",
+        "calendar version and first meaningful public response under DEC04; legacy tickets preserved",
+        "duplicate create and unique reference collision in isolated HTTP/DB"
+      ],
+      "money": "No payment/refund/withdrawal/ledger command in reviewed method; transitive HTTP/DB acceptance remains separate.",
+      "status": "reviewed-current-contract-runtime-acceptance-pending"
+    },
+    {
+      "id": "Z0-TKT-02",
+      "actor": "Authenticated customer role/capability; current user id used as sender.",
+      "ownership": "Ticket customerId must equal caller; attachment same order, caller uploader, kind ticket_attachment and scan clean. Requested internal visibility ignored; customer message always public.",
+      "preconditions": "No explicit rejection for closed ticket. Resolved or waiting_internal becomes waiting_internal; waiting_customer stays waiting_customer on customer response.",
+      "effects": "Message create followed by optional ticket status update outside a shared transaction; no money/order command.",
+      "replayConcurrency": "No replay key; message may persist if later status write fails. No status/ownership CAS on the write.",
+      "auditHistory": "Message sender/time only; no status event or explicit AuditLog here.",
+      "testsNeeded": [
+        "other customer gets NotFound without writes",
+        "internal visibility cannot be requested by customer",
+        "resolved/closed/waiting_customer reply transition and retry",
+        "partial failure after message persistence and attachment rejection"
+      ],
+      "money": "No payment/refund/withdrawal/ledger command in reviewed method; transitive HTTP/DB acceptance remains separate.",
+      "status": "reviewed-current-contract-runtime-acceptance-pending"
+    },
+    {
+      "id": "Z0-TKT-03",
+      "actor": "Support or any admin role via RolesGuard; no AdminScopeGuard/capability per command currently declared.",
+      "ownership": "Support may assign only to self; any admin may select an active primary-role support user. Existing other assignee does not block takeover.",
+      "preconditions": "Resolved/closed denied on a pre-transaction read; target role support and active. Assignment state otherwise overwritten to assigned.",
+      "effects": "Ticket update and ticket.assigned AuditLog in one transaction; no financial/order state change.",
+      "replayConcurrency": "Read occurs before transaction; update where id only, no expected old assignee/status. Concurrent claims can both succeed/overwrite; retry adds another AuditLog.",
+      "auditHistory": "Actor id/role, old/new assignee saved, but before is from the earlier read and not a guaranteed locked snapshot.",
+      "testsNeeded": [
+        "support assigning other rejected; admin assigning inactive/non-support rejected",
+        "closed/resolved assignment rejected",
+        "competing support claims cannot silently steal after future fix",
+        "transaction rollback and truthful before/after audit in isolated DB"
+      ],
+      "money": "No payment/refund/withdrawal/ledger command in reviewed method; transitive HTTP/DB acceptance remains separate.",
+      "status": "reviewed-current-contract-runtime-acceptance-pending"
+    },
+    {
+      "id": "Z0-TKT-04",
+      "actor": "Support or any admin role; delegates assign(id, user.id, user).",
+      "ownership": "Same as assign; admin claiming self is rejected unless that user's primary role is support (current service query).",
+      "preconditions": "Same target-role and terminal-state checks as assign, not a distinct atomic claim command.",
+      "effects": "Delegated assignment transaction plus AuditLog; no money command.",
+      "replayConcurrency": "Same id-only update/overwrite window as assign, no first-claim CAS or replay key.",
+      "auditHistory": "ticket.assigned actor audit; not a separate claimed action.",
+      "testsNeeded": [
+        "claim controller binds real current id",
+        "two claimants and existing assignee",
+        "admin self-claim current rejection recorded, not silently broadened"
+      ],
+      "money": "No payment/refund/withdrawal/ledger command in reviewed method; transitive HTTP/DB acceptance remains separate.",
+      "status": "reviewed-current-contract-runtime-acceptance-pending"
+    },
+    {
+      "id": "Z0-TKT-05",
+      "actor": "Support or any admin role; support must own assignment, admin bypasses that comparison only.",
+      "ownership": "Own clean ticket_attachment within ticket.orderId; customer-facing details filter internal notes. Admin scope not checked in this controller.",
+      "preconditions": "No resolved/closed status guard. Body only IsString. internal_only explicitly internal; all other DTO-valid cases public.",
+      "effects": "Create message; public reply separately sets waiting_customer and queues ticket.reply via notifyUser without tx; internal note neither changes status nor queues. No first-response SLA event/snapshot.",
+      "replayConcurrency": "No replay key/shared transaction; failed ticket update or Outbox insertion can leave message/status persisted and retry duplicate replies.",
+      "auditHistory": "Sender/time/visibility persisted, but no explicit reply AuditLog or meaningful-first-response attribution; queue is not delivered receipt.",
+      "testsNeeded": [
+        "unassigned/other support and dirty/foreign attachment denied",
+        "internal note invisible in customer query and not first response",
+        "closed reply and whitespace body characterized",
+        "notification failure/retry and atomic first public response under concurrency",
+        "per-command admin capability negative cases under DEC13"
+      ],
+      "money": "No payment/refund/withdrawal/ledger command in reviewed method; transitive HTTP/DB acceptance remains separate.",
+      "status": "reviewed-current-contract-runtime-acceptance-pending"
+    },
+    {
+      "id": "Z0-TKT-06",
+      "actor": "Support assigned to ticket or any admin role via controller/guard.",
+      "ownership": "ensureExists and support-assignee check; no admin scope in this route.",
+      "preconditions": "No terminal-state check; reason IsString only, no trim/nonblank. Reason actually stored, not discarded.",
+      "effects": "Separate ticket->escalated update, SLA event and escalation row; no money/order transition.",
+      "replayConcurrency": "No shared transaction/replay key/CAS. Failure may leave escalated status/event without reason row; repeated escalation adds rows.",
+      "auditHistory": "Escalation carries actor/reason/time, SLA event has no actor. No dedicated AuditLog.",
+      "testsNeeded": [
+        "wrong assignee no writes",
+        "blank reason currently passes DTO and persists",
+        "closed/resolved escalation and transaction failure",
+        "authorized trimmed reason actually consumed after scoped fix"
+      ],
+      "money": "No payment/refund/withdrawal/ledger command in reviewed method; transitive HTTP/DB acceptance remains separate.",
+      "status": "reviewed-current-contract-runtime-acceptance-pending"
+    },
+    {
+      "id": "Z0-TKT-07",
+      "actor": "Support assigned to ticket or any admin role; no explicit admin command capability currently.",
+      "ownership": "Ticket exists in transaction; support assignment checked against actor. Related order id comes from ticket, not arbitrary request body.",
+      "preconditions": "No current-state guard; repeated resolve or closed->resolved permitted by method.",
+      "effects": "Within tx set resolved/resolvedAt; if linked order, append versioned public support report. Does not modify Order.status, escrow or ledger.",
+      "replayConcurrency": "No replay key/status CAS; repeats change resolvedAt and can append more reports. Report version uses aggregate+1; DB/concurrency acceptance separate.",
+      "auditHistory": "Resolved timestamp + report author, no explicit resolve AuditLog; no SLA first-response event.",
+      "testsNeeded": [
+        "foreign assignment denied with transaction rollback",
+        "closed/repeated resolve and related report duplicates",
+        "report version collision and failure rollback in isolated DB",
+        "resolution duration separate from approved first-response clock"
+      ],
+      "money": "No payment/refund/withdrawal/ledger command in reviewed method; transitive HTTP/DB acceptance remains separate.",
+      "status": "reviewed-current-contract-runtime-acceptance-pending"
+    },
+    {
+      "id": "Z0-TKT-08",
+      "actor": "Support assigned to ticket or any admin role; customer has no close route here.",
+      "ownership": "Ticket exists; support assignment checked. Admin scope/capability not independently checked.",
+      "preconditions": "Only resolved allowed by pre-write check; repeated close currently fails instead of returning prior result.",
+      "effects": "Update status closed/closedAt by id; no order or financial mutation.",
+      "replayConcurrency": "Check then id-only update outside transaction; concurrent change after read not protected by CAS.",
+      "auditHistory": "closedAt only, no explicit actor/reason AuditLog in this method.",
+      "testsNeeded": [
+        "wrong assignee, nonexistent and non-resolved denied",
+        "resolved close accepted; repeated close and racing reply",
+        "command-specific permission/audit per DEC13"
+      ],
+      "money": "No payment/refund/withdrawal/ledger command in reviewed method; transitive HTTP/DB acceptance remains separate.",
+      "status": "reviewed-current-contract-runtime-acceptance-pending"
+    }
+  ],
+  "findings": [
+    {
+      "id": "Z0-TKT-GAP-01",
+      "title": "DEC04 calendar/metric gap",
+      "evidence": "Current normal SLA is 9 working hours, Thursday+Friday excluded; urgent=4/high=8/low=27. Ticket has slaDueAt/resolvedAt/closedAt but no versioned calendar/target or first meaningful public response marker. Existing breach/summary is not the approved first-response metric.",
+      "requirement": "D07",
+      "nextStep": "Add an additive versioned policy/calendar snapshot and atomic eligible first-public-response event for new tickets only; separate resolution metric. Preserve old deadlines and unknown history. Do not change shared helper or data before scoped authorization/tests.",
+      "accepted": false,
+      "targetPhases": ["Z1", "Z5", "Z9"]
+    },
+    {
+      "id": "Z0-TKT-GAP-02",
+      "title": "Non-atomic claim/assignment",
+      "evidence": "Support can take an already assigned ticket for self; pre-read then id-only transactional update permits both concurrent claims and stale audit-before values.",
+      "requirement": "D03",
+      "nextStep": "Define authorized reassignment separately from claim; use expected-assignee/status CAS/locking and transaction-bound audit. Test two real DB connections and replay, without silently changing who may reassign.",
+      "accepted": false,
+      "targetPhases": ["Z1", "Z5", "Z9"]
+    },
+    {
+      "id": "Z0-TKT-GAP-03",
+      "title": "Terminal ticket and reopen drift",
+      "evidence": "reply/escalate/resolve lack terminal-state guards; public reply can reopen closed to waiting_customer, resolve can reopen closed and duplicate reports, while customer response on waiting_customer leaves status unchanged.",
+      "requirement": "ZEUS-UI-031",
+      "nextStep": "Explicit ticket transition and replay contract with non-destructive history; compare current UI and owner expectations, then scoped implementation and tests for all terminal/reopen paths.",
+      "accepted": false,
+      "targetPhases": ["Z1", "Z5", "Z9"]
+    },
+    {
+      "id": "Z0-TKT-GAP-04",
+      "title": "Blank text/reason accepted",
+      "evidence": "Ticket DTO string validators accept whitespace/empty strings; escalation persists reason but does not normalize or ensure meaningful nonblank value. This conflicts with the approved real server-side sensitive-reason rule.",
+      "requirement": "DEC16",
+      "nextStep": "Trim and bound text server-side; nonblank reason must be consumed in escalation/audit. Keep internal/public visibility and customer-confirmation no-fake-note contract. DTO/behavior fix needs scoped authority.",
+      "accepted": false,
+      "targetPhases": ["Z1", "Z5", "Z9"]
+    },
+    {
+      "id": "Z0-TKT-GAP-05",
+      "title": "Partial persistence and duplicate retry",
+      "evidence": "Reply/customer response/escalation use separate writes and Outbox may fail after message/status persists. Caller may see failure and resend, producing duplicates; notifyUser supports tx but reply does not supply it.",
+      "requirement": "ZEUS-API4-023",
+      "nextStep": "Atomic domain+Outbox transaction and payload-bound idempotency; preserve user text on retry; inject DB/Outbox/report failure and test rollback/concurrent replay.",
+      "accepted": false,
+      "targetPhases": ["Z1", "Z5", "Z9"]
+    },
+    {
+      "id": "Z0-TKT-GAP-06",
+      "title": "Unsupported support KPI",
+      "evidence": "supportPerformance counts every customer-visible message; aggregate without userId includes customer-authored messages, not only support replies. No meaningful-first-response denominator or period/provenance. It must not drive automated HR effects.",
+      "requirement": "ZEUS-UI-032",
+      "nextStep": "Role- and event-qualified metrics with interval, denominator and unknown state; separate first response/resolution and require human audited command for any sensitive staffing effect per DEC16.",
+      "accepted": false,
+      "targetPhases": ["Z1", "Z5", "Z9"]
+    },
+    {
+      "id": "Z0-TKT-GAP-07",
+      "title": "Repeated breach events",
+      "evidence": "flagOverdueTickets selects waiting_customer and has no first-response marker or breach-event deduplication; repeated calls append breach rows and urgent update for same still-overdue ticket, inflating KPI.",
+      "requirement": "D07",
+      "nextStep": "Versioned policy and one breach event per ticket/clock/policy generation; first-response clock must not pause while waiting_customer. Backfill neither historical first-response nor zero scores from unknown data.",
+      "accepted": false,
+      "targetPhases": ["Z1", "Z5", "Z9"]
+    },
+    {
+      "id": "Z0-TKT-GAP-08",
+      "title": "Admin command authority wider than DEC13 target",
+      "evidence": "Support controller declares support/admin RolesGuard only, no AdminScopeGuard. Current service skips assignee restriction for all admin roles; no Ops/Finance/Super per-command proxy capability. This is authenticated broad admin access, not anonymous access or proof of production exploit.",
+      "requirement": "DEC13",
+      "nextStep": "Implement explicit allowed command+subject capability and separate actor/owner audit in an independently authorized access package; preserve Support's zero financial authority and no impersonation.",
+      "accepted": false,
+      "targetPhases": ["Z1", "Z5", "Z9"]
+    }
+  ],
+  "authority": "Documentation and isolated in-memory characterization only. DEC04/13/16 target approvals are not protected runtime/auth/DB exceptions. Fixed preservation baseline and the three existing invoice/pricing/reconciliation exceptions remain unchanged.",
+  "limits": "Eight scoped write routes reviewed, not full Z0 or all remaining commands. AST/hash/DTO evidence is not authentication, SQL rollback, live notification, distributed concurrency, privacy export or E2E acceptance. GAP tests deliberately reproduce open behavior and must not be called fixes."
+}
