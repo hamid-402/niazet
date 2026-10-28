@@ -28,6 +28,7 @@ import { ResetPasswordDto } from './dto/password-reset.dto';
 import { AuthSessionService, SessionContext } from './auth-session.service';
 import { AuthenticatedUser } from '../common/types/authenticated-user';
 import { registrationProof } from './registration-proof';
+import type { VerifiedEmailLoginClaim } from './verified-email-session';
 
 const OTP_LENGTH = 6;
 const OTP_MAX_ATTEMPTS = 5;
@@ -443,7 +444,11 @@ export class AuthService {
   // Password login
   // ---------------------------------------------------------------------
 
-  async login(dto: LoginDto, context: SessionContext = {}) {
+  async login(
+    dto: LoginDto,
+    context: SessionContext = {},
+    emailClaim?: VerifiedEmailLoginClaim,
+  ) {
     const user = await this.prisma.user.findUnique({
       where: { phone: dto.phone },
     });
@@ -496,6 +501,11 @@ export class AuthService {
       },
     });
 
+    if (emailClaim !== undefined)
+      return this.sessions.issue(user, context, {
+        ...emailClaim,
+        credentialHash: user.passwordHash,
+      });
     return this.sessions.issue(user, context);
   }
 

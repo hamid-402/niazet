@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { inverseIdentityIntake } from './orbit-z3-identity-intake-approval.mjs';
 
 // Separate standing Z3 presentation authority. This module grants NO API,
 // auth, role, schema or financial implementation exemption. Pins alone do not
@@ -97,6 +98,7 @@ export function matchesCustomerContinuation(path, bytes) {
   return Object.hasOwn(customerContinuationPins, path) && hash(bytes) === customerContinuationPins[path].after;
 }
 export function inverseCustomerContinuation(path, bytes) {
+  bytes = inverseIdentityIntake(path, bytes);
   if (path === 'scripts/acceptance/zeus-z1-dependency-review.mjs') {
     if (hash(bytes) !== customerHistoricalReviewerPin.after) return bytes;
     let source = bytes.toString('utf8').replaceAll('\r\n', '\n');
@@ -134,6 +136,8 @@ export function inverseCustomerContinuation(path, bytes) {
   return previous;
 }
 export function verifyCustomerContinuation(read) {
+  const currentRead = read;
+  read = path => inverseIdentityIntake(path, currentRead(path));
   assert.equal(Object.keys(customerContinuationPins).length, 13, 'Customer continuation exact UI scope drift');
   for (const [path, pin] of Object.entries(customerContinuationPins)) {
     assert(path.startsWith('apps/web/src/') && !path.startsWith('apps/web/src/lib/'), 'Non-UI path in presentation approval');

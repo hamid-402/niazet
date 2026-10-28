@@ -45,6 +45,16 @@ import {
 import { answersFromSnapshot, snapshotServiceForm } from './service-form';
 import { createVersionedOrderReport } from './domain/order-reports';
 import { bindDeliveryOutputs } from '../files/output-publication';
+import {
+  customerIntakeEnabled,
+  requireCustomerIntake,
+} from '../account/customer-intake-config';
+import {
+  executionIntakeView,
+  orderIntakeView,
+  saveOrderIntake,
+  sealOrderIntake,
+} from './domain/order-intake';
 
 const DEFAULT_IN_PROGRESS_CANCEL_REFUND_RATE = 0.5;
 
@@ -150,6 +160,7 @@ export class OrdersService {
     dto: CreateOrderDto,
     idempotencyKey: string,
   ) {
+    if (dto.intake !== undefined) requireCustomerIntake(this.config);
     return this.idempotency.execute({
       key: idempotencyKey,
       scope: `order.draft.create:${customerId}`,
@@ -186,7 +197,7 @@ export class OrdersService {
           dto.formResponses,
           false,
         );
-        return tx.order.create({
+        const created = await tx.order.create({
           data: {
             code: generateReferenceCode('ORD'),
             customerId,
@@ -219,6 +230,17 @@ export class OrdersService {
             package: true,
           },
         });
+        if (customerIntakeEnabled(this.config) && dto.intake !== undefined)
+          return {
+            ...created,
+            intake: await saveOrderIntake(
+              tx,
+              created,
+              dto.intake,
+              formResponses,
+            ),
+          };
+        return created;
       },
     });
   }
@@ -228,6 +250,7 @@ export class OrdersService {
     orderId: string,
     dto: UpdateOrderDraftDto,
   ) {
+    if (dto.intake !== undefined) requireCustomerIntake(this.config);
     return this.prisma.$transaction(
       async (tx) => {
         const order = await tx.order.findFirst({
@@ -321,7 +344,19 @@ export class OrdersService {
             });
           }
         }
-        return tx.order.findUniqueOrThrow({
+        const intake = customerIntakeEnabled(this.config)
+          ? await saveOrderIntake(
+              tx,
+              {
+                id: orderId,
+                status: OrderStatus.draft,
+                version: order.version + 1,
+              },
+              dto.intake,
+              formResponses,
+            )
+          : undefined;
+        const updated = await tx.order.findUniqueOrThrow({
           where: { id: orderId },
           include: {
             acceptanceCriteria: true,
@@ -329,6 +364,7 @@ export class OrdersService {
             package: true,
           },
         });
+        return intake === undefined ? updated : { ...updated, intake };
       },
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
@@ -367,6 +403,8 @@ export class OrdersService {
           where: { id: orderId },
           data: { formResponses },
         });
+        if (customerIntakeEnabled(this.config))
+          await saveOrderIntake(tx, order, undefined, formResponses);
         await this.transition(
           orderId,
           OrderStatus.submitted,
@@ -385,6 +423,8 @@ export class OrdersService {
           {},
           tx,
         );
+        if (customerIntakeEnabled(this.config))
+          await sealOrderIntake(tx, finalOrder);
         await this.notifications.notifyUser(
           customerId,
           'order.submitted',
@@ -1886,7 +1926,27 @@ export class OrdersService {
   // ---------------------------------------------------------------------
 
   async findOneForCustomer(customerId: string, orderId: string) {
-    return this.queries.findOneForCustomer(customerId, orderId);
+    const order = await this.queries.findOneForCustomer(customerId, orderId);
+    return customerIntakeEnabled(this.config)
+      ? {
+          ...order,
+          intake: orderIntakeView(
+            await this.prisma.orderIntake.findUnique({ where: { orderId } }),
+          ),
+        }
+      : order;
+  }
+
+  async intakeForOps(orderId: string) {
+    requireCustomerIntake(this.config);
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      select: { id: true },
+    });
+    if (!order) throw new NotFoundException('سفارش یافت نشد.');
+    return orderIntakeView(
+      await this.prisma.orderIntake.findUnique({ where: { orderId } }),
+    );
   }
 
   listForCustomer(
@@ -1904,7 +1964,16 @@ export class OrdersService {
   }
 
   async findOneForExecutor(executorUserId: string, orderId: string) {
-    return this.queries.findOneForExecutor(executorUserId, orderId);
+    // Keep the existing assignment/ownership gate before any intake read.
+    const order = await this.queries.findOneForExecutor(
+      executorUserId,
+      orderId,
+    );
+    if (!order || !customerIntakeEnabled(this.config)) return order;
+    const intake = await this.prisma.orderIntake.findUnique({
+      where: { orderId },
+    });
+    return { ...order, intakeRequirements: executionIntakeView(intake) };
   }
 
   listForAdmin(params: {

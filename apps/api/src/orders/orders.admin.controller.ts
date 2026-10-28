@@ -102,6 +102,12 @@ export class OrdersAdminController {
     return this.orders.findOneForAdmin(id);
   }
 
+  @Get(':id/intake')
+  @AdminScopes(AdminScope.ops_admin)
+  intake(@Param('id') id: string) {
+    return this.orders.intakeForOps(id);
+  }
+
   @Post(':id/triage')
   @AdminScopes(AdminScope.ops_admin)
   triage(

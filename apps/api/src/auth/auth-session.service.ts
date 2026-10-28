@@ -6,6 +6,15 @@ import {
 } from '@nestjs/common';
 import { CapabilityType, Prisma, User, UserStatus } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
+import { ConfigService } from '@nestjs/config';
+import {
+  assertVerifiedEmailProof,
+  emailFamilyAllowed,
+  listIdentityAwareSessions,
+  requireVerifiedEmail,
+  verifiedEmailEnabled,
+  VerifiedEmailSessionProof,
+} from './verified-email-session';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
 import { PrismaService } from '../prisma/prisma.service';
 import {
@@ -25,22 +34,45 @@ export class AuthSessionService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly tokens: AuthTokenService,
+    private readonly config: ConfigService = new ConfigService({
+      ZEUS_VERIFIED_EMAIL_ENABLED: false,
+    }),
   ) {}
 
-  async issue(user: User, context: SessionContext = {}) {
+  async issue(
+    user: User,
+    context: SessionContext = {},
+    emailProof?: VerifiedEmailSessionProof,
+  ) {
     const refresh = createRefreshToken();
+    const familyId = randomUUID();
     await this.prisma.$transaction(async (tx) => {
+      if (emailProof !== undefined) requireVerifiedEmail(this.config);
+      const identity =
+        emailProof === undefined
+          ? undefined
+          : await assertVerifiedEmailProof(tx, user.id, emailProof);
       await tx.session.create({
         data: {
           id: refresh.sessionId,
           userId: user.id,
-          familyId: randomUUID(),
+          familyId,
           refreshTokenHash: refresh.tokenHash,
           userAgent: context.userAgent,
           ipAddress: context.ipAddress,
           expiresAt: this.tokens.refreshExpiry(),
         },
       });
+      if (identity)
+        await tx.emailLoginFamily.create({
+          data: {
+            familyId,
+            userId: user.id,
+            identityId: identity.id,
+            identityRevision: identity.revision,
+            emailNormalized: identity.emailNormalized,
+          },
+        });
       await tx.userLoginState.upsert({
         where: { userId: user.id },
         create: { userId: user.id, lastSuccessfulLoginAt: new Date() },
@@ -115,6 +147,11 @@ export class AuthSessionService {
             });
             return { kind: 'reuse' as const };
           }
+          if (
+            verifiedEmailEnabled(this.config) &&
+            !(await emailFamilyAllowed(tx, session))
+          )
+            return { kind: 'invalid' as const };
           if (session.expiresAt <= now) {
             await tx.session.update({
               where: { id: session.id },
@@ -207,11 +244,23 @@ export class AuthSessionService {
     });
     if (!session)
       throw new UnauthorizedException('نشست معتبر نیست؛ دوباره وارد شوید.');
+    if (
+      verifiedEmailEnabled(this.config) &&
+      !(await emailFamilyAllowed(this.prisma, session))
+    )
+      throw new UnauthorizedException('نشست معتبر نیست؛ دوباره وارد شوید.');
     this.assertLoginAllowed(session.user);
     return this.toAuthenticatedUser(session.user);
   }
 
   async listActive(userId: string, currentSessionId?: string) {
+    if (verifiedEmailEnabled(this.config)) {
+      const sessions = await listIdentityAwareSessions(this.prisma, userId);
+      return sessions.map((session) => ({
+        ...session,
+        isCurrent: session.id === currentSessionId,
+      }));
+    }
     const sessions = await this.prisma.session.findMany({
       where: {
         userId,

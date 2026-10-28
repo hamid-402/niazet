@@ -3,6 +3,7 @@ import { Order, Prisma } from '@prisma/client';
 import { readCommercialPolicy } from '../../pricing/commercial-policy';
 import { requestFingerprint } from '../../finance/idempotency.service';
 import { answersFromSnapshot, snapshotServiceForm } from '../service-form';
+import { intakeNeedsHumanReview } from '../order-intake-contract';
 
 /** Only the owner-initiated pending-triage -> triaging edge uses this gate. */
 export async function assertFixedRegistrationEligibility(
@@ -64,6 +65,18 @@ export async function assertFixedRegistrationEligibility(
   )
     throw new ConflictException(
       'تعریف فرم یا خدمت از زمان ثبت تغییر کرده است؛ بررسی انسانی لازم است.',
+    );
+  // Schema detection keeps the accepted 27-migration local environment usable
+  // until the additive upgrade; a disabled UI flag cannot bypass stored terms.
+  const intakeSchema = await tx.$queryRaw<
+    Array<{ present: boolean }>
+  >`SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class WHERE relname='order_intakes' AND relkind IN ('r','p')) AS present`;
+  const intake = intakeSchema[0]?.present
+    ? await tx.orderIntake.findUnique({ where: { orderId: order.id } })
+    : null;
+  if (intakeNeedsHumanReview(intake?.data, order.formResponses))
+    throw new ConflictException(
+      'شرایط محرمانگی، تحویل مرحله‌ای یا افزودنی درخواستی به بررسی انسانی و قرارداد صریح نیاز دارد؛ قیمت یا اولویت خودکار عوض نمی‌شود.',
     );
   const [payments, contract, milestones, unsafeFiles] = await Promise.all([
     tx.payment.count({ where: { orderId: order.id } }),

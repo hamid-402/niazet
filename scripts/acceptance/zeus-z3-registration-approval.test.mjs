@@ -5,6 +5,7 @@ import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { registrationOriginalRef, registrationApiPins, registrationAdapterPins, registrationHash, matchesRegistrationApproval, inverseRegistrationInput, verifyRegistrationApproval } from '../orbit-z3-registration-approval.mjs';
 import { inverseCustomerContinuation, verifyCustomerContinuation } from '../orbit-z3-customer-continuation-approval.mjs';
+import { matchesIdentityIntake } from '../orbit-z3-identity-intake-approval.mjs';
 
 const root = new URL('../../', import.meta.url);
 const rawRead = p => readFileSync(new URL(p, root));
@@ -61,7 +62,7 @@ test('every API file outside the nine approved paths is byte-identical, includin
   assert(baseline.length > 200);
   for (const p of baseline) if (!Object.hasOwn(registrationApiPins, p)) assert.equal(text(read(p)), text(old(p)), 'Unapproved API change: ' + p);
   const added = git('ls-files', '--others', '--exclude-standard', '--', 'apps/api/').trim().split('\n').filter(Boolean);
-  for (const p of added) assert(matchesRegistrationApproval(p, read(p)), 'Unapproved new API path: ' + p);
+  for (const p of added) assert(matchesIdentityIntake(p, rawRead(p)) || matchesRegistrationApproval(p, read(p)), 'Unapproved new API path: ' + p);
   for (const p of ['apps/web/src/lib/auth-context.tsx', 'apps/web/src/lib/api.ts', 'apps/web/src/lib/role-paths.ts', 'apps/web/src/lib/types.ts']) assert.equal(text(read(p)), text(old(p)));
 });
 

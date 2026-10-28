@@ -17,6 +17,10 @@ import {
 import { PaginationDto } from '../../common/dto/pagination.dto';
 
 export class CreateOrderDto {
+  @IsOptional()
+  @IsObject()
+  intake?: Record<string, unknown> | null;
+
   @IsString()
   serviceId!: string;
 
@@ -57,6 +61,10 @@ export class SubmitOrderDto {
 }
 
 export class UpdateOrderDraftDto {
+  @IsOptional()
+  @IsObject()
+  intake?: Record<string, unknown> | null;
+
   @IsOptional()
   @IsString()
   packageId?: string | null;

@@ -26,6 +26,7 @@ import { inverseZ3UiInput, matchesZ3UiApproval } from '../orbit-z3-customer-ui-a
 import { matchesZ3PublicationApproval } from '../orbit-z3-publication-ui-approval.mjs';
 import { matchesRegistrationApproval } from '../orbit-z3-registration-approval.mjs';
 import { inverseCustomerContinuation, matchesCustomerContinuation } from '../orbit-z3-customer-continuation-approval.mjs';
+import { matchesIdentityIntake } from '../orbit-z3-identity-intake-approval.mjs';
 
 const root = new URL("../../", import.meta.url);
 const composerPins = {
@@ -436,7 +437,7 @@ export function checkHistoricalReview() {
   ]) {
     if (!Object.hasOwn(saved.sourceInputs, path))
       assert(
-        matchesZ1DomainApproval(path, read(path)) || matchesWalletUiApproval(path, read(path)) || matchesZ1ContractApproval(path, read(path)) || matchesZ1DataApproval(path, read(path)) || matchesZ2EngineApproval(path, read(path)) || matchesZ2CommercialApproval(path, read(path)) || matchesZ3OutputApproval(path, readFileSync(new URL(path, root))) || matchesZ3UiApproval(path, readFileSync(new URL(path, root))) || matchesZ3PublicationApproval(path, readFileSync(new URL(path, root))) || matchesRegistrationApproval(path, readFileSync(new URL(path, root))) || matchesCustomerContinuation(path, readFileSync(new URL(path, root))),
+        matchesZ1DomainApproval(path, read(path)) || matchesWalletUiApproval(path, read(path)) || matchesZ1ContractApproval(path, read(path)) || matchesZ1DataApproval(path, read(path)) || matchesZ2EngineApproval(path, read(path)) || matchesZ2CommercialApproval(path, read(path)) || matchesZ3OutputApproval(path, readFileSync(new URL(path, root))) || matchesZ3UiApproval(path, readFileSync(new URL(path, root))) || matchesZ3PublicationApproval(path, readFileSync(new URL(path, root))) || matchesRegistrationApproval(path, readFileSync(new URL(path, root))) || matchesCustomerContinuation(path, readFileSync(new URL(path, root))) || matchesIdentityIntake(path, readFileSync(new URL(path, root))),
         `Unapproved new historical source: ${path}`,
       );
   }

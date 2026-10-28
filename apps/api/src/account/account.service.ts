@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   AuditSensitivity,
   CustomerAccountType,
@@ -13,6 +14,7 @@ import {
 import { AuditService } from '../audit/audit.service';
 import type { AuthenticatedUser } from '../common/types/authenticated-user';
 import { PrismaService } from '../prisma/prisma.service';
+import { customerPrivateData } from './customer-private-data';
 import type {
   RequestAccountDeletionDto,
   UpdateCustomerProfileDto,
@@ -42,6 +44,7 @@ export class AccountService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
+    private readonly config: ConfigService = new ConfigService(),
   ) {}
 
   async getProfile(userId: string) {
@@ -262,6 +265,7 @@ export class AccountService {
       tickets,
       invoices,
       notifications,
+      ...(await customerPrivateData(this.prisma, this.config, user.id)),
     };
   }
 

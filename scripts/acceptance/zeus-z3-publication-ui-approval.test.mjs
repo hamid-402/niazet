@@ -5,18 +5,22 @@ import { readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { z3PublicationPins, z3PublicationOriginalRef, inverseZ3PublicationInput, matchesZ3PublicationApproval, verifyZ3PublicationApproval } from '../orbit-z3-publication-ui-approval.mjs';
-import { inverseRegistrationInput, matchesRegistrationApproval } from '../orbit-z3-registration-approval.mjs';
+import { inverseRegistrationInput, matchesRegistrationApproval, registrationApiPins } from '../orbit-z3-registration-approval.mjs';
 import { inverseCustomerContinuation } from '../orbit-z3-customer-continuation-approval.mjs';
+import { inverseIdentityIntake, matchesIdentityIntake, identityIntakeApiPins } from '../orbit-z3-identity-intake-approval.mjs';
 const root = new URL('../../', import.meta.url), rawRead = p => readFileSync(new URL(p, root));
 // B3 remains a historical certificate, never new registration acceptance.
 const read = p => inverseRegistrationInput(p, inverseCustomerContinuation(p, rawRead(p)));
 function historicalApiDiff() {
   const changed = execFileSync('git', ['diff', '--name-only', z3PublicationOriginalRef, '--', 'apps/api/'], { cwd: root, encoding: 'utf8', windowsHide: true }).trim().split('\n').filter(Boolean);
   for (const p of changed) {
-    assert(matchesRegistrationApproval(p, rawRead(p)), 'Unapproved backend change: ' + p);
+    assert(matchesRegistrationApproval(p, inverseIdentityIntake(p, rawRead(p))) || matchesIdentityIntake(p, rawRead(p)), 'Unapproved backend change: ' + p);
+    // Exact newly added paths have no historical bytes to compare. Their
+    // current implementation is accepted only by the independent new gate.
+    if (identityIntakeApiPins[p]?.before === null || registrationApiPins[p]?.before === null) continue;
     assert.equal(text(read(p)), text(old(p)), 'Exact historical backend reconstruction failed: ' + p);
   }
-  return changed.filter(p => !matchesRegistrationApproval(p, rawRead(p))).join('\n');
+  return changed.filter(p => !matchesRegistrationApproval(p, inverseIdentityIntake(p, rawRead(p))) && !matchesIdentityIntake(p, rawRead(p))).join('\n');
 }
 const text = b => b.toString('utf8').replaceAll('\r\n', '\n');
 const old = p => execFileSync('git', ['show', z3PublicationOriginalRef + ':' + p], { cwd: root, windowsHide: true });

@@ -16,6 +16,7 @@ import { matchesZ2CommercialApproval, verifyZ2CommercialApproval } from './orbit
 import { matchesZ3OutputApproval } from './orbit-z3-output-approval.mjs';
 import { matchesRegistrationApproval, verifyRegistrationApproval } from './orbit-z3-registration-approval.mjs';
 import { inverseCustomerContinuation, verifyCustomerContinuation } from './orbit-z3-customer-continuation-approval.mjs';
+import { inverseIdentityIntake, matchesIdentityIntake, verifyIdentityIntake } from './orbit-z3-identity-intake-approval.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 // Fixed pre-redesign checkpoint. Never silently rebase this gate to HEAD.
@@ -53,8 +54,10 @@ try {
   ])];
   const tracked = new Set(split(git('ls-files', '-z')));
   const rawRead = path => readFileSync(new URL(path, new URL('../', import.meta.url)));
-  verifyCustomerContinuation(rawRead);
-  const read = path => inverseCustomerContinuation(path, rawRead(path));
+  verifyIdentityIntake(rawRead);
+  const historicalRead = path => inverseIdentityIntake(path, rawRead(path));
+  verifyCustomerContinuation(historicalRead);
+  const read = path => inverseCustomerContinuation(path, historicalRead(path));
   verifyRegistrationApproval(read);
   verifyZ2CommercialApproval(read);
   verifyParserApproval(read);
@@ -68,7 +71,7 @@ try {
   verifyInvoiceDomain(path => git('show', `${baseline}:${path}`), path => read(path).toString('utf8'));
   verifyPricingApproval(path => git('show', `${baseline}:${path}`), read);
   verifyReconciliationApproval(path => git('show', `${baseline}:${path}`), read);
-const failures = violations(files, (path) => tracked.has(path) && existsSync(new URL(path, new URL('../', import.meta.url))), changed, path => existsSync(new URL(path, new URL('../', import.meta.url))) && (matchesInvoiceApproval(path, read(path)) || matchesPricingApproval(path, read(path)) || matchesReconciliationApproval(path, read(path)) || matchesParserApproval(path, read(path)) || matchesSecurityApproval(path, read(path)) || matchesZ1DomainApproval(path, read(path)) || matchesZ1ContractApproval(path, read(path)) || matchesZ1DataApproval(path, read(path)) || matchesZ2EngineApproval(path, read(path)) || matchesZ2CommercialApproval(path, read(path)) || matchesZ3OutputApproval(path, read(path)) || matchesRegistrationApproval(path, read(path))));
+const failures = violations(files, (path) => tracked.has(path) && existsSync(new URL(path, new URL('../', import.meta.url))), changed, path => existsSync(new URL(path, new URL('../', import.meta.url))) && (matchesIdentityIntake(path, rawRead(path)) || matchesInvoiceApproval(path, read(path)) || matchesPricingApproval(path, read(path)) || matchesReconciliationApproval(path, read(path)) || matchesParserApproval(path, read(path)) || matchesSecurityApproval(path, read(path)) || matchesZ1DomainApproval(path, read(path)) || matchesZ1ContractApproval(path, read(path)) || matchesZ1DataApproval(path, read(path)) || matchesZ2EngineApproval(path, read(path)) || matchesZ2CommercialApproval(path, read(path)) || matchesZ3OutputApproval(path, read(path)) || matchesRegistrationApproval(path, read(path))));
   const routes = files.filter((path) => path.startsWith('apps/web/src/app/') && path.endsWith('/page.tsx'));
   assert.deepEqual(failures, [], failures.join('\n'));
   console.log('Z2-B1: five exact additive engine files accepted; no order/payment/DB activation.');

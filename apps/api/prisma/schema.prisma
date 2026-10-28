@@ -380,10 +380,14 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  capabilities  UserCapability[]
-  sessions      Session[]
-  loginAttempts LoginAttempt[]
-  otpCodes      OtpCode[]
+  capabilities         UserCapability[]
+  sessions             Session[]
+  loginAttempts        LoginAttempt[]
+  otpCodes             OtpCode[]
+  emailLoginIdentity   EmailLoginIdentity?
+  emailLoginChallenges EmailLoginChallenge[]
+  emailLoginFamilies   EmailLoginFamily[]
+  customerOnboarding   CustomerOnboardingState?
 
   executorProfile         ExecutorProfile?
   onboardingReviews       OnboardingReview[]
@@ -437,6 +441,66 @@ model User {
   systemSettingsUpdated SystemSetting[] @relation("SettingUpdatedBy")
 
   @@map("users")
+}
+
+// Verified identities are additive. Existing User.email is never backfilled
+// into this table or treated as proof of ownership.
+model EmailLoginIdentity {
+  id              String   @id @default(uuid())
+  userId          String   @unique @map("user_id")
+  emailNormalized String   @unique @map("email_normalized")
+  revision        Int      @default(1)
+  verifiedAt      DateTime @map("verified_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  user            User     @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@map("email_login_identities")
+}
+
+model EmailLoginChallenge {
+  id                   String    @id @default(uuid())
+  userId               String    @map("user_id")
+  emailNormalized      String    @map("email_normalized")
+  expectedProfileEmail String?   @map("expected_profile_email")
+  tokenHash            String    @unique @map("token_hash")
+  expiresAt            DateTime  @map("expires_at")
+  consumedAt           DateTime? @map("consumed_at")
+  verifiedIdentityId   String?   @map("verified_identity_id")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@index([userId, consumedAt, expiresAt])
+  @@map("email_login_challenges")
+}
+
+// A family tag survives refresh rotation/cleanup of an individual Session.
+// Changing/unlinking an email can revoke all sessions issued using that proof.
+model EmailLoginFamily {
+  familyId         String   @id @map("family_id")
+  userId           String   @map("user_id")
+  identityId       String   @map("identity_id")
+  identityRevision Int      @map("identity_revision")
+  emailNormalized  String   @map("email_normalized")
+  createdAt        DateTime @default(now()) @map("created_at")
+  revokedAt        DateTime? @map("revoked_at")
+  user             User     @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@index([userId, identityId])
+  @@map("email_login_families")
+}
+
+model CustomerOnboardingState {
+  userId        String   @id @map("user_id")
+  schemaVersion Int      @default(1) @map("schema_version")
+  revision      Int      @default(1)
+  purpose       String?
+  skipped       Boolean  @default(false)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@map("customer_onboarding_states")
 }
 
 model CustomerProfile {
@@ -855,6 +919,7 @@ model Order {
   urgency              String               @default("normal")
   briefDescription     String               @map("brief_description")
   formResponses        Json?                @map("form_responses")
+  intake               OrderIntake?
   confidentialityLevel ConfidentialityLevel @default(normal) @map("confidentiality_level")
 
   budgetHint Int?   @map("budget_hint")
@@ -989,6 +1054,19 @@ model OrganizationSubscription {
   plan              OrganizationPlan @relation(fields: [planId], references: [id], onDelete: Restrict)
 
   @@map("organization_subscriptions")
+}
+
+model OrderIntake {
+  orderId       String    @id @map("order_id")
+  schemaVersion Int       @default(1) @map("schema_version")
+  orderVersion  Int       @map("order_version")
+  data          Json
+  sealedAt      DateTime? @map("sealed_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  order         Order     @relation(fields: [orderId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+
+  @@map("order_intakes")
 }
 
 model OrderStatusHistory {
