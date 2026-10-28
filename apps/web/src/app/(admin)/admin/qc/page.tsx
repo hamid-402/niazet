@@ -34,6 +34,7 @@ export default function AdminQcQueuePage() {
   return (
     <div>
       <SectionTitle>صف کنترل کیفیت (QC)</SectionTitle>
+      <Link href="/admin/qc/legacy" className="mb-5 inline-block text-sm font-bold text-accent underline">بررسی انسانی نسخه‌های قدیمیِ بدون مدرک انتشار</Link>
       {error && <ErrorBanner message={error} />}
       {!items && !error && <PageLoading />}
       {items && items.length === 0 && (
@@ -47,7 +48,7 @@ export default function AdminQcQueuePage() {
               <p className="text-xs text-fg-subtle">
                 {item.order.serviceLine.title}
               </p>
-              <h3 className="font-bold text-fg">{item.order.title}</h3>
+              <h2 className="font-bold text-fg">{item.order.title}</h2>
               <p className="text-xs text-fg-subtle">{item.order.code}</p>
             </Card>
           </Link>

@@ -2,6 +2,7 @@
 
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { apiFetch, ApiError } from "@/lib/api";
 import {
   Button,
@@ -115,6 +116,7 @@ export default function AdminQcDetailPage({
       <Card className="mb-4">
         <h2 className="mb-2 font-bold text-fg">فایل‌های خروجی</h2>
         {review.publicationManifest?.requiresManualBinding && <p className="mb-3 text-sm leading-7 text-warning">این پرونده قدیمی مدرک نسخه ندارد؛ ابتدا نسخهٔ فایل باید با بررسی انسانی به پرونده متصل شود. قبولی سفارش یا فایل دیگر، مجوز این نسخه نیست.</p>}
+        {review.publicationManifest?.requiresManualBinding && <Link href="/admin/qc/legacy" className="mb-3 inline-block text-sm font-bold text-accent underline">رفتن به بررسی انسانی نسخه‌های قدیمی</Link>}
         {review.order.files.length === 0 ? (
           <p className="text-sm text-fg-subtle">فایلی ثبت نشده است.</p>
         ) : (

@@ -15,7 +15,9 @@ import {
   TabList,
 } from "@/components/ui";
 import { OrderStatusBadge } from "@/components/status-badge";
-import { SecureFileLink, SecureFileUpload } from "@/components/secure-file";
+import { SecureFileUpload } from "@/components/secure-file";
+import { CustomerOutputPublications, CustomerOutputFileLink } from "@/components/customer-output-publications";
+import { outputKindLabel } from "@/components/output-publication-contract";
 import type { OrderDetail, OrderFile } from "@/lib/types";
 import { formatDate, formatNumber, formatToman } from "@/lib/format";
 import { customerNextAction, OrderTimeline } from "@/components/order-timeline";
@@ -115,6 +117,7 @@ export default function CustomerOrderDetailPage({
   const handler = order.publicHandlers?.[0];
 
   return (
+    <CustomerOutputPublications orderId={id} enabled={(order.files ?? []).some(file => ['output', 'revision'].includes(file.fileKind))}>
     <OrbitCustomerSurface>
     <div className={styles.orderDetail}>
       <div className={styles.detailHeader}>
@@ -381,7 +384,7 @@ export default function CustomerOrderDetailPage({
                   <p className="mt-2 text-sm text-fg-muted">{r.summary}</p>
                   {r.file && (
                     <div className="mt-2">
-                      <SecureFileLink
+                      <CustomerOutputFileLink
                         file={r.file}
                         label={`فایل گزارش: ${r.file.originalName}`}
                       />
@@ -417,10 +420,10 @@ export default function CustomerOrderDetailPage({
               {order.files.map((f) => (
                 <li
                   key={f.id}
-                  className="flex items-center justify-between py-2"
+                  className="flex flex-wrap items-start justify-between gap-3 py-2"
                 >
-                  <SecureFileLink file={f} />
-                  <span className="text-xs text-fg-subtle">{f.fileKind}</span>
+                  <div className="min-w-0 flex-1 break-words"><CustomerOutputFileLink file={f} /></div>
+                  <span className="shrink-0 whitespace-nowrap text-xs text-fg-subtle">{outputKindLabel(f.fileKind)}</span>
                 </li>
               ))}
             </ul>
@@ -439,7 +442,7 @@ export default function CustomerOrderDetailPage({
                   <p className="text-fg">{m.body}</p>
                   {m.attachment && (
                     <div className="mt-2">
-                      <SecureFileLink
+                    <CustomerOutputFileLink
                         file={m.attachment}
                         label={`پیوست: ${m.attachment.originalName}`}
                       />
@@ -560,6 +563,7 @@ export default function CustomerOrderDetailPage({
       )}
     </div>
     </OrbitCustomerSurface>
+    </CustomerOutputPublications>
   );
 }
 

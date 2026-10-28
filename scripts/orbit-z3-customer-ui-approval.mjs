@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { inverseZ3PublicationInput, verifyZ3PublicationApproval } from './orbit-z3-publication-ui-approval.mjs';
 export const z3UiOriginalRef = '166804b';
 export const z3UiPins = {
   "apps/web/src/app/(customer)/orders/[id]/page.tsx": {
@@ -39,14 +40,16 @@ export const z3UiPins = {
 const root = new URL('../', import.meta.url);
 const hash = value => createHash('sha256').update(value.toString('utf8').replaceAll('\r\n', '\n')).digest('hex');
 const original = path => execFileSync('git', ['show', z3UiOriginalRef + ':' + path], { cwd: root, windowsHide: true });
-export function matchesZ3UiApproval(path, bytes) { return Object.hasOwn(z3UiPins, path) && hash(bytes) === z3UiPins[path].after; }
+export function matchesZ3UiApproval(path, bytes) { return Object.hasOwn(z3UiPins, path) && hash(inverseZ3PublicationInput(path, bytes)) === z3UiPins[path].after; }
 export function inverseZ3UiInput(path, bytes) {
+  bytes = inverseZ3PublicationInput(path, bytes);
   if (!matchesZ3UiApproval(path, bytes) || z3UiPins[path].before === null) return bytes;
   const before = original(path);
   assert.equal(hash(before), z3UiPins[path].before, 'Z3 original input drift: ' + path);
   return before;
 }
 export function verifyZ3UiApproval(read) {
+  verifyZ3PublicationApproval(read);
   for (const [path, pin] of Object.entries(z3UiPins)) {
     assert(matchesZ3UiApproval(path, read(path)), 'Z3 exact UI input drift: ' + path);
     if (pin.before !== null) assert.equal(hash(original(path)), pin.before, 'Z3 original input drift: ' + path);

@@ -23,6 +23,7 @@ import { matchesZ2EngineApproval } from '../orbit-z2-engine-approval.mjs';
 import { inverseZ2CommercialInput, matchesZ2CommercialApproval } from '../orbit-z2-commercial-approval.mjs';
 import { matchesZ3OutputApproval } from '../orbit-z3-output-approval.mjs';
 import { inverseZ3UiInput, matchesZ3UiApproval } from '../orbit-z3-customer-ui-approval.mjs';
+import { matchesZ3PublicationApproval } from '../orbit-z3-publication-ui-approval.mjs';
 
 const root = new URL("../../", import.meta.url);
 const composerPins = {
@@ -433,7 +434,7 @@ export function checkHistoricalReview() {
   ]) {
     if (!Object.hasOwn(saved.sourceInputs, path))
       assert(
-        matchesZ1DomainApproval(path, read(path)) || matchesWalletUiApproval(path, read(path)) || matchesZ1ContractApproval(path, read(path)) || matchesZ1DataApproval(path, read(path)) || matchesZ2EngineApproval(path, read(path)) || matchesZ2CommercialApproval(path, read(path)) || matchesZ3OutputApproval(path, readFileSync(new URL(path, root))) || matchesZ3UiApproval(path, readFileSync(new URL(path, root))),
+        matchesZ1DomainApproval(path, read(path)) || matchesWalletUiApproval(path, read(path)) || matchesZ1ContractApproval(path, read(path)) || matchesZ1DataApproval(path, read(path)) || matchesZ2EngineApproval(path, read(path)) || matchesZ2CommercialApproval(path, read(path)) || matchesZ3OutputApproval(path, readFileSync(new URL(path, root))) || matchesZ3UiApproval(path, readFileSync(new URL(path, root))) || matchesZ3PublicationApproval(path, readFileSync(new URL(path, root))),
         `Unapproved new historical source: ${path}`,
       );
   }

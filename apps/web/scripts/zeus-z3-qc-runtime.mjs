@@ -34,8 +34,8 @@ try {
         if (path === '/notifications') return send([]);
         if (path === '/notifications/preferences') return send({ inAppEnabled: true, emailEnabled: false, smsEnabled: false });
         if (['/admin/qc', '/admin/qc/queue'].includes(path) && method === 'GET') return send([]);
-        const detail = path.match(/^\/admin\/qc\/(empty|legacy|checklist)$/);
-        if (detail && method === 'GET') { const id = detail[1]; return send({ id, comment: null, publicationManifest: { fingerprint: 'a'.repeat(64), requiresManualBinding: id === 'legacy', versions: [] }, order: { code: 'UI-ONLY', title: 'پرونده آزمایشی کنترل کیفیت', briefDescription: 'فقط داده نمایشی مرورگر؛ بدون اتصال به داده اصلی', files: [], serviceLine: { qcChecklistTemplates: id === 'checklist' ? [{ items: [{ id: 'check-1', label: 'کیفیت محتوای خروجی' }] }] : [] } } }); }
+        const detail = path.match(/^\/admin\/qc\/(empty|legacy-fixture|checklist)$/);
+        if (detail && method === 'GET') { const id = detail[1]; return send({ id, comment: null, publicationManifest: { fingerprint: 'a'.repeat(64), requiresManualBinding: id === 'legacy-fixture', versions: [] }, order: { code: 'UI-ONLY', title: 'پرونده آزمایشی کنترل کیفیت', briefDescription: 'فقط داده نمایشی مرورگر؛ بدون اتصال به داده اصلی', files: [], serviceLine: { qcChecklistTemplates: id === 'checklist' ? [{ items: [{ id: 'check-1', label: 'کیفیت محتوای خروجی' }] }] : [] } } }); }
         if (method === 'POST' && /^\/admin\/qc\/(empty|checklist)\/approve$/.test(path)) {
           const body = request.postDataJSON(); writes.push({ path, body });
           assert.equal(body.manifestFingerprint, 'a'.repeat(64));
@@ -58,7 +58,7 @@ try {
       await page.screenshot({ path: `${output}/${theme}-${width}-human.png`, fullPage: true });
       failDecision = false; await approve.click(); await page.waitForURL('**/admin/qc');
       assert.equal(writes.length, 2);
-      await page.goto(base + '/admin/qc/legacy'); await approve.waitFor(); await human.check(); await comment.fill('پرونده قدیمی نیازمند اتصال مدرک نسخه است');
+      await page.goto(base + '/admin/qc/legacy-fixture'); await approve.waitFor(); await human.check(); await comment.fill('پرونده قدیمی نیازمند اتصال مدرک نسخه است');
       assert(await approve.isDisabled()); assert(await page.getByRole('button', { name: 'درخواست اصلاح' }).isEnabled());
       axe = await new AxeBuilder({ page }).analyze(); assert.deepEqual(axe.violations, []);
       await page.screenshot({ path: `${output}/${theme}-${width}-legacy.png`, fullPage: true });

@@ -24,9 +24,10 @@ const target = new URL(source); target.pathname = '/' + name;
 const maintenance = new URL(source); maintenance.pathname = '/postgres';
 const { PrismaClient } = req('@prisma/client');
 const control = new PrismaClient({ datasources: { db: { url: maintenance.toString() } } });
-const output = join(root, '.artifacts/zeus/z3-file-qc'); mkdirSync(output, { recursive: true });
+const publicationUi = process.argv.includes('--with-publication-ui');
+const output = join(root, publicationUi ? '.artifacts/zeus/z3-publication-ui/postgres' : '.artifacts/zeus/z3-file-qc'); mkdirSync(output, { recursive: true });
 const temp = mkdtempSync(join(runtime, 'z3-qc-'));
-const report = { date: '2026-10-27', status: 'running', mainDatabaseConnected: false, liveProvidersUsed: false, cases: [], temporaryDatabaseRemoved: false, generatedFixtureRemoved: false };
+const report = { date: publicationUi ? '2026-10-28' : '2026-10-27', status: 'running', mainDatabaseConnected: false, liveProvidersUsed: false, cases: [], temporaryDatabaseRemoved: false, generatedFixtureRemoved: false };
 let created = false, db, app, native;
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const sourcePaths = ['apps/api/prisma/schema.prisma', 'apps/api/prisma/migrations/20261027180000_zeus_output_publications/migration.sql', 'apps/api/src/files/files.service.ts', 'apps/api/src/files/files.controller.ts', 'apps/api/src/files/files.module.ts', 'apps/api/src/files/output-publication.ts', 'apps/api/src/files/output-publication.service.ts', 'apps/api/src/files/output-publication.controller.ts', 'apps/api/src/files/output-publication.dto.ts', 'apps/api/src/orders/orders.service.ts', 'apps/api/src/qc/qc.service.ts', 'apps/api/src/qc/dto/qc.dto.ts'];
@@ -208,6 +209,10 @@ try {
   await db.orderFile.update({ where: { id: output1.id }, data: { scanStatus: 'clean', purgedAt: new Date() } });
   await request(`/files/${output1.id}/signed-url`, customer, 'GET', undefined, 403);
   report.cases.push('manual_legacy_route_cannot_bypass_new_qc_and_quarantined_or_purged_files_remain_blocked');
+  if (publicationUi) {
+    const { verifyPublicationBrowser } = await import('../../apps/web/scripts/zeus-publication-browser.mjs');
+    report.publicationBrowser = await verifyPublicationBrowser({ db, storage, origin, customer, executor, password, serviceId: service.id, noChecklistServiceId: noQc.id, root });
+  }
   assert.deepEqual(await snapshot(financialTables), moneyBefore);
   report.cases.push('all_wallet_payment_escrow_and_ledger_rows_are_unchanged_by_file_acceptance');
   assert.deepEqual(hashes(), report.sourceHashes);
